@@ -99,7 +99,6 @@ class StudentLogin extends Controller
             ],
             [
                 'name' => $socialUser->getName(),
-                'contact' => null,
                 'password' => bcrypt(str()->random(16)), // Random password
                 'image' => $socialUser->getAvatar(),
                 'status' => 'Active',
@@ -122,7 +121,6 @@ class StudentLogin extends Controller
             ],
             [
                 'name' => $socialUser->getName(),
-                'contact' => null,
                 'password' => bcrypt(str()->random(16)), // Random password
                 'image' => $socialUser->getAvatar(),
                 'status' => 'Active',
