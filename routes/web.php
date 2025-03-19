@@ -230,6 +230,7 @@ Route::middleware(['auth'])->group(function()
 		Route::get('/paper/view/{id}', 'view')->name('paper.view');
 		Route::get('/paper/exam/{id}', 'exam')->name('paper.exam');
 		Route::get('/paper/solution/{id}', 'solution')->name('paper.solution');
+		Route::get('/paper/solution-ajax/{id}', 'solutionAjax')->name('paper.solution.ajax');
 		Route::get('/paper/result/{id}', 'result')->name('paper.result');
 		Route::get('/paper/result/csv/{id}', 'resultCsv')->name('paper.result.csv');
 		Route::get('/paper/copy/{id}', 'copy')->name('paper.copy');
@@ -251,6 +252,7 @@ Route::middleware(['auth'])->group(function()
 		Route::get('student/send_verify/{id}', 'sendVerifyEmail')->name('send.verify.email');
 
 		Route::post('student.search', 'search')->name('student.search');
+		Route::get('student/login-by-id/{id}', 'loginById')->name('student.login-by-id');
 	});
 
 	Route::controller(SyllabusCtrl::class)->group(function()

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\SourceCtrl;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use App\Models\Filter;
@@ -287,9 +288,21 @@ class PaperCtrl extends Controller
     public function solution($id)
     {
         $paper = Paper::find($id);
-        $questions = $paper->questions()->paginate(20);
 
-        return view('layouts.papers.solution', compact('paper', 'questions'));
+        return view('layouts.papers.solution', compact('paper'));
+    }
+
+    public function solutionAjax($id)
+    {
+        $source = new SourceCtrl;
+        $paper = Paper::find($id);
+        $questions = $paper->questions()->with('mcqitems')->paginate(15);
+
+        return response()->json([
+            'success' => true,
+            'questions' => $questions,
+            'format' => $source->mcqlist()[$paper->format ?? 0]
+        ], 200);
     }
 
     public function result($id)

@@ -68,7 +68,7 @@ function check($id)
                   <th>Status</th>
                   <th>Created By</th>
                   <th>Created On</th>
-                  <th width="150">Action</th>
+                  <th width="180">Action</th>
                 </tr>
               </thead>
 
@@ -94,8 +94,8 @@ function check($id)
                 <td>
                   <a href="{{route('student.show', $value->id)}}" class="btn btn-info" title="User Details"><i class="fa fa-file-text"></i></a>
                   <a href="{{route('student.edit', $value->id)}}" class="btn btn-warning" title="Edit this User"><i class="fa fa-edit"></i></a>
-                  @if($value->status == 1)
-                  {{-- <a href="/admin/user_login/{{$value->email}}" class="label label-success" title="Login to this account" target="_blank"><i class="fa fa-search-plus"></i></a> --}}
+                  @if(Auth::user()->AuthorizeRoles(['SuperAdmin', 'Admin']))
+                  <a href="{{route('student.login-by-id', $value->id)}}" class="btn btn-success" title="Login to this account" target="_blank"><i class="fa fa-user"></i></a>
                   @endif
                   @if($value->status == 'Inactive')
                   <a href="{{route('send.verify.email', $value->id)}}" class="btn btn-default" onclick="return confirm('Are you sure you want to resend email verification to this student?')" title="Resend verification email."><i class="fa fa-envelope-o"></i></a>

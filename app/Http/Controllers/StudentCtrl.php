@@ -496,4 +496,14 @@ class StudentCtrl extends Controller
 
         return view('layouts.students.index', compact('students'));
     }
+
+    // login to the student panel
+    public function loginById($id)
+    {
+        $user = Student::find($id);
+
+        Auth::guard('student')->loginUsingId($user->id);
+    
+        return redirect()->intended(route('students.my-course'));
+    }
 }

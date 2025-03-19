@@ -198,11 +198,11 @@ if($exam)
         '<button class="btn btn-success" onclick="showNextQuestion(this)">Next <i class="fa fa-long-arrow-right"></i></button>'+
       '</div>':'';
       
-      e.mcqitems.forEach(i => {
+      e.mcqitems.forEach((i, n) => {
         mcqs += '<li>'+
           '<label class="">'+
             '<input onclick="answer(this)" type="radio" name="'+e.id+'" id="'+e.id+i.id+'" check="0" value="'+i.id+'"/>'+
-            '<span> {{$source->mcqlist()[$paper->format][1]}} '+i.item+'</span>'+
+            '<span> '+data.format[n]+' '+i.item+'</span>'+
             '</label>'+
           '</li>';
       });

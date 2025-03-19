@@ -295,6 +295,7 @@ class StudentHomeCtrl extends Controller
   // return quesiton on ajax request
   public function getQuestions($paper_id)
   {
+    $source = new SourceCtrl;
     // serve questions according to the paper
     $paper = Paper::find($paper_id);
     $questions = $paper->questions()->select('id', 'title')->with('mcqitems')->paginate(5);
@@ -310,6 +311,7 @@ class StudentHomeCtrl extends Controller
       [
         'success' => $success,
         'questions' => $questions,
+        'format' => $source->mcqlist()[$paper->format ?? 0]
       ]
     );
   }

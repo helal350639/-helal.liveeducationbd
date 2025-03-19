@@ -1,4 +1,4 @@
-<footer class="main-footer">
+<footer class="main-footer" id="footer">
     <strong>Copyright &copy; <script> document.write(new Date().getFullYear()) </script> <a href="{{ url('/') }}">
       {{ config('app.name', 'Laravel') }}</a>.</strong> All rights reserved.
   </footer>
