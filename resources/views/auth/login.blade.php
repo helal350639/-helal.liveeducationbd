@@ -18,7 +18,6 @@
         <div class="login-box-body">
           <p class="login-box-msg">
           <img src="/img/logo.png?v=3008" alt=""><br><br>ADMIN LOGIN</p>
-
           <form action="{{ route('login.post') }}" method="POST" style="margin-bottom:15px">
             @csrf
             <div class="form-group">
