@@ -56,8 +56,10 @@ function position($user_mark, $total_marks)
         $marks = $paper->questions->count() * $paper->mark;
         @endphp
         <div class="col-md-6 col-md-offset-3 result no-padding" id="result">
-          <div class="panel" style="text-align: center">
-            <img src="/img/logo.png" alt="" style="max-width:100px">
+          <div class="panel">
+            <div style="text-align: center">
+              <img src="/img/logo.png" alt="" style="max-width:100px">
+            </div>
             @if($paper->banner)
             <img src="{{$paper->banner}}" alt="" style="width:100%">
             @endif

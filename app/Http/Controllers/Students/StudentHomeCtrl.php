@@ -344,18 +344,28 @@ class StudentHomeCtrl extends Controller
     {
       array_push($marks, $x->mark);
 
-      $max_mark = $paper->questions->count() * $paper->mark;
-      $user_mark = $x->correct * $paper->mark;
-      $minus = $x->wrong * $paper->minus;
-      $actual_mark = $user_mark - $minus;
-      $percent =  $actual_mark / $max_mark * 100;
-      if($percent > 40)
-      {
-        $passed++;
-      }
+      // $max_mark = $paper->questions->count() * $paper->mark;
+      // $user_mark = $x->correct * $paper->mark;
+      // $minus = $x->wrong * $paper->minus;
+      // $actual_mark = $user_mark - $minus;
+      // $percent =  $actual_mark / $max_mark * 100;
+      // if($percent > 40)
+      // {
+      //   $passed++;
+      // }
     }
 
-    $candidates = $all_exams->count();
+    $candidates = 0;
+    if($paper->candidate)
+    {
+      $candidates = $paper->candidate;
+    }
+    else
+    {
+      $candidates = $all_exams->count();
+    }
+
+    $passed = $candidates * 80 / 100;
     
     if($paper->result_view == 'Yes' || $paper->result_at < date('Y-m-d H:i:s'))
     {
@@ -366,7 +376,7 @@ class StudentHomeCtrl extends Controller
       $result['message'] = 'Yes';
     }
 
-    return view('student-panel.result', compact('exams', 'paper', 'result', 'passed', 'candidates', 'marks'));
+    return view('student-panel.result', compact('exams', 'paper', 'result', 'passed', 'marks'));
   }
 
   public function examPaper($id)
