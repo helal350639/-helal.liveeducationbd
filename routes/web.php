@@ -187,6 +187,7 @@ Route::middleware(['auth'])->group(function()
 	Route::resource('exam', 'ExamCtrl');
 	Route::resource('page', 'PageCtrl');
 	Route::resource('routine', 'RoutineCtrl');
+	Route::resource('sms', 'SmsCtrl');
 
 	/** -------------------- Custom Routes ------------------ */
 	Route::controller(DepartmentCtrl::class)->group(function()
@@ -240,6 +241,7 @@ Route::middleware(['auth'])->group(function()
 	Route::controller(BatchCtrl::class)->group(function()
 	{
 		Route::get('get_batches/{batch_id}', 'getBatches');
+		Route::get('batch_send_sms/{id}', 'sendSMS')->name('batch.sms');
 	});
 
 	Route::controller(StudentCtrl::class)->group(function()
@@ -270,8 +272,14 @@ Route::middleware(['auth'])->group(function()
 		Route::get('/exam/paper/{exam_id}', 'paper')->name('exam.paper');
 	});
 
-	Route::controller(ComplainCtrl::class)->group(function(){
+	Route::controller(ComplainCtrl::class)->group(function()
+	{
 		Route::post('/complain-reply', 'reply')->name('complain.reply');
+	});
+
+	Route::controller(SmsCtrl::class)->group(function()
+	{
+		Route::post('sms/confirm', 'confirm')->name('sms.confirm');
 	});
 	
 });

@@ -24,9 +24,12 @@ $source = new SourceCtrl;
             <h4 class="box-title">Batch Information</h4>
           </div>
           <div class="col-md-12 text-right toolbar-icon">
+            <button id="text" title="Copy URL" class="btn btn-default btn-sm" onclick="handleClick();" href="{{route('home.course.show', $batch->id)}}"><i class="fa fa-copy"></i> Copy URL </button>
             <a href="{{route('batch.create')}}" title="Add New" class="label label-info"><i class="fa fa-plus"></i></a>
             <a href="{{route('batch.index')}}" title="List" class="label label-success"><i class="fa fa-list"></i></a>
             <a href="{{route('batch.edit', $batch->id)}}" class="label label-warning" title="Edit this"><i class="fa fa-edit"></i></a>
+
+            <a href="{{route('batch.sms', $batch->id)}}" class="label label-primary" title="Send SMS"><i class="fa fa-envelope"></i></a>
             
           </div>
           <div class="col-md-12">
@@ -121,5 +124,22 @@ $source = new SourceCtrl;
       </div><!-- /.box -->
     </div><!--/.col (left) -->
   </section><!-- /.content -->
+
+  <script>
+    function copyToClipBoard(str){
+    const element = document.createElement('textarea');
+    element.value = str;
+    document.body.appendChild(element);
+    element.select();
+    document.execCommand('copy');
+    document.body.removeChild(element);
+    alert('Link Copied to the clipboard');
+  }
+
+  function handleClick(){
+    let text = document.querySelector('#text');
+    copyToClipBoard(text.getAttribute('href'));
+  }
+  </script>
    
 @endsection

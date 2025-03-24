@@ -336,15 +336,24 @@ class StudentHomeCtrl extends Controller
     $all_exams = Exam::orderBy('mark', 'DESC')
     ->where('paper_id', $paper->id)
     ->get();
-    foreach($all_exams as $key => $value)
+
+    $marks = [];
+
+    $passed = 0;
+    foreach($all_exams as $x)
     {
-      if($user->id == $value->student_id)
+      array_push($marks, $x->mark);
+
+      $max_mark = $paper->questions->count() * $paper->mark;
+      $user_mark = $x->correct * $paper->mark;
+      $minus = $x->wrong * $paper->minus;
+      $actual_mark = $user_mark - $minus;
+      $percent =  $actual_mark / $max_mark * 100;
+      if($percent > 40)
       {
-        $position = $key+1;
-        break;
+        $passed++;
       }
     }
-    // dd($position);
 
     $candidates = $all_exams->count();
     
@@ -357,7 +366,7 @@ class StudentHomeCtrl extends Controller
       $result['message'] = 'Yes';
     }
 
-    return view('student-panel.result', compact('exams', 'paper', 'result', 'position', 'candidates'));
+    return view('student-panel.result', compact('exams', 'paper', 'result', 'passed', 'candidates', 'marks'));
   }
 
   public function examPaper($id)

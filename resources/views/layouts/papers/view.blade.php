@@ -65,13 +65,27 @@ $source = New SourceCtrl;
 @endsection
 @section('scripts')
 <script>
-  function copyUrl() {
-      var range = document.createRange();
-      range.selectNode(document.getElementById("exam-url"));
-      window.getSelection().removeAllRanges(); // clear current selection
-      window.getSelection().addRange(range); // to select text
-      document.execCommand("copy");
-      window.getSelection().removeAllRanges();// to deselect
+  // function copyUrl() {
+  //     var range = document.createRange();
+  //     range.selectNode(document.getElementById("exam-url"));
+  //     window.getSelection().removeAllRanges(); // clear current selection
+  //     window.getSelection().addRange(range); // to select text
+  //     document.execCommand("copy");
+  //     window.getSelection().removeAllRanges();// to deselect
+  // }
+
+  function copyToClipBoard(str){
+    const element = document.createElement('textarea');
+    element.value = str;
+    document.body.appendChild(element);
+    element.select();
+    document.execCommand('copy');
+    document.body.removeChild(element);
+  }
+
+  function handleClick(){
+    let text = document.querySelector('#text');
+    copyToClipBoard(text.getAttribute('href'));
   }
 </script>
 @endsection

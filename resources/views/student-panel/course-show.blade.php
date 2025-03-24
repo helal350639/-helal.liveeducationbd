@@ -103,7 +103,7 @@ $value = $batch;
               <div class="penel-heading no-padding" style="text-align: center;">
                 @if($value->video)
                 <div class="videoWrapper">
-                  <iframe class="responsive-iframe" style="width: 100%; height:100%; border:5px solid #fff" src="https://www.youtube.com/embed/{{$value->video}}" allowfullscreen></iframe>
+                  <iframe class="responsive-iframe" style="width: 100%; height:100%; border:5px solid #fff" src="https://www.youtube.com/embed/{{$value->video}}?autoplay=1&mute=1" allowfullscreen ></iframe>
                 </div>
                 @else
                 <img class="course-image" src="{{ $value->banner? $value->banner : '/img/course.png'}}" alt="" />
