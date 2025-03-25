@@ -74,7 +74,7 @@ function position($user_mark, $total_marks)
             <div class="col-xs-6 no-padding">
               <div class="items">
                 মোট পরীক্ষার্থীর সংখ্যা<br>
-                <i class="fa fa-users"></i> {{$paper->candidate? $paper->candidate:$candidates}}
+                <i class="fa fa-users"></i> {{$candidates}}
               </div>
             </div>
             <div class="col-xs-6 no-padding">
