@@ -7,6 +7,8 @@ $exam_index = $exams->count();
 
 function position($user_mark, $total_marks)
 {
+  $user_mark = number_format($user_mark);
+  
   if($user_mark > 0)
   {
   $arr = range(1, $total_marks);

@@ -347,7 +347,7 @@ class StudentHomeCtrl extends Controller
       $candidates = count($marks);
     }
 
-    $passed = $candidates * 80 / 100;
+    $passed = number_format($candidates * 80 / 100);
     
     if($paper->result_view == 'Yes' || $paper->result_at < date('Y-m-d H:i:s'))
     {
