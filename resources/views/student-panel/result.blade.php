@@ -51,9 +51,9 @@ function position($user_mark, $candidates, $marks)
       @if(isset($result['result']))
       <div class="row">
         @foreach($exams as $key => $value)
-        @php
-        // $user_mark = number_format($value->mark);
-        $user_mark = number_format($value->mark/($paper->questions->count()*$paper->mark)*100);
+        @php        
+        $total_mark = $paper->questions->count() * $paper->mark;
+        $user_mark = number_format($value->mark / $total_mark * 100);
         @endphp
         <div class="col-md-6 col-md-offset-3 result no-padding" id="result">
           <div class="panel">
@@ -112,7 +112,7 @@ function position($user_mark, $candidates, $marks)
             <div class="col-xs-6 no-padding">
               <div class="items">
                 আপনার অবস্থান<br>
-                {{position($user_mark, $candidates, $paper->questions->count() * $paper->mark)}}
+                {{position($user_mark, $candidates, $total_mark)}}
               </div>
             </div>
             <div class="panel-body">
