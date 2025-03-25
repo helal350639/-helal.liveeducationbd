@@ -333,9 +333,9 @@ class StudentHomeCtrl extends Controller
       $exams = Exam::where('student_id', $user->id)->where('paper_id', $id)->orderBy('id', 'DESC')->limit(1)->get();
     }
 
-    $marks = Exam::orderBy('mark', 'DESC')
+    $allExams = Exam::orderBy('mark', 'DESC')
     ->where('paper_id', $paper->id)
-    ->pluck('mark')->toArray();
+    ->count();
 
     $candidates = 0;
     if($paper->candidate)
@@ -344,7 +344,7 @@ class StudentHomeCtrl extends Controller
     }
     else
     {
-      $candidates = count($marks);
+      $candidates = $allExams;
     }
 
     $passed = number_format($candidates * 80 / 100);
@@ -358,7 +358,7 @@ class StudentHomeCtrl extends Controller
       $result['message'] = 'Yes';
     }
 
-    return view('student-panel.result', compact('exams', 'paper', 'result', 'passed', 'marks', 'candidates'));
+    return view('student-panel.result', compact('exams', 'paper', 'result', 'passed', 'candidates'));
   }
 
   public function examPaper($id)

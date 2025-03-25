@@ -5,16 +5,19 @@ $user = Auth::guard('student')->user();
 $percentage = $score = 0;
 $exam_index = $exams->count();
 
-function position($user_mark, $total_marks)
+function position($user_mark, $candidates, $marks)
 {
-  $user_mark = number_format($user_mark);
+  $user_mark = number_format($user_mark/$marks*100);
+  // dd($user_mark);
   
   if($user_mark > 0)
   {
-  $arr = range(1, $total_marks);
-  rsort($arr);
-  $rank = array_search($user_mark, $arr)+1;
-  return $rank;
+    // $candidates = 100;
+    $arr = range(1, $candidates);
+    rsort($arr);
+    // dd($arr);
+    $rank = array_search($user_mark, $arr)+1;
+    return $rank;
   }
   return 0;
 }
@@ -55,7 +58,6 @@ function position($user_mark, $total_marks)
         @foreach($exams as $key => $value)
         @php
         $user_mark = number_format($value->mark);
-        $marks = $paper->questions->count() * $paper->mark;
         @endphp
         <div class="col-md-6 col-md-offset-3 result no-padding" id="result">
           <div class="panel">
@@ -114,7 +116,7 @@ function position($user_mark, $total_marks)
             <div class="col-xs-6 no-padding">
               <div class="items">
                 আপনার অবস্থান<br>
-                {{position($user_mark, $marks)}}
+                {{position($user_mark, $candidates, $paper->questions->count() * $paper->mark)}}
               </div>
             </div>
             <div class="panel-body">
