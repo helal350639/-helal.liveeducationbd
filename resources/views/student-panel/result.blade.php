@@ -6,7 +6,7 @@ $percentage = $score = 0;
 $exam_index = $exams->count();
 
 function position($user_mark, $candidates, $marks)
-{  
+{
   if($user_mark > 0)
   {
     $arr = range(1, $candidates);
@@ -53,7 +53,7 @@ function position($user_mark, $candidates, $marks)
         @foreach($exams as $key => $value)
         @php        
         $total_mark = $paper->questions->count() * $paper->mark;
-        $user_mark = number_format($value->mark / $total_mark * 100);
+        $user_mark = number_format($value->mark / $total_mark * $paper->candidate);
         @endphp
         <div class="col-md-6 col-md-offset-3 result no-padding" id="result">
           <div class="panel">
