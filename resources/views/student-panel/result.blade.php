@@ -6,16 +6,11 @@ $percentage = $score = 0;
 $exam_index = $exams->count();
 
 function position($user_mark, $candidates, $marks)
-{
-  $user_mark = number_format($user_mark/$marks*100);
-  // dd($user_mark);
-  
+{  
   if($user_mark > 0)
   {
-    // $candidates = 100;
     $arr = range(1, $candidates);
     rsort($arr);
-    // dd($arr);
     $rank = array_search($user_mark, $arr)+1;
     return $rank;
   }
@@ -57,7 +52,8 @@ function position($user_mark, $candidates, $marks)
       <div class="row">
         @foreach($exams as $key => $value)
         @php
-        $user_mark = number_format($value->mark);
+        // $user_mark = number_format($value->mark);
+        $user_mark = number_format($value->mark/($paper->questions->count()*$paper->mark)*100);
         @endphp
         <div class="col-md-6 col-md-offset-3 result no-padding" id="result">
           <div class="panel">
@@ -102,13 +98,13 @@ function position($user_mark, $candidates, $marks)
             <div class="col-xs-6 no-padding">
               <div class="items">
                 আপনার ফলাফল<br>
-                @if($percentage > 80)
+                @if($user_mark > 80)
                 <label class="label label-success">Extra Ordinary</label>
-                @elseif($percentage > 60)
+                @elseif($user_mark > 60)
                 <label class="label label-info">Very Good</label>
-                @elseif($percentage > 40)
+                @elseif($user_mark > 40)
                 <label class="label label-warning">Good</label>
-                @elseif($percentage < 40)
+                @elseif($user_mark < 40)
                 <label class="label label-danger">Learner</label>
                 @endif
               </div>
