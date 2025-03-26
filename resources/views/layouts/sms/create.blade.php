@@ -50,7 +50,7 @@
                     <div class="form-group">
                         <label for="details">SMS Details</label>
                         <textarea class="form-control" name="details" id="details" rows="5" required onkeyup="charCount(this)"></textarea>
-                        <p style="color: red">160 Characters = 1 SMS | <b>Character Count: <span id="char_count">160</span></b> | SMS Count: <span id="sms_count">1/2</span></p>
+                        <p style="color: red">160 Characters = 1 SMS | <b>Character Count: <span id="char_count">160</span></b> | SMS Count: <span id="sms_count">1</span></p>
                     </div>
                 </div>
                 <div class="col-md-12">
@@ -75,10 +75,11 @@
     {
         let char_count = document.getElementById('char_count');
         let sms_count = document.getElementById('sms_count');
-
-        smsCount = (e.value.length / 160).toFixed(0);
-        sms_count.innerHTML = (smsCount == 0 ? 1: smsCount);
+        
         char_count.innerHTML = e.value.length;
+
+        smsCount = Math.ceil(e.value.length / 160);
+        sms_count.innerHTML = smsCount;
     }
     function getStudents(e)
     {
