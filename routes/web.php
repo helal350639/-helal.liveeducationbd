@@ -280,6 +280,8 @@ Route::middleware(['auth'])->group(function()
 	Route::controller(SmsCtrl::class)->group(function()
 	{
 		Route::post('sms/confirm', 'confirm')->name('sms.confirm');
+		//this route for ajax call
+		Route::get('sms/batch_student/{batch_ids}', 'getBatchStudents')->name('sms.batch.student');
 	});
 	
 });

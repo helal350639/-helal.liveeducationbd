@@ -125,13 +125,16 @@ if($complains)
         </li>
 
         <li class="treeview">
-          <a href="{{route('sms.create')}}">
+          <a href="#">
             <i class="fa fa-envelope"></i>
-            <span>Send SMS</span>
+            <span>SMS</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>
           </a>
+          <ul class="treeview-menu">
+            <li><a href="{{route('sms.create')}}"><i class="fa fa-send"></i> Send SMS</a></li>
+          </ul>
         </li>
 
 
