@@ -16,6 +16,7 @@ use App\Models\Department;
 use App\Models\Group;
 use App\Models\Student;
 use App\Models\Exam;
+use App\Models\Choice;
 use Auth;
 use Image;
 use Toastr;
@@ -449,5 +450,54 @@ class PaperCtrl extends Controller
         
         Session::flash('success', 'The question paper successfully copied.');
         return redirect()->route('paper.show', $paper->id);
+    }
+
+    /** re-check result */
+    public function reCheckResult($exam_id)
+    {
+        $exam = Exam::find($exam_id);
+        $paper = Paper::find($exam->paper_id);
+        $questions = $paper->questions()
+        ->leftJoin('mcq_items', 'mcq_items.question_id', 'questions.id')
+        ->whereNotNull('mcq_items.correct_answer')
+        ->pluck('mcq_items.id', 'mcq_items.question_id')
+        ->toArray();
+        $choices = Choice::where('exam_id', $exam_id);
+        $correct_mcqs = $choices->pluck('mcq_id', 'question_id')->toArray();
+
+        $correct = $wrong = 0;
+
+        foreach ($questions as $key => $value) {
+            if (array_key_exists($key, $correct_mcqs)) {
+                if ($correct_mcqs[$key] === $value) {
+                    $correct++;
+                } else {
+                    $wrong++;
+                }
+            }
+        }
+
+        $total_questions = count($questions);
+        $answered = $correct + $wrong;
+        $no_answered = $total_questions - $answered;
+        $total_mark = ($correct * $paper->mark) - ($wrong * $paper->minus);
+
+        try{
+            Exam::where('id', $exam_id)->update([
+                'answer' => $answered,
+                'correct' => $correct,
+                'wrong' => $wrong,
+                'no_answer' => $no_answered,
+                'mark' => $total_mark
+            ]);
+        }
+        catch(\Exception $e)
+        {
+            return $e->getMessage();
+        }
+
+        Session::flash('success', 'The exam result updated');
+
+        return redirect()->route('paper.exam', $paper->id);
     }
 }

@@ -236,6 +236,7 @@ Route::middleware(['auth'])->group(function()
 		Route::get('/paper/result/csv/{id}', 'resultCsv')->name('paper.result.csv');
 		Route::get('/paper/copy/{id}', 'copy')->name('paper.copy');
 		Route::post('/paper/copy-store', 'copyStore')->name('paper.copy.store');
+		Route::get('/paper/recheck_result/{id}', 'reCheckResult')->name('paper.recheck.result');
 	});
 
 	Route::controller(BatchCtrl::class)->group(function()

@@ -45,14 +45,13 @@ $source = New SourceCtrl;
                   <th>Department</th>
                   <th>Start & End Time</th>
                   <th>Status</th>
-                  <th>Actions</th>
                   {{-- <th style="text-align: right">Correct</th>
                   <th style="text-align: right">Wrong</th>
-                  <th style="text-align: right">Blank</th>
-                  <th style="text-align: right">Total Mark</th> --}}
+                  <th style="text-align: right">Blank</th> --}}
+                  <th style="text-align: right">Total Mark</th>
+                  <th>Actions</th>
                 </tr>
                 @foreach($exams as $key => $value)
-                {{-- <tr style="color:{{in_array($value->student->id, $students)?'':'red'}}"> --}}
                 <tr>
                   <td>{{$key+1}}</td>
                   <td>{{$value->student->name}}</td>
@@ -68,8 +67,8 @@ $source = New SourceCtrl;
                   </td>
                   {{-- <td style="text-align: right">{{$value->correct}}</td>
                   <td style="text-align: right">{{$value->wrong}}</td>
-                  <td style="text-align: right">{{$value->no_answer}}</td>
-                  <td style="text-align: right">{{$value->mark}}</td> --}}
+                  <td style="text-align: right">{{$value->no_answer}}</td> --}}
+                  <td style="text-align: right">{{$value->mark}}</td>
                   <td>
                     <a class="btn btn-info btn-sm" href="{{route('exam.paper', $value->id)}}"><i class="fa fa-th"></i></a>
                     @if(Auth::user()->authorizeRoles(['SuperAdmin']))
@@ -78,6 +77,9 @@ $source = New SourceCtrl;
                       @method('DELETE')
                       <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this one? If you delete this exam, the candidate will lose his/her result that\'s will not get back later.')" title="Delete This!"><i class="fa fa-trash"></i></button>
                     </form>
+                    @endif
+                    @if($value->mark == 0)
+                    {{-- <a class="btn btn-success btn-sm" href="{{route('exam.paper', $value->id)}}" title="Re-Check Result"><i class="fa fa-check"></i></a> --}}
                     @endif
                   </td>
                 </tr>

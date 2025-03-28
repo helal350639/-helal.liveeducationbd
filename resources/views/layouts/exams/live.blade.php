@@ -48,7 +48,6 @@ $source = New SourceCtrl;
                   <th>Actions</th>
                 </tr>
                 @foreach($exams as $key => $value)
-                {{-- <tr style="color:{{in_array($value->student->id, $students)?'':'red'}}"> --}}
                 <tr>
                   <td>{{$key+1}}</td>
                   <td>{{$value->student->name}}</td>

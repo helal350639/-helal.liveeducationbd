@@ -35,7 +35,7 @@ $source = New SourceCtrl;
       <div class="box box-body table-responsive no-padding">
         <table id="print" class="table table-bordered table-hover">
           <tr>
-            <th colspan="8">
+            <th colspan="12">
               @if($paper->banner)
               <img src="{{$paper->banner}}" alt="" style="width:100%" />
               @endif
@@ -53,13 +53,14 @@ $source = New SourceCtrl;
             <th>Department</th>
             <th>Start & End Time</th>
             <th>Status</th>
-            <th>Actions</th>
-            {{-- <th style="text-align: right">Correct</th>
+            <th style="text-align: right">Correct</th>
             <th style="text-align: right">Wrong</th>
             <th style="text-align: right">Blank</th>
-            <th style="text-align: right">Total Mark</th> --}}
+            <th style="text-align: right">Total Mark</th>
+            <th>Actions</th>
           </tr>
           @foreach($exams as $key => $value)
+          @if($value->student)
           <tr style="color:{{in_array($value->student->id, $students)?'':'red'}}">
             <td>{{$key+1}}</td>
             <td>{{$value->student->name}}</td>
@@ -73,11 +74,12 @@ $source = New SourceCtrl;
               <label class="label label-success"> {{$value->status}}</label>
               @endif
             </td>
-            {{-- <td style="text-align: right">{{$value->correct}}</td>
+            <td style="text-align: right">{{$value->correct}}</td>
             <td style="text-align: right">{{$value->wrong}}</td>
             <td style="text-align: right">{{$value->no_answer}}</td>
-            <td style="text-align: right">{{$value->mark}}</td> --}}
+            <td style="text-align: right">{{$value->mark}}</td>
             <td>
+
               @if(Auth::user()->authorizeRoles(['SuperAdmin']))
               <form style="display: inline" action="{{route('exam.destroy', $value->id)}}" method="POST">
                 @csrf
@@ -85,8 +87,13 @@ $source = New SourceCtrl;
                 <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this one? If you delete this exam, the candidate will lose his/her result that\'s will not get back later.')" title="Delete This!"><i class="fa fa-trash"></i></button>
               </form>
               @endif
+
+              @if($value->mark == 0)
+              <a href="{{route('paper.recheck.result', $value->id)}}" title="View" class="btn btn-info btn-sm" title="Re-Check Result" onclick="return confirm('Are you sure, you want to update the result?')"><i class="fa fa-check"></i></a>
+              @endif
             </td>
           </tr>
+          @endif
           @endforeach
         </table>
       </div> <!-- /.box-body -->
