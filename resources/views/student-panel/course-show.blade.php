@@ -18,7 +18,9 @@ $value = $batch;
 <meta name="robots" content="index, follow, nocache"/>
 <meta name="googlebot" content="index, follow, max-video-preview:-1, max-image-preview:large, max-snippet:-1"/>
 <meta name="category" content="education"/>
+
 <meta property="fb:app_id" content="1360109555168118" />
+<meta property="og:type" content="video.other">
 <meta property="og:url" content="{{route('home.course.show', $batch->id)}}" />
 <meta property="og:title" content="{{$batch->name}}" />
 <meta property="og:description" content="{{substr($batch->short, 3, -4)}}" />
@@ -27,10 +29,8 @@ $value = $batch;
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta property="og:image:alt" content="{{$batch->name}}"/>
-<meta property="og:type" content="Online Education" />
 <meta property="og:site_name" content="Live Education BD" />
 
-<meta property="og:type" content="video.other">
 <meta property="og:video" content="https://www.youtube.com/embed/{{$value->video}}">
 <meta property="og:video:secure_url" content="https://www.youtube.com/embed/{{$value->video}}">
 <meta property="og:video:type" content="text/html">
