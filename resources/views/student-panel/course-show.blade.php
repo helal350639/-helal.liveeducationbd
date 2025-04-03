@@ -25,7 +25,8 @@ $value = $batch;
 <meta property="og:title" content="{{$batch->name}}" />
 <meta property="og:description" content="{{substr($batch->short, 3, -4)}}" />
 <meta property="og:logo" content="{{route('homepage').$batch->banner}}" />
-<meta property="og:image" content="{{route('homepage').$batch->banner}}" />
+{{-- <meta property="og:image" content="{{route('homepage').$batch->banner}}" /> --}}
+<meta property="og:image" content="https://img.youtube.com/vi/{{$value->video}}/maxresdefault.jpg">
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta property="og:image:alt" content="{{$batch->name}}"/>
