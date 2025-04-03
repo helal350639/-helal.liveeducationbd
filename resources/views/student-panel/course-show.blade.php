@@ -20,18 +20,22 @@ $value = $batch;
 <meta name="category" content="education"/>
 <meta property="fb:app_id" content="1360109555168118" />
 <meta property="og:url" content="{{route('home.course.show', $batch->id)}}" />
-<meta property="og:video" content="https://www.youtube.com/embed/{{$value->video}}">
-
 <meta property="og:title" content="{{$batch->name}}" />
-<meta property="og:description" content="{{$batch->short}}" />
+<meta property="og:description" content="{{substr($batch->short, 3, -4)}}" />
 <meta property="og:logo" content="{{route('homepage').$batch->banner}}" />
 <meta property="og:image" content="{{route('homepage').$batch->banner}}" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta property="og:image:alt" content="{{$batch->name}}"/>
-<meta property="og:type" content="video.other"/>
 <meta property="og:type" content="Online Education" />
 <meta property="og:site_name" content="Live Education BD" />
+
+<meta property="og:type" content="video.other">
+<meta property="og:video" content="https://www.youtube.com/embed/{{$value->video}}">
+<meta property="og:video:secure_url" content="https://www.youtube.com/embed/{{$value->video}}">
+<meta property="og:video:type" content="text/html">
+<meta property="og:video:width" content="1280">
+<meta property="og:video:height" content="720">
 
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:site" content="@liveeducationbd"/>

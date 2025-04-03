@@ -53,7 +53,7 @@ $source = New SourceCtrl;
                 @foreach($mcqs as $mcq)
                 <tr>
                   <td>{{$mcq->id}}</td>
-                  <td>{!! $mcq->title !!}</td>
+                  <td>{{ $mcq->title }}</td>
                   <td>{{ $mcq->type }}</td>
                   <td>
                     @foreach($mcq->chapters as $val)
