@@ -20,6 +20,8 @@ $value = $batch;
 <meta name="category" content="education"/>
 <meta property="fb:app_id" content="1360109555168118" />
 <meta property="og:url" content="{{route('home.course.show', $batch->id)}}" />
+<meta property="og:video" content="https://www.youtube.com/embed/{{$value->video}}">
+
 <meta property="og:title" content="{{$batch->name}}" />
 <meta property="og:description" content="{{$batch->short}}" />
 <meta property="og:logo" content="{{route('homepage').$batch->banner}}" />
