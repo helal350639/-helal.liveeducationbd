@@ -32,8 +32,8 @@ $value = $batch;
 <meta property="og:image:alt" content="{{$batch->name}}"/>
 <meta property="og:site_name" content="Live Education BD" />
 
-{{-- <meta property="og:video" content="https://www.youtube.com/embed/{{$value->video}}"> --}}
-<meta property="og:video" content="https://www.youtube.com/watch?v={{$value->video}}">
+<meta property="og:video" content="https://www.youtube.com/embed/{{$value->video}}">
+{{-- <meta property="og:video" content="https://www.youtube.com/watch?v={{$value->video}}"> --}}
 <meta property="og:video:secure_url" content="https://www.youtube.com/embed/{{$value->video}}">
 <meta property="og:video:type" content="text/html">
 <meta property="og:video:width" content="1280">
