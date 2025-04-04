@@ -24,16 +24,15 @@ $value = $batch;
 <meta property="og:url" content="{{route('home.course.show', $batch->id)}}" />
 <meta property="og:title" content="{{$batch->name}}" />
 <meta property="og:description" content="{{substr($batch->short, 3, -4)}}" />
-<meta property="og:logo" content="{{route('homepage').$batch->banner}}" />
+{{-- <meta property="og:logo" content="{{route('homepage').$batch->banner}}" /> --}}
 {{-- <meta property="og:image" content="{{route('homepage').$batch->banner}}" /> --}}
 <meta property="og:image" content="https://img.youtube.com/vi/{{$value->video}}/maxresdefault.jpg">
-<meta property="og:image:width" content="1200" />
-<meta property="og:image:height" content="630" />
-<meta property="og:image:alt" content="{{$batch->name}}"/>
-<meta property="og:site_name" content="Live Education BD" />
+{{-- <meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" /> --}}
+{{-- <meta property="og:image:alt" content="{{$batch->name}}"/> --}}
+{{-- <meta property="og:site_name" content="Live Education BD" /> --}}
 
 <meta property="og:video" content="https://www.youtube.com/embed/{{$value->video}}">
-{{-- <meta property="og:video" content="https://www.youtube.com/watch?v={{$value->video}}"> --}}
 <meta property="og:video:secure_url" content="https://www.youtube.com/embed/{{$value->video}}">
 <meta property="og:video:type" content="text/html">
 <meta property="og:video:width" content="1280">
