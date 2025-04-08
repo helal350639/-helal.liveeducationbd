@@ -26,7 +26,7 @@ $source = New SourceCtrl;
                 <a href="{{route('question.create')}}" class="btn btn-info">
                   <i class="fa fa-plus"></i> Add Question
                 </a>
-                <form class="form-inline" style="display: inline;" action="{{route('question.search')}}" method="post">
+                <form class="form-inline" style="display: inline;" action="{{route('question.search')}}" method="GET">
                   @csrf
                 <div class="input-group input-group-sm" style="float:right; width: 150px;margin-left:15px">
                   <input type="text" name="search" class="form-control pull-right" placeholder="Search" required>

@@ -212,7 +212,7 @@ Route::middleware(['auth'])->group(function()
 		Route::get('view_question', 'viewQuestion')->name('question.view');
 		Route::post('question_view', 'viewQuestionPost')->name('question.view.post');
 		Route::post('check_question_exist', 'Questions')->name('questions.title');
-		Route::post('question_search', 'QuestionSearch')->name('question.search');
+		Route::get('question_search', 'QuestionSearch')->name('question.search');
 	});
 
 	Route::controller(ChapterCtrl::class)->group(function()
