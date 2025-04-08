@@ -40,20 +40,36 @@ $source = New SourceCtrl;
             </div>
             <!-- /.box-header -->
             <div class="box-body table-responsive no-padding">
-              <br>
+              <table id="example1" class="table table-bordered table-hover">
+                <tr>
+                  <th>Id</th>
+                  <th>Name</th>
+                  <th>Questions</th>
+                  <th>Department Name</th>
+                  <th>Batch Name</th>
+                  <th>Course Name</th>
+                  <th>Status</th>
+                  <th width="130">Action</th>
+                </tr>
               @foreach($syllabus as $key => $value)
-              <a href="{{route('syllabus.view', $value->id)}}">
-                <div class="col-md-6">
-                  <div class="panel panel-default">
-                    <div class="panel-heading input-group">
-                        <h4>({{$key+1}}) : <b> {{$value->name}}</b></h4>
-                        <span class="input-group-addon" title="Questions">{{$value->questions->count()}}</span>
-                      <div class="clearfix"></div>
-                    </div>
-                  </div>
-                </div>
-              </a>
+                <tr>
+                  <td>{{$key+1}}</td>
+                  <td>{{$value->name}}</td>
+                  <td>{{$value->questions->count()}}</td>
+                  <td>{{$value->department ? $value->department->name : ''}}</td>
+                  <td>{{$value->batch ? $value->batch->name : ''}}</td>
+                  <td>{{$value->course ? $value->course->name : ''}}</td>
+                  <td>
+                    <label class="text-{{$value->status == 'Published'? 'success':'warning'}}">{{$value->status}}</label>
+                  </td>
+                  <td>
+                    <a href="{{route('syllabus.add.question', ['syllabus', $value->id])}}" title="Add Questions" class="btn btn-info btn-sm"><i class="fa fa-plus"></i></a>
+                    <a class="btn btn-primary btn-sm" href="{{route('syllabus.view', $value->id)}}"><i class="fa fa-file"></i></a>
+                    <a class="btn btn-warning btn-sm" href="{{route('syllabus.edit', $value->id)}}"><i class="fa fa-gear"></i></a>
+                  </td>
+                </tr>
               @endforeach
+              </table>
             </div>
             <!-- /.box-body -->
             <div class="box-footer clearfix">
