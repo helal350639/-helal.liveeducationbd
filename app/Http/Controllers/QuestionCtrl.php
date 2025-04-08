@@ -756,5 +756,11 @@ class QuestionCtrl extends Controller
             'questions' => $questions
         ], 201);
     }
+
+    public function QuestionSearch(Request $request)
+    {
+        $mcqs = Question::where('title', 'like', '%'.$request->search.'%')->paginate(25);
+        return view('layouts.questions.index', compact('mcqs'));
+    }
     
 }
