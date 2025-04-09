@@ -293,7 +293,7 @@ $value = $batch;
                       <tr>
                         <th>{{$syllabus->name}}</th>
                         <td>
-                          @if($batch->students()->where('id', $student->id)->first())
+                          @if($student && $batch->students()->where('id', $student->id)->first())
                           <a class="btn btn-default" href="{{route('student.syllabus', $syllabus->id)}}"><i class="fa fa-eye"></i> View</a>
                             
                           <a href="{{route('students.syllabus.pdf', $syllabus->id)}}" class="btn btn-info"><i class="fa fa-download"></i> ডাউনলোড</a>
