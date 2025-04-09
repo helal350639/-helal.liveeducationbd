@@ -8,6 +8,7 @@ if($user)
   $student = \App\Models\Student::find($user->id);
 }
 $value = $batch;
+//
 
 @endphp
 @extends('student')
