@@ -64,7 +64,7 @@
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
-                        <label for="header">Header</label>
+                        <label for="header">Header (<span style="color:red">*</span>)</label>
                         <textarea class="form-control editor" name="header" id="header" rows="5"></textarea>
                     </div>
                 </div>

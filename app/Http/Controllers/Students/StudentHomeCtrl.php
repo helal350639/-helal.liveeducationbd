@@ -530,31 +530,37 @@ class StudentHomeCtrl extends Controller
         ->get()
         ->groupBy('question_id');
 
+        $qids = [];
+
         foreach ($questions as $data) {
           $departments = explode(',', $data->department_names);
           $subjects = explode(',', $data->subject_names);
           $chapters = explode(',', $data->chapter_names);
 
-          foreach ($departments as $department) {
-            if (!isset($groupedData[$department])) {
-              $groupedData[$department] = [];
-            }
-
-            foreach ($subjects as $subject) {
-              if (!isset($groupedData[$department][$subject])) {
-                $groupedData[$department][$subject] = [];
+            foreach ($departments as $department) {
+              if (!isset($groupedData[$department]) && !in_array($data->question_id, $qids)) {
+                $groupedData[$department] = [];
               }
 
-              foreach ($chapters as $chapter) {
-                if (!isset($groupedData[$department][$subject][$chapter])) {
-                  $groupedData[$department][$subject][$chapter] = [];
+              foreach ($subjects as $subject) {
+                if (!isset($groupedData[$department][$subject]) && !in_array($data->question_id, $qids)) {
+                  $groupedData[$department][$subject] = [];
                 }
 
-                $groupedData[$department][$subject][$chapter][$data->question_id] = [
-                  'question' => $data->question_title,
-                  'explain' => $data->explanation,
-                  'mcqs' => $mcqItems[$data->question_id] ?? []
-                ];
+                foreach ($chapters as $chapter) {
+                  if (!isset($groupedData[$department][$subject][$chapter]) && !in_array($data->question_id, $qids)) {
+                    $groupedData[$department][$subject][$chapter] = [];
+                  }
+
+                  if(!in_array($data->question_id, $qids)) {
+                    $groupedData[$department][$subject][$chapter][$data->question_id] = [
+                    'question' => $data->question_title,
+                    'explain' => $data->explanation,
+                    'mcqs' => $mcqItems[$data->question_id] ?? []
+                  ];
+                  
+                  array_push($qids, $data->question_id);
+                }
               }
             }
           }
@@ -563,6 +569,8 @@ class StudentHomeCtrl extends Controller
         // Sleep for a short time to reduce CPU spike
         usleep(100000); // 100 milliseconds
     });
+    // dd($groupedData);
+
     
     return [
       'syllabus' => $syllabus,
