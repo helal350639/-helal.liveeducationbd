@@ -38,13 +38,12 @@
     <div class="col-md-12">
       <div class="col-md-4">
         <br>
-        <img src="/img/logo.png" alt="" class="footer-logo">
+        <img src="/img/logo.png" alt="" class="footer-logo"><br><br>
         <ul class="social-icons">
           <!-- <li><a href="#" class="icon fa-twitter"><span class="label">Twitter</span></a></li> -->
           <li>
             <a target="_blank" href="https://www.facebook.com/saeonlineexamgroup?mibextid=ZbWKwL">
-              <div class="fa fa-facebook"></div>
-              <span class="label">Facebook</span>
+              <span class="label" style="border:1px solid #ddd; border-radius:10px"> <i class="fa fa-facebook"></i> </span> &nbsp;  Facebook
             </a>
           </li>
           <!-- <li><a href="#" class="icon fa-instagram"><span class="label">Instagram</span></a></li> -->
