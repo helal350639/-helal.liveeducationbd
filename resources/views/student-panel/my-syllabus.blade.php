@@ -65,7 +65,7 @@ if($user)
               <td>
                 @if($syllabus->pdf)
 
-                <a class="btn btn-default" href="{{$syllabus->pdf}}"><i class="fa fa-eye"></i> View</a>
+                {{-- <a class="btn btn-default" href="{{$syllabus->pdf}}"><i class="fa fa-eye"></i> View</a> --}}
                   
                 <a href="{{$syllabus->pdf}}" class="btn btn-info"><i class="fa fa-download"></i> ডাউনলোড</a>
 
