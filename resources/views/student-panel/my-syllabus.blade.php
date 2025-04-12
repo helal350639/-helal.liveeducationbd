@@ -84,9 +84,16 @@ if($user)
             <tr>
               <th>{{$syllabus->name}}</th>
               <td>
+                @if($syllabus->pdf)
+
+                  <a href="{{$syllabus->pdf}}" class="btn btn-info"><i class="fa fa-download"></i> ডাউনলোড</a>
+
+                @else
+
                 <a class="btn btn-default" href="{{route('student.syllabus', $syllabus->id)}}"><i class="fa fa-eye"></i> View</a>
                   
                 <a href="{{route('students.syllabus.pdf', $syllabus->id)}}" class="btn btn-info"><i class="fa fa-download"></i> ডাউনলোড</a>
+                @endif
               </td>
             </tr>
           @endforeach
