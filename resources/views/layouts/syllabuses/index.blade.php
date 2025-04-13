@@ -74,7 +74,7 @@ $source = New SourceCtrl;
             <!-- /.box-body -->
             <div class="box-footer clearfix">
               <div class="pagination-sm no-margin pull-right">
-                {{-- {{$syllabus->links()}} --}}
+                {{$syllabus->links()}}
               </div>
             </div>
           </div>

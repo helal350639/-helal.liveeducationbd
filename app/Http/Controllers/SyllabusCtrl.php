@@ -28,7 +28,7 @@ class SyllabusCtrl extends Controller
      */
     public function index()
     {
-        $syllabus = Syllabus::orderBy('id','DESC')->get();
+        $syllabus = Syllabus::orderBy('id','DESC')->paginate(25);
         return view('layouts.syllabuses.index', compact('syllabus'));
     }
     

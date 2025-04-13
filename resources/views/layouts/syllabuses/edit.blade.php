@@ -29,6 +29,11 @@ $value = $syllabus;
                 <a href="{{route('syllabus.create')}}" title="Add" class="label label-info"><i class="fa fa-plus"></i></a>
                 <a href="{{route('syllabus.index')}}" title="View" class="label label-success"><i class="fa fa-list"></i></a>
                 <a href="{{route('syllabus.view', $syllabus->id)}}" class="label label-primary" title="view"><i class="fa fa-file-text"></i></a>
+                <form style="display: inline" action="{{route('syllabus.destroy', $syllabus->id)}}" method="POST">
+                  @csrf
+                  @method('DELETE')
+                  <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this one?')"><i class="fa fa-trash"></i></button>
+                </form>
             </div>
         </div>
         <form action="{{route('syllabus.update', $value)}}" method="POST" enctype="multipart/form-data">
