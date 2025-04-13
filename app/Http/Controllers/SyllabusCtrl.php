@@ -200,19 +200,21 @@ class SyllabusCtrl extends Controller
             {
                 $data['routine'] = $source->uploadImage($data['routine'], 'routine/');
             }
+
+            // updated data to the database
             Syllabus::where('id', $id)->update($data);
 
-            if(File::exists($xsamplepdf))
+            if($request->hasFile('sample_pdf') && File::exists($xsamplepdf))
             {
                 File::delete($xsamplepdf);
             }
 
-            if(File::exists($xpdf))
+            if($request->hasFile('pdf') && File::exists($xpdf))
             {
                 File::delete($xpdf);
             }
             
-            if(File::exists($xroutine))
+            if($request->hasFile('routine') && File::exists($xroutine))
             {
                 File::delete($xroutine);
             }
@@ -237,16 +239,16 @@ class SyllabusCtrl extends Controller
     {
         if(Auth::user()->AuthorizeRoles('SuperAdmin'))
         {
-            $group = Group::find($id);
+            $syllabus = Syllabus::find($id);
 
             // delete all relationship
-            // $group->papers()->detach();
+            $syllabus->questions()->detach();
 
             //delete group table
-            $group->delete();
+            $syllabus->delete();
 
-            Session::flash('Success','The group successfully deleted');
-            return redirect()->route('group.index');
+            Session::flash('Success','The syllabus successfully deleted');
+            return redirect()->route('syllabus.index');
         }
 
         Session::flash('error', 'Permission restricted!');
