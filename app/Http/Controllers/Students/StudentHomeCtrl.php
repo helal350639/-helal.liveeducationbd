@@ -599,7 +599,7 @@ class StudentHomeCtrl extends Controller
 
     ini_set("pcre.backtrack_limit", "10000000");
     ini_set("pcre.recursion_limit", "10000000");
-    ini_set('max_execution_time', 60); // 60 seconds or higher
+    ini_set('max_execution_time', 120); // 60 seconds or higher
 
     $mpdf = new Mpdf([
       'mode' => 'utf-8',
