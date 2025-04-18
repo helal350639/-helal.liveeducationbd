@@ -14,7 +14,7 @@ $value = $batch;
 @extends('student')
 @section('title', 'Course')
 @section('stylesheets')
-<meta name="description" content="{{$batch->short}}"/>
+<meta name="description" content="{{$batch->subtitle}}"/>
 <meta name="keywords" content="{{$batch->name}}"/>
 <meta name="robots" content="index, follow, nocache"/>
 <meta name="googlebot" content="index, follow, max-video-preview:-1, max-image-preview:large, max-snippet:-1"/>
@@ -50,7 +50,7 @@ $value = $batch;
 <meta name="twitter:site" content="@liveeducationbd"/>
 <meta name="twitter:creator" content="@liveeducationbd"/>
 <meta name="twitter:title" content="{{$batch->name}}"/>
-<meta name="twitter:description" content="{{$batch->short}}"/>
+<meta name="twitter:description" content="{{$batch->subtitle}}"/>
 <meta name="twitter:image" content="{{route('homepage').$batch->banner}}"/>
 <meta name="twitter:image:width" content="1200"/>
 <meta name="twitter:image:height" content="630"/>
