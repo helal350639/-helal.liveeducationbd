@@ -124,6 +124,20 @@ if($complains)
           </a>
         </li>
 
+        {{-- <li class="treeview">
+          <a href="#">
+            <i class="fa fa-at"></i>
+            <span>Emails</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li><a href="{{route('email.create')}}"><i class="fa fa-pencil"></i> Compose Email</a></li>
+            <li><a href="{{route('email.index')}}"><i class="fa fa-list"></i> View Emails</a></li>
+          </ul>
+        </li> --}}
+
         <li class="treeview">
           <a href="#">
             <i class="fa fa-envelope"></i>

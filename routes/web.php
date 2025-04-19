@@ -188,6 +188,7 @@ Route::middleware(['auth'])->group(function()
 	Route::resource('page', 'PageCtrl');
 	Route::resource('routine', 'RoutineCtrl');
 	Route::resource('sms', 'SmsCtrl');
+	Route::resource('email', 'EmailCtrl');
 
 	/** -------------------- Custom Routes ------------------ */
 	Route::controller(DepartmentCtrl::class)->group(function()
@@ -284,6 +285,13 @@ Route::middleware(['auth'])->group(function()
 		Route::post('sms/confirm', 'confirm')->name('sms.confirm');
 		//this route for ajax call
 		Route::get('sms/batch_student/{batch_ids}', 'getBatchStudents')->name('sms.batch.student');
+	});
+
+	Route::controller(EmailCtrl::class)->group(function()
+	{
+		Route::post('email/confirm', 'confirm')->name('email.confirm');
+		//this route for ajax call
+		Route::get('email/batch_student/{batch_ids}', 'getBatchStudents')->name('email.batch.student');
 	});
 	
 });

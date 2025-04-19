@@ -80,7 +80,8 @@ $qcount = 0;
                     <div class="question">
                       <span style="display: inline-flex">
                         <span class="q_number">প্রশ্ন {{$qcount+1}}.</span>
-                        <span>{!! substr($questionData['question'], 3, -4) !!}</span>
+                        <span>{!! $questionData['question'] !!}</span>
+                        {{-- <span>{!! substr($questionData['question'], 3, -4) !!}</span> --}}
                       </span>
                       @php
                       $correct_ans = '';
@@ -104,8 +105,9 @@ $qcount = 0;
                       @if(isset($questionData['explain']))
                       <div class="explain">
                         <span class="exp-title">ব্যাখাঃ </span>
-                        {!! Str::substr($questionData['explain'], 3, -4) !!}</div>
-                        <br>
+                        {!! Str::substr($questionData['explain'], 3, -4) !!}
+                      </div>
+                      <br>
                       @endif
                     </div>
                     @endforeach
