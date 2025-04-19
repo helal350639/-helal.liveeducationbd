@@ -639,7 +639,7 @@ class StudentHomeCtrl extends Controller
 
     // $mpdf->Output(storage_path('app/mpdf/syllabus.pdf'), 'F');
 
-    $mpdf->Output($syllabus ? $syllabus->name : '----Syllabus', 'D');
+    $mpdf->Output($syllabus ? $syllabus->name.'.pdf' : '----Syllabus.pdf', 'D');
 
     // $mpdf->stream('document.pdf');
 

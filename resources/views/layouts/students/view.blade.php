@@ -66,6 +66,7 @@ $xids = $object->students()->pluck('id')->toArray();
                   <th>Name</th>
                   <th>Email</th>
                   <th>Contact</th>
+                  <th>Department</th>
                   {{-- <th>Status</th>
                   <th>Created On</th> --}}
                   <th width="110">Action</th>
@@ -80,6 +81,11 @@ $xids = $object->students()->pluck('id')->toArray();
                 <td>{{$value->name}}</td>
                 <td>{{$value->email}}</td>
                 <td>{{$value->contact}}</td>
+                <td>
+                  @foreach($value->departments as $department)
+                  <label class="label label-info">{{$department->name}}</label>
+                  @endforeach
+                </td>
                 {{-- <td>
                   @if($value->status == "Active")
                   <span class="label label-success">{{$value->status}}</span>
