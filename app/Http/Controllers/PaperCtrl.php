@@ -500,4 +500,17 @@ class PaperCtrl extends Controller
 
         return redirect()->route('paper.exam', $paper->id);
     }
+
+    /** detuch question from question paper */
+    public function detachQuestion($paperId, $qid)
+    {
+        $paper = Paper::find($paperId);
+
+        $paper->questions()->detach($qid);
+        return response()->json([
+            'success' => true
+            ]
+        );
+        // return 'I am responding from server with id:'.$qid;
+    }
 }

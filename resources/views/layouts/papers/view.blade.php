@@ -46,10 +46,22 @@ $source = New SourceCtrl;
             <div class="col-md-12">
               @foreach($paper->questions as $key => $value)
               <div class="panel">
-                <div style="display: inline; font-weight:bold;float:left; padding-right:10px">প্রশ্ন {{$key+1}}.</div><div style="display: inline">{!! $value->title !!}</div>
+                <div style="display: inline; font-weight:bold;float:left; padding-right:10px">প্রশ্ন {{$key+1}}.</div>
+                <div style="display: inline">{!! $value->title !!}
+                  <span style="float:right">
+                    <button class="btn btn-danger btn-xs" onclick="removeQuestion(this)" id="{{$value->id}}">
+                      <i class="fa fa-times"></i>
+                    </button>
+                  </span>
+                </div>
                 <ul class="mcqitems">
                   @foreach($value->mcqitems as $k => $val)
-                  <li><span><input type="radio" name="correct{{$value->id}}"></span><span> {{$source->mcqlist()[$paper->format][$k]}} </span>{{$val->item}}</li>
+                  <li style="{{$val->correct_answer ? 'color:green; font-weight:bolder' : ''}}">
+                    {{-- <span>
+                      <input type="radio" name="correct{{$value->id}}" />
+                    </span> --}}
+                    <span> {{$source->mcqlist()[$paper->format][$k]}} </span>{{$val->item}}
+                  </li>
                   @endforeach
                 </ul>
               </div>
@@ -65,14 +77,6 @@ $source = New SourceCtrl;
 @endsection
 @section('scripts')
 <script>
-  // function copyUrl() {
-  //     var range = document.createRange();
-  //     range.selectNode(document.getElementById("exam-url"));
-  //     window.getSelection().removeAllRanges(); // clear current selection
-  //     window.getSelection().addRange(range); // to select text
-  //     document.execCommand("copy");
-  //     window.getSelection().removeAllRanges();// to deselect
-  // }
 
   function copyToClipBoard(str){
     const element = document.createElement('textarea');
@@ -86,6 +90,27 @@ $source = New SourceCtrl;
   function handleClick(){
     let text = document.querySelector('#text');
     copyToClipBoard(text.getAttribute('href'));
+  }
+
+  // remove/detuch the question from question paper
+  function removeQuestion(e)
+  {
+    if(confirm('Are you sure, you want to remove this question from this paper?')){
+
+      $.ajax({
+        url: '/paper/detach/{{$paper->id}}/'+e.id,
+        type: 'GET',
+        success:function (data){
+          // console.log(data);
+          if(data.success == true){
+            e.parentNode.parentNode.parentNode.remove();
+          }
+        },
+        error: function (data){
+          console.log(data);
+        }
+      });
+    }
   }
 </script>
 @endsection
