@@ -167,8 +167,9 @@ class StudentHomeCtrl extends Controller
     ->LeftJoin('department_student', 'department_student.department_id', 'departments.id')
     ->LeftJoin('students', 'students.id', 'department_student.student_id')
     ->where('students.id', $student->id)
-    ->orderBy('syllabi.id', 'ASC')
+    ->where('syllabi.batch_id', $request->batch_id)
     ->select('syllabi.id', 'syllabi.name', 'students.name as student_name')
+    ->orderBy('syllabi.id', 'DESC')
     ->get();
     // dd($syllabuses);
     return view('student-panel.my-syllabus', compact('syllabuses', 'batches', 'batch'));

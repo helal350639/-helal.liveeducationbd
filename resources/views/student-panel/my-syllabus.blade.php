@@ -55,7 +55,7 @@ if($user)
           <h4> &nbsp; সিলেবাস সমূহ</h4>
           <table class="table">
             @php
-            $batch_syllabus = $batch->syllabuses()->where('department_id', null)->get();
+            $batch_syllabus = $batch->syllabuses()->where('department_id', null)->orderBy('id', 'DESC')->get();
             @endphp
 
             @if($batch_syllabus)
