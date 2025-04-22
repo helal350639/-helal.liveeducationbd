@@ -43,9 +43,10 @@ if($user)
                     <div class="col-md-3">
                       <a href="{{route('students.check', $paper->id)}}">
                       <div class="panel" style="min-height: 130px">
-                        <div class="panel-body" style="padding-top:0;font-size:22px"><b>{{substr($paper->name, 0, 30)}}...</b>
+                        <div class="panel-body" style="padding-top:0;font-size:22px">
+                          <h4>{{substr($paper->name, 0, 30)}}</h4>
                         </div>
-                        <p style="padding:0 15px">Batch: <b>{{substr( $batch->name, 0, 20)}} ...</b></p>
+                        <p style="padding:0 15px">Batch: <b>{{substr( $batch->name, 0, 45)}}</b></p>
                         <div class="panel-footer">
                           @php
                           $latest_exam = $paper->exams()->orderBy('id', 'DESC')->where('student_id', $user->id)->first();
@@ -53,6 +54,9 @@ if($user)
                           @if($latest_exam)
                           <a href="{{route('students.exam.paper', $latest_exam->id)}}" class="btn btn-info btn-block"><i class="fa fa-file-o"></i> আপনার এক্সাম পেপার</a>
                           <a href="{{route('students.solution', $paper->id)}}" class="btn btn-success btn-block"><i class="fa fa-check"></i> সলূশন পেপার</a>
+                          @else
+                          <a href="#" class="btn btn-block btn-disable">No Exam Paper</a>
+                          <a href="#" class="btn btn-block btn-disable">No Solution Paper</a>
                           @endif
                           @if($paper->exams->where('student_id', $user->id)->first() && $paper->result_at < date('Y-m-d'))
                           <a href="{{route('students.result', $paper->id)}}" class="btn btn-warning cst-btn btn-block">ফলাফল দেখুন</a>
@@ -100,7 +104,8 @@ if($user)
                         <a href="{{route('students.exam.paper', $latest_exam->id)}}" class="btn btn-info btn-block"><i class="fa fa-file-o"></i> আপনার এক্সাম পেপার</a>
                         <a href="{{route('students.solution', $paper->id)}}" class="btn btn-success btn-block"><i class="fa fa-check"></i> সলূশন পেপার</a>
                         @else
-                        <p class="btn btn-default btn-block">No exam set</p>
+                        <a href="#" class="btn btn-block btn-disable">No Exam Paper</a>
+                        <a href="#" class="btn btn-block btn-disable">No Solution Paper</a>
                         @endif
                         @if($paper->exams->where('student_id', $user->id)->first() && $paper->result_at < date('Y-m-d'))
                         <a href="{{route('students.result', $paper->id)}}" class="btn btn-warning cst-btn btn-block">ফলাফল দেখুন</a>
