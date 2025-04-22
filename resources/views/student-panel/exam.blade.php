@@ -46,7 +46,7 @@ if($user)
                         <div class="panel-body" style="padding-top:0;font-size:22px">
                           <h4>{{substr($paper->name, 0, 30)}}</h4>
                         </div>
-                        <p style="padding:0 15px">Batch: <b>{{substr( $batch->name, 0, 45)}}</b></p>
+                        <p style="padding:0 15px"><b>{{substr( $batch->name, 0, 45)}}</b></p>
                         <div class="panel-footer">
                           @php
                           $latest_exam = $paper->exams()->orderBy('id', 'DESC')->where('student_id', $user->id)->first();
