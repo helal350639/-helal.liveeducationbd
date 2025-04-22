@@ -34,7 +34,7 @@ if($user)
               <div class="col-md-8">
                 <div class="form-group">
                   <label for="">Select Batch</label>
-                  <select name="batch_id" id="batch_id" class="form-control">
+                  <select name="batch_id" id="batch_id" class="form-control" required>
                     <option value="">Select One</option>
                     @foreach($batches as $value)
                       <option value="{{$value->id}}" {{!empty($batch) && $batch->id == $value->id ? 'selected':''}}>{{$value->name}}</option>
@@ -51,36 +51,11 @@ if($user)
       </div>
       <div class="ro/w">
         <div class="box col-md-12 no-padding">
-          @if( !empty($syllabuses) )
-          <h4> &nbsp; সিলেবাস সমূহ</h4>
+          @if(!empty($department_syllabuses))
+          <h4> &nbsp; ডিপার্টমেন্ট এর সিলেবাস সমূহ</h4>
           <table class="table">
-            @php
-            $batch_syllabus = $batch->syllabuses()->where('department_id', null)->orderBy('id', 'DESC')->get();
-            @endphp
 
-            @if($batch_syllabus)
-            @foreach($batch_syllabus as $syllabus)
-            <tr>
-              <th>{{$syllabus->name}}</th>
-              <td>
-                @if($syllabus->pdf)
-
-                {{-- <a class="btn btn-default" href="{{$syllabus->pdf}}"><i class="fa fa-eye"></i> View</a> --}}
-                  
-                <a href="{{$syllabus->pdf}}" class="btn btn-info"><i class="fa fa-download"></i> ডাউনলোড</a>
-
-                @else
-
-                <a class="btn btn-default" href="{{route('student.syllabus', $syllabus->id)}}"><i class="fa fa-eye"></i> View</a>
-                  
-                <a href="{{route('students.syllabus.pdf', $syllabus->id)}}" class="btn btn-info"><i class="fa fa-download"></i> ডাউনলোড</a>
-
-                @endif
-              </td>
-            </tr>
-            @endforeach
-            @endif
-            @foreach($syllabuses as $syllabus)
+            @foreach($department_syllabuses as $syllabus)
             <tr>
               <th>{{$syllabus->name}}</th>
               <td>
@@ -102,14 +77,44 @@ if($user)
       @else
       <div class="panel panel-default">
         <div class="panel-body">
-          <label>আপনের কোন কোর্সে সিলেবাস প্রকাশিত হয়নি।</label>
+          <label>সিলেবাস প্রকাশিত হয়নি।</label>
           <p><a href="{{route('students.course')}}">চলমান কোর্স সমূহ</a></p>
         </div>
       </div>
       @endif
+      
+      @if( !empty($batch_syllabuses) )
+      <h4> &nbsp; ব্যাচে এর সিলেবাস সমূহ</h4>
+      <table class="table">
+        @foreach($batch_syllabuses as $syllabus)
+        <tr>
+          <th>{{$syllabus->name}}</th>
+          <td>
+            @if($syllabus->pdf)
+              
+            <a href="{{$syllabus->pdf}}" class="btn btn-info"><i class="fa fa-download"></i> ডাউনলোড</a>
+
+            @else
+
+            <a class="btn btn-default" href="{{route('student.syllabus', $syllabus->id)}}"><i class="fa fa-eye"></i> View</a>
+              
+            <a href="{{route('students.syllabus.pdf', $syllabus->id)}}" class="btn btn-info"><i class="fa fa-download"></i> ডাউনলোড</a>
+
+            @endif
+          </td>
+        </tr>
+        @endforeach
+      </table>
+      @else
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <label>সিলেবাস প্রকাশিত হয়নি।</label>
         </div>
       </div>
-    </section> <!-- /.content -->
+      @endif
+      </div>
+    </div>
+  </section> <!-- /.content -->
 
 <script>
   function showPassword(e)

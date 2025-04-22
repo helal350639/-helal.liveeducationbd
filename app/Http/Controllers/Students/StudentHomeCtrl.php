@@ -161,8 +161,12 @@ class StudentHomeCtrl extends Controller
     $batches = $student->batches()->orderBy('id', 'DESC')->where('status', 'Active')->get();
 
     $batch = Batch::find($request->batch_id);
+    $batch_syllabuses = $batch->syllabuses()
+    ->where('department_id', null)
+    ->orderBy('id', 'DESC')
+    ->get();
 
-    $syllabuses = $batch->syllabuses()
+    $department_syllabuses = $batch->syllabuses()
     ->Join('departments', 'departments.id', 'syllabi.department_id')
     ->LeftJoin('department_student', 'department_student.department_id', 'departments.id')
     ->LeftJoin('students', 'students.id', 'department_student.student_id')
@@ -172,7 +176,7 @@ class StudentHomeCtrl extends Controller
     ->orderBy('syllabi.id', 'DESC')
     ->get();
     // dd($syllabuses);
-    return view('student-panel.my-syllabus', compact('syllabuses', 'batches', 'batch'));
+    return view('student-panel.my-syllabus', compact('batch_syllabuses', 'department_syllabuses', 'batches', 'batch'));
   }
 
   public function exam()
