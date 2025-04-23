@@ -695,7 +695,6 @@ function submitMCQ(e)
     let showMessage = document.getElementById('showMessage');
     let msgArea = document.getElementById('msgArea');
     let msg_footer = document.getElementById('msg_footer');
-    // submit.setAttribute('disabled', 'disabled');
     let loading = document.getElementById('loading');
     loading.style.display = 'block';
 

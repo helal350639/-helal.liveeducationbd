@@ -126,7 +126,7 @@ $correct_answer = '';
                   @elseif($value->type == 'Written')
                   <tr>
                     <th>Answer:</th>
-                    <td> {!!$value->answer!!}</td>
+                    <td> {{$value->answer}}</td>
                   </tr>
                   @else
                   <tr>
@@ -136,7 +136,7 @@ $correct_answer = '';
                   @endif
                   <tr>
                     <th>Explanation:</th>
-                    <td>{!!$value->explanation!!}</td>
+                    <td>{{$value->explanation}}</td>
                   </tr>
                   <tr>
                     <th>Filters:</th>

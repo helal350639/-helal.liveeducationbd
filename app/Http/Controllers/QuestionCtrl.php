@@ -288,6 +288,7 @@ class QuestionCtrl extends Controller
         }
 
         $data['status'] = 'Active';
+        $data['created_at'] = date('Y-m-d H:i:s');
         $data['created_by'] = Auth::id();
 
         // dd($data);
@@ -329,7 +330,9 @@ class QuestionCtrl extends Controller
 
             $mcq->filters()->attach($filters);
 
-            for($a = 0; count($labels) > $a; $a++)
+            $labelCounter = count($labels);
+
+            for($a = 0; $labelCounter > $a; $a++)
             {
                 try {
                     Label::insert(['label' => $labels[$a], 'question_id' => $mcq->id]);
@@ -340,7 +343,9 @@ class QuestionCtrl extends Controller
                 }
             }
 
-            for($f = 0; count($answerfiles) > $f; $f++)
+            $answerFileCounter = count($answerfiles);
+
+            for($f = 0; $answerFileCounter > $f; $f++)
             {
                 $file = [];
                 try {
@@ -364,9 +369,6 @@ class QuestionCtrl extends Controller
         }
 
         $question = Question::orderBy('id', 'DESC')->with(['mcqitems'])->first();
-        
-        // Session::flash('success', 'The MCQ Question successfully created!');
-        // return redirect()->route('mcq.index');
 
         return response()->json([
             'success' => true,
