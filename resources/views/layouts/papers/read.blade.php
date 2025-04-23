@@ -19,7 +19,7 @@ $value = $paper;
     <!-- Main content -->
   <section class="content">
     <div class="row"><!-- left column -->
-      <div class="col-md-12"><!-- general form elements -->
+      <div class="col-md-8"><!-- general form elements -->
         <div class="box box-primary">
           <div class="box-header with-border">
             <h4 class="box-title">Question Paper Information[ <a>{{route('students.instruction', $paper->id)}}</a> ]</h4>
@@ -101,6 +101,14 @@ $value = $paper;
                   </td>
                 </tr>
                 <tr>
+                  <th>Exam Start At:</th>
+                  <td>{{$source->dtformat($value->open)}}</td>
+                </tr>
+                <tr>
+                  <th>Exma Finish At:</th>
+                  <td>{{$source->dtformat($value->close)}}</td>
+                </tr>
+                <tr>
                   <th>List Format:</th>
                   <td>{{$value->format}}</td>
                 </tr>
@@ -119,6 +127,10 @@ $value = $paper;
                 <tr>
                   <th>Student Can View Result After Exam?:</th>
                   <td>{{$value->result_view}} </td>
+                </tr>
+                <tr>
+                  <th>Result Publish At:</th>
+                  <td>{{$source->dtformat($value->result_at)}} </td>
                 </tr>
                 <tr>
                   <th>How many times can a student take the exam?:</th>

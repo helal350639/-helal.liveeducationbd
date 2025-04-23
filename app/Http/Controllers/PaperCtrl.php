@@ -99,6 +99,8 @@ class PaperCtrl extends Controller
             $data['format'] = 0;
         }
 
+        $data['created_at'] = date('Y-m-d H:i:s');
+
         try{
             Paper::insert($data);
         }
