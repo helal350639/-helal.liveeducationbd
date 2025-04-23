@@ -45,17 +45,15 @@ $source = New SourceCtrl;
                   <th>Phone</th>
                   <th>Order At</th>
                   <th>Status</th>
-                  <th width="130">Action</th>
+                  <th>Connected?</th>
+                  <th width="100">Action</th>
                 </tr>
                 @foreach($orders as $value)
-                  @php
-                  $student = \App\Models\Student::find($value->student_id);
-                  @endphp
                 <tr>
                   <td>{{$value->id}}</td>
-                  <td>{{$value->name}}</td>
-                  <td>{{$value->batch_id ? \App\Models\Batch::find($value->batch_id)->name:''}}</td>
-                  <td>{{$value->department_id ? \App\Models\Department::find($value->department_id)->name:''}}</td>
+                  <td>{{$value->student_name}}</td>
+                  <td>{{$value->batch_name}}</td>
+                  <td>{{$value->department_name}}</td>
                   <td>{{$value->email}}</td>
                   <td>{{$value->phone}}</td>
                   <td>{{$source->dtformat($value->created_at)}}</td>
@@ -70,6 +68,13 @@ $source = New SourceCtrl;
                     <span class="label label-default">{{$value->status}}</span>
                     @else
                     <span class="label label-danger">{{$value->status}}</span>
+                    @endif
+                  </td>
+                  <td>
+                    @if($value->batch_has_student)
+                    <i class="text-green fa fa-check"></i>
+                    @else
+                    <i class="text-red fa fa-times"></i>
                     @endif
                   </td>
                   <td>

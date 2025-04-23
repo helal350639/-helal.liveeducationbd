@@ -873,6 +873,7 @@ function resetFields()
     let label = document.getElementById('label');
     label.innerHTML = '';
 
+    // reset all filters fields
     let filters = document.getElementsByName('filter[]');
     for(let x = 0; filters.length > x; x++)
     {
@@ -882,11 +883,16 @@ function resetFields()
         }
     }
 
+    //reset all label fields
     let labelFields = document.getElementsByClassName('label-filters');
     for(let l = 0; labelFields.length > l; l++)
     {
         labelFields[l].value = [];
     }
+
+    //reset question title and explanation fields
+    $('#title').summernote('reset');
+    $('#explanation').summernote('reset');
 
     $(function (){ $('.select2').select2() });
 }

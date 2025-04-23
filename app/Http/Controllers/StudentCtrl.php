@@ -58,7 +58,7 @@ class StudentCtrl extends Controller
             $object = Course::find($id);
         }
 
-        $students = $object->students()->paginate(25);
+        $students = $object->students()->orderBy('id', 'desc')->paginate(25);
 
         return view('layouts.students.view', compact('object', 'students', 'name'));
     }

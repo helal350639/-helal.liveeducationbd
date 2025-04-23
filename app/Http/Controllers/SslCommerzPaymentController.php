@@ -94,7 +94,8 @@ class SslCommerzPaymentController extends Controller
                 'status' => 'Pending',
                 'address' => $post_data['cus_add1'],
                 'transaction_id' => $post_data['tran_id'],
-                'currency' => $post_data['currency']
+                'currency' => $post_data['currency'],
+                'created_at' => date('Y-m-d H:i:s')
             ]);
         $order_latest = DB::table('orders')
         ->where('student_id', $request->student_id)

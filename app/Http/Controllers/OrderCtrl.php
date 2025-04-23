@@ -28,8 +28,21 @@ class OrderCtrl extends Controller
 
   public function index()
   {
-    $orders = Order::orderBy('id','desc')->paginate(25);
-    return view('layouts.orders.index',compact('orders'));
+    $orders = Order::leftJoin('batches', 'batches.id', 'orders.batch_id')
+    ->leftJoin('departments', 'departments.id', 'orders.department_id')
+    ->leftJoin('students', 'students.id', 'orders.student_id')
+    ->leftJoin('batch_student', function($join){
+      $join->on('batch_student.student_id', 'students.id');
+    })
+    ->orderBy('id','desc')
+    ->select('orders.*',
+    'batches.name as batch_name',
+    'departments.name as department_name',
+    'students.name as student_name',
+    'batch_student.student_id as batch_has_student'
+    )
+    ->paginate(25);
+    return view('layouts.orders.index', compact('orders'));
   }
 
   public function destroy($id)

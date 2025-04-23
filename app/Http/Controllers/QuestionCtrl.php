@@ -289,9 +289,8 @@ class QuestionCtrl extends Controller
 
         $data['status'] = 'Active';
         $data['created_at'] = date('Y-m-d H:i:s');
+        $data['updated_at'] = null;
         $data['created_by'] = Auth::id();
-
-        // dd($data);
 
         try {
             // upload title image

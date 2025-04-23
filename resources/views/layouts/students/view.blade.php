@@ -61,7 +61,6 @@ $xids = $object->students()->pluck('id')->toArray();
             <table id="example1" class="table table-bordered table-hover">
               <thead>
                 <tr>
-                  {{-- <th style="width:32px">#</th> --}}
                   <th>ID</th>
                   <th>Name</th>
                   <th>Email</th>

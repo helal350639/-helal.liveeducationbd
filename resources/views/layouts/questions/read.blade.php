@@ -79,7 +79,7 @@ $correct_answer = '';
                   <tr>
                   <tr>
                     <th style="width: 200px;">Question Title:</th>
-                    <td><label style="font-size:16px">{!!$value->title!!}</label> <br><img src="{{$value->image}}" alt="" width="150"></td>
+                    <td><label style="font-size:16px">{{$value->title}}</label> <br><img src="{{$value->image}}" alt="" width="150"></td>
                   </tr>
                   @if($mcq->type == 'Written')
                   <tr>
