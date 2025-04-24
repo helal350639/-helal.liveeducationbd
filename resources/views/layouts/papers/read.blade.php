@@ -130,7 +130,7 @@ $value = $paper;
                 </tr>
                 <tr>
                   <th>Result Publish At:</th>
-                  <td>{{$source->dtformat($value->result_at)}} </td>
+                  <td>{{$source->dtformat($value->result_at)}} <br> DataBase date: {{$value->result_at}}<br> Current Date: &nbsp; &nbsp;  {{date('Y-m-d H:i:s')}}</td>
                 </tr>
                 <tr>
                   <th>How many times can a student take the exam?:</th>

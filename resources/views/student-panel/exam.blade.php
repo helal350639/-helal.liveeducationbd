@@ -51,16 +51,25 @@ if($user)
                           @php
                           $latest_exam = $paper->exams()->orderBy('id', 'DESC')->where('student_id', $user->id)->first();
                           @endphp
+
                           @if($latest_exam)
                           <a href="{{route('students.exam.paper', $latest_exam->id)}}" class="btn btn-info btn-block"><i class="fa fa-file-o"></i> আপনার এক্সাম পেপার</a>
-                          <a href="{{route('students.solution', $paper->id)}}" class="btn btn-success btn-block"><i class="fa fa-check"></i> সলূশন পেপার</a>
                           @else
                           <a href="#" class="btn btn-block btn-disable">No Exam Paper</a>
+                          @endif
+
+                          @if($latest_exam || $paper->close < date('Y-m-d H:i:s'))
+                          <a href="{{route('students.solution', $paper->id)}}" class="btn btn-success btn-block"><i class="fa fa-check"></i> সলূশন পেপার</a>
+                          @else
                           <a href="#" class="btn btn-block btn-disable">No Solution Paper</a>
                           @endif
-                          @if($paper->exams->where('student_id', $user->id)->first() && $paper->result_at < date('Y-m-d'))
+
+                          @if($paper->exams->where('student_id', $user->id)->first())
                           <a href="{{route('students.result', $paper->id)}}" class="btn btn-warning cst-btn btn-block">ফলাফল দেখুন</a>
+                          @else
+                          <a href="#" class="btn btn-default btn-block">No Result</a>
                           @endif
+
                           @if(!$paper->exams->where('student_id', $user->id)->first())
                           <a class="btn btn-info cst-btn btn-block" href="{{route('students.instruction', $paper->id)}}">পরীক্ষা দিন</a>
                           @endif
