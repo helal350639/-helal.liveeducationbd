@@ -75,6 +75,9 @@ $source = New SourceCtrl;
                     <i class="text-green fa fa-check"></i>
                     @else
                     <i class="text-red fa fa-times"></i>
+                    @endif
+
+                    @if($value->status == 'Processing' || $value->status == 'Success')
                     <a href="{{route('student.addto.batch', $value->id)}}" class="btn btn-success btn-sm"><i class="fa fa-plus"></i> > <i class="fa fa-file-text"></i> </a>
                     @endif
                   </td>

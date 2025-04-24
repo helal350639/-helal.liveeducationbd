@@ -43,6 +43,7 @@ class OrderCtrl extends Controller
     'students.name as student_name',
     'batch_student.student_id as batch_has_student'
     )
+    ->distinct()
     ->paginate(25);
     return view('layouts.orders.index', compact('orders'));
   }
