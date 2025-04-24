@@ -294,6 +294,11 @@ Route::middleware(['auth'])->group(function()
 		//this route for ajax call
 		Route::get('email/batch_student/{batch_ids}', 'getBatchStudents')->name('email.batch.student');
 	});
+
+	Route::controller(OrderCtrl::class)->group(function()
+	{
+		Route::get('order/add_to_batch/{id}', 'addToBatch')->name('student.addto.batch');
+	});
 	
 });
 

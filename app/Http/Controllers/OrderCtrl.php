@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\SourceCtrl;
 use Illuminate\Http\Request;
 use App\Models\Filter;
 use App\Models\SubFilter;
 use App\Models\Role;
 use App\Models\Order;
+use App\Models\Student;
 use Auth;
 use Image;
 use File;
@@ -47,10 +49,42 @@ class OrderCtrl extends Controller
 
   public function destroy($id)
   {
-      $file = Order::find($id);
-      $file->delete();
+    $file = Order::find($id);
+    $file->delete();
 
-      Session::flash('success', 'The order item successfully deleted!');
-      return redirect()->route('order.index');
+    Session::flash('success', 'The order item successfully deleted!');
+    return redirect()->route('order.index');
+  }
+
+  public function addToBatch($orderId)
+  {
+    $source = new SourceCtrl;
+    $order = Order::find($orderId);
+    if($order->status == 'Processing' || $order->status == 'Success')
+    {
+      $student = Student::find($order->student_id);
+      $student->batches()->sync($order->batch_id);
+      $student->departments()->sync($order->department_id);
+
+      //send sms
+      if($student->contact)
+      {
+          $source->sms_send('88'.$student->contact, 'Your course has been successfully purchased. For more information, please visit liveeducationbd.com');
+      }
+
+      //send email
+      if($student->email)
+      {
+          $data = [
+              'email_to' => $student->email,
+              'subject' => 'New Course Purchase | Live Education BD',
+              'comments' => 'Hello '.$student->name.'<br> Your course has been successfully purchased. For more information, visit <a href="'.route('home.course.show', $order->batch_id).'">liveeducationbd.com</a>'
+          ];
+          $source->sendMail($data);
+      }
+
+      Session::flash('success', 'The student added to the batch and departmnet');
+    }
+    return back();
   }
 }
