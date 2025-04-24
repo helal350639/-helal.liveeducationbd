@@ -84,7 +84,7 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <label for="title">Question Title (*)</label>
-                        <textarea class="form-control edi/tor" name="title" id="title" rows="3" required></textarea>
+                        <textarea class="form-control editor" name="title" id="title" rows="3" required></textarea>
                         {{-- <div class="input-group"> --}}
                             {{-- <span class="input-group-addon">
                                 <img src="" alt="" width="54">
