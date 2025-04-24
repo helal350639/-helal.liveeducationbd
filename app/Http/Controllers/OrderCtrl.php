@@ -43,7 +43,8 @@ class OrderCtrl extends Controller
     'students.name as student_name',
     'batch_student.student_id as batch_has_student'
     )
-    ->distinct()
+    ->groupBy('orders.id', 'orders.student_id', 'orders.batch_id', 'orders.department_id', 'orders.name', 'orders.email', 'orders.phone', 'orders.amount', 'orders.address', 'orders.status', 'orders.transaction_id', 'orders.currency', 'orders.created_at', 'batches.name', 'departments.name', 'students.name', 'batch_student.student_id')
+    // ->distinct()
     ->paginate(25);
     return view('layouts.orders.index', compact('orders'));
   }
