@@ -61,11 +61,11 @@ function student($ids)
                   <th>Status</th>
                   <th width="130">Action</th>
                 </tr>
-                @foreach($smses as $value)
+                @foreach($emails as $value)
                 <tr>
                   <td>{{$value->id}}</td>
-                  <td>{{$value->name}}</td>
-                  <td>{{$value->details}}</td>
+                  <td>{{$value->title}}</td>
+                  <td>{!!$value->details!!}</td>
                   <td>{{student($value->student_id)}}</td>
                   <td>{{batch($value->batch_id)}}</td>
                   <td>{{$source->dtformat($value->created_at)}}</td>
@@ -92,7 +92,7 @@ function student($ids)
             <!-- /.box-body -->
             <div class="box-footer clearfix">
               <div class="pagination-sm no-margin pull-right">
-                {{$smses->links()}}
+                {{$emails->links()}}
               </div>
             </div>
           </div>

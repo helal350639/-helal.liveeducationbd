@@ -225,9 +225,10 @@ class SmsCtrl extends Controller
     }
 
     /** get students according to the batch */
-    public function getBatchStudents($batch_ids)
+    public function getBatchStudents($batch_ids_str)
     {
-        $batch_ids = explode(', ', $batch_ids);
+        $batch_ids = explode(',', $batch_ids_str);
+        // dd($batch_ids);
         $students = Student::leftJoin('batch_student', 'batch_student.student_id', 'students.id')
         ->leftJoin('batches', 'batches.id', 'batch_student.batch_id')
         ->whereIn('batch_student.batch_id', $batch_ids)

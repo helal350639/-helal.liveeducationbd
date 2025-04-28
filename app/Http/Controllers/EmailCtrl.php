@@ -27,8 +27,8 @@ class EmailCtrl extends Controller
      */
     public function index()
     {
-        $emails = Email::orderBy('id','DESC')->paginate(25);
-        return view('layouts.email.index', compact('emails'));
+      $emails = Email::orderBy('id','DESC')->paginate(25);
+      return view('layouts.email.index', compact('emails'));
     }
 
     /**
@@ -38,12 +38,12 @@ class EmailCtrl extends Controller
      */
     public function create()
     {
-        $batches = Batch::where('status', 'Active')
-        ->orderBy('id', 'DESC')
-        ->select('id', 'name')
-        ->get();
+      $batches = Batch::where('status', 'Active')
+      ->orderBy('id', 'DESC')
+      ->select('id', 'name')
+      ->get();
 
-        return view('layouts.email.create', compact('batches'));
+      return view('layouts.email.create', compact('batches'));
     }
 
     /**
@@ -54,86 +54,90 @@ class EmailCtrl extends Controller
      */
     public function store(Request $request)
     {
-        $source = new SourceCtrl;
-        $this->validate($request, [
-            'batch_id'  => 'required|array',
-            'student_id'  => 'nullable|array',
-            'details'   => 'nullable|max:1000',
-        ]);
-        
-        $data = $request->all();
-        // dd($data);
-        if(isset($data['_token']))
+      $source = new SourceCtrl;
+      $this->validate($request, [
+        'batch_id'  => 'required|array',
+        'student_id'  => 'nullable|array',
+        'details'   => 'nullable|max:1000',
+      ]);
+
+      // process request data      
+      $data = $request->all();
+
+      // remove csrf token
+      if(isset($data['_token']))
+      {
+        unset($data['_token']);
+      }
+
+      // get batch ids
+      $batch_ids = $data['batch_id'];
+
+      $emailable_ids = '';
+      $student_emails = [];
+      $student_ids = [];
+
+      function arrayMapping($student_emails)
+      {
+        $emails = array_map(function($email)
         {
-            unset($data['_token']);
-        }
+          return $email;
+        }, 
+        $student_emails);
 
-        // if(isset($data['status']))
-        // {
-        //     $data['status'] = 'Active';
-        // }
-        // else
-        // {
-        //     $data['status'] = 'Deactive';
-        // }
+        return implode(', ', $emails);
+      }
 
-        $batch_ids = $data['batch_id'];
-
+      if(isset($data['student_id']))
+      {
+        $students = Student::whereIn('id', $data['student_id']);
+        $student_emails = $students->pluck('email')->toArray();
+        $student_ids = $students->pluck('id')->toArray();
+        // $emailable_ids = arrayMapping($student_emails);
+      }
+      else
+      {
         $students = Student::leftJoin('batch_student', 'batch_student.student_id', 'students.id')
         ->leftJoin('batches', 'batches.id', 'batch_student.batch_id')
         ->whereIn('batch_student.batch_id', $batch_ids);
 
-        $student_contacts = $students->pluck('students.contact')->toArray();
+        $student_emails = $students->pluck('students.email')->toArray();
         $student_ids = $students->pluck('students.id')->toArray();
-        // ->get();
+        // $emailable_ids = arrayMapping($student_emails);
+      }
 
-        $emailable_contact = '';
+      $data['batch_id'] = json_encode($data['batch_id']);
 
-        function arrayMapping($student_contacts)
-        {
-            $contact = array_map(function($num)
-            {
-                return '+88'.$num;
-            }, $student_contacts);
+      $data['student_id'] = json_encode($student_ids);
+      $data['sms_send_by'] = Auth::id();
 
-            return implode(', ', $contact);
-        }
+      // dd($emailable_ids);
 
-        if(isset($data['student_id']))
-        {
-            $students = Student::whereIn('id', $data['student_id']);
-            $student_contacts = $students->pluck('contact')->toArray();
-            $student_ids = $students->pluck('id')->toArray();
-            $emailable_contact = arrayMapping($student_contacts);
-        }
-        else
-        {
-            $emailable_contact = arrayMapping($student_contacts);
-        }
+      try {
+        // create email data
+        $emailData = [
+          'email_to' => 'liveeducationbd24@gmail.com',
+          'email_bcc' => $student_emails,
+          'subject'  => $request->title,
+          'comments' => $request->details
+        ];
 
-        // dd($emailable_contact);
+        // send email to the students
+        $source->sendMail($emailData);
 
-        $data['batch_id'] = json_encode($data['batch_id']);
+        // store entry to the database
+        Email::insert($data);
+      }
+      catch(\Exception $e)
+      {
+        return $e->getMessage();
+      }
 
-        $data['student_id'] = json_encode($student_ids);
-        $data['sms_send_by'] = Auth::id();
+      // $batch = Email::orderBy('id', 'DESC')->first();
+      
+      Session::flash('success', 'Email Send successfull');
 
-        /** ------------- send sms by gateway --------------- */ 
-        $source->sms_send($emailable_contact, $data['details']);
-
-        try{
-            Email::insert($data);
-        }
-        catch(\Exception $e)
-        {
-            return $e->getMessage();
-        }
-
-        // $batch = Email::orderBy('id', 'DESC')->first();
-        
-        Session::flash('success', 'SMS Send successfull');
-
-        return redirect()->route('sms.index');
+      return redirect()->route('email.index');
     }
 
     /**
@@ -145,7 +149,7 @@ class EmailCtrl extends Controller
     public function show($id)
     {
         $email = Email::find($id);
-        return view('layouts.email.read', compact('sms'));
+        return view('layouts.email.read', compact('email'));
     }
 
     /**
@@ -157,7 +161,7 @@ class EmailCtrl extends Controller
     public function edit($id)
     {
         $email = Email::find($id);
-        return view('layouts.email.edit', compact('sms'));
+        return view('layouts.email.edit', compact('email'));
     }
 
     /**
@@ -193,9 +197,9 @@ class EmailCtrl extends Controller
             return $e;
         }
         
-        Session::flash('success', 'The sms successfully Updated!');
+        Session::flash('success', 'The email successfully Updated!');
 
-        return redirect()->route('sms.index');
+        return redirect()->route('email.index');
     }
 
     /**
@@ -216,8 +220,8 @@ class EmailCtrl extends Controller
             //delete group table
             $email->delete();
 
-            Session::flash('Success','The sms successfully deleted');
-            return redirect()->route('sms.index');
+            Session::flash('Success','The email successfully deleted');
+            return redirect()->route('email.index');
         }
 
         Session::flash('error', 'Permission restricted!');

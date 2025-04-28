@@ -124,7 +124,7 @@ if($complains)
           </a>
         </li>
 
-        {{-- <li class="treeview">
+        <li class="treeview">
           <a href="#">
             <i class="fa fa-at"></i>
             <span>Emails</span>
@@ -136,7 +136,7 @@ if($complains)
             <li><a href="{{route('email.create')}}"><i class="fa fa-pencil"></i> Compose Email</a></li>
             <li><a href="{{route('email.index')}}"><i class="fa fa-list"></i> View Emails</a></li>
           </ul>
-        </li> --}}
+        </li>
 
         <li class="treeview">
           <a href="#">

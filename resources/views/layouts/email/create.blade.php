@@ -1,6 +1,8 @@
 @extends('dashboard')
 @section('title', 'Send SMS')
 @section('content')
+
+<link href="/assets/summernote/summernote.min.css" rel="stylesheet">
 <section class="content-header">
   <h1>Send Email</h1>
   <ol class="breadcrumb">
@@ -12,12 +14,12 @@
 <!-- Main content -->
 <section class="content">
   <div class="row"> <!-- left column -->
-    <div class="col-md-8"> <!-- general form elements -->
+    <div class="col-md-10"> <!-- general form elements -->
       <div class="box box-primary">
         <div class="box-header with-border">
             <h3 style="color: #800" class="box-title">Email Details</h3>
         </div>
-        <form action="{{route('email.store')}}" method="POST">
+        <form action="{{route('email.store')}}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="box-body">
                 <div class="col-md-12">
@@ -49,7 +51,7 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <label for="details">Email Details</label>
-                        <textarea class="form-control" name="details" id="details" rows="10" required></textarea>
+                        <textarea class="form-control editor" name="details" id="details" rows="10" required></textarea>
                     </div>
                 </div>
                 <div class="col-md-12">
@@ -69,20 +71,14 @@
 </section> <!-- /.content -->
 @endsection
 @section('scripts')
-<script>
-    // function charCount(e)
-    // {
-    //     let char_count = document.getElementById('char_count');
-    //     let sms_count = document.getElementById('sms_count');
-        
-    //     char_count.innerHTML = e.value.length;
 
-    //     smsCount = Math.ceil(e.value.length / 160);
-    //     sms_count.innerHTML = smsCount;
-    // }
+<script src="/assets/summernote/summernote.min.js"></script>
+<script>
     function getStudents(e)
     {
         let ids = Array.from(e.selectedOptions).map(({value}) => value);
+
+        console.log(ids);
 
         if(ids.length > 0)
         {
@@ -121,5 +117,11 @@
 
     //select 2
     $(function (){ $('.select2').select2() });
+    //this script for text editor
+    $(document).ready(function() {
+        $('.editor').summernote({
+            height: 200
+        });
+    });
 </script>
 @endsection
