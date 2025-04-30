@@ -299,6 +299,9 @@ Route::middleware(['auth'])->group(function()
 	{
 		Route::get('order/add_to_batch/{id}', 'addToBatch')->name('student.addto.batch');
 	});
+
+  // database backup
+  Route::get('/download-database', [BackupController::class, 'downloadDatabase'])->name('database.download');
 	
 });
 

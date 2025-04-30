@@ -357,6 +357,11 @@ if($complains)
           </ul>
         </li>
 
+        {{-- <li>
+          <a href="{{ route('database.download') }}" class="btn btn-primary">
+          Download Database Backup </a>
+        </li> --}}
+
         @endif
 
         <li class="treeview">
@@ -376,7 +381,6 @@ if($complains)
       </ul>
     </section> <!-- /.sidebar -->
   </aside>
-
 
   <div class="alert-section" style="">
     <div class="clearfix"></div>
