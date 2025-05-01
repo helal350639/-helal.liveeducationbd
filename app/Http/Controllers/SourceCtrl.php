@@ -115,9 +115,14 @@ class SourceCtrl extends Controller
 
     Mail::send('mail.default', $data, function($message) use ($data)
     {
-      $message->to($data['email_to'])
-      ->bcc($data['email_bcc'])
-      ->subject($data['subject']);
+      $message->to($data['email_to']);
+
+      if(isset($data['email_bcc']))
+      {
+        $message->bcc($data['email_bcc']);
+      }
+
+      $message->subject($data['subject']);
       $message->from($data['email_from'], $data['from_name']);
     });
   }
