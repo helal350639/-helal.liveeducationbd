@@ -216,60 +216,60 @@ class SslCommerzPaymentController extends Controller
 
         if($order_details)
         {
-            /** add student to the batch and department */
-            $student = Student::find($order_details->student_id);
-            $student->batches()->sync([$order_details->batch_id]);
-            $student->departments()->sync([$order_details->department_id]);
+          /** add student to the batch and department */
+          $student = Student::find($order_details->student_id);
+          $student->batches()->attach([$order_details->batch_id]);
+          $student->departments()->attach([$order_details->department_id]);
 
-            //send sms
-            if($student->contact)
-            {
-                $source->sms_send('88'.$student->contact, 'Your course has been successfully purchased. For more information, please visit liveeducationbd.com');
-            }
+          //send sms
+          if($student->contact)
+          {
+              $source->sms_send('88'.$student->contact, 'Your course has been successfully purchased. For more information, please visit liveeducationbd.com');
+          }
 
-            //send email
-            if($student->email)
-            {
-                $data = [
-                    'email_to' => $student->email,
-                    'subject' => 'New Course Purchase | Live Education BD',
-                    'comments' => 'Hello '.$student->name.'<br> Your course has been successfully purchased. For more information, visit <a href="'.route('home.course.show', $order_details->batch_id).'">liveeducationbd.com</a>'
-                ];
-                $source->sendMail($data);
-            }
+          //send email
+          if($student->email)
+          {
+            $data = [
+              'email_to' => $student->email,
+              'subject' => 'New Course Purchase | Live Education BD',
+              'comments' => 'Hello '.$student->name.'<br> Your course has been successfully purchased. For more information, visit <a href="'.route('home.course.show', $order_details->batch_id).'">liveeducationbd.com</a>'
+            ];
+            $source->sendMail($data);
+          }
         }
 
         if ($order_details->status == 'Pending') {
-            $validation = $sslc->orderValidate($request->all(), $tran_id, $amount, $currency);
+          $validation = $sslc->orderValidate($request->all(), $tran_id, $amount, $currency);
 
-            if ($validation) {
-
-                /*
-                That means IPN did not work or IPN URL was not set in your merchant panel. Here you need to update order status
-                in order table as Processing or Complete.
-                Here you can also sent sms or email for successfull transaction to customer
-                */
-                $update_product = DB::table('orders')
-                    ->where('transaction_id', $tran_id)
-                    ->update(['status' => 'Processing']);
-
-                echo "<br> Transaction is successfully Completed. It will automatic redirect to you ... ";
-
-                //redirect to homepage
-                echo $redirect_script;
-            }
-        } else if ($order_details->status == 'Processing' || $order_details->status == 'Complete') {
+          if ($validation)
+          {
             /*
-             That means through IPN Order status already updated. Now you can just show the customer that transaction is completed. No need to udate database.
-             */
-            echo "Transaction is successfully Completed";
+            That means IPN did not work or IPN URL was not set in your merchant panel. Here you need to update order status
+            in order table as Processing or Complete.
+            Here you can also sent sms or email for successfull transaction to customer
+            */
+            $update_product = DB::table('orders')
+              ->where('transaction_id', $tran_id)
+              ->update(['status' => 'Processing']);
+
+            echo "<br> Transaction is successfully Completed. It will automatic redirect to you ... ";
+
             //redirect to homepage
             echo $redirect_script;
+          }
+        } else if ($order_details->status == 'Processing' || $order_details->status == 'Complete') {
+          /*
+          That means through IPN Order status already updated. Now you can just show the customer that transaction is completed. No need to udate database.
+          */
+          echo "Transaction is successfully Completed";
+          //redirect to homepage
+          echo $redirect_script;
         } else {
-            #That means something wrong happened. You can redirect customer to your product page.
-            echo "Invalid Transaction";
-            //redirect to homepage
-            echo $redirect_script;
+          #That means something wrong happened. You can redirect customer to your product page.
+          echo "Invalid Transaction";
+          //redirect to homepage
+          echo $redirect_script;
         }
     }
 
@@ -281,18 +281,18 @@ class SslCommerzPaymentController extends Controller
         $tran_id = $request->input('tran_id');
 
         $order_details = DB::table('orders')
-            ->where('transaction_id', $tran_id)
-            ->select('transaction_id', 'status', 'currency', 'amount')->first();
+          ->where('transaction_id', $tran_id)
+          ->select('transaction_id', 'status', 'currency', 'amount')->first();
 
         if ($order_details->status == 'Pending') {
-            $update_product = DB::table('orders')
-                ->where('transaction_id', $tran_id)
-                ->update(['status' => 'Failed']);
+          $update_product = DB::table('orders')
+          ->where('transaction_id', $tran_id)
+          ->update(['status' => 'Failed']);
 
-            echo "Transaction is Failed";
+          echo "Transaction is Failed";
 
-            //redirect to homepage
-            echo $redirect_script;
+          //redirect to homepage
+          echo $redirect_script;
 
         } else if ($order_details->status == 'Processing' || $order_details->status == 'Complete') {
             echo "Transaction is already Successful";
