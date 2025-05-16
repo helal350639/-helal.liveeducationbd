@@ -53,7 +53,12 @@ $source = New SourceCtrl;
                   <td>{{$value->id}}</td>
                   <td>{{$value->student_name}}</td>
                   <td>{{$value->batch_name}}</td>
-                  <td>{{$value->department_name}}</td>
+                  <td>
+                    {{$value->department_name}}
+                    @if(!DB::table('department_student')->where('department_id', $value->department_id)->where('student_id', $value->student_id)->first())
+                    <p style="color:red">Missing</p>
+                    @endif
+                  </td>
                   <td>{{$value->email}}</td>
                   <td>{{$value->phone}}</td>
                   <td>{{$source->dtformat($value->created_at)}}</td>
