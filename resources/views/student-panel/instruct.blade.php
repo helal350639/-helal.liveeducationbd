@@ -17,73 +17,70 @@ if($user)
   .checkbox{padding-left: 25px}
 </style>
 
-    <!-- Content Header (Page header) -->
-    <section class="content-header">
-      <h1> পরীক্ষা সমূহ {{-- <small>পরীক্ষা সমূহple 2.0</small> --}} </h1>
-      <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> হোম</a></li>
-        <li><a href="#">পরীক্ষা সমূহ</a></li>
-        {{-- <li class="active">Top Navigation</li> --}}
-      </ol>
-    </section>
-
     <!-- Main content -->
-    <section class="content">
+    <section class="our_courses">
+      <div class="container">
+        <div class="row">
+          <div class="content-header">
+            <h1> পরীক্ষা </h1>
+          </div>
+        </div>
         <div class="col-md-6 col-md-offset-3">
           @if( $paper->permit == 'Batch' && $student->batches->find($paper->batch_id) || $paper->permit == 'Department' && $student->departments->find($paper->department_id) || $paper->permit == 'Group' && $student->groups->find($paper->group_id) || $paper->permit == 'Every One')
           
             @if($paper->close && $paper->close < date('Y-m-d H:i:s'))
-            <div class="panel panel-warning">
-              <div class="panel-heading">
+            <div class="card card-warning">
+              <div class="card-heading p-3">
                 <b>Exam No. {{$value->name}}</b>
               </div>
-              <div class="panel-body">
+              <div class="card-body">
                 <p class="text-danger">পরীক্ষার সময় শেষ...</p>
               </div>
-              <div class="panel-footer">
-                <a class="btn btn-danger pull-right" href="{{route('students.exam')}}"><i class="fa fa-arrow-left"></i> এক্সাম পেজ ফিরে যান</a>
+              <div class="card-footer">
+                <a class="btn btn-danger pull-right" href="{{route('students.exam')}}"><i class="fa fa-arrow-left"></i> এক্সাম পেজ এ ফিরে যান</a>
                 <div class="clearfix"></div>
               </div>
             </div>
 
             @elseif($value->status == 'Scheduled')
-            <div class="panel panel-warning">
-              <div class="panel-heading">
+            <div class="card card-warning">
+              <div class="card-heading p-3">
                 <b>Exam No. {{$value->name}}</b>
               </div>
-              <div class="panel-body">
+              <div class="card-body">
                 <p> পরীক্ষা সময় <b>{{ $source->dtformat($value->open)}}</b></p>
                 <b><span id="timer" style="font-size:20px; font-wieght:bold"></span></b> সময় পরে পরীক্ষা শুরু হবে
             </div>
-              <div class="panel-footer">
+              <div class="card-footer">
                 <a class="btn btn-info pull-right" href="{{route('students.exam', $value->id)}}">Back</a>
                 <div class="clearfix"></div>
               </div>
             </div>
 
             @elseif($value->status == 'Published')
-            <div class="panel panel-warning">
-              <div class="panel-heading">
+            <div class="card card-warning">
+              <div class="card-heading p-3">
                 <b>Exam No. {{$value->name}}</b>
               </div>
-              <div class="panel-body">
+              <div class="card-body">
                 <p>{!! $value->details !!}</p>
               </div>
-              <div class="panel-footer">
+              <div class="card-footer">
                 <a class="btn btn-info pull-right" href="{{route('students.exam.show', $value->id)}}">শুরু করুন</a>
                 <div class="clearfix"></div>
               </div>
             </div>
             @endif
           @else
-            <div class="panel panel-danger">
-              <div class="panel-heading">
+            <div class="card card-danger">
+              <div class="card-heading p-3">
                 <p>This exam is not match with you!</p>
                 <a href="{{route('homepage')}}">Back</a>
               </div>
             </div>
           @endif
         </div>
+      </div>
     </section> <!-- /.content -->
 
 <script>

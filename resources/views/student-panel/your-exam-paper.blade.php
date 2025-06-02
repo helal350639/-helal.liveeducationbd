@@ -6,9 +6,8 @@ $user = Auth::guard('student')->user();
 @endphp
 
 @extends('student')
-@section('title', 'Course')
+@section('title', 'Exam Paper')
 @section('content')
-{{-- <script src='https://www.google.com/recaptcha/api.js' async defer></script> --}}
 <style>
   .checkbox{padding-left: 25px}
   .panel ::-webkit-scrollbar{width: 5px;}
@@ -33,11 +32,14 @@ $user = Auth::guard('student')->user();
     <section class="content-header"></section>
 
     <!-- Main content -->
-    <section class="content" id="content">
-      <div class="row">
-        <div class="panel panel-heading">
-          <h3 class="no-margin">আপনার এক্সাম পেপার</h3>
+    <section class="our_courses" id="content">
+      <div class="container">
+        <div class="row">
+          <div class="title-area text-center">
+            <h3>আপনার এক্সাম পেপার</h3>
+          </div>
         </div>
+      <div class="row p-3">
         <div class="col-md-12 no-padding">
           @foreach($paper->questions as $key => $value)
           @php
@@ -52,12 +54,12 @@ $user = Auth::guard('student')->user();
           //   $choice = $choices[$value->id];
           // }
           @endphp
-          <div class="panel panel-default">
-            <div class="panel-heading" style="background-color:none">
+          <div class="card panel-default p-3 mt-3">
+            <div class="card-heading" style="background-color:none">
               <div style="display: inline; font-weight:bold;float:left; padding-right:5px">প্রশ্ন {{$key+1}}.</div>
               <div style="display: inline;text-align:justify">{!! $value->title !!}</div>
             </div>
-            <ul class="panel-body mcqitems" id="{{$value->id}}">
+            <ul class="card-body mcqitems" id="{{$value->id}}">
               @foreach($value->mcqitems as $k => $val)
                 @if($k <= 4)
                   @php
@@ -79,16 +81,18 @@ $user = Auth::guard('student')->user();
                 @endif
               @endforeach
             </ul>
-            <div class="panel-footer" style="color: #0a0">
+            <div class="card-footer" style="color: #0a0">
               সঠিক উত্তরঃ <b>{{$right_answer}}</b>
             </div>
           </div>
           @endforeach
         </div> <!--/.col -->
-        <div class="col-md-12">
-          <a href="{{route('students.result', $paper->id)}}" class="btn btn-default pull-right">Back</a>
+        <div class="col-md-12 p-3">
+          <a href="{{route('students.result', $paper->id)}}" class="btn btn-warning pull-right">Back</a>
         </div>
       </div><!-- /.row -->
+        
+    </div>
     </section> <!-- /.content -->
 @endsection
 @section('scripts')

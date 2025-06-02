@@ -1,13 +1,15 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Homepage;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use App\Models\Course;
 use App\Models\Paper;
 use App\Models\Exam;
 use App\Models\Question;
+use App\Models\Teacher;
 use App\Models\Student;
 use App\Models\Batch;
 use App\Models\Department;
@@ -15,6 +17,7 @@ use App\Models\Group;
 use App\Models\McqItem;
 use App\Models\Choice;
 use App\Models\Page;
+use App\Models\Complain;
 use Auth;
 use Session;
 
@@ -24,29 +27,48 @@ class HomePageCtrl extends Controller
 
   public function index()
   {
-    $mybatches = [];
-    $user = Auth::guard('student')->user();
-    if($user)
-    {
-      $student = Student::find($user->id);
-      $mybatches = $student->batches()->orderBy('id', 'DESC')->get();
-    }
-    // active courses
-    $courses = Course::orderBy('id', 'DESC')
+    $courses = Course::orderBy('id', 'ASC')
     ->where('status', 'Active')
+    ->get();
+
+    $sliders = Batch::where('status', 'Active')
+    ->whereRaw('DATE(reg_end_at) >= ?', [date('Y-m-d H:i:s')])
+    ->where('web', 'Yes')
+    ->orderBy('id', 'DESC')
+    ->limit('5')
     ->get();
 
     // Active batches
     $batches = Batch::where('status', 'Active')
     ->whereRaw('DATE(reg_end_at) >= ?', [date('Y-m-d H:i:s')])
+    ->limit(8)
     ->orderBy('id', 'DESC')
     ->get();
 
-    $papers = Paper::orderBy('id', 'DESC')->whereIn('status', ['Published', 'Scheduled'])->where('permit', 'Every One')->get();
+    // teachers
+    $teachers = Teacher::where('status', 'Active')
+    ->where('web', 'Yes')
+    ->orderBy('id', 'DESC')
+    ->select('id', 'name', 'designation', 'image')
+    ->get();
 
-    // dd($batches);
+    $complains = Complain::orderBy('id', 'DESC')
+    ->where('web', 'Yes')
+    ->select('name', 'details')
+    ->get();
+
+    $json = Storage::get('about.json');
+    $array = json_decode($json, true);
+    $about = (object) $array;
+
+    // dd($complains);
     
-    return view('student-panel.index', compact('courses', 'mybatches', 'batches', 'papers'));
+    return view('homepage.index', compact('courses', 'sliders', 'batches', 'teachers', 'complains', 'about'));
+  }
+
+  public function comingSoon()
+  {
+    return view('student-panel.coming-soon');
   }
 
   public function course()
@@ -277,5 +299,19 @@ class HomePageCtrl extends Controller
       return 'Page Not Found! <a href="/">Back</a>';
     }
     return view('student-panel.single-page', compact('page'));
+  }
+
+  public function circular()
+  {
+    return view('student-panel.circular');
+  }
+
+  public function resultList($paper_id)
+  {
+    $paper = Paper::find($paper_id);
+    $exams = Exam::where('paper_id', $paper_id)
+    ->orderBy('mark', 'DESC')
+    ->get();
+    return view('homepage.result-list', compact('paper', 'exams'));
   }
 }

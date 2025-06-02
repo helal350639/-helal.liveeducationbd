@@ -117,9 +117,8 @@ class ComplainCtrl extends Controller
      */
     public function edit($id)
     {
-        $filters = Complain::where('status', 'Active')->get();
-        $subfilter = Complain::find($id);
-        return view('layouts.answerfiles.edit', compact('filters', 'subfilter'));
+        $complain = Complain::find($id);
+        return view('layouts.complains.edit', compact('complain'));
     }
 
     /**
@@ -132,20 +131,6 @@ class ComplainCtrl extends Controller
     public function update(Request $request, $id)
     {
         $source = new SourceCtrl;
-        $validator = Validator::make($request->all(), [
-            'file'   => 'required|mimes:jpeg,jpg,png,pdf|max:1000',
-        ]);
-
-        if($validator->fails()){
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => 'File upload failed',
-                    'errors' => $validator->getMessageBag()->toArray()
-                ],
-                201
-            );
-        }
         
         $data = $request->all();
 
@@ -153,25 +138,17 @@ class ComplainCtrl extends Controller
         {
             unset($data['_token']);
         }
+
         if(isset($data['_method']))
         {
             unset($data['_method']);
         }
 
-        $file = Complain::find($id);
-        $xfile = public_path($file->file);
+        $data['status'] = isset($data['status']) ? 'Active' : 'Deactive';
+        $data['web'] = isset($data['web']) ? 'Yes' : 'No';
 
-        if(isset($data['file']))
-        {
-            $data['file'] = $source->uploadImage($data['file'], 'questions/written/files/');
-        }
-
-        try{
+        try {
             Complain::where('id', $id)->update($data);
-            if(File::exists($xfile))
-            {
-                File::delete($xfile);
-            }
         }
         catch(\E $e)
         {
@@ -179,8 +156,7 @@ class ComplainCtrl extends Controller
         }
 
         $file = Complain::find($id);
-        
-        return response()->json(['success' => 'true', 'message' => 'File successfully updated!', 'file' => $file], 200);
+        return back();
     }
 
     /**

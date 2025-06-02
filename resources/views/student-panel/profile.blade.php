@@ -11,26 +11,27 @@ $source = New SourceCtrl;
 @extends('student')
 @section('title', 'হোম')
 @section('content')
-{{-- <script src='https://www.google.com/recaptcha/api.js' async defer></script> --}}
-<style> </style>
 
     <!-- Main content -->
-    <section class="content">
-      <div class="box box-info">
-        <div class="box-header with-border">
-          <h3 class="box-ti/tle" style="text-align: center;display:block">প্রোফাইল</h3>
+    <section class="our_courses">
+      <div class="container">
+        <div class="row">
+          <div class="title-area text-center">
+            <h2> প্রোফাইল </h2>
+          </div>
         </div>
+      <div class="p-5">
 
         <div class="row" style="margin-bottom:35px">
-          <div class="col-md-12">
-            <div class="col-md-6 col-md-offset-3">
+          <div class="card col-sm-6 offset-sm-3 p-3">
+            <div class="col-md-12">
               <form action="#" method="POST" style="margin-bottom:15px">
                 @csrf
                 <div class="form-group">
                   <label for="name">রেজিস্ট্রেশন আইডি</label>
                   <div class="input-group">
                     <span class="input-group-addon"><i class="fa fa-user"></i></span>
-                    <input type="text" name="name" class='form-control' required value="{{$user?$source->numset($user->id, 6):''}}" disabled/>
+                    <input type="text" name="name" class='form-control' required value="{{$user ? $source->numset($user->id, 6) : ''}}" disabled/>
                   </div>
                 </div>
                 <div class="form-group">
@@ -66,6 +67,7 @@ $source = New SourceCtrl;
           </div>
         </div> <!-- /.row -->
       </div> <!-- /.box -->
+    </div>
 
     </section> <!-- /.content -->
 @endsection

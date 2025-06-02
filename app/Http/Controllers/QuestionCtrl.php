@@ -92,15 +92,15 @@ class QuestionCtrl extends Controller
 
         if(isset($data['chapter_id']))
         {
-            $questions = $questions->whereHas('chapters', function($query) use($data){
-                $query->where('chapter_id', $data['chapter_id']);
-            });
+          $questions = $questions->whereHas('chapters', function($query) use($data){
+            $query->where('chapter_id', $data['chapter_id']);
+          });
         }
         elseif(isset($data['subject_id']))
         {
-            $questions = $questions->whereHas('subjects', function($query) use($data){
-                $query->where('subject_id', $data['subject_id']);
-            });
+          $questions = $questions->whereHas('subjects', function($query) use($data){
+            $query->where('subject_id', $data['subject_id']);
+          });
         }
         elseif(isset($data['semester_id']))
         {

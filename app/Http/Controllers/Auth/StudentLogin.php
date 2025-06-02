@@ -48,7 +48,7 @@ class StudentLogin extends Controller
     {
         if(Auth::guard('student')->check())
         {
-            return redirect()->intended(route('students.my-course'));
+            return redirect()->intended(route('students.dashboard'));
         }
 
         return view('auth.student-login');
@@ -70,7 +70,7 @@ class StudentLogin extends Controller
             // 'status' => 'Active'
         ], $remember = true))
         {
-            return redirect()->intended(route('students.my-course'));
+            return redirect()->intended(route('students.dashboard'));
         }
         
         return back()->withErrors(['email' => 'Invalid credentials']);

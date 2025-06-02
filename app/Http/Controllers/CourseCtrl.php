@@ -140,17 +140,11 @@ class CourseCtrl extends Controller
             // $size = ['w' => 400, 'h' => 600];
             $data['banner'] = $source->uploadImage($data['banner'], 'courses/');
         }
+        
+        $data['status'] = isset($data['status']) ? 'Active' : 'Deactive';
+        $data['web'] = isset($data['web']) ? 'Yes' : 'No';
 
-        if(isset($data['status']))
-        {
-            $data['status'] = 'Active';
-        }
-        else
-        {
-            $data['status'] = 'Deactive';
-        }
-
-        try{
+        try {
             Course::where('id', $id)->update($data);
 
             if(File::exists($xbanner))

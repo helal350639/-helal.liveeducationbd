@@ -65,7 +65,7 @@ $source = New SourceCtrl;
                   </td>
                   <td>
                     <a href="{{route('complain.show', $val->id)}}" class="btn btn-info btn-sm" title="Details"><i class="fa fa-file-text"></i></a>
-                    {{-- <a href="{{route('complain.edit', $val->id)}}" class="btn btn-warning btn-sm" title="Edit this"><i class="fa fa-edit"></i></a> --}}
+                    <a href="{{route('complain.edit', $val->id)}}" class="btn btn-warning btn-sm" title="Edit this"><i class="fa fa-edit"></i></a>
                     <form style="display: inline" action="{{route('complain.destroy', $val->id)}}" method="POST">
                       @csrf
                       @method('DELETE')

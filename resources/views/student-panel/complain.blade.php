@@ -9,15 +9,16 @@ if($user)
 @extends('student')
 @section('title', 'হোম')
 @section('content')
-{{-- <script src='https://www.google.com/recaptcha/api.js' async defer></script> --}}
-<style> </style>
 
     <!-- Main content -->
-    <section class="content">
-      <div class="box box-info">
-        <div class="box-header with-border">
-          <h3 class="box-ti/tle" style="text-align: center;display:block">আপনার অভিযোগ দিন</h3>
+    <section class="our_courses">
+      <div class="container">
+        <div class="row">
+          <div class="title-area text-center">
+            <h3> আপনার অভিযোগ দিন </h3>
+          </div>
         </div>
+      <div class="row">
 
         <div class="row" style="margin-bottom:35px">
           <div class="col-md-12">
@@ -92,6 +93,8 @@ if($user)
           </div>
         </div> <!-- /.row -->
       </div> <!-- /.box -->
+      
+    </div>
 
     </section> <!-- /.content -->
 @endsection

@@ -1,0 +1,4 @@
+ALTER TABLE `courses` ADD `web` VARCHAR(20) NULL AFTER `banner`;
+ALTER TABLE `batches` ADD `web` VARCHAR(20) NULL DEFAULT NULL AFTER `status`;
+ALTER TABLE `complains` ADD `web` VARCHAR(20) NULL DEFAULT NULL AFTER `status`;
+ALTER TABLE `teachers` ADD `web` VARCHAR(20) NULL AFTER `status`;

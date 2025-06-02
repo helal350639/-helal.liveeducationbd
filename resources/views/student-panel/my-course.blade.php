@@ -13,7 +13,6 @@ if($user)
 @extends('student')
 @section('title', 'আমার কোর্স সমূহ')
 @section('content')
-{{-- <script src='https://www.google.com/recaptcha/api.js' async defer></script> --}}
 <style>
   .checkbox{padding-left: 25px}
   .panel ::-webkit-scrollbar{width: 5px;}
@@ -21,59 +20,58 @@ if($user)
   .course-image{width:100%}
 </style>
 
-    <!-- Content Header (Page header) -->
-    <section class="content-header">
-      <h1>আমার কোর্স সমূহ</h1>
-      <ol class="breadcrumb">
-        <li><a href="/"><i class="fa fa-dashboard"></i> হোম</a></li>
-        <li><a href="#">আমার কোর্স সমূহ</a></li>
-        {{-- <li class="active">Top Navigation</li> --}}
-      </ol>
-    </section>
-
     <!-- Main content -->
-    <section class="content">
-      @if(count($courses))
-
-      @foreach($courses as $value)
-      <a href="{{route('home.course.show', $value->id)}}">
-      <div class="col-md-3">
-        <div class="panel panel-default">
-          <div class="penel-heading no-padding" style="text-align: center;padding:15px;min-height:150px">
-            <img class="course-image" src="{{ $value->banner? $value->banner : '/img/course.png'}}" alt="" />
+    <section class="our_courses">
+      <div class="container">
+        <div class="row">
+          <div class="title-area text-center">
+            <h1> আমার কোর্স সমূহ </h1>
           </div>
-          <div class="panel-heading"><b>{{substr($value->name, 0, 30)}} ...</b></div>
-          <div class="box-group" id="accordion{{$value->id}}">
-            <div class="p/anel bo/x box-primary">
-              <div class="box-header with-border">
-                <div class="box-t/itle">
-                  <a data-toggle="collapse" data-parent="#accordion{{$value->id}}" href="#dept{{$value->id}}">
-                    <b>বিস্তারিত দেখুন...</b>
-                    <span class="pull-right-container">
-                      <i class="fa fa-chevron-down pull-right"></i>
-                    </span>
-                  </a>
-                </div>
+        </div>
+      @if(count($courses))
+      
+      <div class="all-courses-area">
+        <div class="row g-2 g-md-3 g-lg-4">
+
+          @foreach($courses as $value)
+          
+          <div class="col-6 col-lg-3 mt-4">
+            <div class="exam-package-area">
+              <div class="package-exam-image">
+                <a href="{{route('home.course.show', $value->id)}}">
+                <img src="{{ $value->banner? $value->banner : '/img/course.png'}}" alt="" loading="lazy" />
+                </a>
               </div>
-              <div id="dept{{$value->id}}" class="panel-collapse collapse">
-                <div class="box-body">
-                  @php
-                  $syllabuses = $value->syllabuses->whereIn('department_id', $departments_ids);
-                  @endphp
-                  {{-- {{$value->syllabuses->whereIn('department_id', $departments_ids)}} --}}
-                  @if($syllabuses->count())
-                    @foreach($syllabuses as $key => $syllabus)
-                    <a class="btn btn-primary cst-btn btn-block" href="{{route('student.syllabus', $syllabus->id)}}">{{$syllabus->name}}</a>
-                    @endforeach
-                  @endif
+              <div class="package-exam-content mx-2 mx-lg-3">
+                <div class="package-exam-title pt-3">
+                  <h2><a href="{{route('home.course.show', $value->id)}}">{{substr($value->name, 0, 20)}}</a></h2>
+                </div>
+                <div class="row button-and-price pb-3 pb-lg-4">
+                  <div class="col">
+                    <div class="package-exam-rating">
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                      <i class="far fa-star"></i>
+                    </div>
+                  </div>
+                  <div class="col text-end">
+                    <div class="package-exam-button">
+                      <div class="package-exam-details">
+                        <a href="{{route('home.course.show', $value->id)}}">View Details </a>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div><!-- /#accordion-->
+          </div>
+
+          
+          @endforeach
         </div>
       </div>
-      </a>
-      @endforeach
       @else
       <div class="panel panel-default">
         <div class="panel-body">
@@ -81,25 +79,7 @@ if($user)
         </div>
       </div>
       @endif
-      <div class="clearfix"></div>
+      
+    </div>
     </section> <!-- /.content -->
-
-<script>
-  function showPassword(e)
-  {
-    let elm = e.previousElementSibling;
-    if(elm.type == 'password')
-    {
-      elm.setAttribute('type', 'text');
-      e.firstChild.classList.add('fa-eye');
-      e.firstChild.classList.remove('fa-eye-slash');
-    }
-    else 
-    {
-      elm.setAttribute('type', 'password');
-      e.firstChild.classList.add('fa-eye-slash');
-      e.firstChild.classList.remove('fa-eye');
-    }
-  }
-</script>
 @endsection

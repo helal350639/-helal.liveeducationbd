@@ -16,10 +16,10 @@ if($exam)
   $exam_id = $exam->id;
 }
 @endphp
+
 @extends('student')
 @section('title', 'Course')
 @section('content')
-{{-- <script src='https://www.google.com/recaptcha/api.js' async defer></script> --}}
 <style>
   .checkbox{padding-left: 25px}
   .panel ::-webkit-scrollbar{width: 5px;}
@@ -51,17 +51,18 @@ if($exam)
     <section class="content-header"></section>
 
     <!-- Main content -->
-    <section class="content" id="content">
+    <section class="our_courses" id="content">
+      <div class="container">
         @if($exam_id)
-        <div class="row">
-          <div class="box box-info" id="fixed">
-            <div class="col-xs-4">
+          <div class="card" id="fixed">
+            <div class="row">
+            <div class="col-4">
               Questions: <b>{{$paper->questions->count()}}</b>
             </div>
-            <div class="col-xs-4">
+            <div class="col-4">
               <div class="timer"><span id="timer">00:00</span></div>
             </div>
-            <div class="col-xs-4">
+            <div class="col-4">
               Solved: <b id="solved">0</b>
             </div>
             <div class="clearfix"></div>
@@ -86,13 +87,15 @@ if($exam)
         @else
         <p>We are getting trouble to sit you to the exam, right now. Please try again later. <a href="{{route('students.exam')}}">Go back to the exam page</a></p>
         @endif
+        
+      </div>
     </section> <!-- /.content -->
 
   <!-- loading section -->
 <div id="loading" class="loading">
   {{-- <span onclick="this.parentNode.style.display='none'"><i class="fa fa-times"></i></span> --}}
   <img src="/img/loading.webp" alt="">
-  <p>আপনার রেজালশীট ও সলুশন পেপার প্রস্তুত করা হচ্ছে। <br>অনুগ্রহ পূর্বক অপেক্ষা করুন...</p>
+  <p>আপনার রেজালটশীট ও সলুশন পেপার প্রস্তুত করা হচ্ছে। <br>অনুগ্রহ পূর্বক অপেক্ষা করুন...</p>
 </div>
 
 @endsection
@@ -148,12 +151,12 @@ if($exam)
     {
       // let last_page = 3;
       let paper_id = '{{$paper->id}}';
-      var end = $("#footer").offset().top;
+      var end = $("#Footer").offset().top;
       var viewEnd = $(window).scrollTop() + $(window).height();
       var distance = end - viewEnd;
 
       // when we're almost at the bottom
-      if (distance < 900){
+      if (distance < 600){
         // unbind to prevent excessive firing
         $(window).off('scroll', scrollProducts);
         // console.log('we reached the bottom');

@@ -9,7 +9,11 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\Auth\StudentLogin;
 use App\Http\Controllers\Students\StudentHomeCtrl;
-use App\Http\Controllers\HomePageCtrl;
+use App\Http\Controllers\Homepage\CategoryCtrl;
+use App\Http\Controllers\Homepage\JobPreparationCtrl;
+use App\Http\Controllers\Homepage\ExamCtrl;
+use App\Http\Controllers\Homepage\HomePageCtrl;
+use App\Http\Controllers\Homepage\HomepageSettingCtrl;
 use App;
 use URL;
 use Laravel\Socialite\Facades\Socialite;
@@ -48,6 +52,43 @@ Route::controller(HomePageCtrl::class)->group(function()
 	Route::get('home/course', 'course')->name('home.course');
 	Route::get('home/course/{id}', 'courseShow')->name('home.course.show');
 	Route::get('home/pages/{slug}', 'page')->name('home.page');
+  Route::get('home/coming-soon', 'comingSoon')->name('home.coming-soon');
+  Route::get('home/circular', 'circular')->name('home.circular');
+  Route::get('home/results/{paper}', 'resultList')->name('home.results');
+});
+
+Route::controller(CategoryCtrl::class)->group(function()
+{
+  Route::prefix('category')->group(function()
+  {
+    Route::get('courses/{type?}', 'courses')->name('category.courses');
+    Route::get('batches/{type?}', 'batches')->name('category.batches');
+    Route::get('batch/{type?}/{course}', 'batch')->name('category.batch');
+    Route::get('departments/{type}', 'departments')->name('category.departments');
+    Route::get('department/{type}/{batch?}', 'department')->name('category.department');
+    Route::get('paper/{type}/{batch}/{department?}', 'paper')->name('category.paper');
+    Route::get('result-option', 'resultOption')->name('category.result.option');
+  });
+});
+
+Route::controller(JobPreparationCtrl::class)->group(function()
+{
+  Route::get('homepage/courses', 'courses')->name('homepage.courses');
+  Route::get('homepage/batch/{course_id}', 'batches')->name('homepage.batches');
+});
+
+Route::controller(ExamCtrl::class)->group(function()
+{
+  Route::get('live-exam-courses', 'liveCourses')->name('live.courses');
+  Route::get('live-exam-batches/{course_id}', 'liveBatches')->name('live.batches');
+  Route::get('live-exam-departments/{batch_id}', 'liveDepartments')->name('live.departments');
+  Route::get('live-department-exams/{department_id}', 'liveExams')->name('live.exams');
+
+  // Route::get('free-exam-courses', 'freeCourses')->name('free.courses');
+  Route::get('free-exam-batches', 'freeBatches')->name('free.batches');
+  Route::get('free-exam-departments/{batch_id}', 'freeDepartments')->name('free.departments');
+  Route::get('free-department-exams/{department_id}', 'freeExams')->name('free.exams');
+
 });
 
 Route::get('/login', function()
@@ -63,13 +104,14 @@ Route::controller(RegisterController::class)->group(function()
 	Route::get('/account_verify/{code}', 'verify')->name('email.verify');
 	// Route::get('/verification', '')
 });
-Route::get('students', function()
-{
-	echo '<p style="text-align:center;margin-top:20%">Welcome to Student Panel</p>';
+// Route::get('students', function()
+// {
+// 	echo '<p style="text-align:center;margin-top:20%">Welcome to Student Panel</p>';
 
-	return redirect()->route('students.my-course');
+// 	return redirect()->route('students.my-course');
 
-})->name('students');
+// })->name('students');
+
 Route::controller(StudentLogin::class)->group(function()
 {
 	Route::get('students/login', 'login')->name('students.login');
@@ -96,7 +138,6 @@ Route::controller(SslCommerzPaymentController::class)->group(function()
 {
 	// SSLCOMMERZ Start
 	Route::get('/example1', 'exampleEasyCheckout');
-	// Route::get('/example2', 'exampleHostedCheckout');
 	Route::get('/payment-proceed', 'exampleHostedCheckout');
 
 	Route::post('/students/pay', 'index')->name('payment.proceed');
@@ -114,30 +155,38 @@ Route::middleware('auth:student')->group(function()
 {
 	Route::controller(StudentHomeCtrl::class)->group(function()
 	{
-		Route::get('students/home', 'home')->name('students.home');
-		Route::get('students/exam', 'exam')->name('students.exam');
-		Route::get('students/check/{paper}', 'check')->name('students.check');
-		Route::get('students/instruction/{paper}', 'instruction')->name('students.instruction');
-		Route::get('students/exam/{id}', 'examShow')->name('students.exam.show');
-		Route::get('students/questions/{paper_id}', 'getQuestions')->name('students.exam.questions');
-		Route::get('students/result/{id}/{after?}', 'result')->name('students.result');
-		Route::get('students/exam-paper/{id}', 'examPaper')->name('students.exam.paper');
-		Route::get('students/solution/{id}', 'solution')->name('students.solution');
-		Route::get('students/course', 'course')->name('students.course');
-		Route::get('students/course/{id}', 'courseShow')->name('students.course.show');
-		Route::post('students/course-apply', 'applyCourse')->name('students.course.apply');
-		Route::get('students/checkout/{id}', 'checkout')->name('students.course.checkout');
-		Route::get('students/confirm', 'confirm')->name('students.course.confirm');
-		Route::get('students/my-course', 'myCourse')->name('students.my-course');
-		Route::get('students/my-syllabus', 'mySyllabus')->name('students.my-syllabus');
-		Route::post('students/my-syllabus', 'mySyllabusPost')->name('students.my-syllabus.post');
-		Route::post('student/exam_add', 'examAdd')->name('student.exam.add');
-		Route::get('students/syllabus/{id}', 'syllabus')->name('student.syllabus');
-		Route::get('students/syllabus/{id}/pdf', 'generatePDF')->name('students.syllabus.pdf');
-		Route::get('students/complain', 'complain')->name('students.complain');
-		Route::post('students/complain', 'complainStore')->name('students.complain.store');
-		Route::get('students/update-paper/{id}', 'updatePaperAjax')->name('paper.update.ajax');
-		Route::get('students/profile', 'profile')->name('students.profile');
+    Route::prefix('students')->group(function()
+    {
+      Route::get('/', 'dashboard')->name('students.dashboard');
+      Route::get('home', 'home')->name('students.home');
+      Route::get('exam', 'exam')->name('students.exam');
+      Route::get('free-exam', 'freeExam')->name('students.free-exam');
+      Route::get('batch-exam/{batch}', 'batchExam')->name('students.batch-exam');
+      Route::get('check/{paper}', 'check')->name('students.check');
+      Route::get('instruction/{paper}', 'instruction')->name('students.instruction');
+      Route::get('exam/{id}', 'examShow')->name('students.exam.show');
+      Route::get('questions/{paper_id}', 'getQuestions')->name('students.exam.questions');
+      Route::get('batch-result', 'batchResult')->name('students.batch-result');
+      Route::get('batch-routine', 'batchRoutine')->name('students.batch-routine');
+      Route::get('result/{id}/{after?}', 'result')->name('students.result');
+      Route::get('exam-paper/{id}', 'examPaper')->name('students.exam.paper');
+      Route::get('solution/{id}', 'solution')->name('students.solution');
+      Route::get('course', 'course')->name('students.course');
+      Route::get('course/{id}', 'courseShow')->name('students.course.show');
+      Route::post('course-apply', 'applyCourse')->name('students.course.apply');
+      Route::get('checkout/{id}', 'checkout')->name('students.course.checkout');
+      Route::get('confirm', 'confirm')->name('students.course.confirm');
+      Route::get('my-course', 'myCourse')->name('students.my-course');
+      Route::get('my-syllabus', 'mySyllabus')->name('students.my-syllabus');
+      Route::post('my-syllabus', 'mySyllabusPost')->name('students.my-syllabus.post');
+      Route::post('student/exam_add', 'examAdd')->name('student.exam.add');
+      Route::get('syllabus/{id}', 'syllabus')->name('student.syllabus');
+      Route::get('syllabus/{id}/pdf', 'generatePDF')->name('students.syllabus.pdf');
+      Route::get('complain', 'complain')->name('students.complain');
+      Route::post('complain', 'complainStore')->name('students.complain.store');
+      Route::get('update-paper/{id}', 'updatePaperAjax')->name('paper.update.ajax');
+      Route::get('profile', 'profile')->name('students.profile');
+    });
 	});
 
 	Route::controller(VerificationController::class)->group(function()
@@ -167,7 +216,6 @@ Route::middleware(['auth'])->group(function()
 	/** -------------------- Resource Routes --------------- */
 	Route::resource('filter', 'FilterCtrl');
 	Route::resource('sub-filter', 'SubFilterCtrl');
-	// Route::resource('filter-item', 'FilterItemCtrl');
 	Route::resource('course', 'CourseCtrl');
 	Route::resource('department', 'DepartmentCtrl');
 	Route::resource('semester', 'SemesterCtrl');
@@ -228,18 +276,21 @@ Route::middleware(['auth'])->group(function()
 
 	Route::controller(PaperCtrl::class)->group(function()
 	{
-		Route::get('paper/add-question/{paper_id}', 'addQuestion')->name('paper.add.question');
-		Route::post('paper/add_to_paper', 'addToPaper')->name('paper.addtopaper');
-		Route::get('/paper/view/{id}', 'view')->name('paper.view');
-		Route::get('/paper/exam/{id}', 'exam')->name('paper.exam');
-		Route::get('/paper/solution/{id}', 'solution')->name('paper.solution');
-		Route::get('/paper/solution-ajax/{id}', 'solutionAjax')->name('paper.solution.ajax');
-		Route::get('/paper/result/{id}', 'result')->name('paper.result');
-		Route::get('/paper/result/csv/{id}', 'resultCsv')->name('paper.result.csv');
-		Route::get('/paper/copy/{id}', 'copy')->name('paper.copy');
-		Route::post('/paper/copy-store', 'copyStore')->name('paper.copy.store');
-		Route::get('/paper/recheck_result/{id}', 'reCheckResult')->name('paper.recheck.result');
-		Route::get('/paper/detach/{paperId}/{questionId}', 'detachQuestion')->name('paper.detach.question');
+    Route::prefix('paper')->group(function()
+    {
+      Route::get('add-question/{paper_id}', 'addQuestion')->name('paper.add.question');
+      Route::post('add_to_paper', 'addToPaper')->name('paper.addtopaper');
+      Route::get('view/{id}', 'view')->name('paper.view');
+      Route::get('exam/{id}', 'exam')->name('paper.exam');
+      Route::get('solution/{id}', 'solution')->name('paper.solution');
+      Route::get('solution-ajax/{id}', 'solutionAjax')->name('paper.solution.ajax');
+      Route::get('result/{id}', 'result')->name('paper.result');
+      Route::get('result/csv/{id}', 'resultCsv')->name('paper.result.csv');
+      Route::get('copy/{id}', 'copy')->name('paper.copy');
+      Route::post('copy-store', 'copyStore')->name('paper.copy.store');
+      Route::get('recheck_result/{id}', 'reCheckResult')->name('paper.recheck.result');
+      Route::get('detach/{paperId}/{questionId}', 'detachQuestion')->name('paper.detach.question');
+    });
 	});
 
 	Route::controller(BatchCtrl::class)->group(function()
@@ -299,6 +350,12 @@ Route::middleware(['auth'])->group(function()
 	{
 		Route::get('order/add_to_batch/{id}', 'addToBatch')->name('student.addto.batch');
 	});
+
+  Route::controller(HomePageSettingCtrl::class)->group(function()
+  {
+    Route::get('about-us', 'aboutUs')->name('settings.about-us');
+    Route::post('about-us/update', 'aboutUsUpdate')->name('about.update');
+  });
 
   // database backup
   Route::get('/download-database', [BackupController::class, 'downloadDatabase'])->name('database.download');
