@@ -27,6 +27,7 @@ class CategoryCtrl extends Controller
     $courses = Course::where('status', 'Active')
     ->where('web', 'Yes')
     ->get();
+    
     return view('homepage.course', compact('type', 'title', 'courses'));
   }
 
