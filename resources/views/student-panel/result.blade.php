@@ -19,12 +19,11 @@ function position($user_mark, $candidates, $marks)
 @endphp
 
 @extends('student')
-@section('title', 'Course')
+@section('title', 'Result')
 @section('content')
-{{-- <script src='https://www.google.com/recaptcha/api.js' async defer></script> --}}
 <style>
   .checkbox{padding-left: 25px}
-  .panel ::-webkit-scrollbar{width: 5px;}
+  .card ::-webkit-scrollbar{width: 5px;}
   ::-webkit-scrollbar-thumb{background-color: #ddd}
   .mcqitems{list-style: none; padding-left: 10px}
   .mcqitems li{padding:5px; margin: 10px; max-width: 300px;}
@@ -39,7 +38,7 @@ function position($user_mark, $candidates, $marks)
   #fixed{text-align: center}
   .selected{background:lightblue;}
   .result table th{text-align: right;}
-  .panel{background-color: #eee}
+  .card{background-color: #eee}
   .items{background: #fff; text-align: center; color:#000; margin:5px; padding:10px}
 </style>
 
@@ -47,7 +46,9 @@ function position($user_mark, $candidates, $marks)
     <section class="content-header"></section>
 
     <!-- Main content -->
-    <section class="content no-padding" id="content">
+    <section class="our_courses no-padding" id="content">
+      <div class="container">
+
       @if(isset($result['result']))
       <div class="row">
         @foreach($exams as $key => $value)
@@ -55,8 +56,8 @@ function position($user_mark, $candidates, $marks)
         $total_mark = $paper->questions->count() * $paper->mark;
         $user_mark = number_format($value->mark / $total_mark * $paper->candidate);
         @endphp
-        <div class="col-md-6 col-md-offset-3 result no-padding" id="result">
-          <div class="panel">
+        <div class="col-md-6 col-md-offset-3 result no-padding mt-3" id="result">
+          <div class="card p-3">
             <div style="text-align: center">
               <img src="/img/logo.png" alt="" style="max-width:100px">
             </div>
@@ -71,31 +72,32 @@ function position($user_mark, $candidates, $marks)
               <br>
               {{$source->dformat($value->start_at)}}
             </p>
-            <div class="col-xs-6 no-padding">
+            <div class="row">
+            <div class="col-md-6 no-padding">
               <div class="items">
-                মোট পরীক্ষার্থীর সংখ্যা<br>
+                মোট পরীক্ষার্থীর সংখ্যা <br>
                 <i class="fa fa-users"></i> {{$candidates}}
               </div>
             </div>
-            <div class="col-xs-6 no-padding">
+            <div class="col-md-6 no-padding">
               <div class="items">
                 উত্তীর্ণ পরীক্ষার্থীর সংখ্যা<br>
                 <i class="fa fa-check-circle" style="color:green"></i> {{$passed}}
               </div>
             </div>
-            <div class="col-xs-6 no-padding">
+            <div class="col-md-6 no-padding">
               <div class="items">
                 আপনার মার্কস<br>
                 <i class="fa fa-"></i> {{$value->correct - ($value->wrong * $paper->minus)}}
               </div>
             </div>
-            <div class="col-xs-6 no-padding">
+            <div class="col-md-6 no-padding">
               <div class="items">
                 কর্তনকৃত মার্কস<br>
                 <i class="fa fa-close" style="color:brown"></i> {{$value->wrong * $paper->minus}}
               </div>
             </div>
-            <div class="col-xs-6 no-padding">
+            <div class="col-md-6 no-padding">
               <div class="items">
                 আপনার ফলাফল<br>
                 @if($user_mark > 80)
@@ -109,13 +111,15 @@ function position($user_mark, $candidates, $marks)
                 @endif
               </div>
             </div>
-            <div class="col-xs-6 no-padding">
+            <div class="col-md-6 no-padding">
               <div class="items">
                 আপনার অবস্থান<br>
                 {{position($user_mark, $candidates, $total_mark)}}
               </div>
             </div>
-            <div class="panel-body">
+          </div> 
+
+            <div class="card-body">
               <table class="table table-bordered">
                 <tr>
                   <th colspan="2" style="text-align: center;font-size:18px">Result Summary</th>
@@ -179,8 +183,12 @@ function position($user_mark, $candidates, $marks)
           <p>{{$paper->result_message}}</p>
           <hr>
           <p>
-            <a href="{{route('students.exam')}}" class="btn btn-warning"> <i class="fa fa-arrow-left"></i> Back</a>
-            <a href="{{route('students.complain')}}" class="btn btn-info">আপনার মতামত/অভিযোগ দিন</a>
+            <a href="{{route('students.exam')}}" class="btn btn-warning">
+              <i class="fa fa-arrow-left"></i> Back
+            </a>
+            <a href="{{route('students.complain')}}" class="btn btn-info">
+              আপনার মতামত/অভিযোগ দিন
+            </a>
           </p>
         </div>
       </div>
@@ -193,6 +201,8 @@ function position($user_mark, $candidates, $marks)
         </div>
       </div>
       @endif
+        
+      </div>
     </section> <!-- /.content -->
 @endsection
 

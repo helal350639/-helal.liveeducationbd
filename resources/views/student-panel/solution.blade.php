@@ -20,28 +20,25 @@ $source = New SourceCtrl;
     .mcqitems{width:340px; column-width:140px}
   }
 </style>
-  <!-- Content Header (Page header) -->
-    <section class="content-header">
-      <h1>Solution</h1>
-      <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Solution</a></li>
-        <li class="active">Details</li>
-      </ol>
-    </section>
 
     <!-- Main content -->
-  <section class="content">
-    <div class="row"><!-- left column -->
-      <div class="col-md-12"><!-- general form elements -->
-        <div class="box box-primary">
-          <div class="box-header with-border">
-            <h4 class="box-title" style="display: inline">Solution (<b>{{count($paper->questions)}}</b>)</h4>
-            <div class="text-right toolbar-icon pull-right" style="display: inline">
+  <section class="our_courses">
+    <div class="row">
+      <div class="title-area text-center">
+          <h1>Solution Paper</h1>
+        </div>
+      </div>
+    <div class="row"> <!-- left column -->
+      <div class="col-md-12"> <!-- general form elements -->
+        <div class="card">
+          <div class="card-header with-border">
+            <h4 class="float-start" style="display: inline">Solution (<b>{{count($paper->questions)}}</b>)</h4>
+            <div class="text-right toolbar-icon float-end" style="display: inline">
               {{-- <a href="{{route('paper.add.question', $paper->id)}}" title="Add Questions" class="label label-info"><i class="fa fa-plus"></i> Add Questions</a> --}}
               {{-- <a href="{{route('paper.create')}}" title="Add" class="label label-primary"><i class="fa fa-pencil"></i> Create</a> --}}
               {{-- <a href="{{route('paper.index')}}" title="View" class="label label-success"><i class="fa fa-list"></i></a> --}}
               {{-- <a href="{{route('paper.view', $paper->id)}}" class="label label-primary" title="Details"><i class="fa fa-file-text"></i></a> --}}
-              <a href="#" class="label label-info" title="Print" onclick="printDiv()"><i class="fa fa-print"></i></a>
+              <a href="#" class="label label-info" title="Print" onclick="printDiv()"><i class="fa fa-print"></i> Print</a>
             </div>
           </div>
         </div>

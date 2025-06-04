@@ -123,8 +123,13 @@ foreach($batch->teachers as $val)
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
-                        <label for="status">Status </label><br>
-                        <label><input type="checkbox" name="status" id="status" value="{{$batch->status}}" style="width: 15px; height:15px" {{$batch->status == 'Active' ?'checked':''}}> <span style="margin-top:-10px">Active</span></label>
+                      <label><input type="checkbox" name="status" id="status" value="{{$batch->status}}" style="width: 15px; height:15px" {{$batch->status == 'Active' ?'checked':''}}> <span style="margin-top:-10px">Status</span></label>
+
+                        &nbsp;
+                    
+                      <label>
+                        <input type="checkbox" name="web" id="web" value="{{$batch->web}}" style="width: 15px; height:15px" {{$batch->web == 'Yes' ? 'checked':''}}> <span style="margin-top:-10px">Web</span>
+                      </label>
                     </div>
                 </div>
                 <div class="col-md-6">

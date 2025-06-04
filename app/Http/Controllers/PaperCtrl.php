@@ -37,9 +37,13 @@ class PaperCtrl extends Controller
      */
     public function index()
     {
-        $papers = Paper::orderBy('id','DESC')
-        ->paginate(25);
-        return view('layouts.papers.index', compact('papers'));
+      $courses = Course::where('status', 'Active')->get();
+      $batches = Batch::where('status', 'Active')->get();
+      $departments = Department::where('status', 'Active')->get();
+      $papers = Paper::orderBy('id','DESC')
+      ->paginate(25);
+
+      return view('layouts.papers.index', compact('papers', 'courses', 'batches', 'departments'));
     }
 
     /**
@@ -514,5 +518,34 @@ class PaperCtrl extends Controller
             ]
         );
         // return 'I am responding from server with id:'.$qid;
+    }
+
+    public function search(Request $request)
+    {
+      $data = $request->all();
+      
+      $courses = Course::where('status', 'Active')->get();
+      $batches = Batch::where('status', 'Active')->get();
+      $departments = Department::where('status', 'Active')->get();
+
+      $papers = Paper::orderBy('id','DESC');
+
+      if(isset($data['course_id']))
+      {
+        $papers = $papers->where('course_id', $data['course_id']);
+      }
+      
+      if(isset($data['batch_id']))
+      {
+        $papers = $papers->where('batch_id', $data['batch_id']);
+      }
+
+      if(isset($data['department_id']))
+      {
+        $papers = $papers->where('department_id', $data['department_id']);
+      }
+      $papers = $papers->paginate(25);
+
+      return view('layouts.papers.index', compact('papers', 'courses', 'batches', 'departments', 'data'));
     }
 }

@@ -16,141 +16,56 @@ if($user)
   .checkbox{padding-left: 25px}
 </style>
 
-    <!-- Content Header (Page header) -->
-    <section class="content-header">
-      <h1> পরীক্ষা সমূহ {{-- <small>পরীক্ষা সমূহple 2.0</small> --}} </h1>
-      <ol class="breadcrumb">
-        <li><a href="/"><i class="fa fa-dashboard"></i> হোম</a></li>
-        <li><a href="{{route('students.exam')}}">পরীক্ষা সমূহ</a></li>
-      </ol>
-    </section>
-
     <!-- Main content -->
-    <section class="content">
-      <div class="row">
-        <div class="col-md-12 no-padding">
-          @if( !empty($student) && $student->batches()->count() )
-            @foreach($student->batches()->orderBy('batches.id', 'DESC')->where('status', 'Active')->get() as $batch)
-              @php
-              $batch_papers = $batch->papers()->whereIn('status', ['Published', 'Scheduled'])->orderBy('id', 'DESC')->get();
-              @endphp
-              @if($batch_papers)
-              <div class="col-md-12 box box-info">
-                <h4>{{$batch->name}}</h4>
-              </div>
-                @foreach($batch_papers as $key => $paper)
-                  @if( $paper->permit == 'Batch' && $student->batches->find($paper->batch_id) || $paper->permit == 'Department' && $student->departments->find($paper->department_id) || $paper->permit == 'Group' && $student->groups->find($paper->group_id))
-                    <div class="col-md-3">
-                      <a href="{{route('students.check', $paper->id)}}">
-                      <div class="panel" style="min-height: 130px">
-                        <div class="panel-body" style="padding-top:0;font-size:22px">
-                          <h4>{{substr($paper->name, 0, 30)}}</h4>
-                        </div>
-                        <p style="padding:0 15px"><b>{{substr( $batch->name, 0, 45)}}</b></p>
-                        <div class="panel-footer">
-                          @php
-                          $latest_exam = $paper->exams()->orderBy('id', 'DESC')->where('student_id', $user->id)->first();
-                          @endphp
+    <section class="our_courses">
+      <div class="container">
+        <div class="row">
+          <!-- Content Header (Page header) -->
+          <div class="title-area text-center">
+            <h1> পরীক্ষা সমূহ </h1>
+          </div>
+        </div>
 
-                          @if($latest_exam)
-                          <a href="{{route('students.exam.paper', $latest_exam->id)}}" class="btn btn-info btn-block"><i class="fa fa-file-o"></i> আপনার এক্সাম পেপার</a>
-                          @else
-                          <a href="#" class="btn btn-block btn-disable">No Exam Paper</a>
-                          @endif
-
-                          @if($latest_exam || $paper->close < date('Y-m-d H:i:s'))
-                          <a href="{{route('students.solution', $paper->id)}}" class="btn btn-success btn-block"><i class="fa fa-check"></i> সলূশন পেপার</a>
-                          @else
-                          <a href="#" class="btn btn-block btn-disable">No Solution Paper</a>
-                          @endif
-
-                          @if($paper->exams->where('student_id', $user->id)->first())
-                          <a href="{{route('students.result', $paper->id)}}" class="btn btn-warning cst-btn btn-block">ফলাফল দেখুন</a>
-                          @else
-                          <a href="#" class="btn btn-default btn-block">No Result</a>
-                          @endif
-
-                          @if(!$paper->exams->where('student_id', $user->id)->first())
-                          <a class="btn btn-info cst-btn btn-block" href="{{route('students.instruction', $paper->id)}}">পরীক্ষা দিন</a>
-                          @endif
-                        </div>
-                      </div>
-                    </a>
-                  </div>
-                  @else
-                  {{-- <p style="color:white">Exams will publish soon!</p> --}}
-                  @endif
-                @endforeach
-              @endif
-            @endforeach
-            <div class="row"></div>
-          @else
-            <div class="panel panel-default">
-              <div class="panel-body">
-                <label>আপনের কোন কোর্সে পরীক্ষা চলমান নেই।</label>
-                <p><a href="{{route('students.course')}}">চলমান কোর্স সমূহ</a></p>
-              </div>
-            </div>
-          @endif
-          @if($papers)
-            <div class="col-md-12 box box-info"><h4>Free Exams</h4></div>
-              @foreach($papers as $paper)
-                <div class="col-md-3">
-                  <a href="{{route('students.check', $paper->id)}}">
-                    <div class="panel" style="min-height: 130px">
-                      <div class="panel-heading">
-                        <h4>{{substr($paper->name, 0, 20) }}</h4>
-                      </div>
-                      <div class="panel-body" style="padding-top:0;">
-                        
-                        For: <b>{{$paper->permit}}<b>
-                      </div>
-                      <div class="panel-footer">
-                        @php
-                        $latest_exam = $paper->exams()->orderBy('id', 'DESC')->where('student_id', $user->id)->first();
-                        @endphp
-                        @if($latest_exam)
-                        <a href="{{route('students.exam.paper', $latest_exam->id)}}" class="btn btn-info btn-block"><i class="fa fa-file-o"></i> আপনার এক্সাম পেপার</a>
-                        <a href="{{route('students.solution', $paper->id)}}" class="btn btn-success btn-block"><i class="fa fa-check"></i> সলূশন পেপার</a>
-                        @else
-                        <a href="#" class="btn btn-block btn-disable">No Exam Paper</a>
-                        <a href="#" class="btn btn-block btn-disable">No Solution Paper</a>
-                        @endif
-                        @if($paper->exams->where('student_id', $user->id)->first() && $paper->result_at < date('Y-m-d'))
-                        <a href="{{route('students.result', $paper->id)}}" class="btn btn-warning cst-btn btn-block">ফলাফল দেখুন</a>
-                        @endif
-                        @if(!$paper->exams->where('student_id', $user->id)->first())
-                        <a class="btn btn-info cst-btn btn-block" href="{{route('students.instruction', $paper->id)}}">পরীক্ষা দিন</a>
-                        @endif
+        <div class="row">
+          <div class="col-md-12 no-padding">
+            <div class="all-courses-area">
+              <div class="row g-2 g-md-3 g-lg-4">
+    
+                @if(count($batches))
+                @foreach($batches as $value)
+                <div class="col-6 col-lg-3 mt-4">
+                  <div class="exam-package-area">
+                    <div class="package-exam-image">
+                      <a href="{{route('students.batch-exam', $value->id)}}">
+                      <img src="{{ $value->banner? $value->banner : '/img/course.png'}}" alt="" loading="lazy" />
+                      </a>
+                    </div>
+                    <div class="package-exam-content mx-2 mx-lg-3">
+                      <div class="package-exam-title pt-3">
+                        <h2><a href="{{route('students.batch-exam', $value->id)}}">{{substr($value->name, 0, 20)}}</a></h2>
                       </div>
                     </div>
-                  </a>
+                  </div>
                 </div>
-              @endforeach
+                @endforeach
+                @else
+                <div class="panel panel-default">
+                  <div class="panel-body">
+                    No Course Available
+                  </div>
+                </div>
+                @endif
+              </div>
             </div>
-          @else
-          <p>Free exam not available!</p>
-          @endif
-        </div>
-      </div>
-    </section> <!-- /.content -->
 
-<script>
-  function showPassword(e)
-  {
-    let elm = e.previousElementSibling;
-    if(elm.type == 'password')
-    {
-      elm.setAttribute('type', 'text');
-      e.firstChild.classList.add('fa-eye');
-      e.firstChild.classList.remove('fa-eye-slash');
-    }
-    else 
-    {
-      elm.setAttribute('type', 'password');
-      e.firstChild.classList.add('fa-eye-slash');
-      e.firstChild.classList.remove('fa-eye');
-    }
-  }
-</script>
+          </div>
+        </div> <!-- /.row -->
+        <div class="row p-5">
+          <div class="container text-center">
+            <p><button class="btn btn-warning btn-outline" onclick="window.history.back();"><i class="fa fa-long-arrow-left"></i> Back</button></p>
+          </div>
+        </div>
+      </div> <!-- /.container -->
+    </section> <!-- /.our_courses -->
+    
 @endsection

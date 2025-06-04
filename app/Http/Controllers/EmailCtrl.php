@@ -56,9 +56,9 @@ class EmailCtrl extends Controller
     {
       $source = new SourceCtrl;
       $this->validate($request, [
-        'batch_id'  => 'required|array',
+        'batch_id'    => 'required|array',
         'student_id'  => 'nullable|array',
-        'details'   => 'nullable|max:1000',
+        'details'     => 'nullable|max:10000',
       ]);
 
       // process request data      

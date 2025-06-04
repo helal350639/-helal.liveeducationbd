@@ -136,76 +136,68 @@ class BatchCtrl extends Controller
         ]);
         
         $data = $request->all();
-        // dd($data);
         $batch = Batch::find($id);
         $xbanner = public_path($batch->banner);
         $departments = $teachers = [];
 
         if(isset($data['_token']))
         {
-            unset($data['_token']);
-        }
-        if(isset($data['_method']))
-        {
-            unset($data['_method']);
+          unset($data['_token']);
         }
 
-        if(isset($data['status']))
+        if(isset($data['_method']))
         {
-            $data['status'] = 'Active';
+          unset($data['_method']);
         }
-        else
-        {
-            $data['status'] = 'Deactive';
-        }
+
+        $data['status'] = isset($data['status']) ? 'Active' : 'Deactive';
+        $data['web'] = isset($data['web']) ? 'Yes' : 'No';
 
         if(isset($data['department_id']))
         {
-            $departments = $data['department_id'];
-            unset($data['department_id']);
+          $departments = $data['department_id'];
+          unset($data['department_id']);
         }
 
         if(isset($data['teacher_id']))
         {
-            $teachers = $data['teacher_id'];
-            unset($data['teacher_id']);
+          $teachers = $data['teacher_id'];
+          unset($data['teacher_id']);
         }
 
         if(isset($data['teacher_id']))
         {
-            unset($data['teacher_id']);
+          unset($data['teacher_id']);
         }
 
         if(isset($data['banner']))
         {
-            $data['banner'] = $source->uploadImage($request->banner, 'batches/');
+          $data['banner'] = $source->uploadImage($request->banner, 'batches/');
         }
 
         if(isset($data['video']))
         {
-            $data['video'] = substr($request->video, 32, 20);
+          $data['video'] = substr($request->video, 32, 20);
         }
         else
         {
-            unset($data['video']);
+          unset($data['video']);
         }
 
-        // dd($data);
+        try {
+          Batch::where('id', $id)->update($data);
 
-        try{
-            Batch::where('id', $id)->update($data);
+          if(isset($data['banner']) && File::exists($xbanner))
+          {
+            File::delete($xbanner);
+          }
 
-            if(isset($data['banner']) && File::exists($xbanner))
-            {
-                File::delete($xbanner);
-            }
-
-            $batch->departments()->sync($departments);
-            $batch->teachers()->sync($teachers);
+          $batch->departments()->sync($departments);
+          $batch->teachers()->sync($teachers);
         }
         catch(\E $e)
         {
-            return $e;
+          return $e;
         }
         
         Session::flash('success', 'The batch successfully Updated!');
@@ -223,18 +215,18 @@ class BatchCtrl extends Controller
     {
         if(Auth::user()->AuthorizeRoles('SuperAdmin'))
         {
-            $course = Batch::find($id);
+          $course = Batch::find($id);
 
-            // delete all relationship
-            // $course->courses()->detach();
-            // $course->departments()->detach();
-            $course->papers()->detach();
+          // delete all relationship
+          // $course->courses()->detach();
+          // $course->departments()->detach();
+          $course->papers()->detach();
 
-            //delete course table
-            $course->delete();
+          //delete course table
+          $course->delete();
 
-            Session::flash('Success','The batch successfully deleted');
-            return redirect()->route('batch.index');
+          Session::flash('Success','The batch successfully deleted');
+          return redirect()->route('batch.index');
         }
 
         Session::flash('error', 'Permission restricted!');

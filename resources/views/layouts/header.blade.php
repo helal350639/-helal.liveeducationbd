@@ -375,6 +375,7 @@ if($complains)
             <li><a href="{{ route('profile') }}"><i class="fa fa-user"></i> Profile</a></li>
             <li><a href="/change_password"><i class="fa fa-lock"></i> Change Password</a></li>
             <li><a href="/page"><i class="fa fa-copy"></i> Pages</a></li>
+            <li><a href="/about-us"><i class="fa fa-copy"></i> About Us</a></li>
           </ul>
         </li>
         

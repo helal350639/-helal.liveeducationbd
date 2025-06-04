@@ -33,7 +33,7 @@ class OrderCtrl extends Controller
     $orders = Order::leftJoin('batches', 'batches.id', 'orders.batch_id')
     ->leftJoin('departments', 'departments.id', 'orders.department_id')
     ->leftJoin('students', 'students.id', 'orders.student_id')
-    ->leftJoin('batch_student', function($join){
+    ->leftJoin('batch_student', function($join) {
       $join->on('batch_student.student_id', 'students.id');
     })
     ->orderBy('id','desc')
@@ -44,7 +44,6 @@ class OrderCtrl extends Controller
     'batch_student.student_id as batch_has_student'
     )
     ->groupBy('orders.id', 'orders.student_id', 'orders.batch_id', 'orders.department_id', 'orders.name', 'orders.email', 'orders.phone', 'orders.amount', 'orders.address', 'orders.status', 'orders.transaction_id', 'orders.currency', 'orders.created_at', 'batches.name', 'departments.name', 'students.name', 'batch_student.student_id')
-    // ->distinct()
     ->paginate(25);
     return view('layouts.orders.index', compact('orders'));
   }

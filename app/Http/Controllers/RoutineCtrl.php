@@ -8,7 +8,10 @@ use App\Models\Department;
 use App\Models\Batch;
 use App\Models\Group;
 use App\Models\Routine;
+use App\Models\RoutineItem;
 use App\Models\Role;
+use App\Models\Paper;
+use App\Models\Subject;
 use Auth;
 use Image;
 use Toastr;
@@ -193,25 +196,60 @@ class RoutineCtrl extends Controller
      */
     public function destroy($id)
     {
-        if(Auth::user()->AuthorizeRoles('SuperAdmin'))
+      if(Auth::user()->AuthorizeRoles('SuperAdmin'))
+      {
+        $routine = Routine::find($id);
+        $xpdf = public_path($routine->pdf);
+
+        if(File::exists($xpdf))
         {
-            $routine = Routine::find($id);
-            $xpdf = public_path($routine->pdf);
-
-            if(File::exists($xpdf))
-            {
-                File::delete($xpdf);
-            }
-
-            //delete routine table
-            $routine->delete();
-
-            Session::flash('Success','The routine successfully deleted');
-            return redirect()->route('routine.index');
+            File::delete($xpdf);
         }
 
-        Session::flash('error', 'Permission restricted!');
-        return back();
+        //delete routine table
+        $routine->delete();
+
+        Session::flash('Success','The routine successfully deleted');
+        return redirect()->route('routine.index');
+      }
+
+      Session::flash('error', 'Permission restricted!');
+      return back();
     }
+
+
+  /** ================== Add Item Section =================== */
+
+  public function addItem($id)
+  {
+    $routine = Routine::find($id);
+    $papers = Paper::orderBy('id', 'DESC')->get();
+    $subjects = Subject::orderBy('id', 'DESC')->get();
+    $departments = Department::orderBy('id', 'DESC')->get();
     
+    $items = RoutineItem::orderBy('id', 'DESC')->get();
+
+    return view('layouts.routines.add-item', compact('routine', 'papers', 'subjects', 'departments', 'items'));
+  }
+  
+  public function addItemPost(Request $request)
+  {
+    $data = $request->all();
+    
+    if(isset($data['_token']))
+    {
+      unset($data['_token']);
+    }
+
+    try {
+      RoutineItem::insert($data);
+    }
+    catch(\Exception $e)
+    {
+      return $e->getMessage();
+    }
+
+    // return $this->addItem($data['routine_id']);
+    return redirect()->route('routine.add-item', $data['routine_id']);
+  }
 }

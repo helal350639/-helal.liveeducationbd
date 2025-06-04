@@ -24,35 +24,39 @@ $source = New SourceCtrl;
     <div class="col-xs-12">
       <div class="box">
         <div class="box-body">
-          <form action="">
+          <form action="{{route('paper.search')}}" method="POST">
+            @csrf
             <div class="col-md-3">
               <div class="form-group">
-                <label for="">Group</label>
-                <select name="group_id" id="group_id" class="form-control">
+                <label for="course_id">Course</label>
+                <select name="course_id" id="course_id" class="form-control" onchange="getBatches(this)">
                   <option value="">Select One</option>
-                  <option value="">Group 1</option>
-                  <option value="">Group 2</option>
-                  <option value="">Group 3</option>
-                  <option value="">Group 4</option>
+                  @foreach($courses as $course)
+                  <option value="{{$course->id}}" {{isset($data['course_id']) && $data['course_id'] == $course->id ? 'selected': ''}}>{{$course->name}}</option>
+                  @endforeach
                 </select>
               </div>
             </div>
             <div class="col-md-3">
               <div class="form-group">
-                <label for="">Batch</label>
-                <select name="batch_id" id="batch_id" class="form-control">
+                <label for="batch_id">Batch</label>
+                <select name="batch_id" id="batch_id" class="form-control" onchange="getDepartments(this)">
                   <option value="">Select One</option>
-                  <option value="">Batch 1</option>
-                  <option value="">Batch 2</option>
-                  <option value="">Batch 3</option>
-                  <option value="">Batch 4</option>
+                  @foreach($batches as $batch)
+                  <option value="{{$batch->id}}" {{isset($data['batch_id']) && $data['batch_id'] == $batch->id ? 'selected': ''}}>{{$batch->name}}</option>
+                  @endforeach
                 </select>
               </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
               <div class="form-group">
-                <label for="">Question Paper No.</label>
-                <input type="text" name="name" id="name" class="form-control">
+                <label for="department_id">Department</label>
+                <select name="department_id" id="department_id" class="form-control">
+                  <option value="">Select One</option>
+                  @foreach($departments as $department)
+                  <option value="{{$department->id}}" {{isset($data['department_id']) && $data['department_id'] == $department->id ? 'selected': ''}}>{{$department->name}}</option>
+                  @endforeach
+                </select>
               </div>
             </div>
             <div class="col-md-2"><br>
@@ -121,20 +125,6 @@ $source = New SourceCtrl;
                 </tr>
                 @endforeach
               </table>
-              {{-- <br>
-              @foreach($papers as $key => $value)
-              <a href="{{route('paper.view', $value->id)}}">
-                <div class="col-md-6">
-                  <div class="panel panel-default">
-                    <div class="panel-heading input-group">
-                        <h4>({{$key+1}}) : <b> {{$value->name}}</b></h4>
-                        <span class="input-group-addon" title="Questions">{{$value->questions->count()}}</span>
-                      <div class="clearfix"></div>
-                    </div>
-                  </div>
-                </div>
-              </a>
-              @endforeach --}}
             </div>
             <!-- /.box-body -->
             <div class="box-footer clearfix">
@@ -149,18 +139,65 @@ $source = New SourceCtrl;
     </section>
     <!-- /.content -->
     @endsection
-{{-- @section('scripts')
+@section('scripts')
   <script>
-    $(function () {
-      $('#example1').DataTable()
-      $('#example2').DataTable({
-        'paging'      : true,
-        'lengthChange': false,
-        'searching'   : false,
-        'ordering'    : true,
-        'info'        : true,
-        'autoWidth'   : false
-      })
-    })
+    // on change course get batches
+function getBatches(e)
+{
+    let ids = Array.from(e.selectedOptions).map(({value}) => value);
+
+    $.ajax({
+        type: 'GET', //THIS NEEDS TO BE GET
+        url: '/get_batches/' + ids,
+        success: function (data) {
+
+            var obj = JSON.parse(JSON.stringify(data));
+            var options = '<option value="">Select One</option>';
+
+            $.each(obj['data'], function (key, val) {
+                options += '<option value="'+val.id+'">'+val.name+'</option>';
+            });
+
+            if(options != ""){
+                $("#batch_id").html(options);
+                $("#department_id").html('<option value="">Select One</option>');
+            }else{
+                $("#batch_id").html('');
+            }
+        },
+        error: function(data) { 
+                console.log('data error');
+        }
+    });
+}
+
+// on change batch get departments
+function getDepartments(e)
+{
+    let ids = Array.from(e.selectedOptions).map(({value}) => value);
+
+    $.ajax({
+        type: 'GET', //THIS NEEDS TO BE GET
+        url: '/get_departments_by_batch/' + ids,
+        success: function (data) {
+
+            var obj = JSON.parse(JSON.stringify(data));
+            var options = '<option value="">Select One</option>';
+
+            $.each(obj['data'], function (key, val) {
+                options += '<option value="'+val.id+'">'+val.name+'</option>';
+            });
+
+            if(options != ""){
+                $("#department_id").html(options)
+            }else{
+                $("#department_id").html('')
+            }
+        },
+        error: function(data) { 
+          console.log('data error');
+        }
+    });
+}
   </script>
-@endsection --}}
+@endsection

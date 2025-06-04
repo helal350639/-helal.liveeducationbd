@@ -9,10 +9,11 @@ if($user)
 }
 $value = $batch;
 @endphp
+
 @extends('student')
 @section('title', 'Course-Checkout')
 @section('content')
-{{-- <script src='https://www.google.com/recaptcha/api.js' async defer></script> --}}
+
 <style>
   .checkbox{padding-left: 25px}
   .panel ::-webkit-scrollbar{width: 5px;}
@@ -20,40 +21,29 @@ $value = $batch;
   .course-image{width:100%}
   .teacher-title p{margin:0}
   .box-title {display: block;width:100%}
-  /* @media(min-width: 769px){
-    .pricing{float: right;}
-    .info{}
-  }
-  @media(max-width: 768px){
-    .pricing{}
-    .info{}
-  } */
 </style>
 
-    <!-- Content Header (Page header) -->
-    <section class="content-header">
-      <h1> Course Checkout {{-- <small>Courseple 2.0</small> --}} </h1>
-      <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li><a href="#">Course</a></li>
-      </ol>
-    </section>
-
     <!-- Main content -->
-    <section class="content">
+    <section class="container p-5">
+      <div class="row">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+          <h1>Course Checkout</h1>
+        </div>
+      </div>
       <div class="row">
         <div class="col-md-6 col-md-offset-3 pricing">
           <!-- Apply to the course -->
           <form action="{{route('students.course.apply')}}" method="post">
             @csrf
-            <div class="panel panel-default">
-              <div class="panel-heading no-padding" style="text-align: center;padding:15px">
+            <div class="card card-default">
+              <div class="card-heading no-padding" style="text-align: center;padding:15px">
                 {{-- <img class="course-image" src="{{ $value->banner? $value->banner : '/img/course.jpg'}}" alt="" /> --}}
               </div>
-            <div class="panel-header">
+            <div class="card-header">
               <h3 style="padding:0 15px">{{$value->name}}</h3>
             </div>
-            <div class="panel-body">
+            <div class="card-body">
                 <input type="hidden" name="student_id" value="{{$user ? $user->id : null}}">
                 <input type="hidden" name="batch_id" value="{{$value->id}}">
                 
@@ -108,7 +98,7 @@ $value = $batch;
                 @endif
                 </div>
               </div>
-              <div class="panel-footer">
+              <div class="card-footer">
       
                 {{-- <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button> --}}
                 @if(!empty($user->id) && $value->students()->where('id', $user->id)->first())

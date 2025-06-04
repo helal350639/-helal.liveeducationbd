@@ -17,6 +17,7 @@ use App\Models\McqItem;
 use App\Models\Choice;
 use App\Models\Syllabus;
 use App\Models\Complain;
+use App\Models\Order;
 use Auth;
 use Session;
 use Mail;
@@ -31,22 +32,26 @@ class StudentHomeCtrl extends Controller
     $this->middleware('auth:student');
   }
 
-  public function home()
+  public function dashboard()
   {
-    // $user = Auth::guard('student')->user();
-    // // active courses
-    // $courses = Course::orderBy('id', 'DESC')->where('status', 'Active')->get();
+    $user = Auth::guard('student')->user();
+    // active courses
+    $courses = Course::orderBy('id', 'DESC')->where('status', 'Active')->get();
 
-    // // autheticates user courses
-    // $student = Student::find($user->id);
-    // $mycourses = $student->courses()->orderBy('id', 'DESC')->get();
+    // autheticates user courses
+    $student = Student::find($user->id);
+    $mycourses = $student->courses()->orderBy('id', 'DESC')->get();
 
-    // // authenticates user examps
-    // // $batch_ids = $student->batches()->pluck('id')->toArray();
-    // $papers = Paper::orderBy('id', 'DESC')->whereIn('status', ['Published', 'Scheduled'])->where('permit', 'Every One')->get();
-    // return view('student-panel.home', compact('courses', 'mycourses', 'papers', 'student'));
+    // authenticates user exams
+    $papers = Paper::orderBy('id', 'DESC')->whereIn('status', ['Published', 'Scheduled'])->where('permit', 'Every One')->get();
 
-    return redirect()->route('students.my-course');
+    $orders = Order::leftJoin('batches', 'batches.id', 'orders.batch_id')
+    ->orderBy('orders.id', 'DESC')
+    ->where('orders.student_id', $user->id)
+    ->select('orders.*', 'batches.name')
+    ->get();
+
+    return view('student-panel.dashboard', compact('courses', 'mycourses', 'papers', 'student', 'orders'));
   }
 
   public function profile()
@@ -183,8 +188,23 @@ class StudentHomeCtrl extends Controller
   {
     $user = Auth::guard('student')->user();
     $papers = Paper::orderBy('id', 'DESC')->whereIn('status', ['Published', 'Scheduled'])->where('permit', 'Every One')->get();
+
+    $batches = Batch::all();
     
-    return view('student-panel.exam', compact('papers'));
+    return view('student-panel.exam', compact('papers', 'batches'));
+  }
+
+  public function freeExam()
+  {
+    $batches = Batch::all();
+    return view('student-panel.free-exam', compact('batches'));
+  }
+
+  public function batchExam($id)
+  {
+    $batch = Batch::find($id);
+    $papers = Paper::where('batch_id', $id)->get();
+    return view('student-panel.exam-batch', compact('batch', 'papers'));
   }
 
   public function check($id)
@@ -320,6 +340,12 @@ class StudentHomeCtrl extends Controller
         'format' => $source->mcqlist()[$paper->format ?? 0]
       ]
     );
+  }
+
+  public function batchResult()
+  {
+    $batches = Batch::all();
+    return view('student-panel.batch-result', compact('batches'));
   }
 
   public function result($id, $value = null)
@@ -715,6 +741,12 @@ class StudentHomeCtrl extends Controller
       'success' => false,
       'message' => 'The paper update failed'
     ], 401);
+  }
+
+  public function batchRoutine()
+  {
+    $batches = Batch::all();
+    return view('student-panel.routine-batch', compact('batches'));
   }
 
 }

@@ -8,9 +8,8 @@ if($user)
   $student = \App\Models\Student::find($user->id);
 }
 $value = $batch;
-//
-
 @endphp
+
 @extends('student')
 @section('title', 'Course')
 @section('stylesheets')
@@ -60,22 +59,13 @@ $value = $batch;
 
 @endsection
 @section('content')
-{{-- <script src='https://www.google.com/recaptcha/api.js' async defer></script> --}}
 <style>
   .checkbox{padding-left: 25px}
-  .panel ::-webkit-scrollbar{width: 5px;}
+  .card ::-webkit-scrollbar{width: 5px;}
   ::-webkit-scrollbar-thumb{background-color: #ddd}
   .course-image{width:100%}
   .teacher-title p{margin:0}
   .box-title {display: block;width:100%}
-  @media(min-width: 769px){
-    .pricing{float: right;}
-    .info{}
-  }
-  @media(max-width: 768px){
-    .pricing{}
-    .info{}
-  }
   .list{list-style: none}
   .list li{padding: 10px 0}
   .videoWrapper {
@@ -95,26 +85,22 @@ $value = $batch;
   }
 </style>
 
-{{-- <div class="content-wrapper">
-  <div class="container no-padding"> --}}
-    <!-- Content Header (Page header) -->
-    <section class="content-header">
-      <h1> Course {{-- <small>Courseple 2.0</small> --}} </h1>
-      <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li><a href="#">Course</a></li>
-      </ol>
-    </section>
-
-    <!-- Main content -->
-    <section class="content">
+  <!-- Main content -->
+  <section class="our_courses">
+    <div class="container py-3">
       <div class="row">
-        <div class="col-md-4 pricing">
+        <div class="title-area text-center">
+          <h1>{{$value->course ? $value->course->name:''}}</h1>
+        </div>
+      </div>
+      <div class="row">
+
+        <div class="col col-md-4 order-md-last py-5 pt-0">
           <!-- Apply to the course -->
           <form action="{{route('students.course.apply')}}" method="post">
             @csrf
             <input type="hidden" name="batch_id" value="{{$value->id}}">
-            <div class="panel panel-default">
+            <div class="card card-default">
               <div class="penel-heading no-padding" style="text-align: center;">
                 @if($value->video)
                 <div class="videoWrapper">
@@ -124,7 +110,7 @@ $value = $batch;
                 <img class="course-image" src="{{ $value->banner? $value->banner : '/img/course.png'}}" alt="" />
                 @endif
               </div>
-              <div class="panel-heading">
+              <div class="card-heading p-3">
                 <h3>
                   @if($value->discount && $value->offer_end_at && $value->offer_end_at > date('Y-m-d H:i:s')) 
                   <del> &#2547;{{$source->point0($value->price)}}</del> &nbsp; <span class="label label-warning"> &#2547;{{$source->point0($value->discount)}} ছাড়</span>
@@ -136,7 +122,7 @@ $value = $batch;
                   @endif
                 <p>{{$value->subtitle}}</p>
               </div>
-              <div class="panel-footer">
+              <div class="card-footer">
                 @if(!empty($user->id) && $value->students()->where('id', $user->id)->first())
                 <button class="btn btn-success btn-block" disabled>আপনি কোর্সটি কিনেছেন</button>
                 @else
@@ -154,34 +140,34 @@ $value = $batch;
                 <div class="clearfix"></div>
               </div>
               @if($value->what_is)
-              <div class="panel-body">
+              <div class="card-body">
                 <h3>এই কোর্সে যা থাকছে</h3>
                 {!! $value->what_is !!}
               </div>
               @endif
             </div>
           </form>
-          <div class="clearfix"></div>
         </div> <!--/.col-left-->
         
-        <div class="col-md-8 info">
-          <div class="panel panel-info">
-            <div class="panel-heading">
-              <h3>{{$value->name}} <br><small>Course: <b>{{$value->course ? $value->course->name:''}}</b></small></h3>
+        <div class="col col-md-8 order-md-first">
+          <div class="card card-info mb-5 p-3">
+            <div class="card-heading">
+              <h3>{{$value->name}}</h3>
               @if($value->reg_end_at && $value->reg_end_at > date('Y-m-d H:i:s'))
-              <p style="text-align: center; color:red">রেজিস্ট্রেশনের মেয়াদ আছে: <b><span id="timer"></span></b>
+              <p style="text-align: center; color:red">
+                রেজিস্ট্রেশনের মেয়াদ আছে:  <b><span id="timer"></span></b>
               </p>
               @endif
             </div>
-            <div class="panel-body" style="min-height: 200px">
+            <div class="car-body" style="min-height: 200px">
               {!!$value->short!!}
             </div>
           </div>
           
           @if($value->routine)
-          <div class="panel panel-default">
-            <div class="panel-heading"><h4>কোর্স সিলেবাস</h4></div>
-            <div class="panel-body">{!! $value->routine !!}</div>
+          <div class="card card-default p-3">
+            <div class="card-heading"><h4>কোর্স সিলেবাস</h4></div>
+            <div class="card-body">{!! $value->routine !!}</div>
           </div>
           @endif
 
@@ -194,53 +180,50 @@ $value = $batch;
           @endphp
 
           @if($value->departments || $course_routines)
-          <div class="panel panel-default">
-            <div class="panel-heading"><h4>এক্সাম/ক্লাস রুটিন</h4></div>
-            <div class="box-group" id="accordion">
+          <div class="card card-default mt-5 p-3">
+            <div class="card-heading">
+              <h4>এক্সাম/ক্লাস রুটিন</h4>
+            </div>
+            <div class="main-accordion">
+              <div class="accordion p-3">
 
-              @if($course_routines)
-              <div class="panel box box-warning">
-                <div class="box-header with-border">
-                  <div class="box-title">
-                    <a data-toggle="collapse" data-parent="#accordion" href="#batch_routine">
-                      ব্যাচ এর রুটিন
-                      <span class="pull-right-container">
-                        <i class="fa fa-chevron-down pull-right"></i>
-                      </span>
-                    </a>
-                  </div>
-                </div>
+                @if($course_routines)
+                  <div class="accordion-item p-3">
+                    <div class="accordion-header">
+                      <a data-toggle="collapse" data-parent="#batch_routine" href="#batch_routine">
+                        ব্যাচ এর রুটিন
+                      </a>
+                    </div>
 
-                @php
-                  $batch_routine = $value->routines()->where('department_id', null)->first();
-                @endphp
-                
-                <table class="table">
+                    @php
+                      $batch_routine = $value->routines()->where('department_id', null)->first();
+                    @endphp
+                    
+                    <table class="table">
 
-                @if($batch_routine)
-                  <tr>
-                    <th>{{$batch_routine->name}}</th>
-                    <td> 
-                      @if($batch_routine->pdf)
-                      <a class="btn btn-warning btn-sm" target="_blank" href="{{$batch_routine->pdf}}"><i class="fa fa-download"></i> ডাউনলোড</a>
+                      @if($batch_routine)
+                        <tr>
+                          <th>{{$batch_routine->name}}</th>
+                          <td> 
+                            @if($batch_routine->pdf)
+                            <a class="btn btn-warning btn-sm" target="_blank" href="{{$batch_routine->pdf}}"><i class="fa fa-download"></i> ডাউনলোড</a>
+                            @endif
+                          </td>
+                        </tr>
                       @endif
-                    </td>
-                  </tr>
+                    </table>
+                  </div>
                 @endif
-                </table>
+
               </div>
-              @endif
 
               @foreach($value->departments as $key => $department)
-              <div class="panel box box-primary">
-                <div class="box-header with-border">
-                  <div class="box-title">
-                    <a data-toggle="collapse" data-parent="#accordion" href="#dept_routine{{$key}}">
+              <div class="accordion p-3">
+                <div class="accordion-item">
+                  <div class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#dept_routine{{$key}}" aria-expanded="true" aria-controls="dept_routine{{$key}}">
                       {{$department->name}}
-                      <span class="pull-right-container">
-                        <i class="fa fa-chevron-down pull-right"></i>
-                      </span>
-                    </a>
+                    </button>
                   </div>
                   
                   @php
@@ -259,9 +242,11 @@ $value = $batch;
                     </tr>
                     @endforeach
                   </table>
+                  @else
+                  <p>No routine available</p>
                   @endif
                 
-              </div>
+                </div>
               </div>
               @endforeach
             </div>
@@ -277,104 +262,100 @@ $value = $batch;
           @endphp
 
           @if($value->departments || $course_syllabuses)
-          <div class="panel panel-default">
-            <div class="panel-heading"><h4>বিস্তারিত এক্সাম/ক্লাস PDF</h4></div>
-            <div class="box-group" id="accordion">
+          <div class="card card-default mt-5 p-3">
+            <div class="card-heading">
+              <h4>বিস্তারিত এক্সাম/ক্লাস PDF</h4>
+            </div>
+            <div class="main-accordian">
+              <div class="accordion">
 
-              @if($course_syllabuses)
-              <div class="panel box box-warning">
-                <div class="box-header with-border">
-                  <div class="box-title">
-                    <a data-toggle="collapse" data-parent="#accordion" href="#batch_syllabus">
+                @if($course_syllabuses)
+                <div class="accordion-item">
+                  <div class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#batch_syllabus" aria-expanded="true" aria-controls="batch_syllabus">
                       ব্যাচ এর সিলেবাস সমূহ
-                      <span class="pull-right-container">
-                        <i class="fa fa-chevron-down pull-right"></i>
-                      </span>
-                    </a>
+                    </button>
                   </div>
-                </div>
-                <div id="batch_syllabus" class="panel-collapse collapse in">
-                  <div class="box/-body">
-                    <table class="table">
-                      @foreach($course_syllabuses as $key => $syllabus)
-                      <tr>
-                        <th>{{$syllabus->name}}</th>
-                        <td>
-                          @if($student && $batch->students()->where('id', $student->id)->first())
-                          <a class="btn btn-default" href="{{route('student.syllabus', $syllabus->id)}}"><i class="fa fa-eye"></i> View</a>
-                            
-                          <a href="{{route('students.syllabus.pdf', $syllabus->id)}}" class="btn btn-info"><i class="fa fa-download"></i> ডাউনলোড</a>
-                          @else
-                          Premium
-                          @endif
-                        </td>
-                      </tr>
-                      @endforeach
-                    </table>
-                  </div>
-                </div>
-              </div>
-              @endif
-
-              @foreach($value->departments as $key => $department)
-              <div class="panel box box-primary">
-                <div class="box-header with-border">
-                  <div class="box-title">
-                    <a data-toggle="collapse" data-parent="#accordion" href="#dept{{$key}}">
-                      {{$department->name}}
-                      <span class="pull-right-container">
-                        <i class="fa fa-chevron-down pull-right"></i>
-                      </span>
-                    </a>
-                  </div>
-                <div id="dept{{$key}}" class="panel-collapse collapse in">
-                  <div class="bo/x-body">
-                    @php
-                    $syllabuses = $department->syllabus()->where('batch_id', $value->id)->get();
-                    @endphp
-
-                    @if($syllabuses)
-                    <table class="table">
-                      @foreach($syllabuses as $syllabus)
-                      <tr>
-                        <th>{{$syllabus->name}}</th>
-                        <td>
-                          @if(!empty($student) && $syllabus->batch->students()->where('student_id', $user->id)->first())
+                  <div id="batch_syllabus" class="accordion-collapse collapse show">
+                    <div class="table-responsive">
+                      <table class="table">
+                        @foreach($course_syllabuses as $key => $syllabus)
+                        <tr>
+                          <th>{{$syllabus->name}}</th>
+                          <td>
+                            @if($student && $batch->students()->where('id', $student->id)->first())
                             <a class="btn btn-default" href="{{route('student.syllabus', $syllabus->id)}}"><i class="fa fa-eye"></i> View</a>
-                            
+                              
                             <a href="{{route('students.syllabus.pdf', $syllabus->id)}}" class="btn btn-info"><i class="fa fa-download"></i> ডাউনলোড</a>
-
-                          @else
-                          <button class="btn btn-warning" onclick="alert('This is premium version. Buy the course first.')">ডাউনলোড Full PDF</button>
-
-                          @endif
-                        </td>
-                        <td>
-                          @if($syllabus->sample_pdf)
-                          <a href="{{$syllabus->sample_pdf}}" class="btn btn-info"><i class="fa fa-download"></i> স্যাম্পল PDF</a>
-                          @endif
-                        </td>
-                      </tr>
-                      @endforeach
-                    </table>
-                    @else
-                    <p>এই ডিপার্টমেন্টের জন্যে এখনো কোন সিলেবাস প্রকাশিত হয় নি</p>
-                    @endif
+                            @else
+                            Premium
+                            @endif
+                          </td>
+                        </tr>
+                        @endforeach
+                      </table>
+                    </div>
                   </div>
                 </div>
-                
+                @endif
+
+                @foreach($value->departments as $key => $department)
+                <div class="accordion-item mt-3">
+                  <div class="accordion">
+                    <div class="accordion-header">
+                      <button class="accordion-button" type="button"  data-bs-toggle="collapse" data-bs-target="#dept{{$key}}" aria-expanded="true" aria-controls="batch_syllabus">
+                        {{$department->name}}
+                      </button>
+                    </div>
+                    <div id="dept{{$key}}" class="accordion-collapse collapse show">
+                      <div class="card-body">
+                        @php
+                        $syllabuses = $department->syllabus()->where('batch_id', $value->id)->get();
+                        @endphp
+
+                        @if($syllabuses)
+                        <table class="table">
+                          @foreach($syllabuses as $syllabus)
+                          <tr>
+                            <th>{{$syllabus->name}}</th>
+                            <td>
+                              @if(!empty($student) && $syllabus->batch->students()->where('student_id', $user->id)->first())
+                                <a class="btn btn-default" href="{{route('student.syllabus', $syllabus->id)}}"><i class="fa fa-eye"></i> View</a>
+                                
+                                <a href="{{route('students.syllabus.pdf', $syllabus->id)}}" class="btn btn-info"><i class="fa fa-download"></i> ডাউনলোড</a>
+
+                              @else
+                              <button class="btn btn-warning" onclick="alert('This is premium version. Buy the course first.')">ডাউনলোড Full PDF</button>
+
+                              @endif
+                            </td>
+                            <td>
+                              @if($syllabus->sample_pdf)
+                              <a href="{{$syllabus->sample_pdf}}" class="btn btn-info"><i class="fa fa-download"></i> স্যাম্পল PDF</a>
+                              @endif
+                            </td>
+                          </tr>
+                          @endforeach
+                        </table>
+                        @else
+                        <p>এই ডিপার্টমেন্টের জন্যে এখনো কোন সিলেবাস প্রকাশিত হয় নি</p>
+                        @endif
+                      </div>
+                    </div>
+                  
+                  </div>
+                </div>
+                @endforeach
               </div>
-              </div>
-              @endforeach
             </div>
           </div>
           @endif
           
-          <div class="panel panel-warning">
-            <div class="panel-heading">
+          <div class="card card-warning p-3 mt-5">
+            <div class="card-heading">
               <h4>কোর্সটির মেয়াদ ও অন্যান্য</h4>
             </div>
-            <div class="panel-body table-responsive">
+            <div class="card-body table-responsive">
               <table class="table table-bordered">
                 @if($value->end_at)
                 <tr>
@@ -399,11 +380,11 @@ $value = $batch;
           </div>
           
           @if($value->teachers)
-          <div class="panel panel-default">
-            <div class="panel-heading">
+          <div class="card card-default p-3 mt-5">
+            <div class="card-heading">
               <h4>কোর্স ইন্সট্রাক্টর</h4>
             </div>
-            <div class="panel-body">
+            <div class="card-body">
               <div class="row">
                   @foreach($value->teachers as $val)
                   <div class="col-md-6">
@@ -422,36 +403,35 @@ $value = $batch;
           </div>
           @endif
           @if($value->learn)
-          <div class="panel panel-default">
-            <div class="panel-heading"><h4>কোর্সটি করে যা শিখবেন</h4></div>
-            <div class="panel-body">{!! $value->learn !!}</div>
+          <div class="card card-default p-3 mt-5">
+            <div class="card-heading"><h4>কোর্সটি করে যা শিখবেন</h4></div>
+            <div class="card-body">{!! $value->learn !!}</div>
           </div>
           @endif
 
           @if($value->details)
-          <div class="panel panel-default">
-            <div class="panel-heading"><h4>কোর্স সম্পর্কে বিস্তারিত</h4></div>
-            <div class="panel-body">{!! $value->details !!}</div>
+          <div class="card card-default p-3 mt-5">
+            <div class="card-heading"><h4>কোর্স সম্পর্কে বিস্তারিত</h4></div>
+            <div class="card-body">{!! $value->details !!}</div>
           </div>
           @endif
           @if($value->details)
-          <div class="panel panel-default">
-            <div class="panel-heading"><h4>সাধারণ জিজ্ঞাসা সমূহ</h4></div>
-            <div class="panel-body">{!! $value->faq !!}</div>
+          <div class="card card-default p-3 mt-5">
+            <div class="card-heading"><h4>সাধারণ জিজ্ঞাসা সমূহ</h4></div>
+            <div class="card-body">{!! $value->faq !!}</div>
           </div>
           @endif
           @if($value->refund)
-          <div class="panel panel-danger">
-            <div class="panel-heading"><h4>রিফান্ড পলিসি</h4></div>
-            <div class="panel-body">{!! $value->refund !!}</div>
+          <div class="card card-danger p-3 mt-5 p-3">
+            <div class="card-heading"><h4>রিফান্ড পলিসি</h4></div>
+            <div class="card-body">{!! $value->refund !!}</div>
           </div>
           @endif
-          <a href="{{route('students.complain')}}" class="btn btn-info">আপনার মতামত/অভিযোগ দিন</a>
-        </div><!-- column -->
+          <a href="{{route('students.complain')}}" class="btn btn-info mt-3">আপনার মতামত/অভিযোগ দিন</a>
+        </div> <!-- /.column -->
       </div>
-    </section> <!-- /.content -->
-  {{-- </div> <!-- /.container -->
-</div> --}}
+    </div>
+  </section> <!-- /.content -->
 
 <div class="modal fade" id="paymentConfirm" style="display: none;">
   <div class="modal-dialog">

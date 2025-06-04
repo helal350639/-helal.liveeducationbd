@@ -9,10 +9,10 @@ if($user)
 }
 $value = $batch;
 @endphp
+
 @extends('student')
 @section('title', 'Course')
 @section('content')
-{{-- <script src='https://www.google.com/recaptcha/api.js' async defer></script> --}}
 <style>
   .checkbox{padding-left: 25px}
   .panel ::-webkit-scrollbar{width: 5px;}
@@ -20,29 +20,18 @@ $value = $batch;
   .course-image{width:100%}
   .teacher-title p{margin:0}
   .box-title {display: block;width:100%}
-  /* @media(min-width: 769px){
-    .pricing{float: right;}
-    .info{}
-  }
-  @media(max-width: 768px){
-    .pricing{}
-    .info{}
-  } */
 </style>
 
-    <!-- Content Header (Page header) -->
-    <section class="content-header">
-      <h1> Course Confirm {{-- <small>Courseple 2.0</small> --}} </h1>
-      <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li><a href="#">Course</a></li>
-      </ol>
-    </section>
-
     <!-- Main content -->
-    <section class="content">
-      <div class="row box-info">
-        <div class="col-md-6 col-md-offset-3 pricing">
+    <section class="container p-5">
+      <div class="row">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+          <h1>Course Confirm</h1>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6 pricing pd-3">
           <!-- Apply to the course -->
           <form action="{{route('payment.proceed')}}" method="post">
             @csrf
@@ -56,11 +45,11 @@ $value = $batch;
             <input type="hidden" name="phone" value="{{$student->contact}}" />
             <input type="hidden" name="address1" value="" />
             <input type="hidden" name="total" value="{{$value->net_price}}" />
-            <div class="panel panel-default">
+            <div class="card card-default p-3">
               <div class="penel-heading no-padding" style="text-align: center;padding:15px">
                 {{-- <img class="course-image" src="{{ $value->banner? $value->banner : '/img/course.png'}}" alt="" /> --}}
               </div>
-              <div class="panel-heading">
+              <div class="card-heading">
                 <h3>
                   @if($value->discount) 
                   <del> &#2547;{{$source->point0($value->price)}}</del> &nbsp; <span class="label label-warning"> &#2547;{{$source->point0($value->discount)}} ছাড়</span>
@@ -73,7 +62,7 @@ $value = $batch;
                 <p>{{$value->subtitle}}</p>
               </div>
               @if(!empty($user->id) && !$value->students()->where('id', $user->id)->first())
-              <div class="panel-body table-responsive">
+              <div class="card-body table-responsive">
                 <table class="table">
                   <tr>
                     <td>কোর্স এর নাম</td>
@@ -102,14 +91,13 @@ $value = $batch;
                 </table>
               </div>
               @endif
-              <div class="panel-footer">
+              <div class="card-footer">
                   <button class="btn btn-warning btn-block btn-lg" onsubmit="return confirm('Double check you provided information.')">&#2547; {{$value->net_price}} পেমেন্ট কনফার্ম করুন</button>
                 <div class="clearfix"></div>
               </div>
             </div>
             @endif
           </form>
-          <div class="clearfix"></div>
         </div>
       </div>
     </section> <!-- /.content -->

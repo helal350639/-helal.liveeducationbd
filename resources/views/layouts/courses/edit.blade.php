@@ -46,12 +46,15 @@
                     <img src="{{$course->banner}}" alt="" style="max-width:300px">
                 </div>
                 <div class="col-md-12">
-                    <div class="form-group">
-                        <label>Status:</label><br>
-                        <label for="status">
-                            <input type="checkbox" name="status" id="status" {{$course->status == 'Active'? 'checked':''}} /> Active
-                        </label>
-                    </div>
+                  <div class="form-group">
+                      <label for="status">
+                          <input type="checkbox" name="status" id="status" {{$course->status == 'Active'? 'checked':''}} /> Status
+                      </label>
+                      &nbsp; 
+                      <label for="status">
+                        <input type="checkbox" name="web" id="web" {{$course->web == 'Yes'? 'checked':''}} /> Web
+                    </label>
+                  </div>
                 </div>
             </div> <!-- /.box body -->
             <div class="box-footer">
