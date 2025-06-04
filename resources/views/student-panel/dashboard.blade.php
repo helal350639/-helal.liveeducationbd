@@ -43,7 +43,7 @@
 
   /* width */
   ::-webkit-scrollbar {
-      width: 5px;
+      width: 2px;
   }
 
   /* Track */
@@ -53,7 +53,7 @@
 
   /* Handle */
   ::-webkit-scrollbar-thumb {
-      background: #aa076b;
+      background: #aaa;
   }
 
   /* Handle on hover */
@@ -106,9 +106,9 @@
 </style>
 <style>
   @media (min-width: 1024px) and (max-width: 1440px) {
-      .row {
-          /* --bs-gutter-x: -0.1rem !important; */
-      }
+    .row {
+      /* --bs-gutter-x: -0.1rem !important; */
+    }
   }
   
 :root {
@@ -136,6 +136,7 @@ background-color: lightgrey;
 position: relative;
 font-size: 20px;
 color: rgb(0, 0, 0, 0.8);
+margin-top: 1rem;
 }
 @media screen and (max-width: 800px) {
 :root {
@@ -158,7 +159,7 @@ font-size: 16px;
 </style>
 
 
-  <section class="p-5">
+  <section class="dashboard p-2 py-5" style="background: #eee">
     <div class="container">
       <div class="row">
          <div class="col-md-12">
@@ -172,7 +173,7 @@ font-size: 16px;
       <div class="row g-4">
          <div class="col-6 col-lg-3">
             <div class="card card-body shadow-sm">
-               <a href="#">
+               <a href="{{route('students.my-course')}}">
                   <div class="corce_exam_mobile_res">
                      <div>
                         <span>কোর্স সমূহ</span>
@@ -187,10 +188,10 @@ font-size: 16px;
          </div>
          <div class="col-6 col-lg-3">
             <div class="card card-body shadow-sm">
-               <a href="#">
+               <a href="{{route('students.free-exam')}}">
                   <div class="corce_exam_mobile_res">
                      <div>
-                        <span>পরীক্ষা সমূহ</span>
+                        <span>ফ্রি পরীক্ষা</span>
                         <h3>5</h3>
                      </div>
                      <div class="corce_exam-icon">
@@ -202,10 +203,25 @@ font-size: 16px;
          </div>
          <div class="col-6 col-lg-3">
             <div class="card card-body shadow-sm">
-               <a href="#">
+               <a href="{{route('students.exam')}}">
                   <div class="corce_exam_mobile_res">
                      <div>
-                        <span>রেজাল্ট সমূহ</span>
+                        <span>প্রিমিয়াম পরীক্ষা</span>
+                        <h3>3</h3>
+                     </div>
+                     <div class="corce_exam-icon">
+                        <i class="fa fa-wallet"></i>
+                     </div>
+                  </div>
+               </a>
+            </div>
+         </div>
+         <div class="col-6 col-lg-3">
+            <div class="card card-body shadow-sm">
+               <a href="{{route('category.result.option')}}">
+                  <div class="corce_exam_mobile_res">
+                     <div>
+                        <span>রেজাল্ট</span>
                         <h3>2</h3>
                      </div>
                      <div class="corce_exam-icon">
@@ -220,7 +236,7 @@ font-size: 16px;
                <a href="#">
                   <div class="corce_exam_mobile_res">
                      <div>
-                        <span>রুটিন</span>
+                        <span>এক্সাম/ ক্লাস রুটিন</span>
                         <h3>3</h3>
                      </div>
                      <div class="corce_exam-icon">
@@ -232,7 +248,7 @@ font-size: 16px;
          </div>
          <div class="col-6 col-lg-3">
             <div class="card card-body shadow-sm">
-               <a href="#">
+               <a href="{{route('category.batches', 'Exam PDF')}}">
                   <div class="corce_exam_mobile_res">
                      <div>
                         <span>এক্সাম PDF</span>
@@ -252,21 +268,6 @@ font-size: 16px;
                      <div>
                         <span>ই-বুক সমূহ</span>
                         <h3>2</h3>
-                     </div>
-                     <div class="corce_exam-icon">
-                        <i class="fa fa-wallet"></i>
-                     </div>
-                  </div>
-               </a>
-            </div>
-         </div>
-         <div class="col-6 col-lg-3">
-            <div class="card card-body shadow-sm">
-               <a href="#">
-                  <div class="corce_exam_mobile_res">
-                     <div>
-                        <span>বই সমূহ</span>
-                        <h3>3</h3>
                      </div>
                      <div class="corce_exam-icon">
                         <i class="fa fa-wallet"></i>
@@ -344,7 +345,7 @@ font-size: 16px;
          <div class="col-md-12">
             <div class="card  course_exam_mobile_res">
                <div class="card-header">
-                  <h3 class="text-center f-s-32">Your Order & Payments</h3>
+                  <h3 class="text-center f-s-32  pt-2 pd-0">Your Order & Payments</h3>
                </div>
                <div class="card-body overflow-scroll">
                   <table class="table table-striped f-s-22">

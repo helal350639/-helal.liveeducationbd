@@ -123,7 +123,7 @@ function active($name)
                     <div class="clearfix"></div>
                   </div>
 
-                  <li><a class="dropdown-item" href="#">ড্যাশবোর্ড</a></li>
+                  <li><a class="dropdown-item" href="{{route('students.dashboard')}}">ড্যাশবোর্ড</a></li>
                   <li>
                     <a class="dropdown-item" href="{{route('students.my-syllabus')}}">সিলেবাস সমূহ</a>
                   </li>
@@ -159,12 +159,13 @@ function active($name)
         <nav class="navbar-2 navbar-expand navbar-light" id="extra-mobile-nav">
           <div class="container">
             <div class="navbar-collapse">
-              <!-- Center-align the navigation items -->
               <ul class="navbar-nav justify-content-center w-100">
-                <!-- Free Dropdown -->
                 <li class="nav-item">
-                  <a class="nav-link" href="/#our_courses"  style="color: #1CAB55;">
-                    কোর্স সমূহ
+                  <a class="nav-link" href="{{route('students.dashboard')}}"  style="color: #1CAB55; background:#eee; border-radius:10px">ড্যাশবোর্ড</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/#our_courses" style="color: #1CAB55;">
+                    কোর্স
                   </a>
                 </li>
                 <li class="nav-item dropdown">
@@ -178,18 +179,17 @@ function active($name)
                     </li>
                   </ul>
                 </li>
-                <!-- Exams Dropdown -->
-                <li class="nav-item">
-                  <a class="nav-link" href="{{route('students.my-syllabus')}}" style="color: #1CAB55;">
-                   সিলেবাস
-                  </a>
-                </li>
                 <!-- More Dropdown -->
                 <li class="nav-item dropdown more">
                   <a class="nav-link dropdown-toggle" href="javascript:void(0)" id="moreDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: #1CAB55;">
                   আরও
                   </a>
                   <ul class="dropdown-menu" aria-labelledby="moreDropdown">
+                    <li class="nav-item">
+                      <a class="nav-link" href="{{route('students.my-syllabus')}}" style="color: #1CAB55;">
+                       সিলেবাস
+                      </a>
+                    </li>
                     <li class="nav-item">
                       <a class="nav-link" href="/#our-success">আমাদের সাফল্য</a>
                     </li>
@@ -320,7 +320,7 @@ function active($name)
                 </h4>
               </div>
 
-                <li><a class="dropdown-item" href="#">ড্যাশবোর্ড</a></li>
+                <li><a class="dropdown-item" href="{{route('students.dashboard')}}">ড্যাশবোর্ড</a></li>
                 <li>
                   <a class="dropdown-item" href="{{route('students.my-syllabus')}}">সিলেবাস সমূহ</a>
                 </li>

@@ -2,7 +2,7 @@
 $user = Auth::guard('student')->user();
 @endphp
 
-@extends('batch')
+@extends('homepage')
 @section('title', 'কোর্স সমূহ')
 @section('content')
 
@@ -20,7 +20,7 @@ $user = Auth::guard('student')->user();
           
           <div class="title-area text-center">
             <h1> {{$batch->name}} </h1>
-            <small> এক্সাম ডিপার্টমেন্ট সমূহ </small>
+            <small> ডিপার্টমেন্ট সমূহ </small>
           </div>
           <div class="home-services-area">
             <div class="row g-2 g-md-3 g-lg-4" style="--bs-gutter-x: 0.3rem !important;">
@@ -28,7 +28,7 @@ $user = Auth::guard('student')->user();
               @if($departments->count())
                 @foreach($departments as $value)
                 <div class="col-md-3 col-6 mb-1 dropdown bcs-jobs" id="home-services-area-one">
-                  <a href="{{route('category.paper', [$type, $batch->id, $value->id])}}">
+                  <a href="{{route('category.check-method', [$type, $batch->id, $value->id])}}">
                     <div class="my-home-service premium-course-box">
                       <div class="my-home-service-icon">
                         <img src="/web/img/department.png" alt="" loading="lazy">

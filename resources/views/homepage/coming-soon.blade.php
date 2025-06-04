@@ -2,10 +2,10 @@
 @section('title', 'Course-Checkout')
 @section('content')
 
-<section class="our_courses p-5">
-  <div class="container p-5">
+<section class="our_courses py-5">
+  <div class="container py-5">
     <div class="row">
-      <div class="card col-md-6 offset-md-3 p-5 text-center">
+      <div class="card col-md-6 offset-md-3 py-5 text-center">
         <h3>
           This section is under development. 
           <br>

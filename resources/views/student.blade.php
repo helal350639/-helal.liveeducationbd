@@ -156,16 +156,18 @@ function active($name)
             </div>
           </div>
         </div>
-
-
+        
         <nav class="navbar-2 navbar-expand navbar-light" id="extra-mobile-nav">
           <div class="container">
             <div class="navbar-collapse">
               <!-- Center-align the navigation items -->
               <ul class="navbar-nav justify-content-center w-100">
-                <!-- Free Dropdown -->
                 <li class="nav-item">
-                  <a class="nav-link" href="/#our_courses"  style="color: #1CAB55;">
+                  <a class="nav-link active" aria-current="page"
+                    href="/" style="color: #1CAB55;">হোম</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/#our_courses" style="color: #1CAB55;">
                     কোর্স সমূহ
                   </a>
                 </li>
@@ -180,18 +182,15 @@ function active($name)
                     </li>
                   </ul>
                 </li>
-                <!-- Exams Dropdown -->
-                <li class="nav-item">
-                  <a class="nav-link" href="{{route('students.my-syllabus')}}" style="color: #1CAB55;">
-                   সিলেবাস
-                  </a>
-                </li>
                 <!-- More Dropdown -->
                 <li class="nav-item dropdown more">
                   <a class="nav-link dropdown-toggle" href="javascript:void(0)" id="moreDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: #1CAB55;">
                   আরও
                   </a>
                   <ul class="dropdown-menu" aria-labelledby="moreDropdown">
+                    <li class="nav-item">
+                      <a class="nav-link" href="{{route('students.my-syllabus')}}"> সিলেবাস </a>
+                    </li>
                     <li class="nav-item">
                       <a class="nav-link" href="/#our-success">আমাদের সাফল্য</a>
                     </li>
@@ -253,9 +252,6 @@ function active($name)
                 কোর্স সমূহ
               </a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{{route('students.my-syllabus')}}">সিলেবাস সমূহ</a>
-            </li>
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="/#exam-section">পরীক্ষা</a>
               <ul class="dropdown-menu" aria-labelledby="moreDropdown">
@@ -272,6 +268,9 @@ function active($name)
                 আরও
               </a>
               <ul class="dropdown-menu" aria-labelledby="moreDropdown">
+                <li class="nav-item">
+                  <a class="nav-link" href="{{route('students.my-syllabus')}}">সিলেবাস সমূহ</a>
+                </li>
                 <li class="nav-item">
                   <a class="nav-link" href="/#circular">নিয়োগ বিজ্ঞপ্তি</a>
                 </li>

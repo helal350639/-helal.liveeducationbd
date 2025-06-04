@@ -32,7 +32,7 @@ class HomePageCtrl extends Controller
     ->get();
 
     $sliders = Batch::where('status', 'Active')
-    ->whereRaw('DATE(reg_end_at) >= ?', [date('Y-m-d H:i:s')])
+    // ->whereRaw('DATE(reg_end_at) >= ?', [date('Y-m-d H:i:s')])
     ->where('web', 'Yes')
     ->orderBy('id', 'DESC')
     ->limit('5')
@@ -68,7 +68,7 @@ class HomePageCtrl extends Controller
 
   public function comingSoon()
   {
-    return view('student-panel.coming-soon');
+    return view('homepage.coming-soon');
   }
 
   public function course()
@@ -76,7 +76,7 @@ class HomePageCtrl extends Controller
     $courses = Batch::orderBy('id', 'DESC')
     ->whereRaw('DATE(reg_end_at) >= ?', [date('Y-m-d H:i:s')])
     ->where('status', 'Active')->get();
-    return view('student-panel.course', compact('courses'));
+    return view('homepage.course', compact('courses'));
   }
 
   public function courseShow($id)
@@ -87,7 +87,7 @@ class HomePageCtrl extends Controller
       $departments = $batch->departments()->where('status', 'Active')->get();
     }
     $groups = Group::where('status', 'Active')->get();
-    return view('student-panel.course-show', compact('batch', 'departments', 'groups'));
+    return view('homepage.course-show', compact('batch', 'departments', 'groups'));
   }
 
   public function applyCourse(Request $request)
@@ -121,7 +121,7 @@ class HomePageCtrl extends Controller
     $user = Auth::guard('student')->user();
     $student = Student::find($user->id);
     $courses = $student->courses()->orderBy('id', 'DESC')->where('status', 'Active')->get();
-    return view('student-panel.my-course', compact('courses'));
+    return view('homepage.my-course', compact('courses'));
   }
 
   public function exam()
@@ -130,7 +130,7 @@ class HomePageCtrl extends Controller
     $student = Student::find($user->id);
     $batch_ids = $student->batches()->pluck('id')->toArray();
     $papers = Paper::orderBy('id', 'DESC')->whereIn('batch_id', $batch_ids)->get();
-    return view('student-panel.exam', compact('papers'));
+    return view('homepage.exam', compact('papers'));
   }
 
   public function check($id)
@@ -163,14 +163,14 @@ class HomePageCtrl extends Controller
 
     // dd($check);
     
-    return view('student-panel.check', compact('paper', 'check'));
+    return view('homepage.check', compact('paper', 'check'));
   }
 
   public function instruction($id)
   {
     $user = Auth::guard('student')->user();
     $paper = Paper::find($id);
-    return view('student-panel.instruct', compact('paper'));
+    return view('homepage.instruct', compact('paper'));
   }
 
   public function examShow($id)
@@ -204,10 +204,10 @@ class HomePageCtrl extends Controller
         'marks' => $marks,
       ];
 
-      return view('student-panel.exam-show', compact('paper', 'result', 'exams'));
+      return view('homepage.exam-show', compact('paper', 'result', 'exams'));
     }
     
-    return view('student-panel.exam-show', compact('paper'));
+    return view('homepage.exam-show', compact('paper'));
   }
 
   public function result($id)
@@ -217,7 +217,7 @@ class HomePageCtrl extends Controller
     $paper = Paper::find($id);
     $result = 'Yes';
 
-    return view('student-panel.result', compact('exams', 'paper', 'result'));
+    return view('homepage.result', compact('exams', 'paper', 'result'));
   }
 
   public function solution($id)
@@ -227,7 +227,7 @@ class HomePageCtrl extends Controller
     $paper = Paper::find($exam->paper_id);
     $choices = Choice::where('exam_id', $id)->pluck('mcq_id', 'question_id')->toArray();
     // dd($choices);
-    return view('student-panel.solution', compact('paper', 'choices'));
+    return view('homepage.solution', compact('paper', 'choices'));
   }
 
   public function examAdd(Request $request)
@@ -298,12 +298,12 @@ class HomePageCtrl extends Controller
     {
       return 'Page Not Found! <a href="/">Back</a>';
     }
-    return view('student-panel.single-page', compact('page'));
+    return view('homepage.single-page', compact('page'));
   }
 
   public function circular()
   {
-    return view('student-panel.circular');
+    return view('homepage.circular');
   }
 
   public function resultList($paper_id)

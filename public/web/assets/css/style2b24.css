@@ -2062,6 +2062,19 @@ body {
   margin: 40px 21%;
 }
 
+/* .exam .title-area p {
+  font-size: 18px;
+}
+
+.exam .title-area span {
+  color: #033B3F;
+} */
+
+.exam-area {
+  width: 80%!important;
+  margin: 40px 10%!important;
+}
+
 @media (max-width: 375px) {
 
   #home-services-area-one,

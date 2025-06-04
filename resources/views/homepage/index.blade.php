@@ -29,7 +29,7 @@ if($user)
         padding-top: 0 !important;
         padding-bottom: 0 !important;">
         <div class="home-2nd-add-image">
-          <a href="{{route('home.coming-soon')}}"><img src="/web/img/ad2.jpg" alt="" srcset="" loading="lazy"></a>
+          <a href="{{route('home.coming-soon')}}"><img src="/web/img/eid-mubarak.jpg" alt="" srcset="" loading="lazy"></a>
         </div>
       </div>
       <div class="col-lg-3" style="padding: 0 !important;">
@@ -219,16 +219,16 @@ if($user)
   </div>
 </section>
 
-  <section id="exam-section" class="our-service background-res background-ats py-5" style="background-image: url('/web/img/background-bg.jpg')">
+  <section id="exam-section" class="our-service background-res background-ats py-5" style="background-image: url('/web/img/background-bg.jpg');">
     <div class="container py-3">
       <div class="row">
         <div class="title-area text-center">
           <h2 class="fw-bold mb-4 custom-section-title">Exam Section<br></h2>
         </div>
       </div>
-      <div class="home-services-area">
+      <div class="home-services-area exam-area">
         <div class="row" style="--bs-gutter-x: 0.3rem !important;">
-          <div class="col-md-3 col-6 mb-1 dropdown bcs-jobs" id="home-services-area-one">
+          <div class="col-md-2 col-6 mb-1 dropdown bcs-jobs" id="home-services-area-one">
             <a href="{{route('category.batches', 'Free Exam')}}">
               <div class="my-home-service premium-course-box">
                 <div class="my-home-service-icon">
@@ -240,7 +240,7 @@ if($user)
               </div>
             </a>
           </div>
-          <div class="col-md-3 col-6 mb-1" id="home-services-area-two" data-toggle="tooltip" data-placement="bottom" title="Tooltip on bottom">
+          <div class="col-md-2 col-6 mb-1" id="home-services-area-two" data-toggle="tooltip" data-placement="bottom" title="Tooltip on bottom">
             <a href="{{route('category.batches', 'Premium Exam')}}">
               <div class="my-home-service premium-course-box" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="...">
                 <div class="my-home-service-icon">
@@ -252,7 +252,7 @@ if($user)
               </div>
             </a>
           </div>
-          <div class="col-md-3 col-6 mb-1" id="home-services-area-three">
+          <div class="col-md-2 col-6 mb-1" id="home-services-area-three">
             <a href="{{route('category.result.option')}}">
               <div class="my-home-service premium-course-box" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="...">
                 <div class="my-home-service-icon">
@@ -264,7 +264,7 @@ if($user)
               </div>
             </a>
           </div>
-          <div class="col-md-3 col-6 mb-1" id="home-services-area-four">
+          <div class="col-md-2 col-6 mb-1" id="home-services-area-four">
             <a href="{{route('category.batches', 'Exam Routine')}}">
               <div class="my-home-service premium-course-box" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="...">
                 <div class="my-home-service-icon">
@@ -272,6 +272,30 @@ if($user)
                 </div>
                 <div class="my-home-service-content">
                   <h3>Exam Routine</h3>
+                </div>
+              </div>
+            </a>
+          </div>
+          <div class="col-md-2 col-6 mb-1" id="home-services-area-four">
+            <a href="{{route('category.batches', 'Exam PDF')}}">
+              <div class="my-home-service premium-course-box" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="...">
+                <div class="my-home-service-icon">
+                  <img src="/web/img/it-books.png" alt="" loading="lazy">
+                </div>
+                <div class="my-home-service-content">
+                  <h3>Exam PDF</h3>
+                </div>
+              </div>
+            </a>
+          </div>
+          <div class="col-md-2 col-6 mb-1" id="home-services-area-four">
+            <a href="{{route('home.coming-soon')}}">
+              <div class="my-home-service premium-course-box" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="...">
+                <div class="my-home-service-icon">
+                  <img src="/web/img/it-books.png" alt="" loading="lazy">
+                </div>
+                <div class="my-home-service-content">
+                  <h3>Written Exam</h3>
                 </div>
               </div>
             </a>

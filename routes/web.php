@@ -14,10 +14,10 @@ use App\Http\Controllers\Homepage\JobPreparationCtrl;
 use App\Http\Controllers\Homepage\ExamCtrl;
 use App\Http\Controllers\Homepage\HomePageCtrl;
 use App\Http\Controllers\Homepage\HomepageSettingCtrl;
-use App;
-use URL;
 use Laravel\Socialite\Facades\Socialite;
 use App\Models\Student;
+use App;
+use URL;
 
 
 /*
@@ -68,6 +68,7 @@ Route::controller(CategoryCtrl::class)->group(function()
     Route::get('department/{type}/{batch?}', 'department')->name('category.department');
     Route::get('paper/{type}/{batch}/{department?}', 'paper')->name('category.paper');
     Route::get('result-option', 'resultOption')->name('category.result.option');
+    Route::get('check-method/{type}/{batch}/{department?}', 'checkMethod')->name('category.check-method');
   });
 });
 
@@ -290,6 +291,7 @@ Route::middleware(['auth'])->group(function()
       Route::post('copy-store', 'copyStore')->name('paper.copy.store');
       Route::get('recheck_result/{id}', 'reCheckResult')->name('paper.recheck.result');
       Route::get('detach/{paperId}/{questionId}', 'detachQuestion')->name('paper.detach.question');
+      Route::post('search', 'search')->name('paper.search');
     });
 	});
 
@@ -350,6 +352,12 @@ Route::middleware(['auth'])->group(function()
 	{
 		Route::get('order/add_to_batch/{id}', 'addToBatch')->name('student.addto.batch');
 	});
+
+  Route::controller(RoutineCtrl::class)->group(function()
+  {
+    Route::get('routine/add-item/{id}', 'addItem')->name('routine.add-item');
+    Route::post('routine/add-item-update', 'addItemPost')->name('routine.add-item.store');
+  });
 
   Route::controller(HomePageSettingCtrl::class)->group(function()
   {

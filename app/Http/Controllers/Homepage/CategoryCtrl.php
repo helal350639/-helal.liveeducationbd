@@ -8,6 +8,7 @@ use App\Models\Course;
 use App\Models\Batch;
 use App\Models\Department;
 use App\Models\Paper;
+use App\Models\Syllabus;
 
 class CategoryCtrl extends Controller
 {
@@ -90,6 +91,26 @@ class CategoryCtrl extends Controller
     return view('homepage.department', compact('type', 'batch', 'departments'));
   }
 
+  public function checkMethod($type, $batch_id, $department_id)
+  {
+    if($type == 'Exam PDF')
+    {
+      return $this->syllabus($type, $batch_id, $department_id);
+    }
+
+    if($type == 'Premium Exam' || $type == 'Free Exam')
+    {
+      return $this->paper($type, $batch_id, $department_id);
+    }
+
+    return $type.': Under development';
+  }
+
+  public function resultOption()
+  {
+    return view('homepage.result-option');
+  }
+
   public function paper($type, $batch_id, $department_id)
   {
     $batch = Batch::find($batch_id);
@@ -109,8 +130,14 @@ class CategoryCtrl extends Controller
     return view('homepage.paper', compact('type', 'batch', 'department', 'papers'));
   }
 
-  public function resultOption()
+  //
+  public function syllabus($type, $batch_id, $department_id)
   {
-    return view('homepage.result-option');
+    $department = Department::find($department_id);
+    $syllabuses = Syllabus::orderBy('id', 'DESC')
+    ->where('department_id', $department_id)
+    ->get();
+
+    return view('homepage.exam-pdf', compact('syllabuses', 'department'));
   }
 }
