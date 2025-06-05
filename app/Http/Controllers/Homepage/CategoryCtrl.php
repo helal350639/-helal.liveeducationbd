@@ -25,7 +25,7 @@ class CategoryCtrl extends Controller
     }
 
     $courses = Course::where('status', 'Active')
-    ->where('web', 'Yes')
+    // ->where('web', 'Yes')
     ->get();
     
     return view('homepage.course', compact('type', 'title', 'courses'));
@@ -42,7 +42,7 @@ class CategoryCtrl extends Controller
     }
 
     $batches = Batch::where('status', 'Active')
-    ->where('web', 'Yes')
+    // ->where('web', 'Yes')
     ->get();
 
     return view('homepage.batch', compact('type', 'batches'));
