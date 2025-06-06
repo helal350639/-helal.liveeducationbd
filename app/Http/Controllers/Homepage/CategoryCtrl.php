@@ -24,8 +24,8 @@ class CategoryCtrl extends Controller
       $title = $type;
     }
 
-    $courses = Course::where('status', 'Active')
-    // ->where('web', 'Yes')
+    $courses = Course::where('status', 'Active')    
+    ->whereRaw('DATE(reg_end_at) > ?', date('Y-m-d H:i:s'))
     ->get();
     
     return view('homepage.course', compact('type', 'title', 'courses'));

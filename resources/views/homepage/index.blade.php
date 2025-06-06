@@ -29,7 +29,7 @@ if($user)
         padding-top: 0 !important;
         padding-bottom: 0 !important;">
         <div class="home-2nd-add-image">
-          <a href="{{route('home.coming-soon')}}"><img src="/web/img/eid-mubarak.jpg" alt="" srcset="" loading="lazy"></a>
+          <a href="#"><img src="/web/img/eid-mubarak.jpg?v=1.1" alt="" srcset="" loading="lazy"></a>
         </div>
       </div>
       <div class="col-lg-3" style="padding: 0 !important;">
