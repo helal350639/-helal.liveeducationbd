@@ -15,6 +15,7 @@ class CategoryCtrl extends Controller
   public function courses($type)
   {
     $title = '';
+    
     if($type == 'job')
     {
       $title = 'Job Preparation';
