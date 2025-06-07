@@ -49,9 +49,9 @@ $user = Auth::guard('student')->user();
                         </div>
                         <div class="package-exam-price">
                           <div class="package-exam-total-price text-muted">
-                            <s class="text-muted">৳ 320</s>
+                            <s class="text-muted">৳ {{number_format($value->price)}}</s>
                           </div>
-                          <div class="package-exam-discount-price">৳ 200</div>
+                          <div class="package-exam-discount-price">৳ {{number_format($value->net_price)}}</div>
                         </div>
                       </div>
                       <div class="col text-end">
@@ -86,6 +86,9 @@ $user = Auth::guard('student')->user();
             </div>
           </div>
         </div>
+
+        @include('partials.back-button')
+
       </div>
     </section> <!-- /.content -->
 
