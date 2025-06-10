@@ -191,7 +191,7 @@ if($user)
         <p class="pointer-cursor text-center">Job Preparation</p>
       </a>
 
-      <a href="{{route('category.batches', 'Online Live Exam Premium')}}" class="emergency-box">
+      <a href="{{route('category.batches', 'Premium Exams')}}" class="emergency-box">
         <img src="/web/img/live-exam.png" alt="All Job Guidelines & Techniques" class="img-fluid">
         <p class="pointer-cursor text-center">Online live exam premium</p>
       </a>

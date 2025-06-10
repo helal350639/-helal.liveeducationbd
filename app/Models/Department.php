@@ -41,7 +41,12 @@ class Department extends Model
 
     public function paper()
     {
-        return $this->hasOne(Paper::class, 'department_id');
+      return $this->hasOne(Paper::class, 'department_id');
+    }
+
+    public function papers()
+    {
+      return $this->hasMany(Paper::class, 'department_id');
     }
 
     public function syllabus()

@@ -54,6 +54,14 @@ $user = Auth::guard('student')->user();
                               <a href="{{route('category.department', [$type, $value->id])}}">View Details </a>
                             </div>
                           </div>
+                      
+                          <div class="package-exam-price">
+                            <div class="package-exam-discount-price text-right">
+                              @if(isset($value->items_count))
+                              ({{ $value->items_count }})
+                              @endif
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>

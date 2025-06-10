@@ -35,6 +35,9 @@ $user = Auth::guard('student')->user();
                       </div>
                       <div class="my-home-service-content">
                         <h3>{{$value->name}}</h3>
+                        @if(isset($value->items_count))
+                        <h3>({{$value->items_count}})</h3>
+                        @endif
                       </div>
                     </div>
                   </a>
