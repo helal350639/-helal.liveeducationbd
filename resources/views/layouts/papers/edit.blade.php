@@ -212,7 +212,6 @@ $value = $paper;
                             <option value="">Select One</option>
                             <option value="Batch" {{$value->permit == 'Batch'? 'selected': ''}}>Batch</option>
                             <option value="Department" {{$value->permit == 'Department'? 'selected': ''}}>Department</option>
-                            <option value="Group" {{$value->permit == 'Group'? 'selected': ''}}>Group</option>
                             <option value="Every One" {{$value->permit == 'Every One'? 'selected': ''}}>Every One</option>
                         </select>
                     </div>
