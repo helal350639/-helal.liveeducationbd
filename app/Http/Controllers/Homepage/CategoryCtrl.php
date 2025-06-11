@@ -97,6 +97,7 @@ class CategoryCtrl extends Controller
     $course = Course::find($course_id);
     $batches = Batch::where('status', 'Active')
     ->where('course_id', $course_id)
+    ->whereRaw('DATE(reg_end_at) > ?', date('Y-m-d H:i:s'))
     ->get();
 
     if($type == 'job')
