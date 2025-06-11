@@ -231,7 +231,7 @@ if($user)
       <div class="home-services-area exam-area">
         <div class="row" style="--bs-gutter-x: 0.3rem !important;">
           <div class="col-md-2 col-6 mb-1 dropdown bcs-jobs" id="home-services-area-one">
-            <a href="{{route('category.batches', 'Free Exam')}}">
+            <a href="{{route('category.batches', 'Free Exams')}}">
               <div class="my-home-service premium-course-box">
                 <div class="my-home-service-icon">
                   <img src="/web/img/it-books.png" alt="" loading="lazy">
@@ -243,7 +243,7 @@ if($user)
             </a>
           </div>
           <div class="col-md-2 col-6 mb-1" id="home-services-area-two" data-toggle="tooltip" data-placement="bottom" title="Tooltip on bottom">
-            <a href="{{route('category.batches', 'Premium Exam')}}">
+            <a href="{{route('category.batches', 'Premium Exams')}}">
               <div class="my-home-service premium-course-box" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="...">
                 <div class="my-home-service-icon">
                   <img src="/web/img/it-books.png" alt="" loading="lazy">
