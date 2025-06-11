@@ -40,6 +40,7 @@ class CategoryCtrl extends Controller
     if($type == 'Free Exams' || $type == 'Premium Exams')
     {
       $batches = $batches->leftJoin('papers', 'batches.id', 'papers.batch_id')
+      ->whereRaw('DATE(papers.close) > ?', date('Y-m-d H:i:s'))
       ->whereIn('papers.status', ['Published', 'Scheduled']);
 
       if($type == 'Premium Exams')
@@ -54,6 +55,25 @@ class CategoryCtrl extends Controller
 
       $batches = $batches->groupBy('batches.id', 'batches.name', 'batches.banner')
       ->select('batches.id', 'batches.name', 'batches.banner');
+
+      // ->withCount([
+      //   'papers as items_count' => function ($query) use ($type)
+      //   {
+      //     if($type == 'Premium Exams')
+      //     {
+      //       $query->whereNot('permit', 'Every One');
+      //     }
+
+      //     if($type == 'Free Exams')
+      //     {
+      //       $query->where('permit', 'Every One');
+      //     }
+
+      //     // ->whereRaw('DATE(open) < ?', date('Y-m-d H:i:s'))
+      //     $query->whereRaw('DATE(close) > ?', date('Y-m-d H:i:s'))
+      //     ->whereIn('status', ['Published', 'Scheduled']);
+      //   }
+      //   ]);
     }
     
     if($type == 'premium_result')
@@ -119,6 +139,8 @@ class CategoryCtrl extends Controller
       $departments = $departments->leftJoin('papers', 'departments.id', 'papers.department_id')
 
       ->where('papers.batch_id', $batch->id)
+      // ->whereRaw('DATE(open) < ?', date('Y-m-d H:i:s'))
+      ->whereRaw('DATE(papers.close) > ?', date('Y-m-d H:i:s'))
       ->whereIn('papers.status', ['Published', 'Scheduled']);
 
       if($type == 'Premium Exams')
@@ -133,6 +155,26 @@ class CategoryCtrl extends Controller
 
       $departments = $departments->groupBy('departments.id', 'departments.name', 'batch_department.batch_id', 'batch_department.department_id')
       ->select('departments.id', 'departments.name', 'batch_department.batch_id', 'batch_department.department_id');
+
+      // ->withCount([
+      //   'papers as items_count' => function ($query) use ($batch, $type)
+      //   {
+      //     if($type == 'Premium Exams')
+      //     {
+      //       $query->whereNot('permit', 'Every One');
+      //     }
+
+      //     if($type == 'Free Exams')
+      //     {
+      //       $query->where('permit', 'Every One');
+      //     }
+
+      //     $query->where('batch_id', $batch->id)
+      //     // ->whereRaw('DATE(open) < ?', date('Y-m-d H:i:s'))
+      //     ->whereRaw('DATE(close) > ?', date('Y-m-d H:i:s'))
+      //     ->whereIn('status', ['Published', 'Scheduled']);
+      //   }
+      //   ]);
     }
 
     $departments = $departments->get();
@@ -169,7 +211,9 @@ class CategoryCtrl extends Controller
     $papers = Paper::orderBy('id', 'DESC')
     ->where('batch_id', $batch_id)
     ->where('department_id', $department_id)
-    ->whereIn('status', ['Published', 'Scheduled']);
+    ->whereIn('status', ['Published', 'Scheduled'])
+    // ->whereRaw('DATE(open) <= ?', date('Y-m-d H:i:s'))
+    ->whereRaw('DATE(close) >= ?', date('Y-m-d H:i:s'));
 
     if($type == 'Premium Exams')
     {

@@ -84,7 +84,9 @@ if($user)
                         <div class="v-button d-flex flex-wrap gap-2">
                           <a href="{{route('students.instruction', $paper->id)}}" class="btn btn-sm btn-warning"> পরীক্ষা দিন </a>
                           <a href="{{route('students.result', $paper->id)}}" class="btn btn-sm btn-success"> উত্তর</a>
-                          <a href="{{route('home.results', $paper->id)}}" class="btn btn-sm btn-info text-white"> মেধাক্রম </a>
+                          
+                          {{-- {{route('home.results', $paper->id)}} --}}
+                          <a href="#" class="btn btn-sm btn-info text-white"> মেধাক্রম </a>
                           @if($paper->close < date('Y-m-d H:i:s'))
                           <p></p>
                           @endif

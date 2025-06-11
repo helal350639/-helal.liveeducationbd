@@ -188,7 +188,7 @@ font-size: 16px;
          </div>
          <div class="col-6 col-lg-3">
             <div class="card card-body shadow-sm">
-               <a href="{{route('students.free-exam')}}">
+               <a href="{{route('category.batches', 'Free Exams')}}">
                   <div class="corce_exam_mobile_res">
                      <div>
                         <span>ফ্রি পরীক্ষা</span>
@@ -203,7 +203,7 @@ font-size: 16px;
          </div>
          <div class="col-6 col-lg-3">
             <div class="card card-body shadow-sm">
-               <a href="{{route('students.exam')}}">
+               <a href="{{route('category.batches', 'Premium Exams')}}">
                   <div class="corce_exam_mobile_res">
                      <div>
                         <span>প্রিমিয়াম পরীক্ষা</span>
