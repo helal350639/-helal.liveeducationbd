@@ -69,10 +69,24 @@
                     </div>
                 </div>
                 <div class="col-md-12">
-                    <div class="form-group">
-                        <label for="details">Details</label>
-                        <textarea class="form-control" name="details" id="details" rows="5"></textarea>
-                    </div>
+                  <div class="form-group">
+                    <label for="subject">Subject</label>
+                    <select class="form-control select2" multiple name="subjects[]" id="subjects" required>
+                      @foreach($subjects as $val)
+                      <option value="{{$val->id}}">{{$val->name}}</option>
+                      @endforeach
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <label for="department">Department</label>
+                    <select class="form-control select2" multiple name="departments[]" id="departments" required>
+                      @foreach($departments as $val)
+                      <option value="{{$val->id}}">{{$val->name}}</option>
+                      @endforeach
+                    </select>
+                  </div>
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">

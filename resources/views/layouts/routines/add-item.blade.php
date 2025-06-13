@@ -2,6 +2,9 @@
 @section('title', 'Add New Routine')
 @section('stylesheets')
 <link href="/assets/summernote/summernote.min.css" rel="stylesheet">
+<style>
+  .text-right{text-align: right}
+</style>
 @endsection
 @section('content')
 <section class="content-header">
@@ -14,90 +17,42 @@
 
 <!-- Main content -->
 <section class="content">
-  <div class="row"> <!-- left column -->
-    <div class="col-md-12"> <!-- general form elements -->
-      <div class="box box-primary">
-        <div class="box-header with-border">
-            <h3 style="color: #800" class="box-title">Routine Details</h3>
-        </div>
-        <form action="{{route('routine.add-item.store')}}" method="POST" enctype="multipart/form-data">
-            @csrf
-            <input type="hidden" name="routine_id" value="{{$routine->id}}">
-            <div class="box-body">
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label for="name">Exam Name/No</label>
-                        <select class="form-control select2" name="paper_id" id="paper_id" required>
-                            <option value="">Select One</option>
-                            @foreach($papers as $val)
-                            <option value="{{$val->id}}">{{$val->name}}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label for="">Subject</label>
-                        <select name="subject_id" id="subject_id" class="form-control select2" required>
-                            <option value="">Select One</option>
-                            @foreach($subjects as $val)
-                            <option value="{{$val->id}}">{{$val->name}}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label for="">Department</label>
-                        <select name="department_id" id="department_id" class="form-control select2">
-                            <option value="">Select One</option>
-                            @foreach($departments as $val)
-                            <option value="{{$val->id}}">{{$val->name}}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label for="date">Date</label>
-                        <input type="date" class="form-control" name="date" id="date" required>
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label for="chapter">Chapter Details</label>
-                        <textarea class="form-control editor" name="chapter" id="chapter" rows="5"></textarea>
-                    </div>
-                </div>
-            </div> <!-- /.box body -->
-            <div class="box-footer">
-                <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-save"></i> Save</button>
-            </div>
-        </form>
-      </div> <!-- /.box -->
-    </div> <!--/.col (left) -->
-  </div> <!-- /.row -->
   <div class="row">
     <div class="col-md-12">
       <div class="box box-info">
-        <table class="table">
+        <div class="box-header with-border">
+            <h3 style="color: #800" class="box-title">{{$routine->name}}</h3>
+        </div>
+        <table class="table table-bordered">
           <tr>
             <th>ID</th>
             <th>Exam Name/No</th>
-            <th>Subject</th>
-            <th>Chapter</th>
-            <th>Department</th>
-            <th>Date</th>
+
+            @foreach($subjects as $subject)
+            <th>{{$subject->name}}</th>
+            @endforeach
+
+            @foreach($departments as $department)
+            <th>{{$department->name}}</th>
+            @endforeach
+
+            <th>Date & Time</th>
           </tr>
 
-          @foreach($items as $item)
+          @foreach($routine_rows as $key => $item)
           <tr>
             <td>{{$item->id}}</td>
-            <td>{{$item->paper_id}}</td>
-            <td>{{$item->subject_id}}</td>
-            <td>{!!$item->chapter!!}</td>
-            <td>{{$item->department_id}}</td>
-            <td>{{$item->date}}</td>
+            <td>{{$item->name}}</td>
+
+            @foreach($item->subjects as $subject)
+            <td>{!!$subject->chapter!!}</td>
+            @endforeach
+
+            @foreach($item->departments as $department)
+            <td>{!!$department->details!!}</td>
+            @endforeach
+
+            <td>{{$item->exam_at}}</td>
           </tr>
           @endforeach
 
@@ -106,6 +61,126 @@
       <div class="clearfix"></div>
     </div>
   </div>
+
+  <div class="row"> <!-- left column -->
+    <div class="col-md-12"> <!-- general form elements -->
+      <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 style="color: #800" class="box-title">{{$routine->name}}</h3>
+        </div>
+        <form action="{{route('routine.add-item.store')}}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <input type="hidden" name="routine_id" value="{{$routine->id}}">
+            <div class="box-body">
+                <div class="row">
+
+                  <input type="hidden" name="routine_id" value="{{$routine->id}}">
+
+                  <div class="col-md-6">
+                    <div class="form-group row">
+                      <label class="col-md-4 text-right" for="">Exam No</label>
+                      <div class="col-md-8">
+                        <input class="form-control" name="paper_id" id="paper_id" required>
+                      </div>
+                    </div>
+
+                  @foreach($subjects as $subject)
+                    <div class="form-group row">
+                      <label class="col-md-4 text-right" for="">{{$subject->name}}</label>
+                      <div class="col-md-8">
+                        <input type="hidden" name="subject_id[]" value="{{$subject->id}}" required>
+                        <textarea class="form-control editor" name="subject_item[]" rows="5"></textarea>
+                      </div>
+                    </div>
+
+                  @endforeach
+                  </div>
+                  
+                  <div class="col-md-6">
+
+                  @foreach($departments as $department)
+                    <div class="form-group row">
+                      <label class="col-md-4 text-right" for="">{{$department->name}}</label>
+                      <div class="col-md-8">
+                        <input type="hidden" name="department_id[]" value="{{$department->id}}" required>
+                        <textarea class="form-control editor" name="department_item[]" rows="5"></textarea>
+                      </div>
+                    </div>
+
+                  @endforeach
+                  
+                    <div class="form-group row">
+                      <label class="col-md-4 text-right" for="">Date & Time</label>
+                      <div class="col-md-8">
+                        <input type="datetime-local" class="form-control" name="exam_at" id="exam_at" required>
+                      </div>
+                    </div>
+                  </div>
+                  
+
+                  {{-- <form method="POST" action="#">
+                    @csrf
+                    <table id="dynamicTable" class="table table-bordered">
+                        <thead>
+                            <tr id="columnHeaders">
+                                <!-- Will be filled by JS -->
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- Dynamic rows -->
+                        </tbody>
+                    </table>
+                
+                    <button type="button" onclick="addColumn()">Add Column</button>
+                    <button type="button" onclick="addRow()">Add Row</button>
+                    <br><br>
+                    <button type="submit">Save Table</button>
+                </form> --}}
+                
+                {{-- <script>
+                    let columnCount = 0;
+                    let rowCount = 0;
+                
+                    function addColumn() {
+                        columnCount++;
+                        const colHeader = document.createElement('th');
+                        colHeader.innerHTML = `Column ${columnCount}`;
+                        document.getElementById('columnHeaders').appendChild(colHeader);
+                
+                        const rows = document.getElementById('tableBody').rows;
+                        for (let i = 0; i < rows.length; i++) {
+                            const cell = rows[i].insertCell(-1);
+                            cell.innerHTML = `<input type="text" name="table[${i}][${columnCount - 1}]" class="form-control" />`;
+                        }
+                    }
+                
+                    function addRow() {
+                        const row = document.createElement('tr');
+                        let cols = '';
+                        for (let j = 0; j < columnCount; j++) {
+                            cols += `<td><input type="text" name="table[${rowCount}][${j}]" class="form-control" /></td>`;
+                        }
+                        row.innerHTML = cols;
+                        document.getElementById('tableBody').appendChild(row);
+                        rowCount++;
+                    }
+                
+                    // Optionally add one row/column on load
+                    window.onload = () => {
+                        addColumn();
+                        addRow();
+                    };
+                </script> --}}
+                
+                </div>
+            </div> <!-- /.box body -->
+            <div class="box-footer">
+                <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-plus"></i> Add</button>
+            </div>
+        </form>
+      </div> <!-- /.box -->
+    </div> <!--/.col (left) -->
+  </div> <!-- /.row -->
 </section> <!-- /.content -->
 @endsection
 @section('scripts')
@@ -173,6 +248,7 @@
     //this script for text editor
     $(document).ready(function() {
         $('.editor').summernote({
+          toolbar: [],
             height: 100
         });
     });

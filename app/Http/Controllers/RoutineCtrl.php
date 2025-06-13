@@ -12,11 +12,17 @@ use App\Models\RoutineItem;
 use App\Models\Role;
 use App\Models\Paper;
 use App\Models\Subject;
+use App\Models\RoutineSubjectColumn;
+use App\Models\RoutineDepartmentColumn;
+use App\Models\RoutineItemRow;
+use App\Models\RoutineSubjectRow;
+use App\Models\RoutineDepartmentRow;
 use Auth;
 use Image;
 use Toastr;
 use File;
 use Session;
+use DB;
 
 class RoutineCtrl extends Controller
 {
@@ -44,8 +50,9 @@ class RoutineCtrl extends Controller
     {
         $courses = Course::orderBy('id', 'DESC')->where('status', 'Active')->get();
         $batches = Batch::where('status', 'Active')->get();
+        $subjects = Subject::where('status', 'Active')->get();
         $departments = Department::where('status', 'Active')->get();
-        return view('layouts.routines.create', compact('courses', 'batches', 'departments'));
+        return view('layouts.routines.create', compact('courses', 'batches', 'departments', 'subjects'));
     }
 
     /**
@@ -64,39 +71,69 @@ class RoutineCtrl extends Controller
             'header'    => 'nullable|string',
             'details'   => 'nullable|max:1000',
             'pdf'       => 'nullable|mimes:pdf|max:10000',
+            'subjects' => 'nullable',
+            'departments' => 'nullable'
         ]);
         
         $data = $request->all();
+
         if(isset($data['_token']))
         {
-            unset($data['_token']);
+          unset($data['_token']);
         }
 
-        if(isset($data['status']))
-        {
-            $data['status'] = 'Published';
-        }
-        else
-        {
-            $data['status'] = 'Unpublished';
-        }
+        $data['status'] = isset($data['status']) ? 'Published' : 'Unpublished';
 
         $data['created_by'] = Auth::id();
 
-        try{
+        $subjects = $data['subjects'];
+        $departments = $data['departments'];
+
+        if(isset($data['subjects']))
+        {
+          unset($data['subjects']);
+        }
+
+        if(isset($data['departments']))
+        {
+          unset($data['departments']);
+        }
+
+        try {
             // upload pdf file
             if($request->hasFile('pdf'))
             {
-                $data['pdf'] = $source->uploadImage($data['pdf'], 'routine/');
+              $data['pdf'] = $source->uploadImage($data['pdf'], 'routine/');
             }
-            Routine::insert($data);
-        }
-        catch(\E $e)
-        {
-            return $e;
-        }
+            // Routine::insert($data);
+            $routine = Routine::create($data);
 
-        // $batch = Group::orderBy('id', 'DESC')->first();
+            // insert subjects columns
+            foreach($subjects as $subject)
+            {
+              DB::table('routine_subject_columns')->insert(
+                [
+                  'routine_id' => $routine->id,
+                  'subject_id' => $subject
+                ]
+              );
+            }
+
+            // insert departments columns
+            foreach($departments as $department)
+            {
+              DB::table('routine_department_columns')->insert(
+                [
+                  'routine_id' => $routine->id,
+                  'department_id' => $department
+                ]
+              );
+            }
+        }
+        catch(\Exception $e)
+        {
+          return $e->getMessage();
+        }
         
         Session::flash('success', 'New routine successfully created!');
 
@@ -224,25 +261,63 @@ class RoutineCtrl extends Controller
   {
     $routine = Routine::find($id);
     $papers = Paper::orderBy('id', 'DESC')->get();
-    $subjects = Subject::orderBy('id', 'DESC')->get();
-    $departments = Department::orderBy('id', 'DESC')->get();
+
+    $subjects = RoutineSubjectColumn::leftJoin('subjects', 'subjects.id', 'routine_subject_columns.subject_id')
+    ->orderBy('routine_subject_columns.id', 'ASC')
+    ->where('routine_subject_columns.routine_id', $id)
+    ->select('routine_subject_columns.*', 'subjects.name')
+    ->get();
+
+    $departments = RoutineDepartmentColumn::leftJoin('departments', 'departments.id', 'routine_department_columns.department_id')
+    ->orderBy('routine_department_columns.id', 'ASC')
+    ->where('routine_department_columns.routine_id', $id)
+    ->select('routine_department_columns.*', 'departments.name')
+    ->get();
     
     $items = RoutineItem::orderBy('id', 'DESC')->get();
 
-    return view('layouts.routines.add-item', compact('routine', 'papers', 'subjects', 'departments', 'items'));
+
+    $routine_rows = RoutineItemRow::leftJoin('papers', 'papers.id', 'routine_item_rows.paper_id')
+    ->where('routine_item_rows.routine_id', $id)
+    ->with(['subjects', 'departments'])
+    ->select('routine_item_rows.*', 'papers.name')
+    ->get();
+    // dd($routine_rows);
+
+    return view('layouts.routines.add-item', compact('routine', 'papers', 'subjects', 'departments', 'items', 'routine_rows'));
   }
   
   public function addItemPost(Request $request)
   {
     $data = $request->all();
-    
-    if(isset($data['_token']))
-    {
-      unset($data['_token']);
-    }
+
+    // dd($data);
 
     try {
-      RoutineItem::insert($data);
+
+      $routineItem = RoutineItemRow::create([
+        'routine_id' => $data['routine_id'],
+        'paper_id' => $data['paper_id'],
+        'exam_at' => $data['exam_at']
+      ]);
+
+      foreach($data['subject_id'] as $key => $value)
+      {
+        RoutineSubjectRow::insert([
+          'item_id' => $routineItem->id,
+          'column_id' => $value,
+          'chapter' => $data['subject_item'][$key]
+        ]);
+      }
+
+      foreach($data['department_id'] as $key => $value)
+      {
+        RoutineDepartmentRow::insert([
+          'item_id' => $routineItem->id,
+          'column_id' => $value,
+          'details' => $data['department_item'][$key]
+        ]);
+      }
     }
     catch(\Exception $e)
     {
