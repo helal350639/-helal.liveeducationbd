@@ -2,6 +2,18 @@
 use \App\Http\Controllers\SourceCtrl;
 $source = New SourceCtrl;
 $value = $routine;
+
+// $subjects = $subject_columns;
+// // dd($subjects);
+
+function checkSubjectIn($id, $subject_columns)
+{
+  if(in_array($id, $subject_columns))
+  {
+    return 'selected';
+  }
+
+}
 @endphp
 
 @extends('dashboard')
@@ -34,7 +46,7 @@ $value = $routine;
             @csrf
             @method('PUT')
             <div class="box-body">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="form-group">
                         <label for="">Course</label>
                         <select name="course_id" id="course_id" class="form-control select2" onchange="getBatches(this)">
@@ -45,7 +57,7 @@ $value = $routine;
                         </select>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="form-group">
                         <label for="">Batch</label>
                         <select name="batch_id" id="batch_id" class="form-control select2" onchange="getDepartments(this)">
@@ -56,18 +68,7 @@ $value = $routine;
                         </select>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label for="">Department</label>
-                        <select name="department_id" id="department_id" class="form-control select2">
-                            <option value="">Select One</option>
-                            @foreach($departments as $val)
-                            <option value="{{$val->id}}" {{$value->department_id == $val->id? 'selected': ''}}>{{$val->name}}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-8">
+                <div class="col-md-6">
                     <div class="form-group">
                         <label for="name">Routine Name</label>
                         <input type="text" class="form-control" name="name" id="name" required value="{{$value->name}}">
@@ -80,10 +81,24 @@ $value = $routine;
                     </div>
                 </div>
                 <div class="col-md-12">
-                    <div class="form-group">
-                        <label for="details">Details</label>
-                        <textarea class="form-control" name="details" id="details" rows="4">{{$value->details}}</textarea>
-                    </div>
+                  <div class="form-group">
+                    <label for="subject">Subject</label>
+                    <select class="form-control select2" multiple name="subjects[]" id="subjects" required>
+                      @foreach($subjects as $val)
+                      <option value="{{$val->id}}" {{checkSubjectIn($val->id, [])}}>{{$val->name}}</option>
+                      @endforeach
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <label for="department">Department</label>
+                    <select class="form-control select2" multiple name="departments[]" id="departments" required>
+                      @foreach($departments as $val)
+                      <option value="{{$val->id}}">{{$val->name}}</option>
+                      @endforeach
+                    </select>
+                  </div>
                 </div>
                 <div class="col-md-8">
                     <div class="form-group">
@@ -197,80 +212,8 @@ $value = $routine;
                     $("#department_id").html('')
                 }
             },
-            error: function(data) { 
-                    console.log('data error');
-            }
-        });
-    }
-
-//result view add setting
-function resultView(e)
-{
-    // console.log(e.options[e.selectedIndex].value == 'No');
-    if(e.options[e.selectedIndex].value == 'No')
-    {
-        let msg = document.createElement('div');
-        msg.classList.add('col-md-6');
-        msg.innerHTML = '<div class="form-group">'+
-                                '<label for="message">Message After Exam</label>'+
-                                '<input type="text" class="form-control" name="message" id="message" value="">'+
-                            '</div>';
-
-        e.parentNode.parentNode.nextElementSibling = msg;
-    }
-}
-function Status(e){
-        let timer = e.parentNode.parentNode.nextElementSibling;
-        if(e.options[e.selectedIndex].value == 'Scheduled')
-        {
-            timer.classList.remove('hide');
-            timer.innerHTML = '<div class="col-md-6">'+
-                            '<div class="form-group">'+
-                                '<label for="open">Publish Time</label>'+
-                                '<input type="datetime-local" class="form-control" name="open" id="open" value="{{$value->open}}">'+
-                            '</div>'+
-                        '</div>'+
-                        '<div class="col-md-6">'+
-                            '<div class="form-group">'+
-                                '<label for="close">Close Time</label>'+
-                                '<input type="datetime-local" class="form-control" name="close" id="close" value="{{$value->close}}">'+
-                            '</div>'+
-                        '</div>';
-        }
-        else
-        {
-            timer.innerHTML = '';
-            timer.classList.add('hide');
-        }
-    }
-
-    // onload call to the status change
-    Status(document.getElementById('status'));
-
-    function getsubcats(elm){
-
-        var catid = elm.options[elm.options.selectedIndex].value;
-
-        $.ajax({
-            type: 'GET', //THIS NEEDS TO BE GET
-            url: '/get_sub_cats/'+catid,
-            success: function (data) {
-
-                var obj = JSON.parse(JSON.stringify(data));
-                var sub_cat_html = "";
-
-                $.each(obj['subcats'], function (key, val) {
-                   sub_cat_html += "<option value="+val.id+">"+val.name+"</option>";
-                });
-
-                if(sub_cat_html != ""){
-                    $("#sub_cat").html('<option value="">Select SubCategory</option>'+sub_cat_html)
-                }else{
-                    $("#sub_cat").html('<option value="">No SubCategory</option>')
-                }
-            },
-            error: function(data) { 
-                 console.log('data error');
+            error: function(data) {
+              console.log('data error');
             }
         });
     }
@@ -282,6 +225,7 @@ function Status(e){
         });
     });
 
-    // getsubcats(elm);
+    //select 2
+    $(function(){$('.select2').select2();});
 </script>
 @endsection

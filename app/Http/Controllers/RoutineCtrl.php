@@ -162,9 +162,19 @@ class RoutineCtrl extends Controller
     {
         $courses = Course::where('status', 'Active')->get();
         $batches = Batch::where('status', 'Active')->get();
+        $subjects = Subject::where('status', 'Active')->get();
         $departments = Department::where('status', 'Active')->get();
         $routine = Routine::find($id);
-        return view('layouts.routines.edit', compact('routine', 'courses', 'departments', 'batches'));
+
+        $subject_columns = RoutineSubjectColumn::where('routine_id', $id)
+        ->pluck('subject_id')
+        ->toArray();
+
+        $department_columns = RoutineDepartmentColumn::where('routine_id', $id)
+        ->pluck('department_id')
+        ->toArray();
+
+        return view('layouts.routines.edit', compact('routine', 'courses', 'departments', 'batches', 'subjects', 'departments', 'subject_columns', 'department_columns'));
     }
 
     /**
@@ -273,9 +283,6 @@ class RoutineCtrl extends Controller
     ->where('routine_department_columns.routine_id', $id)
     ->select('routine_department_columns.*', 'departments.name')
     ->get();
-    
-    // $items = RoutineItem::orderBy('id', 'DESC')->get();
-
 
     $routine_rows = RoutineItemRow::where('routine_item_rows.routine_id', $id)
     ->with(['subjects', 'departments'])

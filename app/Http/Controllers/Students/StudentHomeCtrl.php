@@ -298,7 +298,7 @@ class StudentHomeCtrl extends Controller
     // check the user connected to the papers department
     $user_department = $user->departments()->find($paper->department_id);
 
-    if($user_batch && $user_department)
+    if($user_batch && $user_department || $paper->permit == 'Every One')
     {
       return view('student-panel.instruct', compact('paper'));
     }
