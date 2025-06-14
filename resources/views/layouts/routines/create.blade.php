@@ -1,14 +1,14 @@
 @extends('dashboard')
-@section('title', 'Add New Routine')
+@section('title', 'Create New Routine')
 @section('stylesheets')
 <link href="/assets/summernote/summernote.min.css" rel="stylesheet">
 @endsection
 @section('content')
 <section class="content-header">
-  <h1>Add a Routine</h1>
+  <h1>Create a Routine</h1>
   <ol class="breadcrumb">
     <li><a href="#"><i class="fa fa-dashboard"></i> Routines</a></li>
-    <li class="active">Add Routine</li>
+    <li class="active">Create Routine</li>
 </ol>
 </section>
 
@@ -23,7 +23,7 @@
         <form action="{{route('routine.store')}}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="box-body">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="form-group">
                         <label for="name">Course Name</label>
                         <select class="form-control select2" name="course_id" id="course_id" required onchange="getBatches(this)">
@@ -34,29 +34,15 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="form-group">
                         <label for="">Batch</label>
                         <select name="batch_id" id="batch_id" class="form-control select2" required onchange="getDepartments(this)">
                             <option value="">Select One</option>
-                            {{-- @foreach($batches as $val)
-                            <option value="{{$val->id}}">{{$val->name}}</option>
-                            @endforeach --}}
                         </select>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label for="">Department</label>
-                        <select name="department_id" id="department_id" class="form-control select2">
-                            <option value="">Select One</option>
-                            {{-- @foreach($departments as $val)
-                            <option value="{{$val->id}}">{{$val->name}}</option>
-                            @endforeach --}}
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-8">
+                <div class="col-md-6">
                     <div class="form-group">
                         <label for="name">Routine Name</label>
                         <input type="text" class="form-control" name="name" id="name" required>

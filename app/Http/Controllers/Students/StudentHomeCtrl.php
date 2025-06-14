@@ -18,6 +18,7 @@ use App\Models\Choice;
 use App\Models\Syllabus;
 use App\Models\Complain;
 use App\Models\Order;
+use App\Models\Routine;
 use Auth;
 use Session;
 use Mail;
@@ -35,15 +36,46 @@ class StudentHomeCtrl extends Controller
   public function dashboard()
   {
     $user = Auth::guard('student')->user();
-    // active courses
-    $courses = Course::orderBy('id', 'DESC')->where('status', 'Active')->get();
 
     // autheticates user courses
     $student = Student::find($user->id);
-    $mycourses = $student->courses()->orderBy('id', 'DESC')->get();
 
-    // authenticates user exams
-    $papers = Paper::orderBy('id', 'DESC')->whereIn('status', ['Published', 'Scheduled'])->where('permit', 'Every One')->get();
+    // students batches array
+    $student_batches_ids = $student->batches()->pluck('batch_id')->toArray();
+
+    $student_departments_ids = $student->departments()->pluck('department_id')->toArray();
+
+    // this sutdent courses
+    $mycourses = $student->batches()->count();
+
+    // free available exams
+    $free_exam = Paper::whereRaw('DATE(close) > ?', date('Y-m-d'))
+    ->whereIn('status', ['Published', 'Scheduled'])
+    ->where('permit', 'Every One')
+    ->count();
+
+    // premium available exams
+    $premium_exam = Paper::whereIn('batch_id', $student_batches_ids)
+    ->whereIn('status', ['Published', 'Scheduled'])
+    ->whereNot('permit', 'Every One')
+    ->whereRaw('DATE(close) > ?', date('Y-m-d'))
+    ->count();
+
+    // student already completed the exams
+    $result = Exam::where('student_id', $user->id)
+    ->where('status', 'Completed')
+    ->count();
+
+    // batch routine for the student
+    $routine = Routine::whereIn('batch_id', $student_batches_ids)
+    ->where('status', 'Active')
+    ->count();
+
+    // batch exam pdf for the student
+    $exam_pdf = Syllabus::whereIn('batch_id', $student_batches_ids)
+    ->whereIn('department_id', $student_departments_ids)
+    ->where('status', 'Active')
+    ->count();
 
     $orders = Order::leftJoin('batches', 'batches.id', 'orders.batch_id')
     ->orderBy('orders.id', 'DESC')
@@ -51,7 +83,18 @@ class StudentHomeCtrl extends Controller
     ->select('orders.*', 'batches.name')
     ->get();
 
-    return view('student-panel.dashboard', compact('courses', 'mycourses', 'papers', 'student', 'orders'));
+    $data = [
+      'course' => $mycourses,
+      'free_exam' => $free_exam,
+      'premium_exam' => $premium_exam,
+      'result' => $result,
+      'routine' => $routine,
+      'exam_pdf' => $exam_pdf,
+      'e-book' => '0',
+      'circular' => '0'
+    ];
+
+    return view('student-panel.dashboard', compact('data', 'student', 'orders'));
   }
 
   public function profile()
@@ -248,7 +291,21 @@ class StudentHomeCtrl extends Controller
   {
     $user = Auth::guard('student')->user();
     $paper = Paper::find($id);
-    return view('student-panel.instruct', compact('paper'));
+
+    // check the user bought the batch
+    $user_batch = $user->batches()->find($paper->batch_id);
+
+    // check the user connected to the papers department
+    $user_department = $user->departments()->find($paper->department_id);
+
+    if($user_batch && $user_department)
+    {
+      return view('student-panel.instruct', compact('paper'));
+    }
+    else
+    {
+      return redirect()->route('home.course.show', $paper->batch_id);
+    }
   }
 
   public function examShow($id)

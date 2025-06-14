@@ -240,7 +240,10 @@ class BatchCtrl extends Controller
         $arr = explode(',', $batch_id);
         $items = Batch::whereHas('course', function($q) use($arr) {
             $q->whereIn('course_id', $arr);
-        })->select('id', 'name')->get();
+        })
+        ->where('status', 'Active')
+        ->select('id', 'name')
+        ->get();
         return response()->json(['data' => $items]);
     }
     

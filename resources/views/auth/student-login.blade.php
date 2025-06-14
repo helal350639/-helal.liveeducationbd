@@ -16,12 +16,13 @@
               <h2>{{config('app.name', 'App Name')}}</h2>
             </div>
             <!-- /.login-logo -->
-            <div class="login-box-body">
+            <div class="login-box-body m-3">
               <p class="login-box-msg">
-              <img src="/img/logo.png?v=3008" alt="" width="100">
-              <br>
-              <br>
-              Student Login</p>
+                <img src="/img/logo.png?v=3008" alt="" width="100">
+                <br>
+                <br>
+                Student Login
+              </p>
     
               <div style="text-align:center">
                 <a class="btn-block" href="/auth/google">
@@ -36,20 +37,20 @@
                 <br>
               </div>
     
-              <form id="form" style="display: none" action="{{ route('students.login.post') }}" method="POST" style="margin-bottom:15px">
+              <form id="form" style="display: none" action="{{ route('students.login.post') }}" method="POST" style="margin-bottom:15px" class="py-3">
                 @csrf
-                <div class="form-group">
-                  <label for="email">Email Address</label>
+                <div class="form-group pd-3">
+                  <label for="email" style="text-align: left; width:100%">Email Address</label>
                   <div class="input-group">
-                    <input type='email' name="email" class='form-control' required />
-                    <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
+                    <input type='email' name="email" class='form-control' required placeholder="" />
+                    <span class="input-group-text"><i class="fa fa-envelope"></i></span>
                   </div>
                 </div>
-                <div class="form-group">
-                  <label for="password">Password</label>
+                <div class="form-group my-3">
+                  <label for="password" style="text-align: left; width:100%">Password</label>
                   <div class="input-group">
                     <input type="password" name="password" class="form-control" required>
-                    <span class="input-group-addon" onclick="showPassword(this)"><i class="fa fa-eye-slash"></i></span>
+                    <span class="input-group-text" onclick="showPassword(this)"><i class="fa fa-eye-slash"></i></span>
                   </div>
                 </div>
                 <div class="row">
@@ -66,8 +67,8 @@
                     </div>
                   </div> --}}
                   <!-- /.col -->
-                  <div class="col-xs-12">
-                    <button type="submit" class="btn btn-info btn-submit btn-block">Login</button>
+                  <div class="col-xs-12 d-grid">
+                    <button type="submit" class="btn btn-info btn-submit btn-large">Login</button>
                   </div>
                   <!-- /.col -->
                 </div>

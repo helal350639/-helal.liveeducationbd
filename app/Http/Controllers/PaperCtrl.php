@@ -73,17 +73,6 @@ class PaperCtrl extends Controller
             'header' => 'required',
             'banner' => 'mimes:jpeg,jpg,png,pdf|max:1000',
         ]);
-
-        // if($validator->fails()){
-        //     return response()->json(
-        //         [
-        //             'success' => false,
-        //             'message' => 'File upload failed',
-        //             'errors' => $validator->getMessageBag()->toArray()
-        //         ],
-        //         201
-        //     );
-        // }
         
         $data = $request->all();
         // dd($data);

@@ -277,10 +277,9 @@ class RoutineCtrl extends Controller
     $items = RoutineItem::orderBy('id', 'DESC')->get();
 
 
-    $routine_rows = RoutineItemRow::leftJoin('papers', 'papers.id', 'routine_item_rows.paper_id')
-    ->where('routine_item_rows.routine_id', $id)
+    $routine_rows = RoutineItemRow::where('routine_item_rows.routine_id', $id)
     ->with(['subjects', 'departments'])
-    ->select('routine_item_rows.*', 'papers.name')
+    ->select('routine_item_rows.*')
     ->get();
     // dd($routine_rows);
 
@@ -297,7 +296,7 @@ class RoutineCtrl extends Controller
 
       $routineItem = RoutineItemRow::create([
         'routine_id' => $data['routine_id'],
-        'paper_id' => $data['paper_id'],
+        'paper_name' => $data['paper_name'],
         'exam_at' => $data['exam_at']
       ]);
 
@@ -326,5 +325,34 @@ class RoutineCtrl extends Controller
 
     // return $this->addItem($data['routine_id']);
     return redirect()->route('routine.add-item', $data['routine_id']);
+  }
+
+  //delete routine item
+  public function deleteItem($id)
+  {
+    $item_row = RoutineItemRow::find($id);
+    $subject_rows =  RoutineSubjectRow::where('item_id', $id)->get();
+    $department_rows =  RoutineDepartmentRow::where('item_id', $id)->get();
+
+    if($subject_rows)
+    {
+      foreach($subject_rows as $row)
+      {
+        $row->delete();
+      }
+    }
+
+    if($department_rows)
+    {
+      foreach($department_rows as $row)
+      {
+        $row->delete();
+      }
+    }
+
+    $item_row->delete();
+
+    Session::flash('success', 'The item deleted');
+    return back();
   }
 }

@@ -37,12 +37,13 @@
             @endforeach
 
             <th>Date & Time</th>
+            <th>Action</th>
           </tr>
 
           @foreach($routine_rows as $key => $item)
           <tr>
             <td>{{$item->id}}</td>
-            <td>{{$item->name}}</td>
+            <td>{{$item->paper_name}}</td>
 
             @foreach($item->subjects as $subject)
             <td>{!!$subject->chapter!!}</td>
@@ -53,6 +54,11 @@
             @endforeach
 
             <td>{{$item->exam_at}}</td>
+            <td>
+              <a class="btn btn-danger btn-sm" href="{{route('routine.item.delete', $item->id)}}" onclick="return confirm('Are you sure, you want to delete this?')">
+                <i class="fa fa-trash"></i>
+              </a>
+            </td>
           </tr>
           @endforeach
 
@@ -80,7 +86,7 @@
                     <div class="form-group row">
                       <label class="col-md-4 text-right" for="">Exam No</label>
                       <div class="col-md-8">
-                        <input class="form-control" name="paper_id" id="paper_id" required>
+                        <input class="form-control" name="paper_name" id="paper_name" required>
                       </div>
                     </div>
 

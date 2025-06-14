@@ -177,7 +177,7 @@ font-size: 16px;
                   <div class="corce_exam_mobile_res">
                      <div>
                         <span>কোর্স সমূহ</span>
-                        <h3>2</h3>
+                        <h3>{{$data['course']}}</h3>
                      </div>
                      <div class="corce_exam-icon">
                         <i class="fa fa-wallet"></i>
@@ -192,7 +192,7 @@ font-size: 16px;
                   <div class="corce_exam_mobile_res">
                      <div>
                         <span>ফ্রি পরীক্ষা</span>
-                        <h3>5</h3>
+                        <h3>{{$data['free_exam']}}</h3>
                      </div>
                      <div class="corce_exam-icon">
                         <i class="fa fa-wallet"></i>
@@ -207,7 +207,7 @@ font-size: 16px;
                   <div class="corce_exam_mobile_res">
                      <div>
                         <span>প্রিমিয়াম পরীক্ষা</span>
-                        <h3>3</h3>
+                        <h3>{{$data['premium_exam']}}</h3>
                      </div>
                      <div class="corce_exam-icon">
                         <i class="fa fa-wallet"></i>
@@ -222,7 +222,7 @@ font-size: 16px;
                   <div class="corce_exam_mobile_res">
                      <div>
                         <span>রেজাল্ট</span>
-                        <h3>2</h3>
+                        <h3>{{$data['result']}}</h3>
                      </div>
                      <div class="corce_exam-icon">
                         <i class="fa fa-wallet"></i>
@@ -237,7 +237,7 @@ font-size: 16px;
                   <div class="corce_exam_mobile_res">
                      <div>
                         <span>এক্সাম/ ক্লাস রুটিন</span>
-                        <h3>3</h3>
+                        <h3>{{$data['routine']}}</h3>
                      </div>
                      <div class="corce_exam-icon">
                         <i class="fa fa-wallet"></i>
@@ -252,7 +252,7 @@ font-size: 16px;
                   <div class="corce_exam_mobile_res">
                      <div>
                         <span>এক্সাম PDF</span>
-                        <h3>6</h3>
+                        <h3>{{$data['exam_pdf']}}</h3>
                      </div>
                      <div class="corce_exam-icon">
                         <i class="fa fa-wallet"></i>
@@ -267,7 +267,7 @@ font-size: 16px;
                   <div class="corce_exam_mobile_res">
                      <div>
                         <span>ই-বুক সমূহ</span>
-                        <h3>2</h3>
+                        <h3>{{$data['e-book']}}</h3>
                      </div>
                      <div class="corce_exam-icon">
                         <i class="fa fa-wallet"></i>
@@ -282,7 +282,7 @@ font-size: 16px;
                   <div class="corce_exam_mobile_res">
                      <div>
                         <span>নিয়োগ বিজ্ঞপ্তি</span>
-                        <h3>5</h3>
+                        <h3>{{$data['circular']}}</h3>
                      </div>
                      <div class="corce_exam-icon">
                         <i class="fa fa-wallet"></i>

@@ -26,6 +26,7 @@ class CategoryCtrl extends Controller
     }
 
     $courses = Course::where('status', 'Active')
+    ->where('web', 'Yes')
     ->get();
     
     return view('homepage.course', compact('type', 'title', 'courses'));
@@ -55,25 +56,6 @@ class CategoryCtrl extends Controller
 
       $batches = $batches->groupBy('batches.id', 'batches.name', 'batches.banner')
       ->select('batches.id', 'batches.name', 'batches.banner');
-
-      // ->withCount([
-      //   'papers as items_count' => function ($query) use ($type)
-      //   {
-      //     if($type == 'Premium Exams')
-      //     {
-      //       $query->whereNot('permit', 'Every One');
-      //     }
-
-      //     if($type == 'Free Exams')
-      //     {
-      //       $query->where('permit', 'Every One');
-      //     }
-
-      //     // ->whereRaw('DATE(open) < ?', date('Y-m-d H:i:s'))
-      //     $query->whereRaw('DATE(close) > ?', date('Y-m-d H:i:s'))
-      //     ->whereIn('status', ['Published', 'Scheduled']);
-      //   }
-      //   ]);
     }
     
     if($type == 'premium_result')
@@ -155,26 +137,6 @@ class CategoryCtrl extends Controller
 
       $departments = $departments->groupBy('departments.id', 'departments.name', 'batch_department.batch_id', 'batch_department.department_id')
       ->select('departments.id', 'departments.name', 'batch_department.batch_id', 'batch_department.department_id');
-
-      // ->withCount([
-      //   'papers as items_count' => function ($query) use ($batch, $type)
-      //   {
-      //     if($type == 'Premium Exams')
-      //     {
-      //       $query->whereNot('permit', 'Every One');
-      //     }
-
-      //     if($type == 'Free Exams')
-      //     {
-      //       $query->where('permit', 'Every One');
-      //     }
-
-      //     $query->where('batch_id', $batch->id)
-      //     // ->whereRaw('DATE(open) < ?', date('Y-m-d H:i:s'))
-      //     ->whereRaw('DATE(close) > ?', date('Y-m-d H:i:s'))
-      //     ->whereIn('status', ['Published', 'Scheduled']);
-      //   }
-      //   ]);
     }
 
     $departments = $departments->get();

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class RoutineItemRow extends Model
 {
-  protected $fillable = ['routine_id', 'paper_id', 'exam_at'];
+  protected $fillable = ['routine_id', 'paper_name', 'exam_at'];
 
   public function subjects()
   {

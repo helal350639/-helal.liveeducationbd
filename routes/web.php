@@ -357,6 +357,7 @@ Route::middleware(['auth'])->group(function()
   {
     Route::get('routine/add-item/{id}', 'addItem')->name('routine.add-item');
     Route::post('routine/add-item-update', 'addItemPost')->name('routine.add-item.store');
+    Route::get('routine/delete-item/{item_id}', 'deleteItem')->name('routine.item.delete');
   });
 
   Route::controller(HomePageSettingCtrl::class)->group(function()
