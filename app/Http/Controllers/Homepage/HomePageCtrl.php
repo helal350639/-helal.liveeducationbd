@@ -29,6 +29,7 @@ class HomePageCtrl extends Controller
   {
     $courses = Course::orderBy('id', 'ASC')
     ->where('status', 'Active')
+    ->where('web', 'Yes')
     ->get();
 
     $sliders = Batch::where('status', 'Active')
