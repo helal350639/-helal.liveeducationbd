@@ -21,11 +21,11 @@ if($user)
     <section class="our_courses">
       <div class="container">
         <div class="row">
-          <div class="content-header">
+          <div class="content-header title-area text-center">
             <h1> পরীক্ষা </h1>
           </div>
         </div>
-        <div class="col-md-6 col-md-offset-3">
+        <div class="col-md-6 offset-md-3">
           @if( $paper->permit == 'Batch' && $student->batches->find($paper->batch_id) || $paper->permit == 'Department' && $student->departments->find($paper->department_id) || $paper->permit == 'Group' && $student->groups->find($paper->group_id) || $paper->permit == 'Every One')
           
             @if($paper->close && $paper->close < date('Y-m-d H:i:s'))
@@ -37,7 +37,7 @@ if($user)
                 <p class="text-danger">পরীক্ষার সময় শেষ...</p>
               </div>
               <div class="card-footer">
-                <a class="btn btn-danger pull-right" href="{{route('students.exam')}}"><i class="fa fa-arrow-left"></i> এক্সাম পেজ এ ফিরে যান</a>
+                {{-- <a class="btn btn-danger pull-right" href="{{route('students.exam')}}"><i class="fa fa-arrow-left"></i> এক্সাম পেজ এ ফিরে যান</a> --}}
                 <div class="clearfix"></div>
               </div>
             </div>
@@ -52,7 +52,7 @@ if($user)
                 <b><span id="timer" style="font-size:20px; font-wieght:bold"></span></b> সময় পরে পরীক্ষা শুরু হবে
             </div>
               <div class="card-footer">
-                <a class="btn btn-info pull-right" href="{{route('students.exam', $value->id)}}">Back</a>
+                {{-- <a class="btn btn-info pull-right" href="{{route('students.exam', $value->id)}}">Back</a> --}}
                 <div class="clearfix"></div>
               </div>
             </div>
@@ -75,12 +75,15 @@ if($user)
             <div class="card card-danger">
               <div class="card-heading p-3">
                 <p>This exam is not match with you!</p>
-                <a href="{{route('homepage')}}">Back</a>
+                {{-- <a href="{{route('homepage')}}">Back</a> --}}
               </div>
             </div>
           @endif
         </div>
       </div>
+        
+      @include('partials.back-button')
+
     </section> <!-- /.content -->
 
 <script>

@@ -62,12 +62,12 @@ if($user)
 
                   @foreach($papers as $key => $paper)
 
-                    <div class="col-lg-8 col-md-10 col-sm-12">
+                    <div class="col-lg-8 col-md-10 col-sm-12" title="{{$paper->open}}">
                       <div class="border accordion-body-content d-flex justify-content-between align-items-center flex-wrap p-3 py-2">
                         <div class="text d-flex align-items-center list-content">
                           <div class="course_exam-icon">
                             <div class="circular-progress" title="Provided Answer" data-inner-circle-color="#def3ff" data-percentage="6" data-progress-color="rgb(137 24 26)" data-bg-color="rgb(137 24 26 / 70%)" style="background: #fff; font-size:25px; border:1px solid #ddd; color:#1CAB55">
-                              @if($paper->open < date('Y-m-d') && $paper->close > date('Y-m-d'))
+                              @if($paper->open <= date('Y-m-d H:i:s') && $paper->close > date('Y-m-d H:i:s'))
                               <i class="fa fa-unlock"></i>
                               @else
                               <i class="fa fa-lock" style="color:red"></i>
