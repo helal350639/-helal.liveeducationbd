@@ -11,7 +11,7 @@ use App\Http\Controllers\Auth\StudentLogin;
 use App\Http\Controllers\Students\StudentHomeCtrl;
 use App\Http\Controllers\Homepage\CategoryCtrl;
 use App\Http\Controllers\Homepage\JobPreparationCtrl;
-use App\Http\Controllers\Homepage\ExamCtrl;
+// use App\Http\Controllers\Homepage\ExamCtrl;
 use App\Http\Controllers\Homepage\HomePageCtrl;
 use App\Http\Controllers\Homepage\HomepageSettingCtrl;
 use Laravel\Socialite\Facades\Socialite;
@@ -78,19 +78,19 @@ Route::controller(JobPreparationCtrl::class)->group(function()
   Route::get('homepage/batch/{course_id}', 'batches')->name('homepage.batches');
 });
 
-Route::controller(ExamCtrl::class)->group(function()
-{
-  Route::get('live-exam-courses', 'liveCourses')->name('live.courses');
-  Route::get('live-exam-batches/{course_id}', 'liveBatches')->name('live.batches');
-  Route::get('live-exam-departments/{batch_id}', 'liveDepartments')->name('live.departments');
-  Route::get('live-department-exams/{department_id}', 'liveExams')->name('live.exams');
+// Route::controller(ExamCtrl::class)->group(function()
+// {
+//   Route::get('live-exam-courses', 'liveCourses')->name('live.courses');
+//   Route::get('live-exam-batches/{course_id}', 'liveBatches')->name('live.batches');
+//   Route::get('live-exam-departments/{batch_id}', 'liveDepartments')->name('live.departments');
+//   Route::get('live-department-exams/{department_id}', 'liveExams')->name('live.exams');
 
-  // Route::get('free-exam-courses', 'freeCourses')->name('free.courses');
-  Route::get('free-exam-batches', 'freeBatches')->name('free.batches');
-  Route::get('free-exam-departments/{batch_id}', 'freeDepartments')->name('free.departments');
-  Route::get('free-department-exams/{department_id}', 'freeExams')->name('free.exams');
+//   // Route::get('free-exam-courses', 'freeCourses')->name('free.courses');
+//   Route::get('free-exam-batches', 'freeBatches')->name('free.batches');
+//   Route::get('free-exam-departments/{batch_id}', 'freeDepartments')->name('free.departments');
+//   Route::get('free-department-exams/{department_id}', 'freeExams')->name('free.exams');
 
-});
+// });
 
 Route::get('/login', function()
 {
