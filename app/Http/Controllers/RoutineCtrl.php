@@ -274,7 +274,7 @@ class RoutineCtrl extends Controller
     ->select('routine_department_columns.*', 'departments.name')
     ->get();
     
-    $items = RoutineItem::orderBy('id', 'DESC')->get();
+    // $items = RoutineItem::orderBy('id', 'DESC')->get();
 
 
     $routine_rows = RoutineItemRow::where('routine_item_rows.routine_id', $id)
@@ -283,7 +283,7 @@ class RoutineCtrl extends Controller
     ->get();
     // dd($routine_rows);
 
-    return view('layouts.routines.add-item', compact('routine', 'papers', 'subjects', 'departments', 'items', 'routine_rows'));
+    return view('layouts.routines.add-item', compact('routine', 'papers', 'subjects', 'departments', 'routine_rows'));
   }
   
   public function addItemPost(Request $request)
