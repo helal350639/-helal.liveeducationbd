@@ -22,4 +22,14 @@ class Routine extends Model
     {
         return $this->belongsTo(Batch::class);
     }
+    
+    public function subjects()
+    {
+        return $this->belongsToMany(Subject::class);
+    }
+    
+    public function departments()
+    {
+        return $this->belongsToMany(Department::class);
+    }
 }

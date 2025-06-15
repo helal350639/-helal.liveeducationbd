@@ -66,13 +66,13 @@ class RoutineCtrl extends Controller
         $source = new SourceCtrl;
 
         $this->validate($request, [
-            'course_id' => 'required|numeric',
-            'name'      => 'required|unique:groups|max:255',
-            'header'    => 'nullable|string',
-            'details'   => 'nullable|max:1000',
-            'pdf'       => 'nullable|mimes:pdf|max:10000',
-            'subjects' => 'nullable',
-            'departments' => 'nullable'
+          'course_id' => 'required|numeric',
+          'name'      => 'required|unique:groups|max:255',
+          'header'    => 'nullable|string',
+          'details'   => 'nullable|max:1000',
+          'pdf'       => 'nullable|mimes:pdf|max:10000',
+          'subjects' => 'nullable',
+          'departments' => 'nullable'
         ]);
         
         $data = $request->all();
@@ -166,13 +166,16 @@ class RoutineCtrl extends Controller
         $departments = Department::where('status', 'Active')->get();
         $routine = Routine::find($id);
 
-        $subject_columns = RoutineSubjectColumn::where('routine_id', $id)
-        ->pluck('subject_id')
-        ->toArray();
+        // $subject_columns = RoutineSubjectColumn::where('routine_id', $id)
+        // ->pluck('subject_id')
+        // ->toArray();
 
-        $department_columns = RoutineDepartmentColumn::where('routine_id', $id)
-        ->pluck('department_id')
-        ->toArray();
+        // $department_columns = RoutineDepartmentColumn::where('routine_id', $id)
+        // ->pluck('department_id')
+        // ->toArray();
+
+        $subject_columns = $routine->subjects()->pluck('subject_id')->toArray();
+        $department_columns = $routine->departments()->pluck('department_id')->toArray();
 
         return view('layouts.routines.edit', compact('routine', 'courses', 'departments', 'batches', 'subjects', 'departments', 'subject_columns', 'department_columns'));
     }
@@ -194,6 +197,8 @@ class RoutineCtrl extends Controller
             'header'    => 'nullable|max:255',
             'details'   => 'nullable|max:1000',
             'pdf'       => 'nullable|mimes:pdf|max:10000',
+            'subjects'  => 'required|array',
+            'departments' => 'required|array',
         ]);
         
         $data = $request->all();
@@ -211,7 +216,28 @@ class RoutineCtrl extends Controller
             unset($data['_method']);
         }
 
+        // dd($ex_subjects);
+
+        $subjects = $data['subjects'];
+        $departments = $data['departments'];
+
+        if(isset($data['subjects']))
+        {
+          unset($data['subjects']);
+        }
+
+        if(isset($data['departments']))
+        {
+          unset($data['departments']);
+        }
+
+        // dd($subjects[1]);
+
         try {
+
+          $routine->subjects()->sync($subjects);
+          $routine->departments()->sync($departments);
+
             // upload pdf file
             if($request->hasFile('pdf'))
             {
@@ -272,17 +298,9 @@ class RoutineCtrl extends Controller
     $routine = Routine::find($id);
     $papers = Paper::orderBy('id', 'DESC')->get();
 
-    $subjects = RoutineSubjectColumn::leftJoin('subjects', 'subjects.id', 'routine_subject_columns.subject_id')
-    ->orderBy('routine_subject_columns.id', 'ASC')
-    ->where('routine_subject_columns.routine_id', $id)
-    ->select('routine_subject_columns.*', 'subjects.name')
-    ->get();
+    $subjects = $routine->subjects()->get();
 
-    $departments = RoutineDepartmentColumn::leftJoin('departments', 'departments.id', 'routine_department_columns.department_id')
-    ->orderBy('routine_department_columns.id', 'ASC')
-    ->where('routine_department_columns.routine_id', $id)
-    ->select('routine_department_columns.*', 'departments.name')
-    ->get();
+    $departments = $routine->departments()->get();
 
     $routine_rows = RoutineItemRow::where('routine_item_rows.routine_id', $id)
     ->with(['subjects', 'departments'])

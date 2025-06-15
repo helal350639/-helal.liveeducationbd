@@ -64,8 +64,13 @@ class Department extends Model
         return $this->hasOne(Complain::class, 'department_id');
     }
 
+    // public function routine()
+    // {
+    //     return $this->hasMany(Routine::class, 'department_id');
+    // }
+
     public function routine()
     {
-        return $this->hasMany(Routine::class, 'department_id');
+        return $this->belongsToMany(Routine::class);
     }
 }

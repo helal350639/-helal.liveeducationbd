@@ -58,9 +58,11 @@ if($user)
             <div class="all-courses-area">
               <div class="row justify-content-center g-3">
 
+                <p>{!! $routine->header !!}</p>
+
                 <table class="table table-bordered">
                   <tr>
-                    <th>ID</th>
+                    <th>SL No.</th>
                     <th>Exam Name/No</th>
                 
                     @foreach($subjects as $subject)
@@ -76,7 +78,7 @@ if($user)
                 
                   @foreach($routine_rows as $key => $item)
                   <tr>
-                    <td>{{$item->id}}</td>
+                    <td>{{$key+1}}</td>
                     <td>{{$item->paper_name}}</td>
                 
                     @foreach($item->subjects as $subject)

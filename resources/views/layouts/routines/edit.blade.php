@@ -3,12 +3,9 @@ use \App\Http\Controllers\SourceCtrl;
 $source = New SourceCtrl;
 $value = $routine;
 
-// $subjects = $subject_columns;
-// // dd($subjects);
-
-function checkSubjectIn($id, $subject_columns)
+function checkIn($id, $columns)
 {
-  if(in_array($id, $subject_columns))
+  if(in_array($id, $columns))
   {
     return 'selected';
   }
@@ -85,7 +82,7 @@ function checkSubjectIn($id, $subject_columns)
                     <label for="subject">Subject</label>
                     <select class="form-control select2" multiple name="subjects[]" id="subjects" required>
                       @foreach($subjects as $val)
-                      <option value="{{$val->id}}" {{checkSubjectIn($val->id, [])}}>{{$val->name}}</option>
+                      <option value="{{$val->id}}" {{checkIn($val->id, $subject_columns)}}>{{$val->name}}</option>
                       @endforeach
                     </select>
                   </div>
@@ -95,7 +92,7 @@ function checkSubjectIn($id, $subject_columns)
                     <label for="department">Department</label>
                     <select class="form-control select2" multiple name="departments[]" id="departments" required>
                       @foreach($departments as $val)
-                      <option value="{{$val->id}}">{{$val->name}}</option>
+                      <option value="{{$val->id}}" {{checkIn($val->id, $department_columns)}}>{{$val->name}}</option>
                       @endforeach
                     </select>
                   </div>

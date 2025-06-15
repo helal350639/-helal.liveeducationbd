@@ -269,17 +269,9 @@ class CategoryCtrl extends Controller
     ->where('status', 'Published')
     ->first();
 
-    $subjects = RoutineSubjectColumn::leftJoin('subjects', 'subjects.id', 'routine_subject_columns.subject_id')
-    ->orderBy('routine_subject_columns.id', 'ASC')
-    ->where('routine_subject_columns.routine_id', $routine->id)
-    ->select('routine_subject_columns.*', 'subjects.name')
-    ->get();
+    $subjects = $routine->subjects()->get();
 
-    $departments = RoutineDepartmentColumn::leftJoin('departments', 'departments.id', 'routine_department_columns.department_id')
-    ->orderBy('routine_department_columns.id', 'ASC')
-    ->where('routine_department_columns.routine_id', $routine->id)
-    ->select('routine_department_columns.*', 'departments.name')
-    ->get();
+    $departments = $routine->departments()->get();
 
     $routine_rows = RoutineItemRow::where('routine_item_rows.routine_id', $routine->id)
     ->with(['subjects', 'departments'])
