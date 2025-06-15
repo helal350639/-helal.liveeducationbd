@@ -49,7 +49,7 @@ function position($user_mark, $candidates, $marks)
     <section class="our_courses no-padding" id="content">
       <div class="container">
 
-      @if(isset($result['result']))
+      @if(isset($result['result']) && $exams->count())
       <div class="row">
         @foreach($exams as $key => $value)
         @php        
@@ -163,11 +163,6 @@ function position($user_mark, $candidates, $marks)
               </table>
             </div>
             <div class="panel-footer">
-              <p style="text-align: center">
-                <a href="{{route('students.exam')}}" class="btn btn-warning pull-left"><i class="fa fa-arrow-left"></i> Back</a>
-                {{-- <a href="{{route('students.solution', $value->id)}}" class="btn btn-info pull-right"><i class="fa fa-file-o"></i> Your Exam Paper</a> --}}
-              </p>
-              <div class="clearfix"></div>
             </div>
           </div>
           <div class="clearfix"></div>
@@ -193,14 +188,15 @@ function position($user_mark, $candidates, $marks)
         </div>
       </div>
       @else
-      <div class="col-md-6 col-md-offset-3 panel panel-default">
-        <div class="panel-body" style="text-align: center">
+      <div class="col-md-6 offset-3 card card-default">
+        <div class="card-body" style="text-align: center">
           <p>{{$paper->message}}</p>
-          <hr>
-          <p><a href="/">Back</a></p>
+          <p>Not Permitted</p>
         </div>
       </div>
       @endif
+      
+      @include('partials.back-button')
         
       </div>
     </section> <!-- /.content -->

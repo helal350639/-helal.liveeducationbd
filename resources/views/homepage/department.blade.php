@@ -46,7 +46,7 @@ $user = Auth::guard('student')->user();
               @else
               <div class="card card-default">
                 <div class="card-body text-center">
-                  No Batch Available Departments
+                  No Departments Available 
                 </div>
               </div>
               @endif

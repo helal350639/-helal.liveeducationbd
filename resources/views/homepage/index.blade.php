@@ -237,7 +237,7 @@ if($user)
                   <img src="/web/img/it-books.png" alt="" loading="lazy">
                 </div>
                 <div class="my-home-service-content">
-                  <h3>Free  Exam</h3>
+                  <h3>Free Exam</h3>
                 </div>
               </div>
             </a>

@@ -26,7 +26,7 @@ $user = Auth::guard('student')->user();
               <div class="col-md-8 offset-md-2">
                 <div class="row">
                   <div class="col-md-6 col-12 mb-1 dropdown bcs-jobs" id="home-services-area-one">
-                    <a href="{{route('category.batches', 'premium_result')}}">
+                    <a href="{{route('category.batches', 'Premium Results')}}">
                       <div class="my-home-service premium-course-box">
                         <div class="my-home-service-icon">
                           <img src="/web/img/premium.png" alt="" loading="lazy">
@@ -39,7 +39,7 @@ $user = Auth::guard('student')->user();
                   </div>
                   
                   <div class="col-md-6 col-12 mb-1 dropdown bcs-jobs" id="home-services-area-one">
-                    <a href="{{route('category.batches', 'free_result')}}">
+                    <a href="{{route('category.batches', 'Free Results')}}">
                       <div class="my-home-service premium-course-box">
                         <div class="my-home-service-icon">
                           <img src="/web/img/free.jpg" alt="" loading="lazy">

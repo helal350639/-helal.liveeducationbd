@@ -9,9 +9,15 @@ use App\Models\Batch;
 use App\Models\Department;
 use App\Models\Paper;
 use App\Models\Syllabus;
+use App\Models\Exam;
+use App\Models\Routine;
+use App\Models\RoutineSubjectColumn;
+use App\Models\RoutineDepartmentColumn;
+use App\Models\RoutineItemRow;
 
 class CategoryCtrl extends Controller
 {
+  // courses for showing on the homepage
   public function courses($type)
   {
     $title = '';
@@ -32,12 +38,14 @@ class CategoryCtrl extends Controller
     return view('homepage.course', compact('type', 'title', 'courses'));
   }
 
+  // this batches for [exam, result, exam_pdf...] showing on the homepage everywhere 
   public function batches($type)
   {
     // dd($type);
     $batches = Batch::orderBy('batches.id', 'DESC')
     ->where('batches.status', 'Active');
 
+    // batch query filter for 'Free Exams' & 'Premium Exams'
     if($type == 'Free Exams' || $type == 'Premium Exams')
     {
       $batches = $batches->leftJoin('papers', 'batches.id', 'papers.batch_id')
@@ -58,15 +66,46 @@ class CategoryCtrl extends Controller
       ->select('batches.id', 'batches.name', 'batches.banner');
     }
     
-    if($type == 'premium_result')
+    // batches filter query for 'Premium Results' & 'Free Results'
+    if($type == 'Premium Results' || $type == 'Free Results')
     {
-      $type = 'Premium Result';
+      $batches = $batches->leftJoin('papers', 'batches.id', 'papers.batch_id')
+      ->leftJoin('exams', 'exams.paper_id', 'papers.id')
+      ->where('exams.status', 'Completed');
+
+      if($type == 'Premium Results')
+      {
+        $batches = $batches->whereNot('papers.permit', 'Every One');
+      }
+
+      if($type == 'Free Results')
+      {
+        $batches = $batches->where('papers.permit', 'Every One');
+      }
+
+      $batches = $batches->groupBy('batches.id', 'batches.name', 'batches.banner')
+      ->select('batches.id', 'batches.name', 'batches.banner');
     }
 
-    if($type == 'free_result')
+    // batch query for exam pdf
+    if($type == 'Exam PDF')
     {
-      $type = 'Free Result';
+      $batches = $batches->leftJoin('syllabi', 'syllabi.batch_id', 'batches.id')
+      ->where('syllabi.status', 'Published')
+      ->groupBy('batches.id', 'batches.name', 'batches.banner')
+      ->select('batches.id', 'batches.name', 'batches.banner');
     }
+
+    //
+    if($type == 'Exam Routine')
+    {
+      $batches = $batches->leftJoin('routines', 'routines.batch_id', 'batches.id')
+      ->whereNotNull('routines.batch_id')
+      ->groupBy('batches.id', 'batches.name', 'batches.banner', 'routines.batch_id')
+      ->select('batches.id', 'batches.name', 'batches.banner', 'routines.batch_id');
+    }
+
+    //finally execute the query
     $batches = $batches->get();
     // dd($batches);
 
@@ -74,6 +113,7 @@ class CategoryCtrl extends Controller
 
   }
 
+  // batches query according to the course id
   public function batch($type, $course_id)
   {
     $course = Course::find($course_id);
@@ -90,6 +130,7 @@ class CategoryCtrl extends Controller
     return view('homepage.batch', compact('type', 'course', 'batches'));
   }
 
+  // department query for polytechnic study and where need directly call to the departments
   public function departments($type)
   {
     $title = '';
@@ -108,6 +149,7 @@ class CategoryCtrl extends Controller
     return view('homepage.polytechnic-semester', compact('type', 'semesters'));
   }
 
+  // department query according to the batch id
   public function department($type, $batch_id)
   {
     // dd($type);
@@ -139,6 +181,41 @@ class CategoryCtrl extends Controller
       ->select('departments.id', 'departments.name', 'batch_department.batch_id', 'batch_department.department_id');
     }
 
+    // department query for the 'Free Results' & 'Premium Results'
+    if($type == 'Free Results' || $type == 'Premium Results')
+    {
+      $departments = $departments->leftJoin('papers', 'departments.id', 'papers.department_id')
+      ->leftJoin('exams', 'exams.paper_id', 'papers.id')
+      ->where('papers.batch_id', $batch->id)
+      ->where('exams.status', 'Completed');
+
+      if($type == 'Premium Results')
+      {
+        $departments = $departments->whereNot('papers.permit', 'Every One');
+      }
+
+      if($type == 'Free Results')
+      {
+        $departments = $departments->where('papers.permit', 'Every One');
+      }
+
+      $departments = $departments->groupBy('departments.id', 'departments.name', 'batch_department.batch_id', 'batch_department.department_id')
+      ->select('departments.id', 'departments.name', 'batch_department.batch_id', 'batch_department.department_id');
+    }
+
+    if($type == 'Exam PDF')
+    {
+      $departments = $departments->leftJoin('syllabi', 'syllabi.department_id', 'departments.id')
+      ->where('syllabi.status', 'Published')
+      ->groupBy('departments.id', 'departments.name', 'batch_department.batch_id', 'batch_department.department_id')
+      ->select('departments.id', 'departments.name', 'batch_department.batch_id', 'batch_department.department_id');
+    }
+
+    if($type == 'Exam Routine')
+    {
+      return $this->routine($type, $batch_id);
+    }
+
     $departments = $departments->get();
 
     // dd($departments);
@@ -158,12 +235,58 @@ class CategoryCtrl extends Controller
       return $this->paper($type, $batch_id, $department_id);
     }
 
+    if($type == 'Premium Results' || $type == 'Free Results')
+    {
+      return $this->result($type, $batch_id, $department_id);
+    }
+
     return $type.': Under development';
   }
 
   public function resultOption()
   {
     return view('homepage.result-option');
+  }
+
+  //
+  public function syllabus($type, $batch_id, $department_id)
+  {
+    $department = Department::find($department_id);
+    $syllabuses = Syllabus::orderBy('id', 'DESC')
+    ->where('status', 'Published')
+    ->where('batch_id', $batch_id)
+    ->where('department_id', $department_id)
+    ->get();
+
+    return view('homepage.exam-pdf', compact('syllabuses', 'department'));
+  }
+
+  public function routine($type, $batch_id)
+  {
+    $batch = Batch::find($batch_id);
+    $routine = Routine::where('batch_id', $batch_id)
+    ->orderBy('id', 'DESC')
+    ->where('status', 'Published')
+    ->first();
+
+    $subjects = RoutineSubjectColumn::leftJoin('subjects', 'subjects.id', 'routine_subject_columns.subject_id')
+    ->orderBy('routine_subject_columns.id', 'ASC')
+    ->where('routine_subject_columns.routine_id', $routine->id)
+    ->select('routine_subject_columns.*', 'subjects.name')
+    ->get();
+
+    $departments = RoutineDepartmentColumn::leftJoin('departments', 'departments.id', 'routine_department_columns.department_id')
+    ->orderBy('routine_department_columns.id', 'ASC')
+    ->where('routine_department_columns.routine_id', $routine->id)
+    ->select('routine_department_columns.*', 'departments.name')
+    ->get();
+
+    $routine_rows = RoutineItemRow::where('routine_item_rows.routine_id', $routine->id)
+    ->with(['subjects', 'departments'])
+    ->select('routine_item_rows.*')
+    ->get();
+
+    return view('homepage.exam-routine-view', compact('batch', 'routine', 'subjects', 'departments', 'routine_rows'));
   }
 
   public function paper($type, $batch_id, $department_id)
@@ -192,14 +315,30 @@ class CategoryCtrl extends Controller
     return view('homepage.paper', compact('type', 'batch', 'department', 'papers'));
   }
 
-  //
-  public function syllabus($type, $batch_id, $department_id)
+  public function result($type, $batch_id, $department_id)
   {
+    $batch = Batch::find($batch_id);
     $department = Department::find($department_id);
-    $syllabuses = Syllabus::orderBy('id', 'DESC')
-    ->where('department_id', $department_id)
-    ->get();
+    $results = Exam::where('exams.status', 'Completed')
+    ->leftJoin('papers', 'papers.id', 'exams.paper_id')
+    ->where('papers.batch_id', $batch_id);
 
-    return view('homepage.exam-pdf', compact('syllabuses', 'department'));
+    if($type == 'Premium Results')
+    {
+      $results = $results->whereNot('papers.permit', 'Every One');
+    }
+    elseif($type == 'Free Results')
+    {
+      $results = $results->where('papers.permit', 'Every One');
+    }
+
+    $results = $results->where('papers.department_id', $department_id)
+    ->groupBy('papers.id', 'exams.id', 'papers.name')
+    ->select('papers.id', 'exams.id as examId', 'papers.name');
+    $results = $results->get();
+
+    // dd($results);
+
+    return view('homepage.result', compact('type', 'batch', 'department', 'results'));
   }
 }

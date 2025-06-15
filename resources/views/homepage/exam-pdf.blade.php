@@ -10,7 +10,7 @@ if($user)
 @endphp
 
 @extends('homepage')
-@section('title', 'পরীক্ষা সমূহ')
+@section('title', 'এক্সম PDF')
 @section('content')
 <link rel="stylesheet" href="{{'/web/css/item-list.css'}}" />
 <style>
@@ -96,7 +96,7 @@ if($user)
                 @else
 
                 <div class="col-12 text-center">
-                  <h3>No Exam Paper Available</h3>
+                  <h3>No Exam PDF Available</h3>
                 </div>
 
                 @endif

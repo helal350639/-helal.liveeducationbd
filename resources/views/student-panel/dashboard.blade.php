@@ -1,3 +1,9 @@
+@php
+use \App\Http\Controllers\SourceCtrl;
+$source = new SourceCtrl;
+$user = Auth::guard('student')->user();
+@endphp
+
 @extends('student')
 @section('title', 'Dashboard')
 @section('content')
@@ -166,7 +172,7 @@ font-size: 16px;
             <div class="section-title text-center mb-4">
                <h2> ড্যাশবোর্ড </h2>
                <hr class="w-25 mx-auto bg-danger" />
-               {{-- <p style="font-size: 24px; font-weight: 700; color: #89181A;">- BB188165</p> --}}
+               <p style="font-size: 24px;"> Registration ID: <span style=" font-weight: 700; color: #080;">{{$source->numset($user->id, 6)}}</span></p>
             </div>
          </div>
       </div>
