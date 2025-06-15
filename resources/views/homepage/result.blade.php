@@ -85,7 +85,7 @@ if($user)
                             <span style="float:right;">{{ $source->dformat($paper->result_at) }}</span>
                             <br>
                             <span style="font-size: 12px; font-weight: 700; color: #1CAB55;"> 
-                              (প্রশ্ন -00টি, সময়-00মিনিট)
+                              {{-- (প্রশ্ন -00টি, সময়-00মিনিট) --}}
                              </span>
                           </p>
                         </div>
