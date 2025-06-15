@@ -92,7 +92,7 @@ if($user)
                         <div class="v-button d-flex flex-wrap gap-2">
                           <a href="{{route('students.solution', $paper->id)}}" class="btn btn-sm btn-success"> সল্যুশন</a>
 
-                          @if($paper->exams()->where('student_id', $student->id)->first())
+                          @if($student && $paper->exams()->where('student_id', $student->id)->first())
 
                           <a href="{{route('students.exam.paper', $paper->id)}}" class="btn btn-sm btn-primary">এক্সাম পেপার </a>
 
