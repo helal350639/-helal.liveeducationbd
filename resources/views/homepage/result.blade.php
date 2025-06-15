@@ -7,6 +7,9 @@ if($user)
 {
   $student = \App\Models\Student::find($user->id);
 }
+
+// $student_batch = $student->batches()->get();
+// dd($student_batch);
 @endphp
 
 @extends('homepage')
@@ -14,6 +17,9 @@ if($user)
 @section('content')
 <link rel="stylesheet" href="{{'/web/css/item-list.css'}}" />
 <style>
+  .list-content{
+    width: 50%;
+  }
 /* Custom CSS for mobile devices */
 @media (max-width: 575.98px) {
 
@@ -76,14 +82,23 @@ if($user)
                           </div>
                           <p class="exam-title ps-1" style="width: 100%">
                             <span>{{ $paper->name }}</span>
-                            <span style="float:right;">{{ $source->dformat($paper->open) }} </span>
+                            <span style="float:right;">{{ $source->dformat($paper->result_at) }}</span>
                             <br>
-                            <span style="font-size: 12px; font-weight: 700; color: #1CAB55;"> (প্রশ্ন -00টি, সময়-00মিনিট) </span>
+                            <span style="font-size: 12px; font-weight: 700; color: #1CAB55;"> 
+                              (প্রশ্ন -00টি, সময়-00মিনিট)
+                             </span>
                           </p>
                         </div>
                         <div class="v-button d-flex flex-wrap gap-2">
-                          {{-- <a href="{{route('students.instruction', $paper->id)}}" class="btn btn-sm btn-info"> পরীক্ষা দিন </a> --}}
-                          <a href="{{route('students.result', $paper->id)}}" class="btn btn-sm btn-success"> উত্তর</a>
+                          <a href="{{route('students.solution', $paper->id)}}" class="btn btn-sm btn-success"> সল্যুশন</a>
+
+                          @if($paper->exams()->where('student_id', $student->id)->first())
+
+                          <a href="{{route('students.exam.paper', $paper->id)}}" class="btn btn-sm btn-primary">এক্সাম পেপার </a>
+
+                          <a href="{{route('students.result', $paper->id)}}" class="btn btn-sm btn-warning"> ফলাফল</a>
+
+                          @endif
                           
                           {{-- {{route('home.results', $paper->id)}} --}}
                           <a href="{{route('home.coming-soon')}}" class="btn btn-sm btn-info text-white"> মেধাক্রম </a>

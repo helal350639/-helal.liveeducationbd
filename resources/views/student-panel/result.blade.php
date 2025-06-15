@@ -196,7 +196,7 @@ function position($user_mark, $candidates, $marks)
       </div>
       @endif
       
-      @include('partials.back-button')
+      {{-- @include('partials.back-button') --}}
         
       </div>
     </section> <!-- /.content -->

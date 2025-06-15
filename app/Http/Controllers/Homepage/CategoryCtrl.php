@@ -319,8 +319,8 @@ class CategoryCtrl extends Controller
   {
     $batch = Batch::find($batch_id);
     $department = Department::find($department_id);
-    $results = Exam::where('exams.status', 'Completed')
-    ->leftJoin('papers', 'papers.id', 'exams.paper_id')
+    $results = Paper::where('exams.status', 'Completed')
+    ->leftJoin('exams', 'papers.id', 'exams.paper_id')
     ->where('papers.batch_id', $batch_id);
 
     if($type == 'Premium Results')
@@ -333,8 +333,8 @@ class CategoryCtrl extends Controller
     }
 
     $results = $results->where('papers.department_id', $department_id)
-    ->groupBy('papers.id', 'exams.id', 'papers.name')
-    ->select('papers.id', 'exams.id as examId', 'papers.name');
+    ->groupBy('papers.id', 'papers.name')
+    ->select('papers.id', 'papers.name');
     $results = $results->get();
 
     // dd($results);

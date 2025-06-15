@@ -87,10 +87,9 @@ $user = Auth::guard('student')->user();
           </div>
           @endforeach
         </div> <!--/.col -->
-        <div class="col-md-12 p-3">
-          <a href="{{route('students.result', $paper->id)}}" class="btn btn-warning pull-right">Back</a>
-        </div>
       </div><!-- /.row -->
+      
+      @include('partials.back-button')
         
     </div>
     </section> <!-- /.content -->
