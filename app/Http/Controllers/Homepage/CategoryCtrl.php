@@ -101,6 +101,7 @@ class CategoryCtrl extends Controller
     {
       $batches = $batches->leftJoin('routines', 'routines.batch_id', 'batches.id')
       ->whereNotNull('routines.batch_id')
+      ->where('routines.status', 'Published')
       ->groupBy('batches.id', 'batches.name', 'batches.banner', 'routines.batch_id')
       ->select('batches.id', 'batches.name', 'batches.banner', 'routines.batch_id');
     }
@@ -269,14 +270,19 @@ class CategoryCtrl extends Controller
     ->where('status', 'Published')
     ->first();
 
-    $subjects = $routine->subjects()->get();
+    $subjects = $departments = $routine_rows = [];
 
-    $departments = $routine->departments()->get();
+    if($routine)
+    {
+      $subjects = $routine->subjects()->get();
+  
+      $departments = $routine->departments()->get();
 
-    $routine_rows = RoutineItemRow::where('routine_item_rows.routine_id', $routine->id)
-    ->with(['subjects', 'departments'])
-    ->select('routine_item_rows.*')
-    ->get();
+      $routine_rows = RoutineItemRow::where('routine_item_rows.routine_id', $routine->id)
+      ->with(['subjects', 'departments'])
+      ->select('routine_item_rows.*')
+      ->get();
+    }
 
     return view('homepage.exam-routine-view', compact('batch', 'routine', 'subjects', 'departments', 'routine_rows'));
   }

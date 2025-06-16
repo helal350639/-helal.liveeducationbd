@@ -58,6 +58,8 @@ if($user)
             <div class="all-courses-area">
               <div class="row justify-content-center g-3">
 
+                @if($routine)
+
                 <p>{!! $routine->header !!}</p>
 
                 <table class="table table-bordered">
@@ -94,6 +96,15 @@ if($user)
                   @endforeach
                 
                 </table>
+
+                @else
+
+                <div class="card card-default">
+                  <div class="card-body text-center">
+                    Routine Not Available
+                  </div>
+                </div>
+                @endif
 
               </div>
             </div>

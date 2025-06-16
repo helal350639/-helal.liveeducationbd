@@ -33,7 +33,7 @@ class Subject extends Model
         return $this->belongsToMany(Question::class, 'question_subject', 'subject_id', 'question_id');
     }
 
-    public function routine()
+    public function routines()
     {
         return $this->belongsToMany(Routine::class);
     }
