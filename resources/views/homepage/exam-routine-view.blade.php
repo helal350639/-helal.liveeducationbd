@@ -58,7 +58,7 @@ if($user)
             <div class="all-courses-area">
               <div class="row justify-content-center g-3">
 
-                @if($routine)
+                @if($routine && $routine_rows->count())
 
                 <p>{!! $routine->header !!}</p>
 
@@ -96,7 +96,15 @@ if($user)
                   @endforeach
                 
                 </table>
-
+                
+                @elseif($routine->pdf)
+                  <div class="card card-default">
+                    <object data="{{$routine->pdf}}" type="application/pdf" width="100%" height="600px">
+                      <p>Your browser does not support PDFs.
+                        <a href="path/to/file.pdf">Download the PDF</a>.
+                      </p>
+                    </object>
+                  </div>
                 @else
 
                 <div class="card card-default">

@@ -214,7 +214,10 @@ class CategoryCtrl extends Controller
 
     if($type == 'Exam Routine')
     {
-      return $this->routine($type, $batch_id);
+      $departments = $departments->leftJoin('routines', 'routines.department_id', 'departments.id')
+      ->where('routines.status', 'Published')
+      ->groupBy('departments.id', 'departments.name', 'batch_department.batch_id', 'batch_department.department_id')
+      ->select('departments.id', 'departments.name', 'batch_department.batch_id', 'batch_department.department_id');
     }
 
     $departments = $departments->get();
@@ -241,6 +244,11 @@ class CategoryCtrl extends Controller
       return $this->result($type, $batch_id, $department_id);
     }
 
+    if($type == 'Exam Routine')
+    {
+      return $this->routine($type, $batch_id, $department_id);
+    }
+
     return $type.': Under development';
   }
 
@@ -262,10 +270,11 @@ class CategoryCtrl extends Controller
     return view('homepage.exam-pdf', compact('syllabuses', 'department'));
   }
 
-  public function routine($type, $batch_id)
+  public function routine($type, $batch_id, $department_id)
   {
     $batch = Batch::find($batch_id);
     $routine = Routine::where('batch_id', $batch_id)
+    ->where('department_id', $department_id)
     ->orderBy('id', 'DESC')
     ->where('status', 'Published')
     ->first();
@@ -283,6 +292,8 @@ class CategoryCtrl extends Controller
       ->select('routine_item_rows.*')
       ->get();
     }
+
+    // dd($routine_rows);
 
     return view('homepage.exam-routine-view', compact('batch', 'routine', 'subjects', 'departments', 'routine_rows'));
   }
