@@ -18,6 +18,8 @@ use App\Models\McqItem;
 use App\Models\Choice;
 use App\Models\Page;
 use App\Models\Complain;
+use App\Models\Routine;
+use App\Models\RoutineItemRow;
 use Auth;
 use Session;
 
@@ -88,8 +90,26 @@ class HomePageCtrl extends Controller
     {
       $departments = $batch->departments()->where('status', 'Active')->get();
     }
-    $groups = Group::where('status', 'Active')->get();
-    return view('homepage.course-show', compact('batch', 'departments', 'groups'));
+
+    $routine = Routine::where('batch_id', $batch->id)
+    ->orderBy('id', 'DESC')
+    ->where('status', 'Published')
+    ->first();
+
+    $subjects = $departments = $routine_rows = [];
+
+    if($routine)
+    {
+      $subjects = $routine->subjects()->get();  
+      $departments = $routine->departments()->get();
+
+      $routine_rows = RoutineItemRow::where('routine_item_rows.routine_id', $routine->id)
+      ->with(['subjects', 'departments'])
+      ->select('routine_item_rows.*')
+      ->get();
+    }
+
+    return view('homepage.course-show', compact('batch', 'departments', 'routine', 'subjects', 'departments', 'routine_rows'));
   }
 
   public function applyCourse(Request $request)

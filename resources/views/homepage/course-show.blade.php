@@ -185,70 +185,50 @@ $value = $batch;
               <h4>এক্সাম/ক্লাস রুটিন</h4>
             </div>
             <div class="main-accordion">
-              <div class="accordion p-3">
 
-                @if($course_routines)
-                  <div class="accordion-item p-3">
-                    <div class="accordion-header">
-                      <a data-toggle="collapse" data-parent="#batch_routine" href="#batch_routine">
-                        ব্যাচ এর রুটিন
-                      </a>
-                    </div>
+                @if($routine)
+                <p>{!! $routine->header !!}</p>
 
-                    @php
-                      $batch_routine = $value->routines()->where('department_id', null)->first();
-                    @endphp
-                    
-                    <table class="table">
-
-                      @if($batch_routine)
-                        <tr>
-                          <th>{{$batch_routine->name}}</th>
-                          <td> 
-                            @if($batch_routine->pdf)
-                            <a class="btn btn-warning btn-sm" target="_blank" href="{{$batch_routine->pdf}}"><i class="fa fa-download"></i> ডাউনলোড</a>
-                            @endif
-                          </td>
-                        </tr>
-                      @endif
-                    </table>
-                  </div>
-                @endif
-
-              </div>
-
-              @foreach($value->departments as $key => $department)
-              <div class="accordion p-3">
-                <div class="accordion-item">
-                  <div class="accordion-header">
-                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#dept_routine{{$key}}" aria-expanded="true" aria-controls="dept_routine{{$key}}">
-                      {{$department->name}}
-                    </button>
-                  </div>
-                  
-                  @php
-                  $routines = $department->routine()->where('course_id', $value->course->id)->where('batch_id', $batch->id)->orderBy('id', 'DESC')->get();
-                  @endphp
-                  @if($routines)
-                  <table class="table">
-                    @foreach($routines as $routine)
+                <div class="table-responsive">
+                  <table class="table table-bordered">
                     <tr>
-                      <th>{{$routine->name}} </th>
-                      <td> 
-                        @if($routine->pdf)
-                        <a class="btn btn-warning btn-sm" target="_blank" href="{{$routine->pdf}}"><i class="fa fa-download"></i> ডাউনলোড</a>
-                        @endif
-                      </td>
+                      <th>SL No.</th>
+                      <th>Exam Name/No</th>
+                  
+                      @foreach($subjects as $subject)
+                      <th>{{$subject->name}}</th>
+                      @endforeach
+                  
+                      @foreach($departments as $department)
+                      <th>{{$department->name}}</th>
+                      @endforeach
+
+                      <th>Date & Time</th>                  
+                      <th>Status</th>
+                    </tr>
+                  
+                    @foreach($routine_rows as $key => $item)
+                    <tr>
+                      <td>{{$key+1}}</td>
+                      <td>{{$item->paper_name}}</td>
+                  
+                      @foreach($item->subjects as $subject)
+                      <td>{!!$subject->chapter!!}</td>
+                      @endforeach
+                  
+                      @foreach($item->departments as $department)
+                      <td>{!!$department->details!!}</td>
+                      @endforeach
+                  
+                      <td>{{$source->dtformat($item->exam_at)}}</td>
+                      <td>{{ ($item->exam_at < date('Y-m-d') ? 'Next':'')}}</td>
                     </tr>
                     @endforeach
+                  
                   </table>
-                  @else
-                  <p>No routine available</p>
-                  @endif
-                
                 </div>
-              </div>
-              @endforeach
+                @endif
+                
             </div>
           </div>
           @endif
