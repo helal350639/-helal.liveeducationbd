@@ -293,7 +293,7 @@ class CategoryCtrl extends Controller
       ->get();
     }
 
-    // dd($routine_rows);
+    // dd($routine);
 
     return view('homepage.exam-routine-view', compact('batch', 'routine', 'subjects', 'departments', 'routine_rows'));
   }

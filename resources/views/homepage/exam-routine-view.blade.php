@@ -96,8 +96,8 @@ if($user)
                   @endforeach
                 
                 </table>
-                
-                @elseif($routine->pdf)
+
+                @elseif($routine && $routine->pdf)
                   <div class="card card-default">
                     <object data="{{$routine->pdf}}" type="application/pdf" width="100%" height="600px">
                       <p>Your browser does not support PDFs.
