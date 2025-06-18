@@ -179,14 +179,12 @@ $value = $batch;
           }
           @endphp
 
-          @if($value->departments || $course_routines)
+          @if($routine)
           <div class="card card-default mt-5 p-3">
             <div class="card-heading">
               <h4>এক্সাম/ক্লাস রুটিন</h4>
             </div>
             <div class="main-accordion">
-
-                @if($routine)
                 <p>{!! $routine->header !!}</p>
 
                 <div class="table-responsive">
@@ -235,7 +233,6 @@ $value = $batch;
                   
                   </table>
                 </div>
-                @endif
                 
             </div>
           </div>
