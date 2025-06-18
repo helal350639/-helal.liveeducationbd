@@ -347,7 +347,7 @@ class CategoryCtrl extends Controller
     $results = Paper::where('exams.status', 'Completed')
     ->leftJoin('exams', 'papers.id', 'exams.paper_id')
     ->where('papers.batch_id', $batch_id)
-    ->orderBy('papers.id', 'ASC');
+    ->orderBy('papers.close', 'ASC');
 
     if($type == 'Premium Results')
     {
