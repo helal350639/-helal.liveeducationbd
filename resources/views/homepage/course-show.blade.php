@@ -171,14 +171,6 @@ $value = $batch;
           </div>
           @endif
 
-          @php
-          $course_routines = [];
-          if($value->syllabus)
-          {
-            $course_routines = $value->routines()->where('department_id', NULL)->where('course_id', $value->course->id)->get();
-          }
-          @endphp
-
           @if($routine)
           <div class="card card-default mt-5 p-3">
             <div class="card-heading">
@@ -459,7 +451,7 @@ $value = $batch;
                   <td>ডিপার্টমেন্ট নির্বাচন করুন </td>
                   <th>
                     @if(!empty($user->id) && !$value->students()->where('id', $user->id)->first())
-                      @if($departments->count())
+                      @if($departments)
                         <select id="department_id" name="department_id" class="form-control" required>
                           <option value="">Select One</option>
                           @foreach($departments as $val)
