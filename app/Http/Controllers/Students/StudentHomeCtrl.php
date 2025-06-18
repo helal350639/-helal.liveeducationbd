@@ -46,7 +46,7 @@ class StudentHomeCtrl extends Controller
     $student_departments_ids = $student->departments()->pluck('department_id')->toArray();
 
     // this sutdent courses
-    $mycourses = $student->batches()->count();
+    $mycourses = $student->batches()->where('status', 'Active')->count();
 
     // free available exams
     $free_exam = Paper::whereRaw('DATE(close) > ?', date('Y-m-d'))
@@ -80,6 +80,7 @@ class StudentHomeCtrl extends Controller
     $orders = Order::leftJoin('batches', 'batches.id', 'orders.batch_id')
     ->orderBy('orders.id', 'DESC')
     ->where('orders.student_id', $user->id)
+    ->whereIn('orders.status', ['Processing', 'Complete'])
     ->select('orders.*', 'batches.name')
     ->get();
 

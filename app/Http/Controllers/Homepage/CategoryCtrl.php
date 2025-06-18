@@ -14,6 +14,7 @@ use App\Models\Routine;
 use App\Models\RoutineSubjectColumn;
 use App\Models\RoutineDepartmentColumn;
 use App\Models\RoutineItemRow;
+use Auth;
 
 class CategoryCtrl extends Controller
 {
@@ -39,8 +40,10 @@ class CategoryCtrl extends Controller
   }
 
   // this batches for [exam, result, exam_pdf...] showing on the homepage everywhere 
-  public function batches($type)
+  public function batches($type, $dashboard = null)
   {
+    $student = Auth::guard('student')->user();
+    // dd($dashboard);
     // dd($type);
     $batches = Batch::orderBy('batches.id', 'DESC')
     ->where('batches.status', 'Active');
@@ -49,7 +52,7 @@ class CategoryCtrl extends Controller
     if($type == 'Free Exams' || $type == 'Premium Exams')
     {
       $batches = $batches->leftJoin('papers', 'batches.id', 'papers.batch_id')
-      ->whereRaw('DATE(papers.close) > ?', date('Y-m-d H:i:s'))
+      ->whereRaw('DATE(batches.end_at) > ?', date('Y-m-d H:i:s'))
       ->whereIn('papers.status', ['Published', 'Scheduled']);
 
       if($type == 'Premium Exams')
@@ -60,6 +63,12 @@ class CategoryCtrl extends Controller
       if($type == 'Free Exams')
       {
         $batches = $batches->where('papers.permit', 'Every One');
+      }
+
+      if($dashboard == 'Dashboard' && $student)
+      {
+        $student_batches = $student->batches->pluck('id')->toArray();
+        $batches = $batches->whereIn('batches.id', $student_batches);        
       }
 
       $batches = $batches->groupBy('batches.id', 'batches.name', 'batches.banner')
@@ -110,7 +119,7 @@ class CategoryCtrl extends Controller
     $batches = $batches->get();
     // dd($batches);
 
-    return view('homepage.batch', compact('type', 'batches'));
+    return view('homepage.batch', compact('type', 'batches', 'dashboard'));
 
   }
 
@@ -151,9 +160,10 @@ class CategoryCtrl extends Controller
   }
 
   // department query according to the batch id
-  public function department($type, $batch_id)
+  public function department($type, $batch_id, $dashboard = null)
   {
-    // dd($type);
+    $student = Auth::guard('student')->user();
+    // dd($dashboard);
     $batch = Batch::find($batch_id);
 
     $departments = $batch->departments()
@@ -165,7 +175,7 @@ class CategoryCtrl extends Controller
 
       ->where('papers.batch_id', $batch->id)
       // ->whereRaw('DATE(open) < ?', date('Y-m-d H:i:s'))
-      ->whereRaw('DATE(papers.close) > ?', date('Y-m-d H:i:s'))
+      // ->whereRaw('DATE(papers.close) > ?', date('Y-m-d H:i:s'))
       ->whereIn('papers.status', ['Published', 'Scheduled']);
 
       if($type == 'Premium Exams')
@@ -176,6 +186,12 @@ class CategoryCtrl extends Controller
       if($type == 'Free Exams')
       {
         $departments = $departments->where('papers.permit', 'Every One');
+      }
+
+      if($dashboard == 'Dashboard' && $student)
+      {
+        $student_departments = $student->departments->pluck('id')->toArray();
+        $departments = $departments->whereIn('departments.id', $student_departments);        
       }
 
       $departments = $departments->groupBy('departments.id', 'departments.name', 'batch_department.batch_id', 'batch_department.department_id')
@@ -302,12 +318,12 @@ class CategoryCtrl extends Controller
   {
     $batch = Batch::find($batch_id);
     $department = Department::find($department_id);
-    $papers = Paper::orderBy('id', 'DESC')
+    $papers = Paper::orderBy('close', 'ASC')
     ->where('batch_id', $batch_id)
     ->where('department_id', $department_id)
-    ->whereIn('status', ['Published', 'Scheduled'])
+    ->whereIn('status', ['Published', 'Scheduled']);
     // ->whereRaw('DATE(open) <= ?', date('Y-m-d H:i:s'))
-    ->whereRaw('DATE(close) >= ?', date('Y-m-d H:i:s'));
+    // ->whereRaw('DATE(close) >= ?', date('Y-m-d H:i:s'));
 
     if($type == 'Premium Exams')
     {
@@ -330,7 +346,8 @@ class CategoryCtrl extends Controller
     $department = Department::find($department_id);
     $results = Paper::where('exams.status', 'Completed')
     ->leftJoin('exams', 'papers.id', 'exams.paper_id')
-    ->where('papers.batch_id', $batch_id);
+    ->where('papers.batch_id', $batch_id)
+    ->orderBy('papers.id', 'ASC');
 
     if($type == 'Premium Results')
     {

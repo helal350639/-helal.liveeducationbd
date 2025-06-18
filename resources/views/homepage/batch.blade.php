@@ -30,7 +30,7 @@ $user = Auth::guard('student')->user();
                 <div class="col-6 col-lg-3 mt-4">
                   <div class="exam-package-area">
                     <div class="package-exam-image">
-                      <a href="{{route('category.department', [$type, $value->id])}}">
+                      <a href="{{route('category.department', [$type, $value->id, $dashboard])}}">
                       <img src="{{ $value->banner? $value->banner : '/img/course.png'}}" alt="" loading="lazy" />
                       </a>
                     </div>

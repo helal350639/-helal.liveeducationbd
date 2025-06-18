@@ -221,7 +221,15 @@ $value = $batch;
                       @endforeach
                   
                       <td>{{$source->dtformat($item->exam_at)}}</td>
-                      <td>{{ ($item->exam_at < date('Y-m-d') ? 'Next':'')}}</td>
+                      <td>
+                        @if($item->exam_at >= date('Y-m-d'))
+                        Next
+                        @elseif($item->exam_at < date('Y-m-d'))
+                        Completed
+                        @else
+                        Pending
+                        @endif
+                      </td>
                     </tr>
                     @endforeach
                   

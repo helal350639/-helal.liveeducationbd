@@ -61,10 +61,12 @@ Route::controller(CategoryCtrl::class)->group(function()
   Route::prefix('category')->group(function()
   {
     Route::get('courses/{type?}', 'courses')->name('category.courses');
-    Route::get('batches/{type?}', 'batches')->name('category.batches');
     Route::get('batch/{type?}/{course}', 'batch')->name('category.batch');
+
     Route::get('departments/{type}', 'departments')->name('category.departments');
-    Route::get('department/{type}/{batch?}', 'department')->name('category.department');
+
+    Route::get('batches/{type?}/{dashboard?}', 'batches')->name('category.batches');
+    Route::get('department/{type}/{batch?}/{dashboard?}', 'department')->name('category.department');
     Route::get('paper/{type}/{batch}/{department?}', 'paper')->name('category.paper');
     Route::get('result-option', 'resultOption')->name('category.result.option');
     Route::get('check-method/{type}/{batch}/{department?}', 'checkMethod')->name('category.check-method');
