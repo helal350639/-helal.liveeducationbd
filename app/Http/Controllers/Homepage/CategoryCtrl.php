@@ -318,7 +318,7 @@ class CategoryCtrl extends Controller
   {
     $batch = Batch::find($batch_id);
     $department = Department::find($department_id);
-    $papers = Paper::orderBy('close', 'ASC')
+    $papers = Paper::orderBy('open', 'ASC')
     ->where('batch_id', $batch_id)
     ->where('department_id', $department_id)
     ->whereIn('status', ['Published', 'Scheduled']);
@@ -347,7 +347,7 @@ class CategoryCtrl extends Controller
     $results = Paper::where('exams.status', 'Completed')
     ->leftJoin('exams', 'papers.id', 'exams.paper_id')
     ->where('papers.batch_id', $batch_id)
-    ->orderBy('papers.close', 'ASC');
+    ->orderBy('papers.open', 'ASC');
 
     if($type == 'Premium Results')
     {
