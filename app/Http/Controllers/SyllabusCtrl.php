@@ -306,4 +306,73 @@ class SyllabusCtrl extends Controller
         return view('layouts.syllabuses.print', compact('syllabus'));
     }
     
+    
+    public function copy($id)
+    {
+        $courses = Course::where('status', 'Active')->get();
+        $batches = Batch::where('status', 'Active')->get();
+        $departments = Department::where('status', 'Active')->get();
+        $syllabus = Syllabus::find($id);
+        return view('layouts.syllabuses.copy', compact('syllabus', 'courses', 'departments', 'batches'));
+    }
+
+    public function copyStore(Request $request)
+    {
+        $source = new SourceCtrl;
+
+        $this->validate($request, [
+            'syllabus_id' => 'required|numeric',
+            'course_id' => 'required|numeric',
+            'name'      => 'required|unique:groups|max:255',
+            'header'    => 'required',
+            'details'   => 'nullable|max:1000',
+            'pdf'       => 'nullable|mimes:pdf|max:10000',
+            'routine'   => 'nullable|mimes:pdf|max:10000',
+        ]);
+        
+        $data = $request->all();
+
+        if(isset($data['_token']))
+        {
+          unset($data['_token']);
+        }
+
+        if(isset($data['_method']))
+        {
+          unset($data['_method']);
+        }
+
+        $data['status'] = isset($data['status']) ? 'Active' : 'Deactive';
+
+        $data['created_by'] = Auth::id();
+
+        try {
+          $syllabus = Syllabus::find($request->syllabus_id);
+          $question_ids = $syllabus->questions()->pluck('question_id')->toArray();
+
+            // upload pdf file
+            if($request->hasFile('pdf'))
+            {
+              $data['pdf'] = $source->uploadImage($data['pdf'], 'syllabus/temp/');
+            }
+            // upload pdf routine
+            if($request->hasFile('routine'))
+            {
+              $data['routine'] = $source->uploadImage($data['routine'], 'routine/');
+            }
+
+            $last_syllabus = Syllabus::create($data);
+
+            $last_syllabus->questions()->attach($question_ids);
+        }
+        catch(\Exception $e)
+        {
+          return $e->getMessage();
+        }
+        
+        Session::flash('success', 'Another Syllabus successfully copied!');
+
+        return redirect()->route('syllabus.view', $last_syllabus->id);
+    }
+    
 }

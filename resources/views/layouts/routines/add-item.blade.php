@@ -22,6 +22,10 @@
       <div class="box box-info">
         <div class="box-header with-border">
             <h3 style="color: #800" class="box-title">{{$routine->name}}</h3>
+            <div class="toolbar-icon pull-right text-right">
+              
+              <a href="{{route('routine.index')}}" title="View" class="label label-success"><i class="fa fa-list"></i></a>
+            </div>
         </div>
         <table class="table table-bordered">
           <tr>
