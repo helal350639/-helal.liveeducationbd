@@ -177,13 +177,25 @@ $value = $batch;
               <h4>এক্সাম/ক্লাস রুটিন</h4>
             </div>
             <div class="main-accordion">
-                <p>{!! $routine->header !!}</p>
+              <p>{!! $routine->header !!}</p>
+              <div class="car/d">
+                <form action="#">
+                  <div class="form-group">
+                    <select class="form-control" name="department_id" id="department_id" onchange="getRoutine(this)">
+                      <option value="">Select Department</option>
+                      @foreach($departments as $department)
+                      <option value="{{$department->id}}">{{$department->name}}</option>
+                      @endforeach
+                    </select>
+                  </div>
+                </form>
+              </div>
+              <br>
 
                 <div class="table-responsive">
-                  <table class="table table-bordered">
+                  <table class="table table-bordered" id="routine">
                     <tr>
-                      <th>SL No.</th>
-                      <th>Exam Name/No</th>
+                      <th>Exam No</th>
                   
                       @foreach($subjects as $subject)
                       <th>{{$subject->name}}</th>
@@ -199,7 +211,6 @@ $value = $batch;
                   
                     @foreach($routine_rows as $key => $item)
                     <tr>
-                      <td>{{$key+1}}</td>
                       <td>{{$item->paper_name}}</td>
                   
                       @foreach($item->subjects as $subject)
@@ -586,6 +597,124 @@ $value = $batch;
     
       
     }, 1000);
+  }
+
+  function dateTime(date) {
+    const d = new Date(date);
+
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = d.toLocaleString('en-US', { month: 'short' }); // "Jun"
+    const year = d.getFullYear();
+
+    let hours = d.getHours();
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+
+    hours = hours % 12;
+    hours = hours ? hours : 12; // 0 → 12
+    const hourFormatted = String(hours).padStart(2, '0');
+
+    return `${day} ${month} ${year}, ${hourFormatted}:${minutes} ${ampm}`;
+  }
+
+
+  function dateCheck(date)
+  {
+    let currentDate = new Date();
+    let targetDate = new Date(date.replace(' ', 'T'));
+
+    // Compare timestamps (in milliseconds)
+    if (currentDate.getTime() >= targetDate.getTime()) {
+      return 'Next';
+    } else if(currentDate.getTime() < targetDate.getTime()) {
+      return 'Pending';
+    } else {
+      return 'Completed';
+    }
+
+  }
+
+  // routine filter
+  function getRoutine(e)
+  {
+    let routine = document.getElementById('routine');
+    let departmentId = e.options[e.options.selectedIndex].value;
+    let tableData = '', subjects = '', departments = '', routineRows = '', subjectRow = '', departmentRow = '';
+
+    $.ajaxSetup({
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      }
+    });
+
+    $.ajax({
+      type: 'GET',
+      url: '{{route("home.routine.filter", "")}}/' + '{{$routine->id}}' + '/' + departmentId,
+      success: function (data) {
+
+        var obj = JSON.parse(JSON.stringify(data));
+
+        console.log(obj);
+        
+        obj.subjects.forEach(subject => {
+          subjects += '<th>'+subject.name+'</th>';
+        });
+
+        obj.departments.forEach(department => {
+          departments += '<th>'+department.name+'</th>';
+        });
+
+
+        obj.routine_rows.forEach((routineRow, n) => {
+
+          obj.routine_rows[n].subjects.forEach(subjectData => {
+            subjectRow += '<td>'+subjectData.chapter+'</td>';
+          });
+
+          obj.routine_rows[n].departments.forEach(departmentData => {
+            departmentRow += '<td>'+departmentData.details+'</td>';
+          });
+
+          routineRows +=''+
+          '<tr>'+
+            '<td>'+ routineRow.paper_name +'</td>'+
+        
+            subjectRow +
+        
+            departmentRow +
+        
+            '<td>'+ dateTime(obj.routine_rows[n].exam_at) +'</td>'+
+            '<td>'+
+              dateCheck(obj.routine_rows[n].exam_at)+
+            '</td>'+
+          '</tr>';
+
+          subjectRow = '', departmentRow = '';
+        });
+
+        //item->exam_at >= date("Y-m-d") ? "Next" || item->exam_at < date("Y-m-d") ? "Completed" : "Pending"
+
+        // finally make the table
+        tableData += ''+
+        '<tr>'+
+          '<th>Exam No</th>'+
+      
+          subjects +
+      
+          departments +
+
+          '<th>Date & Time</th>'+
+          '<th>Status</th>'+
+        '</tr>'+
+
+        routineRows;
+
+        routine.innerHTML = tableData;
+      },
+      error: function(data) { 
+        console.log('data error');
+      }
+    });
   }
 </script>
 @endsection

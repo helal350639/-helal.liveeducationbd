@@ -54,6 +54,7 @@ Route::controller(HomePageCtrl::class)->group(function()
   Route::get('home/coming-soon', 'comingSoon')->name('home.coming-soon');
   Route::get('home/circular', 'circular')->name('home.circular');
   Route::get('home/results/{paper}', 'resultList')->name('home.results');
+  Route::get('home/routine-filter/{id}/{department?}', 'routineFilter')->name('home.routine.filter');
 });
 
 Route::controller(CategoryCtrl::class)->group(function()

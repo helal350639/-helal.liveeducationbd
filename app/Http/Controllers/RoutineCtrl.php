@@ -329,7 +329,7 @@ class RoutineCtrl extends Controller
       {
         RoutineSubjectRow::insert([
           'item_id' => $routineItem->id,
-          'column_id' => $value,
+          'subject_id' => $value,
           'chapter' => $data['subject_item'][$key]
         ]);
       }
@@ -338,7 +338,7 @@ class RoutineCtrl extends Controller
       {
         RoutineDepartmentRow::insert([
           'item_id' => $routineItem->id,
-          'column_id' => $value,
+          'department_id' => $value,
           'details' => $data['department_item'][$key]
         ]);
       }

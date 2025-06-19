@@ -336,4 +336,33 @@ class HomePageCtrl extends Controller
     ->get();
     return view('homepage.result-list', compact('paper', 'exams'));
   }
+
+
+
+  public function routineFilter($id, $department = null)
+  {
+    $routine = Routine::find($id);
+    
+    $subjects = $departments = $routine_rows = [];
+
+    if($routine)
+    {
+      $subjects = $routine->subjects()->get();  
+      $departments = $routine->departments()->where('department_id', $department)->get();
+
+      $routine_rows = RoutineItemRow::where('routine_item_rows.routine_id', $routine->id)
+      ->with(['subjects', 'departments' => function ($query) use($department) {
+        $query->where('department_id', $department);
+      }])
+      ->select('routine_item_rows.*')
+      ->get();
+    }
+
+    return response()->json([
+      'routine' => $routine,
+      'subjects' => $subjects,
+      'departments' => $departments,
+      'routine_rows' => $routine_rows
+    ], 200);
+  }
 }
