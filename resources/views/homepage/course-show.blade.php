@@ -171,7 +171,7 @@ $value = $batch;
           </div>
           @endif
 
-          
+          @if($routine)
           <div class="card card-default mt-5 p-3">
             <div class="card-heading">
               <h4>এক্সাম/ক্লাস রুটিন</h4>
@@ -201,6 +201,7 @@ $value = $batch;
                 
             </div>
           </div>
+          @endif
           
           @php
           $course_syllabuses = [];
@@ -595,6 +596,7 @@ $value = $batch;
 
   }
 
+  @if($routine)
   // routine filter
   function getRoutine(e)
   {
@@ -679,5 +681,7 @@ $value = $batch;
   }
 
   getRoutine(document.getElementById('department_id'));
+
+  @endif
 </script>
 @endsection
