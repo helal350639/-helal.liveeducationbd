@@ -194,45 +194,7 @@ $value = $batch;
 
                 <div class="table-responsive">
                   <table class="table table-bordered" id="routine">
-                    <tr>
-                      <th>Exam No</th>
-                  
-                      @foreach($subjects as $subject)
-                      <th>{{$subject->name}}</th>
-                      @endforeach
-                  
-                      @foreach($departments as $department)
-                      <th>{{$department->name}}</th>
-                      @endforeach
-
-                      <th>Date & Time</th>                  
-                      <th>Status</th>
-                    </tr>
-                  
-                    @foreach($routine_rows as $key => $item)
-                    <tr>
-                      <td>{{$item->paper_name}}</td>
-                  
-                      @foreach($item->subjects as $subject)
-                      <td>{!!$subject->chapter!!}</td>
-                      @endforeach
-                  
-                      @foreach($item->departments as $department)
-                      <td>{!!$department->details!!}</td>
-                      @endforeach
-                  
-                      <td>{{$source->dtformat($item->exam_at)}}</td>
-                      <td>
-                        @if($item->exam_at >= date('Y-m-d'))
-                        Next
-                        @elseif($item->exam_at < date('Y-m-d'))
-                        Completed
-                        @else
-                        Pending
-                        @endif
-                      </td>
-                    </tr>
-                    @endforeach
+                    
                   
                   </table>
                 </div>
@@ -716,5 +678,7 @@ $value = $batch;
       }
     });
   }
+
+  getRoutine(document.getElementById('department_id'));
 </script>
 @endsection
