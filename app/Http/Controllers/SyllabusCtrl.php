@@ -323,6 +323,8 @@ class SyllabusCtrl extends Controller
         $this->validate($request, [
             'syllabus_id' => 'required|numeric',
             'course_id' => 'required|numeric',
+            'batch_id' => 'required|numeric',
+            'department_id' => 'nullable|numeric',
             'name'      => 'required|unique:groups|max:255',
             'header'    => 'required',
             'details'   => 'nullable|max:1000',
@@ -342,9 +344,11 @@ class SyllabusCtrl extends Controller
           unset($data['_method']);
         }
 
-        $data['status'] = isset($data['status']) ? 'Active' : 'Deactive';
+        // $data['status'] = isset($data['status']) ? 'Active' : 'Deactive';
 
         $data['created_by'] = Auth::id();
+
+        // dd($data);
 
         try {
           $syllabus = Syllabus::find($request->syllabus_id);

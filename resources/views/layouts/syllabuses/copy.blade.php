@@ -147,7 +147,7 @@ $value = $syllabus;
                 </div>
             </div> <!-- /.box body -->
             <div class="box-footer">
-                <button type="submit" class="btn btn-primary pull-right" onclick="formCheck(this)"><i class="fa fa-save"></i> Save</button>
+                <button type="submit" class="btn btn-primary pull-right" onclick="formCheck(this)"><i class="fa fa-copy"></i> Copy</button>
             </div>
         </form>
     </div> <!-- /.box -->
