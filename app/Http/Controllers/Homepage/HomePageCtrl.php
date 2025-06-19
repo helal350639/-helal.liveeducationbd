@@ -100,16 +100,16 @@ class HomePageCtrl extends Controller
 
     if($routine)
     {
-      $subjects = $routine->subjects()->get();  
       $departments = $routine->departments()->get();
+      // $subjects = $routine->subjects()->get();  
 
-      $routine_rows = RoutineItemRow::where('routine_item_rows.routine_id', $routine->id)
-      ->with(['subjects', 'departments'])
-      ->select('routine_item_rows.*')
-      ->get();
+      // $routine_rows = RoutineItemRow::where('routine_item_rows.routine_id', $routine->id)
+      // ->with(['subjects', 'departments'])
+      // ->select('routine_item_rows.*')
+      // ->get();
     }
 
-    return view('homepage.course-show', compact('batch', 'departments', 'routine', 'subjects', 'departments', 'routine_rows'));
+    return view('homepage.course-show', compact('batch', 'departments', 'routine'));
   }
 
   public function applyCourse(Request $request)
