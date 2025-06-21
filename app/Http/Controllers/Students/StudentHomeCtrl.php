@@ -670,9 +670,22 @@ class StudentHomeCtrl extends Controller
 
   public function syllabus($id)
   {
+    // check this syllabus batch request user permission
+    $user = Auth::guard('student')->user();
+
     $data = $this->syllabusQuestions($id);
     
     $syllabus = $data['syllabus'];
+
+    $user_batch = $user->batches()
+    ->where('batch_id', $syllabus->batch_id)
+    ->first();
+
+    if(!$user_batch)
+    {
+      return redirect()->route('home.course.show', $syllabus->batch_id);
+    }
+
     $groupedData = $data['questions'];
     
     return view('student-panel.syllabus', compact('syllabus', 'groupedData'));
@@ -680,11 +693,24 @@ class StudentHomeCtrl extends Controller
 
   public function generatePDF($id)
   {
-    $syllabus = Syllabus::find($id);
+    // $syllabus = Syllabus::find($id);
+
+    // check this syllabus batch request user permission
+    $user = Auth::guard('student')->user();
 
     $data = $this->syllabusQuestions($id);
     
     $syllabus = $data['syllabus'];
+
+    $user_batch = $user->batches()
+    ->where('batch_id', $syllabus->batch_id)
+    ->first();
+
+    if(!$user_batch)
+    {
+      return redirect()->route('home.course.show', $syllabus->batch_id);
+    }
+
     $groupedData = $data['questions'];
 
     ini_set("pcre.backtrack_limit", "10000000");
