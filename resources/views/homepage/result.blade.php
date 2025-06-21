@@ -17,9 +17,6 @@ if($user)
 @section('content')
 <link rel="stylesheet" href="{{'/web/css/item-list.css'}}" />
 <style>
-  .list-content{
-    width: 50%;
-  }
 /* Custom CSS for mobile devices */
 @media (max-width: 575.98px) {
 
@@ -45,6 +42,12 @@ if($user)
   .playButton svg {
       width: 45px; /* Larger play button for tablets and desktops */
       height: 45px;
+  }
+}
+
+@media (min-width: 481px) {
+  .list-content{
+    width: 50%;
   }
 }
 </style>
