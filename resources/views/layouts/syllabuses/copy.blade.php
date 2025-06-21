@@ -5,16 +5,16 @@ $value = $syllabus;
 @endphp
 
 @extends('dashboard')
-@section('title', 'Edit Syllabus')
+@section('title', 'Copy Syllabus')
 @section('stylesheets')
 <link href="/assets/summernote/summernote.min.css" rel="stylesheet">
 @endsection
 @section('content')
 <section class="content-header">
-  <h1>Edit Syllabus</h1>
+  <h1>Copy Syllabus</h1>
   <ol class="breadcrumb">
     <li><a href="#"><i class="fa fa-dashboard"></i> Syllabuses</a></li>
-    <li class="active">Edit Syllabus</li>
+    <li class="active">Copy Syllabus</li>
 </ol>
 </section>
 
@@ -82,7 +82,7 @@ $value = $syllabus;
                 <div class="col-md-12">
                     <div class="form-group">
                         <label for="header">Header</label>
-                        <textarea class="form-control editor" name="header" id="header" rows="5" required>{{$value->header}}</textarea>
+                        <textarea class="form-control editor" name="header" id="header" rows="5" >{{$value->header}}</textarea>
                     </div>
                 </div>
                 <div class="col-md-12">
