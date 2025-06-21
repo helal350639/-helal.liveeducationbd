@@ -160,7 +160,7 @@ class SyllabusCtrl extends Controller
         $this->validate($request, [
             'course_id' => 'required|numeric',
             'name'      => 'required|max:255',
-            'header'    => 'nullable|max:255',
+            'header'    => 'nullable',
             'details'   => 'nullable|max:1000',
             'sample_pdf'=> 'nullable|mimes:pdf|max:5000',
             'pdf'       => 'nullable|mimes:pdf|max:10000',
