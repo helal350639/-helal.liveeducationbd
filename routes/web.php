@@ -340,6 +340,9 @@ Route::middleware(['auth'])->group(function()
     Route::get('routine/add-item/{id}', 'addItem')->name('routine.add-item');
     Route::post('routine/add-item-update', 'addItemPost')->name('routine.add-item.store');
     Route::get('routine/delete-item/{item_id}', 'deleteItem')->name('routine.item.delete');
+
+    Route::get('routine/edit-item/{id}', 'editItem')->name('routine.item.edit');
+    Route::post('routine/edit-item', 'updateItem')->name('routine.item.update');
   });
 
   Route::controller(HomePageSettingCtrl::class)->group(function()

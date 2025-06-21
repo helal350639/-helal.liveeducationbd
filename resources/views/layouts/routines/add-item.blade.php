@@ -41,7 +41,7 @@
             @endforeach
 
             <th>Date & Time</th>
-            <th>Action</th>
+            <th width=70>Action</th>
           </tr>
 
           @foreach($routine_rows as $key => $item)
@@ -59,7 +59,10 @@
 
             <td>{{$item->exam_at}}</td>
             <td>
-              <a class="btn btn-danger btn-sm" href="{{route('routine.item.delete', $item->id)}}" onclick="return confirm('Are you sure, you want to delete this?')">
+              <a class="btn btn-warning btn-xs" href="{{route('routine.item.edit', $item->id)}}">
+                <i class="fa fa-pencil"></i>
+              </a>
+              <a class="btn btn-danger btn-xs" href="{{route('routine.item.delete', $item->id)}}" onclick="return confirm('Are you sure, you want to delete this?')">
                 <i class="fa fa-trash"></i>
               </a>
             </td>

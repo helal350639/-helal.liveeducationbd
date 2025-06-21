@@ -82,7 +82,7 @@ $value = $syllabus;
                 <div class="col-md-12">
                     <div class="form-group">
                         <label for="header">Header</label>
-                        <textarea class="form-control editor" name="header" id="header" rows="5" required>{{$value->header}}</textarea>
+                        <textarea class="form-control editor" name="header" id="header" rows="5">{{$value->header}}</textarea>
                     </div>
                 </div>
                 <div class="col-md-12">

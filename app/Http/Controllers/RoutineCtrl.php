@@ -352,6 +352,25 @@ class RoutineCtrl extends Controller
     return redirect()->route('routine.add-item', $data['routine_id']);
   }
 
+  public function editItem($id)
+  {
+    $item = RoutineItemRow::find($id);
+    $routine = Routine::find($routineItem->routine_id);
+    $papers = Paper::orderBy('id', 'DESC')->get();
+
+    $subjects = $routine->subjects()->get();
+
+    $departments = $routine->departments()->get();
+
+    $routine_rows = RoutineItemRow::where('routine_item_rows.routine_id', $id)
+    ->with(['subjects', 'departments'])
+    ->select('routine_item_rows.*')
+    ->get();
+    // dd($routine_rows);
+
+    return view('layouts.routines.edit-item', compact('routine', 'papers', 'subjects', 'departments', 'routine_rows', 'item'));
+  }
+
   //delete routine item
   public function deleteItem($id)
   {
