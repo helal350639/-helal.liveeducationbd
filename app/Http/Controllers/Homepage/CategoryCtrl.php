@@ -48,6 +48,15 @@ class CategoryCtrl extends Controller
     $batches = Batch::orderBy('batches.id', 'DESC')
     ->where('batches.status', 'Active');
 
+    if($dashboard == 'Dashboard' && $student)
+    {
+      if($type != 'Free Exams' || $type != 'Free Results')
+      {
+        $student_batches = $student->batches->pluck('id')->toArray();
+        $batches = $batches->whereIn('batches.id', $student_batches);
+      }
+    }
+
     // batch query filter for 'Free Exams' & 'Premium Exams'
     if($type == 'Free Exams' || $type == 'Premium Exams')
     {
@@ -65,11 +74,11 @@ class CategoryCtrl extends Controller
         $batches = $batches->where('papers.permit', 'Every One');
       }
 
-      if($dashboard == 'Dashboard' && $student)
-      {
-        $student_batches = $student->batches->pluck('id')->toArray();
-        $batches = $batches->whereIn('batches.id', $student_batches);        
-      }
+      // if($dashboard == 'Dashboard' && $student)
+      // {
+      //   $student_batches = $student->batches->pluck('id')->toArray();
+      //   $batches = $batches->whereIn('batches.id', $student_batches);
+      // }
 
       $batches = $batches->groupBy('batches.id', 'batches.name', 'batches.banner')
       ->select('batches.id', 'batches.name', 'batches.banner');
@@ -101,11 +110,11 @@ class CategoryCtrl extends Controller
     {
       $batches = $batches->leftJoin('syllabi', 'syllabi.batch_id', 'batches.id');
 
-      if($dashboard == 'Dashboard' && $student)
-      {
-        $student_batches = $student->batches->pluck('id')->toArray();
-        $batches = $batches->whereIn('batches.id', $student_batches);        
-      }
+      // if($dashboard == 'Dashboard' && $student)
+      // {
+      //   $student_batches = $student->batches->pluck('id')->toArray();
+      //   $batches = $batches->whereIn('batches.id', $student_batches);
+      // }
 
       $batches = $batches->where('syllabi.status', 'Published')
       ->groupBy('batches.id', 'batches.name', 'batches.banner')
@@ -117,11 +126,11 @@ class CategoryCtrl extends Controller
     {
       $batches = $batches->leftJoin('routines', 'routines.batch_id', 'batches.id');
 
-      if($dashboard == 'Dashboard' && $student)
-      {
-        $student_batches = $student->batches->pluck('id')->toArray();
-        $batches = $batches->whereIn('batches.id', $student_batches);        
-      }
+      // if($dashboard == 'Dashboard' && $student)
+      // {
+      //   $student_batches = $student->batches->pluck('id')->toArray();
+      //   $batches = $batches->whereIn('batches.id', $student_batches);        
+      // }
 
       $batches = $batches->whereNotNull('routines.batch_id')
       ->where('routines.status', 'Published')
@@ -183,6 +192,15 @@ class CategoryCtrl extends Controller
     $departments = $batch->departments()
     ->where('departments.status', 'Active');
 
+    if($dashboard == 'Dashboard' && $student)
+    {
+      if($type != 'Free Exams' || $type != 'Free Results')
+      {
+        $student_departments = $student->departments->pluck('id')->toArray();
+        $departments = $departments->whereIn('departments.id', $student_departments);
+      }
+    }
+
     if($type == 'Free Exams' || $type == 'Premium Exams')
     {
       $departments = $departments->leftJoin('papers', 'departments.id', 'papers.department_id')
@@ -202,11 +220,11 @@ class CategoryCtrl extends Controller
         $departments = $departments->where('papers.permit', 'Every One');
       }
 
-      if($dashboard == 'Dashboard' && $student)
-      {
-        $student_departments = $student->departments->pluck('id')->toArray();
-        $departments = $departments->whereIn('departments.id', $student_departments);        
-      }
+      // if($dashboard == 'Dashboard' && $student)
+      // {
+      //   $student_departments = $student->departments->pluck('id')->toArray();
+      //   $departments = $departments->whereIn('departments.id', $student_departments);        
+      // }
 
       $departments = $departments->groupBy('departments.id', 'departments.name', 'batch_department.batch_id', 'batch_department.department_id')
       ->select('departments.id', 'departments.name', 'batch_department.batch_id', 'batch_department.department_id');
@@ -220,11 +238,11 @@ class CategoryCtrl extends Controller
       ->where('papers.batch_id', $batch->id)
       ->where('exams.status', 'Completed');
 
-      if($dashboard == 'Dashboard' && $student)
-      {
-        $student_departments = $student->departments->pluck('id')->toArray();
-        $departments = $departments->whereIn('departments.id', $student_departments);        
-      }
+      // if($dashboard == 'Dashboard' && $student)
+      // {
+      //   $student_departments = $student->departments->pluck('id')->toArray();
+      //   $departments = $departments->whereIn('departments.id', $student_departments);        
+      // }
 
       if($type == 'Premium Results')
       {
@@ -244,11 +262,11 @@ class CategoryCtrl extends Controller
     {
       $departments = $departments->leftJoin('syllabi', 'syllabi.department_id', 'departments.id');
 
-      if($dashboard == 'Dashboard' && $student)
-      {
-        $student_departments = $student->departments->pluck('id')->toArray();
-        $departments = $departments->whereIn('departments.id', $student_departments);
-      }
+      // if($dashboard == 'Dashboard' && $student)
+      // {
+      //   $student_departments = $student->departments->pluck('id')->toArray();
+      //   $departments = $departments->whereIn('departments.id', $student_departments);
+      // }
 
       $departments = $departments->where('syllabi.status', 'Published')
       ->groupBy('departments.id', 'departments.name', 'batch_department.batch_id', 'batch_department.department_id')
@@ -260,11 +278,11 @@ class CategoryCtrl extends Controller
       $departments = $departments->leftJoin('routines', 'routines.department_id', 'departments.id');
 
 
-      if($dashboard == 'Dashboard' && $student)
-      {
-        $student_departments = $student->departments->pluck('id')->toArray();
-        $departments = $departments->whereIn('departments.id', $student_departments);
-      }
+      // if($dashboard == 'Dashboard' && $student)
+      // {
+      //   $student_departments = $student->departments->pluck('id')->toArray();
+      //   $departments = $departments->whereIn('departments.id', $student_departments);
+      // }
 
       $departments = $departments->where('routines.status', 'Published')
       ->groupBy('departments.id', 'departments.name', 'batch_department.batch_id', 'batch_department.department_id')
@@ -312,7 +330,7 @@ class CategoryCtrl extends Controller
   public function syllabus($type, $batch_id, $department_id)
   {
     $department = Department::find($department_id);
-    $syllabuses = Syllabus::orderBy('id', 'DESC')
+    $syllabuses = Syllabus::orderBy('id', 'ASC')
     ->where('status', 'Published')
     ->where('batch_id', $batch_id)
     ->where('department_id', $department_id)
@@ -326,7 +344,7 @@ class CategoryCtrl extends Controller
     $batch = Batch::find($batch_id);
     $routine = Routine::where('batch_id', $batch_id)
     ->where('department_id', $department_id)
-    ->orderBy('id', 'DESC')
+    ->orderBy('id', 'ASC')
     ->where('status', 'Published')
     ->first();
 
@@ -336,15 +354,17 @@ class CategoryCtrl extends Controller
     {
       $subjects = $routine->subjects()->get();
   
-      $departments = $routine->departments()->get();
+      $departments = $routine->departments()->where('id', $department_id)->get();
 
       $routine_rows = RoutineItemRow::where('routine_item_rows.routine_id', $routine->id)
-      ->with(['subjects', 'departments'])
+      ->with(['subjects', 'departments' => function($query) use($department_id){
+        $query->where('id', $department_id);
+      }])
       ->select('routine_item_rows.*')
       ->get();
     }
 
-    // dd($routine);
+    // dd($routines);
 
     return view('homepage.exam-routine-view', compact('batch', 'routine', 'subjects', 'departments', 'routine_rows'));
   }

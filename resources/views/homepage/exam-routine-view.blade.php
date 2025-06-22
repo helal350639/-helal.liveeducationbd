@@ -58,44 +58,42 @@ if($user)
             <div class="all-courses-area">
               <div class="row justify-content-center g-3">
 
-                @if($routine && $routine_rows->count())
+                @if($routine)
 
-                <p>{!! $routine->header !!}</p>
+                  <p>{!! $routine->header !!}</p>
 
-                <table class="table table-bordered">
-                  <tr>
-                    <th>SL No.</th>
-                    <th>Exam Name/No</th>
-                
-                    @foreach($subjects as $subject)
-                    <th>{{$subject->name}}</th>
+                  <table class="table table-bordered">
+                    <tr>
+                      <th>Exam Name/No</th>
+                  
+                      @foreach($subjects as $subject)
+                      <th>{{$subject->name}}</th>
+                      @endforeach
+                  
+                      @foreach($departments as $department)
+                      <th>{{$department->name}}</th>
+                      @endforeach
+                  
+                      <th>Date & Time</th>
+                    </tr>
+                  
+                    @foreach($routine_rows as $key => $item)
+                    <tr>
+                      <td>{{$item->paper_name}}</td>
+                  
+                      @foreach($item->subjects as $subject)
+                      <td>{!!$subject->chapter!!}</td>
+                      @endforeach
+                  
+                      @foreach($item->departments as $department)
+                      <td>{!!$department->details!!}</td>
+                      @endforeach
+                  
+                      <td>{{$source->dtformat($item->exam_at)}}</td>
+                    </tr>
                     @endforeach
-                
-                    @foreach($departments as $department)
-                    <th>{{$department->name}}</th>
-                    @endforeach
-                
-                    <th>Date & Time</th>
-                  </tr>
-                
-                  @foreach($routine_rows as $key => $item)
-                  <tr>
-                    <td>{{$key+1}}</td>
-                    <td>{{$item->paper_name}}</td>
-                
-                    @foreach($item->subjects as $subject)
-                    <td>{!!$subject->chapter!!}</td>
-                    @endforeach
-                
-                    @foreach($item->departments as $department)
-                    <td>{!!$department->details!!}</td>
-                    @endforeach
-                
-                    <td>{{$source->dtformat($item->exam_at)}}</td>
-                  </tr>
-                  @endforeach
-                
-                </table>
+                  
+                  </table>
 
                 @elseif($routine && $routine->pdf)
                   <div class="card card-default">
