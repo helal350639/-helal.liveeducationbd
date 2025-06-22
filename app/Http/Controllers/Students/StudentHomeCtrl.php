@@ -68,13 +68,13 @@ class StudentHomeCtrl extends Controller
 
     // batch routine for the student
     $routine = Routine::whereIn('batch_id', $student_batches_ids)
-    ->where('status', 'Active')
+    ->where('status', 'Published')
     ->count();
 
     // batch exam pdf for the student
     $exam_pdf = Syllabus::whereIn('batch_id', $student_batches_ids)
     ->whereIn('department_id', $student_departments_ids)
-    ->where('status', 'Active')
+    ->where('status', 'Published')
     ->count();
 
     $orders = Order::leftJoin('batches', 'batches.id', 'orders.batch_id')

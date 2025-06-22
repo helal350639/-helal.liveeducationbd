@@ -99,8 +99,15 @@ class CategoryCtrl extends Controller
     // batch query for exam pdf
     if($type == 'Exam PDF')
     {
-      $batches = $batches->leftJoin('syllabi', 'syllabi.batch_id', 'batches.id')
-      ->where('syllabi.status', 'Published')
+      $batches = $batches->leftJoin('syllabi', 'syllabi.batch_id', 'batches.id');
+
+      if($dashboard == 'Dashboard' && $student)
+      {
+        $student_batches = $student->batches->pluck('id')->toArray();
+        $batches = $batches->whereIn('batches.id', $student_batches);        
+      }
+
+      $batches = $batches->where('syllabi.status', 'Published')
       ->groupBy('batches.id', 'batches.name', 'batches.banner')
       ->select('batches.id', 'batches.name', 'batches.banner');
     }
@@ -108,8 +115,15 @@ class CategoryCtrl extends Controller
     //
     if($type == 'Exam Routine')
     {
-      $batches = $batches->leftJoin('routines', 'routines.batch_id', 'batches.id')
-      ->whereNotNull('routines.batch_id')
+      $batches = $batches->leftJoin('routines', 'routines.batch_id', 'batches.id');
+
+      if($dashboard == 'Dashboard' && $student)
+      {
+        $student_batches = $student->batches->pluck('id')->toArray();
+        $batches = $batches->whereIn('batches.id', $student_batches);        
+      }
+
+      $batches = $batches->whereNotNull('routines.batch_id')
       ->where('routines.status', 'Published')
       ->groupBy('batches.id', 'batches.name', 'batches.banner', 'routines.batch_id')
       ->select('batches.id', 'batches.name', 'batches.banner', 'routines.batch_id');
@@ -206,6 +220,12 @@ class CategoryCtrl extends Controller
       ->where('papers.batch_id', $batch->id)
       ->where('exams.status', 'Completed');
 
+      if($dashboard == 'Dashboard' && $student)
+      {
+        $student_departments = $student->departments->pluck('id')->toArray();
+        $departments = $departments->whereIn('departments.id', $student_departments);        
+      }
+
       if($type == 'Premium Results')
       {
         $departments = $departments->whereNot('papers.permit', 'Every One');
@@ -222,16 +242,31 @@ class CategoryCtrl extends Controller
 
     if($type == 'Exam PDF')
     {
-      $departments = $departments->leftJoin('syllabi', 'syllabi.department_id', 'departments.id')
-      ->where('syllabi.status', 'Published')
+      $departments = $departments->leftJoin('syllabi', 'syllabi.department_id', 'departments.id');
+
+      if($dashboard == 'Dashboard' && $student)
+      {
+        $student_departments = $student->departments->pluck('id')->toArray();
+        $departments = $departments->whereIn('departments.id', $student_departments);
+      }
+
+      $departments = $departments->where('syllabi.status', 'Published')
       ->groupBy('departments.id', 'departments.name', 'batch_department.batch_id', 'batch_department.department_id')
       ->select('departments.id', 'departments.name', 'batch_department.batch_id', 'batch_department.department_id');
     }
 
     if($type == 'Exam Routine')
     {
-      $departments = $departments->leftJoin('routines', 'routines.department_id', 'departments.id')
-      ->where('routines.status', 'Published')
+      $departments = $departments->leftJoin('routines', 'routines.department_id', 'departments.id');
+
+
+      if($dashboard == 'Dashboard' && $student)
+      {
+        $student_departments = $student->departments->pluck('id')->toArray();
+        $departments = $departments->whereIn('departments.id', $student_departments);
+      }
+
+      $departments = $departments->where('routines.status', 'Published')
       ->groupBy('departments.id', 'departments.name', 'batch_department.batch_id', 'batch_department.department_id')
       ->select('departments.id', 'departments.name', 'batch_department.batch_id', 'batch_department.department_id');
     }

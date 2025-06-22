@@ -239,7 +239,7 @@ font-size: 16px;
          </div>
          <div class="col-6 col-lg-3">
             <div class="card card-body shadow-sm">
-               <a href="#">
+               <a href="{{route('category.batches', ['Exam Routine', 'Dashboard'])}}">
                   <div class="corce_exam_mobile_res">
                      <div>
                         <span>এক্সাম/ ক্লাস রুটিন</span>
@@ -254,7 +254,7 @@ font-size: 16px;
          </div>
          <div class="col-6 col-lg-3">
             <div class="card card-body shadow-sm">
-               <a href="{{route('category.batches', 'Exam PDF')}}">
+               <a href="{{route('category.batches', ['Exam PDF', 'Dashboard'])}}">
                   <div class="corce_exam_mobile_res">
                      <div>
                         <span>এক্সাম PDF</span>
