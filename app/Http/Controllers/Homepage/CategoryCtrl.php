@@ -39,12 +39,27 @@ class CategoryCtrl extends Controller
     return view('homepage.course', compact('type', 'title', 'courses'));
   }
 
+  // batches query according to the course id
+  public function batch($type, $course_id)
+  {
+    $course = Course::find($course_id);
+    $batches = Batch::where('status', 'Active')
+    ->where('course_id', $course_id)
+    ->whereRaw('DATE(reg_end_at) > ?', date('Y-m-d H:i:s'))
+    ->get();
+
+    if($type == 'job')
+    {
+      return view('homepage.job-batch', compact('type', 'course', 'batches'));
+    }
+    
+    return view('homepage.batch', compact('type', 'course', 'batches'));
+  }
+
   // this batches for [exam, result, exam_pdf...] showing on the homepage everywhere 
   public function batches($type, $dashboard = null)
   {
     $student = Auth::guard('student')->user();
-    // dd($dashboard);
-    // dd($type);
     $batches = Batch::orderBy('batches.id', 'DESC')
     ->where('batches.status', 'Active');
 
@@ -74,12 +89,6 @@ class CategoryCtrl extends Controller
         $batches = $batches->where('papers.permit', 'Every One');
       }
 
-      // if($dashboard == 'Dashboard' && $student)
-      // {
-      //   $student_batches = $student->batches->pluck('id')->toArray();
-      //   $batches = $batches->whereIn('batches.id', $student_batches);
-      // }
-
       $batches = $batches->groupBy('batches.id', 'batches.name', 'batches.banner')
       ->select('batches.id', 'batches.name', 'batches.banner');
     }
@@ -89,6 +98,7 @@ class CategoryCtrl extends Controller
     {
       $batches = $batches->leftJoin('papers', 'batches.id', 'papers.batch_id')
       ->leftJoin('exams', 'exams.paper_id', 'papers.id')
+      ->whereRaw('DATE(batches.end_at) > ?', date('Y-m-d H:i:s'))
       ->where('exams.status', 'Completed');
 
       if($type == 'Premium Results')
@@ -110,12 +120,6 @@ class CategoryCtrl extends Controller
     {
       $batches = $batches->leftJoin('syllabi', 'syllabi.batch_id', 'batches.id');
 
-      // if($dashboard == 'Dashboard' && $student)
-      // {
-      //   $student_batches = $student->batches->pluck('id')->toArray();
-      //   $batches = $batches->whereIn('batches.id', $student_batches);
-      // }
-
       $batches = $batches->where('syllabi.status', 'Published')
       ->groupBy('batches.id', 'batches.name', 'batches.banner')
       ->select('batches.id', 'batches.name', 'batches.banner');
@@ -125,12 +129,6 @@ class CategoryCtrl extends Controller
     if($type == 'Exam Routine')
     {
       $batches = $batches->leftJoin('routines', 'routines.batch_id', 'batches.id');
-
-      // if($dashboard == 'Dashboard' && $student)
-      // {
-      //   $student_batches = $student->batches->pluck('id')->toArray();
-      //   $batches = $batches->whereIn('batches.id', $student_batches);        
-      // }
 
       $batches = $batches->whereNotNull('routines.batch_id')
       ->where('routines.status', 'Published')
@@ -144,23 +142,6 @@ class CategoryCtrl extends Controller
 
     return view('homepage.batch', compact('type', 'batches', 'dashboard'));
 
-  }
-
-  // batches query according to the course id
-  public function batch($type, $course_id)
-  {
-    $course = Course::find($course_id);
-    $batches = Batch::where('status', 'Active')
-    ->where('course_id', $course_id)
-    ->whereRaw('DATE(reg_end_at) > ?', date('Y-m-d H:i:s'))
-    ->get();
-
-    if($type == 'job')
-    {
-      return view('homepage.job-batch', compact('type', 'course', 'batches'));
-    }
-    
-    return view('homepage.batch', compact('type', 'course', 'batches'));
   }
 
   // department query for polytechnic study and where need directly call to the departments
