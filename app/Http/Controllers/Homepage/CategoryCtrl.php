@@ -343,7 +343,7 @@ class CategoryCtrl extends Controller
   {
     $batch = Batch::find($batch_id);
     $routine = Routine::where('batch_id', $batch_id)
-    ->where('department_id', $department_id)
+    // ->where('department_id', $department_id)
     ->orderBy('id', 'DESC')
     ->where('status', 'Published')
     ->first();

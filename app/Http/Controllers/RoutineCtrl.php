@@ -148,8 +148,7 @@ class RoutineCtrl extends Controller
      */
     public function show($id)
     {
-        $group = Group::find($id);
-        return view('layouts.routines.read', compact('group'));
+      //
     }
 
     /**
@@ -165,14 +164,6 @@ class RoutineCtrl extends Controller
         $subjects = Subject::where('status', 'Active')->get();
         $departments = Department::where('status', 'Active')->get();
         $routine = Routine::find($id);
-
-        // $subject_columns = RoutineSubjectColumn::where('routine_id', $id)
-        // ->pluck('subject_id')
-        // ->toArray();
-
-        // $department_columns = RoutineDepartmentColumn::where('routine_id', $id)
-        // ->pluck('department_id')
-        // ->toArray();
 
         $subject_columns = $routine->subjects()->pluck('subject_id')->toArray();
         $department_columns = $routine->departments()->pluck('department_id')->toArray();
@@ -289,114 +280,4 @@ class RoutineCtrl extends Controller
       Session::flash('error', 'Permission restricted!');
       return back();
     }
-
-
-  /** ================== Add Item Section =================== */
-
-  public function addItem($id)
-  {
-    $routine = Routine::find($id);
-    $papers = Paper::orderBy('id', 'DESC')->get();
-
-    $subjects = $routine->subjects()->get();
-
-    $departments = $routine->departments()->get();
-
-    $routine_rows = RoutineItemRow::where('routine_item_rows.routine_id', $id)
-    ->with(['subjects', 'departments'])
-    ->select('routine_item_rows.*')
-    ->get();
-    // dd($routine_rows);
-
-    return view('layouts.routines.add-item', compact('routine', 'papers', 'subjects', 'departments', 'routine_rows'));
-  }
-  
-  public function addItemPost(Request $request)
-  {
-    $data = $request->all();
-
-    // dd($data);
-
-    try {
-
-      $routineItem = RoutineItemRow::create([
-        'routine_id' => $data['routine_id'],
-        'paper_name' => $data['paper_name'],
-        'exam_at' => $data['exam_at']
-      ]);
-
-      foreach($data['subject_id'] as $key => $value)
-      {
-        RoutineSubjectRow::insert([
-          'item_id' => $routineItem->id,
-          'subject_id' => $value,
-          'chapter' => $data['subject_item'][$key]
-        ]);
-      }
-
-      foreach($data['department_id'] as $key => $value)
-      {
-        RoutineDepartmentRow::insert([
-          'item_id' => $routineItem->id,
-          'department_id' => $value,
-          'details' => $data['department_item'][$key]
-        ]);
-      }
-    }
-    catch(\Exception $e)
-    {
-      return $e->getMessage();
-    }
-
-    // return $this->addItem($data['routine_id']);
-    return redirect()->route('routine.add-item', $data['routine_id']);
-  }
-
-  public function editItem($id)
-  {
-    $item = RoutineItemRow::find($id);
-    $routine = Routine::find($routineItem->routine_id);
-    $papers = Paper::orderBy('id', 'DESC')->get();
-
-    $subjects = $routine->subjects()->get();
-
-    $departments = $routine->departments()->get();
-
-    $routine_rows = RoutineItemRow::where('routine_item_rows.routine_id', $id)
-    ->with(['subjects', 'departments'])
-    ->select('routine_item_rows.*')
-    ->get();
-    // dd($routine_rows);
-
-    return view('layouts.routines.edit-item', compact('routine', 'papers', 'subjects', 'departments', 'routine_rows', 'item'));
-  }
-
-  //delete routine item
-  public function deleteItem($id)
-  {
-    $item_row = RoutineItemRow::find($id);
-    $subject_rows =  RoutineSubjectRow::where('item_id', $id)->get();
-    $department_rows =  RoutineDepartmentRow::where('item_id', $id)->get();
-
-    if($subject_rows)
-    {
-      foreach($subject_rows as $row)
-      {
-        $row->delete();
-      }
-    }
-
-    if($department_rows)
-    {
-      foreach($department_rows as $row)
-      {
-        $row->delete();
-      }
-    }
-
-    $item_row->delete();
-
-    Session::flash('success', 'The item deleted');
-    return back();
-  }
 }

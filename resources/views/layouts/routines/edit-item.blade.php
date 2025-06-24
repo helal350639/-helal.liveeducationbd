@@ -58,8 +58,12 @@
             @endforeach
 
             <td>{{$item->exam_at}}</td>
-            <td>
-              <a class="btn btn-danger btn-sm" href="{{route('routine.item.delete', $item->id)}}" onclick="return confirm('Are you sure, you want to delete this?')">
+            <td width="70">
+              <a class="btn btn-warning btn-xs" href="{{route('routine.item.edit', $item->id)}}">
+                <i class="fa fa-pencil"></i>
+              </a>
+
+              <a class="btn btn-danger btn-xs" href="{{route('routine.item.delete', $item->id)}}" onclick="return confirm('Are you sure, you want to delete this?')">
                 <i class="fa fa-trash"></i>
               </a>
             </td>
@@ -78,29 +82,28 @@
         <div class="box-header with-border">
             <h3 style="color: #800" class="box-title">{{$routine->name}}</h3>
         </div>
-        <form action="{{route('routine.item.update', $routine)}}" method="POST" enctype="multipart/form-data">
+        <form action="{{route('routine.item-update', $routine_row)}}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             <input type="hidden" name="routine_id" value="{{$routine->id}}">
+
             <div class="box-body">
                 <div class="row">
-
-                  <input type="hidden" name="routine_id" value="{{$routine->id}}">
 
                   <div class="col-md-6">
                     <div class="form-group row">
                       <label class="col-md-4 text-right" for="">Exam No</label>
                       <div class="col-md-8">
-                        <input class="form-control" name="paper_name" id="paper_name" required>
+                        <input class="form-control" name="paper_name" id="paper_name" required value="{{$routine_row->paper_name}}">
                       </div>
                     </div>
 
-                  @foreach($subjects as $subject)
+                  @foreach($subject_rows as $subject)
                     <div class="form-group row">
                       <label class="col-md-4 text-right" for="">{{$subject->name}}</label>
                       <div class="col-md-8">
-                        <input type="hidden" name="subject_id[]" value="{{$subject->id}}" required value="">
-                        <textarea class="form-control editor" name="subject_item[]" rows="5"></textarea>
+                        <input type="hidden" name="subject_id[]" value="{{$subject->subject_id}}" required>
+                        <textarea class="form-control editor" name="subject_item[]" rows="5">{{$subject->chapter}}</textarea>
                       </div>
                     </div>
 
@@ -109,12 +112,12 @@
                   
                   <div class="col-md-6">
 
-                  @foreach($departments as $department)
+                  @foreach($department_rows as $department)
                     <div class="form-group row">
                       <label class="col-md-4 text-right" for="">{{$department->name}}</label>
                       <div class="col-md-8">
-                        <input type="hidden" name="department_id[]" value="{{$department->id}}" required>
-                        <textarea class="form-control editor" name="department_item[]" rows="5"></textarea>
+                        <input type="hidden" name="department_id[]" value="{{$department->department_id}}" required>
+                        <textarea class="form-control editor" name="department_item[]" rows="5">{{$department->details}}</textarea>
                       </div>
                     </div>
 
@@ -123,70 +126,15 @@
                     <div class="form-group row">
                       <label class="col-md-4 text-right" for="">Date & Time</label>
                       <div class="col-md-8">
-                        <input type="datetime-local" class="form-control" name="exam_at" id="exam_at" required>
+                        <input type="datetime-local" class="form-control" name="exam_at" id="exam_at" required value="{{$routine_row->exam_at}}">
                       </div>
                     </div>
                   </div>
-                  
-
-                  {{-- <form method="POST" action="#">
-                    @csrf
-                    <table id="dynamicTable" class="table table-bordered">
-                        <thead>
-                            <tr id="columnHeaders">
-                                <!-- Will be filled by JS -->
-                            </tr>
-                        </thead>
-                        <tbody id="tableBody">
-                            <!-- Dynamic rows -->
-                        </tbody>
-                    </table>
-                
-                    <button type="button" onclick="addColumn()">Add Column</button>
-                    <button type="button" onclick="addRow()">Add Row</button>
-                    <br><br>
-                    <button type="submit">Save Table</button>
-                </form> --}}
-                
-                {{-- <script>
-                    let columnCount = 0;
-                    let rowCount = 0;
-                
-                    function addColumn() {
-                        columnCount++;
-                        const colHeader = document.createElement('th');
-                        colHeader.innerHTML = `Column ${columnCount}`;
-                        document.getElementById('columnHeaders').appendChild(colHeader);
-                
-                        const rows = document.getElementById('tableBody').rows;
-                        for (let i = 0; i < rows.length; i++) {
-                            const cell = rows[i].insertCell(-1);
-                            cell.innerHTML = `<input type="text" name="table[${i}][${columnCount - 1}]" class="form-control" />`;
-                        }
-                    }
-                
-                    function addRow() {
-                        const row = document.createElement('tr');
-                        let cols = '';
-                        for (let j = 0; j < columnCount; j++) {
-                            cols += `<td><input type="text" name="table[${rowCount}][${j}]" class="form-control" /></td>`;
-                        }
-                        row.innerHTML = cols;
-                        document.getElementById('tableBody').appendChild(row);
-                        rowCount++;
-                    }
-                
-                    // Optionally add one row/column on load
-                    window.onload = () => {
-                        addColumn();
-                        addRow();
-                    };
-                </script> --}}
                 
                 </div>
             </div> <!-- /.box body -->
             <div class="box-footer">
-                <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-plus"></i> Add</button>
+                <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-refresh"></i> update</button>
             </div>
         </form>
       </div> <!-- /.box -->
