@@ -69,8 +69,6 @@ class StudentHomeCtrl extends Controller
     // batch routine for the student
     $routine = Routine::whereIn('batch_id', $student_batches_ids)
     ->where('status', 'Published')
-    ->groupBy('batch_id')
-    ->select('batch_id')
     ->count();
 
     // batch exam pdf for the student
