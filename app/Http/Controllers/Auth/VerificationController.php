@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Session;
 use App\Models\Student;
 use Auth;
+use Validator;
 
 
 class VerificationController extends Controller
@@ -49,9 +50,24 @@ class VerificationController extends Controller
     {
         $source = new SourceCtrl;
 
-        $this->Validate($request, [
-            'contact' => 'required|string|min:11|max:11'
-        ]);
+        $validator = Validator::make($request->all(), [
+          'contact' => 'required|string|min:11|max:11|unique:students',
+      ], [
+          'contact.required' => 'The contact number is required.',
+          'contact.string'   => 'The contact number must be a valid string.',
+          'contact.min'      => 'The contact number must be exactly 11 characters.',
+          'contact.max'      => 'The contact number must be exactly 11 characters.',
+          'contact.unique'   => 'This contact number is already registered.',
+      ]);
+      
+      if ($validator->fails()) {
+          return response()->json([
+              'success' => false,
+              'message' => 'Validation Error.',
+              'errors' => $validator->errors(), // already grouped by field
+          ], 422);
+      }
+      
 
         $contact = '88'.$request->contact;
         $otp = rand(1111, 9999);
@@ -61,8 +77,8 @@ class VerificationController extends Controller
         
         return response()->json([
             'success' => true,
-            'data' => $result
-        ]);
+            'result' => $result
+        ], 200);
     }
 
     public function otpCheck(Request $request)
@@ -90,7 +106,7 @@ class VerificationController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Contact successfully updated' 
-            ]);
+            ], 200);
             
         }
         else
@@ -98,7 +114,7 @@ class VerificationController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'OTP does not match please check again.'
-                ]);
+                ], 200);
         }
     }
 }

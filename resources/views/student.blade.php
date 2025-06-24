@@ -546,7 +546,7 @@ function active($name)
   </div>
 
   {{-- contact verify modal --}}
-  {{-- @include('student-panel.contact-verify') --}}
+  @include('student-panel.contact-verify')
   
   <!-- JavaScript Libraries (footer) -->
   <script src="{{'/web/assets/js/jquery-3.6.0.min.js'}}"></script>

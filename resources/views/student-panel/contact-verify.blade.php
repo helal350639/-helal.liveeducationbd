@@ -1,21 +1,21 @@
 {{-- contact verification --}}
-<div class="modal fade in" id="modal-contact">
+<p>This is a contact verify model</p>
+<div class="modal fade" id="modal-contact" style="margin-top:60px">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="showModal()">
-          <span aria-hidden="true">&times;</span></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         <h4 class="modal-title">Continue to add your contact number</h4>
       </div>
       <div class="modal-body" id="contact-body">
         <div class="form-group">
           <label for="">Contact Number: </label>
           <input type="number" name="contact" id="contact-number" class="form-control" placeholder="01XXXXXXXXX" required/>
-          <p style="color:red">Please double check your contact number</p>
+          <p style="color:red" id="errorMsg"></p>
         </div>
       </div>
       <div class="modal-footer" id="contact-footer">
-        <button type="button" class="btn btn-default pull-left" data-dismiss="modal" onclick="showModal()">Close</button>
+        <button type="button" class="btn btn-default pull-left" data-bs-dismiss="modal" >Close</button>
         <button type="button" class="btn btn-info" onclick="submitForm()">Continue</button>
       </div>
     </div> <!-- /.modal-content -->
@@ -24,74 +24,72 @@
 {{-- contact verification end --}}
 
 <script>
-  function showModal()
+
+  @if(Auth::guard('student')->user() && Auth::guard('student')->user()->contact == null)
+  
+  window.addEventListener('DOMContentLoaded', function () {
+    const myModal = new bootstrap.Modal(document.getElementById('modal-contact'));
+    myModal.show();
+  });
+
+  @endif
+  
+  let contactBody = document.getElementById('contact-body');
+  let number = document.getElementById('contact-number');
+  let contactFooter = document.getElementById('contact-footer');
+
+  number.addEventListener('keyup', function()
   {
-    let modalId = document.getElementById('modal-contact');
-    if(modalId.style.display == 'block')
+    $('#errorMsg').text('');
+  });
+
+  function submitForm()
+  {
+    if(number.value == '' || number.value.length > 11)
     {
-      modalId.style.display = 'none';
+      $('#errorMsg').text('Your mobile number must be exactly 11 digits.');
     }
     else
     {
-      modalId.style.display = 'block';
-    }
-    
-  }
-
-  @if(Auth::guard('student')->user() && Auth::guard('student')->user()->contact == null)
-  // showModal();
-  const myModal = document.getElementById('modal-contact')
-  const myInput = document.getElementById('myInput')
-
-  myModal.addEventListener('shown.bs.modal', () => {
-    myInput.focus()
-  });
-  @endif
-  
-  function submitForm()
-  {
-    let body = document.getElementById('contact-body');
-    let number = document.getElementById('contact-number');
-    let footer = document.getElementById('contact-footer');
-
-    if(number.value.length == 0)
-    {
-      return confirm('Please input your 11 digit mobile number');
-    }
-
-    $.ajaxSetup({
-      headers: {
-        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-      }
-    });
-
-    var formData = new FormData();
-    formData.append('contact', number.value);
-
-    $.ajax({
-      url: '{{route("contact-check")}}',
-      type: 'POST',
-      data: formData,
-      processData: false,
-      contentType: false,
-      success: function(data){
-        if(data.success == true)
-        {
-          body.innerHTML = '<div class="form-group">'+
-            '<label for="">OTP: </label>'+
-            '<input type="number" name="otp" id="otp-number" class="form-control" placeholder="xxxx"/>'+
-            '<p style="color:red">Please check your phone. 4 digit number has been sent by SMS.</p>'+
-          '</div>';
-
-          footer.innerHTML = '<button type="button" class="btn btn-info" onclick="confirm()">Confirm</button>';
+      $.ajaxSetup({
+        headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
+      });
 
-        // console.log(data);
-      },
-      error: function(data){
-        console.log(data);
-      },
-    });
+      var formData = new FormData();
+      formData.append('contact', number.value);
+
+      $.ajax({
+        url: '{{route("contact-check")}}',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(data){
+          if(data.success === true)
+          {
+            contactBody.innerHTML = '<div class="form-group">'+
+              '<label for="">OTP: </label>'+
+              '<input type="number" name="otp" id="otp-number" class="form-control" placeholder="xxxx"/>'+
+              '<p style="color:red">Please check your phone. 4 digit number has been sent by SMS.</p>'+
+            '</div>';
+
+            contactFooter.innerHTML = '<button type="button" class="btn btn-info" onclick="confirm()">Confirm</button>';
+          }
+        },
+        error: function(xhr){
+          if (xhr.status === 422) {
+              const errors = xhr.responseJSON.errors;
+              $.each(errors, function (field, messages) {
+                  $('#errorMsg').text(messages[0]);
+              });
+          } else {
+              console.error('Unexpected error', xhr.responseText);
+          }
+        },
+      });
+    }
   }
 
   function confirm()
