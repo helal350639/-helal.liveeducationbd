@@ -17,6 +17,7 @@ use Laravel\Socialite\Facades\Socialite;
 use App\Models\Student;
 use App;
 use URL;
+use Illuminate\Support\Facades\Log;
 
 
 /*
@@ -359,6 +360,19 @@ Route::middleware(['auth'])->group(function()
   // database backup
   Route::get('/download-database', [BackupController::class, 'downloadDatabase'])->name('database.download');
 	
+});
+
+// Route::controller(ScheduleCtrl::class)->group(function()
+// {
+//   Route::prefix('/schedule')->group(function()
+//   {
+//     Route::get('send-sms', 'sendSms');
+//     Route::get('send-email', 'sendEmail');
+//   });
+// });
+
+Route::get('create-log', function(){
+  Log::info('test log');
 });
 
 // cache clear
