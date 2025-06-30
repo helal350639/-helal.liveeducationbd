@@ -373,6 +373,7 @@ Route::middleware(['auth'])->group(function()
 
 Route::get('create-log', function(){
   Log::info('test log');
+  return 'working...';
 });
 
 // cache clear
