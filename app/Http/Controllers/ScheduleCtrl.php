@@ -14,6 +14,8 @@ use Image;
 use Toastr;
 use File;
 use Session;
+use DateTime;
+use App;
 
 class ScheduleCtrl extends Controller
 {
@@ -27,8 +29,18 @@ class ScheduleCtrl extends Controller
   static function scheduleEmail()
   {
     $source = new SourceCtrl;
+
+    $now = now();
+    if(App::environment('production'))
+    {
+      $past = new DateTime();
+      $past->modify('-7 hours 49 minutes');
+      $now = $past->format('Y-m-d H:i:s');
+    }
+    // dd($now);
+    
     $emails = Email::where('status', 'Scheduled')
-    ->where('datetime', '<=', now())
+    ->where('datetime', '<=', $now)
     ->get();
 
     if($emails)
