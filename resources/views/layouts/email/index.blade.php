@@ -74,6 +74,8 @@ function student($ids)
                     <span class="label label-success">{{$value->status}}</span>
                     @elseif($value->status == 'Scheduled')
                     <span class="label label-info">{{$value->status}}</span>
+                    <br>
+                    <small>{{$source->dtformat($value->datetime)}}</small>
                     @else
                     <span class="label label-warning">{{$value->status}}</span>
                     @endif
