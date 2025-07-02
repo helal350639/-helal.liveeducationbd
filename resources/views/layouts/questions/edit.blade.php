@@ -673,7 +673,7 @@ function getFilters(e)
             }
         },
         error: function(data) { 
-                console.log('data error');
+          console.log('data error');
         }
     });
 }
@@ -688,20 +688,20 @@ function addMulitMcq()
     for(let x = 0; mcqItems.length > x; x++)
     {
         Items += '<div class="form-group">'+
-                        '<div class="input-group">'+
-                            '<span class="input-group-addon label-danger" onclick="this.parentNode.parentNode.remove()">'+
-                            '<i class="fa fa-close"></i>'+
-                            '</span>'+
-                            '<textarea class="form-control" name="items[]" id="items" rows="3" >'+mcqItems[x]+'</textarea>'+
-                            '<span class="input-group-addon">'+
-                                '<input style="display: none" type="file" name="item_img[]" id="item_'+x+'"/>'+
-                                '<label for="item_'+x+'"><i class="fa fa-image"></i></label>'+
-                            '</span>'+
-                            '<span class="input-group-addon">'+
-                                '<input type="radio" name="correct[]" onchange="checkAns()" required/>'+
-                            '</span>'+
-                        '</div>'+
-                    '</div>';
+                    '<div class="input-group">'+
+                        '<span class="input-group-addon label-danger" onclick="this.parentNode.parentNode.remove()">'+
+                        '<i class="fa fa-close"></i>'+
+                        '</span>'+
+                        '<textarea class="form-control" name="items[]" id="items" rows="3" >'+mcqItems[x]+'</textarea>'+
+                        '<span class="input-group-addon">'+
+                            '<input style="display: none" type="file" name="item_img[]" id="item_'+x+'"/>'+
+                            '<label for="item_'+x+'"><i class="fa fa-image"></i></label>'+
+                        '</span>'+
+                        '<span class="input-group-addon">'+
+                            '<input type="radio" name="correct[]" onchange="checkAns()" required/>'+
+                        '</span>'+
+                    '</div>'+
+                '</div>';
     }
 
     multiItems.innerHTML = Items;
@@ -715,18 +715,18 @@ function addOneField()
     let field = document.createElement('div');
     field.setAttribute('class', 'form-group');
     field.innerHTML = '<div class="input-group">'+
-                            '<span class="input-group-addon label-danger" onclick="this.parentNode.parentNode.remove()">'+
-                            '<i class="fa fa-close"></i>'+
-                            '</span>'+
-                            '<textarea class="form-control" name="items[]" id="items" rows="3" ></textarea>'+
-                            '<span class="input-group-addon">'+
-                                '<input style="display: none" type="file" name="item_img[]" id="item_'+x+'"/>'+
-                                '<label for="item_'+x+'"><i class="fa fa-image"></i></label>'+
-                            '</span>'+
-                            '<span class="input-group-addon">'+
-                                '<input type="radio" name="correct[]" onchange="checkAns()" required/>'+
-                                '</span>'+
-                        '</div>';
+                        '<span class="input-group-addon label-danger" onclick="this.parentNode.parentNode.remove()">'+
+                        '<i class="fa fa-close"></i>'+
+                        '</span>'+
+                        '<textarea class="form-control" name="items[]" id="items" rows="3" ></textarea>'+
+                        '<span class="input-group-addon">'+
+                            '<input style="display: none" type="file" name="item_img[]" id="item_'+x+'"/>'+
+                            '<label for="item_'+x+'"><i class="fa fa-image"></i></label>'+
+                        '</span>'+
+                        '<span class="input-group-addon">'+
+                            '<input type="radio" name="correct[]" onchange="checkAns()" required/>'+
+                        '</span>'+
+                      '</div>';
     multiItems.appendChild(field);
 
 }

@@ -54,15 +54,27 @@
                         <textarea class="form-control editor" name="details" id="details" rows="10" required></textarea>
                     </div>
                 </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label>Status:</label><br>
-                        <label for="status"><input type="checkbox" name="status" id="status"> Active</label>
-                    </div>
+                
+              <div class="col-md-6">
+                <div class="form-group">
+                    <label>Status:</label><br>
+                    <select name="status" id="status" class="form-control" required onchange="checkStatus(this)">
+                      <option value="">Select One</option>
+                      <option value="Scheduled">Scheduled</option>
+                      <option value="Sent">Sent</option>
+                      <option value="Unsent">Unsent</option>
+                    </select>
                 </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="">Data & Time:</label>
+                <input type="datetime-local" name="datetime" class="form-control" id="datetime">
+              </div>
+            </div>
             </div> <!-- /.box body -->
             <div class="box-footer">
-                <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-send"></i> Send</button>
+                <button type="submit" class="btn btn-primary pull-right" id="sentBtn"><i class="fa fa-send"></i> Send</button>
             </div>
         </form>
     </div> <!-- /.box -->
@@ -74,6 +86,29 @@
 
 <script src="/assets/summernote/summernote.min.js"></script>
 <script>
+  const datatime = document.getElementById('datetime')
+  const sentBtn = document.getElementById('sentBtn')
+  function checkStatus(e)
+  {
+    const option = e.options[e.selectedIndex];
+    if(option.value == 'Sent')
+    {
+      sentBtn.innerHTML = '<i class="fa fa-send"></i> Send';
+    }
+    else
+    {
+      sentBtn.innerHTML = '<i class="fa fa-save"></i> Save';
+    }
+
+    if(option.value == 'Scheduled')
+    {
+      datetime.setAttribute('required', 'required');
+    }
+    else
+    {
+      datetime.removeAttribute('required');
+    }
+  }
     function getStudents(e)
     {
         let ids = Array.from(e.selectedOptions).map(({value}) => value);
@@ -106,8 +141,8 @@
                         $("#student_id").html('')
                     }
                 },
-                error: function(data) { 
-                        console.log('data error');
+                error: function(data) {
+                  console.error('data error');
                 }
             });
         }

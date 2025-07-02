@@ -93,7 +93,6 @@ class EmailCtrl extends Controller
         $students = Student::whereIn('id', $data['student_id']);
         $student_emails = $students->pluck('email')->toArray();
         $student_ids = $students->pluck('id')->toArray();
-        // $emailable_ids = arrayMapping($student_emails);
       }
       else
       {
@@ -103,7 +102,6 @@ class EmailCtrl extends Controller
 
         $student_emails = $students->pluck('students.email')->toArray();
         $student_ids = $students->pluck('students.id')->toArray();
-        // $emailable_ids = arrayMapping($student_emails);
       }
 
       $data['batch_id'] = json_encode($data['batch_id']);
@@ -111,19 +109,20 @@ class EmailCtrl extends Controller
       $data['student_id'] = json_encode($student_ids);
       $data['sms_send_by'] = Auth::id();
 
-      // dd($emailable_ids);
-
       try {
-        // create email data
-        $emailData = [
-          'email_to' => 'liveeducationbd24@gmail.com',
-          'email_bcc' => $student_emails,
-          'subject'  => $request->title,
-          'comments' => $request->details
-        ];
-
-        // send email to the students
-        $source->sendMail($emailData);
+        if($data['status'] == 'Sent')
+        {
+          // create email data
+          $emailData = [
+            'email_to' => 'liveeducationbd24@gmail.com',
+            'email_bcc' => $student_emails,
+            'subject'  => $request->title,
+            'comments' => $request->details
+          ];
+  
+          // send email to the students
+          $source->sendMail($emailData);
+        }
 
         // store entry to the database
         Email::insert($data);
@@ -132,8 +131,6 @@ class EmailCtrl extends Controller
       {
         return $e->getMessage();
       }
-
-      // $batch = Email::orderBy('id', 'DESC')->first();
       
       Session::flash('success', 'Email Send successfull');
 
@@ -160,8 +157,17 @@ class EmailCtrl extends Controller
      */
     public function edit($id)
     {
-        $email = Email::find($id);
-        return view('layouts.email.edit', compact('email'));
+      $batches = Batch::where('status', 'Active')
+      ->orderBy('id', 'DESC')
+      ->select('id', 'name')
+      ->get();
+
+      $email = Email::find($id);
+      $student_str = json_decode($email->student_id);
+      $student_ids = array_map('intval', $student_str);
+
+      $students = Student::whereIn('id', $student_ids)->get();
+      return view('layouts.email.edit', compact('email', 'batches', 'students'));
     }
 
     /**
@@ -173,10 +179,12 @@ class EmailCtrl extends Controller
      */
     public function update(Request $request, $id)
     {
-        $this->validate($request, [
-            'name'      => 'required|max:255',
-            'details'   => 'nullable|max:1000',
-        ]);
+      $source = new SourceCtrl;
+      $this->validate($request, [
+        'batch_id'    => 'required|array',
+        'student_id'  => 'nullable|array',
+        'details'     => 'nullable|max:10000',
+      ]);
         
         $data = $request->all();
 
@@ -184,12 +192,13 @@ class EmailCtrl extends Controller
         {
             unset($data['_token']);
         }
+
         if(isset($data['_method']))
         {
             unset($data['_method']);
         }
 
-        try{
+        try {
             Email::where('id', $id)->update($data);
         }
         catch(\E $e)

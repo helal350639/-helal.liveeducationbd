@@ -376,6 +376,8 @@ Route::get('create-log', function(){
   return 'working...';
 });
 
+Route::get('schedule-test', [HomePageCtrl::class, 'scheduleTest']);
+
 // cache clear
 Route::get('reboot', function ()
 {

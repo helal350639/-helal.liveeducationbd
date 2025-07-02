@@ -11,6 +11,11 @@ class Email extends Model
     //     return $this->hasOne(Paper::class, 'group_id');
     // }
     
+    // public function batches()
+    // {
+    //     return $this->belongsToMany(Batch::class);
+    // }
+    
     // public function students()
     // {
     //     return $this->belongsToMany(Student::class);

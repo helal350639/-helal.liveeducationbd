@@ -70,20 +70,22 @@ function student($ids)
                   <td>{{batch($value->batch_id)}}</td>
                   <td>{{$source->dtformat($value->created_at)}}</td>
                   <td>
-                    @if($value->status == 'Active')
+                    @if($value->status == 'Sent')
                     <span class="label label-success">{{$value->status}}</span>
-                    @elseif($value->status == 'Deactive')
+                    @elseif($value->status == 'Scheduled')
+                    <span class="label label-info">{{$value->status}}</span>
+                    @else
                     <span class="label label-warning">{{$value->status}}</span>
                     @endif
                   </td>
                   <td>
                     {{-- <a href="{{route('group.show',$value->id)}}" class="label label-info" title="Details"><i class="fa fa-file-text"></i></a> --}}
-                    {{-- <a href="{{route('students.add', [$value->id, 'Group'])}}" class="btn btn-primary btn-sm" title="Add Students"><i class="fa fa-user-plus"></i></a>
-                    <a href="{{route('group.edit', $value->id)}}" class="btn btn-warning btn-sm" title="Edit"><i class="fa fa-edit"></i></a>
+                    {{-- <a href="{{route('students.add', [$value->id, 'Group'])}}" class="btn btn-primary btn-sm" title="Add Students"><i class="fa fa-user-plus"></i></a> --}}
+                    <a href="{{route('email.edit', $value->id)}}" class="btn btn-warning btn-sm" title="Edit"><i class="fa fa-edit"></i></a>
                     <form style="display: inline" action="{{route('group.destroy', $value->id)}}" method="POST">
                       @csrf
                       @method('DELETE')
-                      <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this one?')"><i class="fa fa-trash"></i></button></form> --}}
+                      <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this one?')"><i class="fa fa-trash"></i></button></form>
                   </td>
                 </tr>
                 @endforeach

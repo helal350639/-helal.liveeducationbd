@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Homepage;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\ScheduleCtrl;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Course;
@@ -364,5 +365,11 @@ class HomePageCtrl extends Controller
       'departments' => $departments,
       'routine_rows' => $routine_rows
     ], 200);
+  }
+
+  public function scheduleTest()
+  {
+    return ScheduleCtrl::scheduleEmail();
+    // return ScheduleCtrl::scheduleSms();
   }
 }
