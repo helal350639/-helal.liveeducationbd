@@ -34,7 +34,7 @@ class ScheduleCtrl extends Controller
     if(App::environment('production'))
     {
       $past = new DateTime();
-      $past->modify('-7 hours 49 minutes');
+      $past->modify('+6 hours 11 minutes');
       $now = $past->format('Y-m-d H:i:s');
     }
     // dd($now);
