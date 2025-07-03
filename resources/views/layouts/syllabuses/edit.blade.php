@@ -73,7 +73,7 @@ $value = $syllabus;
                         </select>
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-8">
                     <div class="form-group">
                         <label for="name">Syllabus Name</label>
                         <input type="text" class="form-control" name="name" id="name" required value="{{$value->name}}">
@@ -95,16 +95,22 @@ $value = $syllabus;
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="status">Status</label>
-                            <select class="form-control" name="status" id="status" onchange="Status(this)">
+                            <select class="form-control" name="status" id="status" onchange="Status(this)" required>
                                 <option value="">Select One</option>
                                 <option value="Unpublished" {{$value->status == 'Unpublished'? 'selected':''}}>Unpublished</option>
                                 <option value="Published" {{$value->status == 'Published'? 'selected':''}}>Published</option>
-                                {{-- <option value="Scheduled" {{$value->status == 'Scheduled'? 'selected':''}}>Scheduled</option> --}}
+                                <option value="Scheduled" {{$value->status == 'Scheduled'? 'selected':''}}>Scheduled</option>
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-12 no-padding hide">
+                    {{-- <div class="col-md-12 no-padding hide">
                         
+                    </div> --}}
+                    <div class="col-md-12">
+                      <div class="form-group">
+                        <label for="">Date & Time</label>
+                        <input type="datetime-local" class="form-control" name="datetime" id="datetime" value="{{$value->datetime}}">
+                      </div>
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -242,7 +248,7 @@ $value = $syllabus;
 //result view add setting
 function resultView(e)
 {
-    console.log(e.options[e.selectedIndex].value == 'No');
+    // console.log(e.options[e.selectedIndex].value == 'No');
     if(e.options[e.selectedIndex].value == 'No')
     {
         let msg = document.createElement('div');
@@ -255,29 +261,40 @@ function resultView(e)
         e.parentNode.parentNode.nextElementSibling = msg;
     }
 }
-function Status(e){
-        let timer = e.parentNode.parentNode.nextElementSibling;
-        if(e.options[e.selectedIndex].value == 'Scheduled')
-        {
-            timer.classList.remove('hide');
-            timer.innerHTML = '<div class="col-md-6">'+
-                            '<div class="form-group">'+
-                                '<label for="open">Publish Time</label>'+
-                                '<input type="datetime-local" class="form-control" name="open" id="open" value="{{$value->open}}">'+
-                            '</div>'+
-                        '</div>'+
-                        '<div class="col-md-6">'+
-                            '<div class="form-group">'+
-                                '<label for="close">Close Time</label>'+
-                                '<input type="datetime-local" class="form-control" name="close" id="close" value="{{$value->close}}">'+
-                            '</div>'+
-                        '</div>';
-        }
-        else
-        {
-            timer.innerHTML = '';
-            timer.classList.add('hide');
-        }
+
+function Status(e)
+{
+  const datetime = document.getElementById('datetime');
+  if(e.options[e.selectedIndex].value == 'Scheduled')
+  {
+    datetime.setAttribute('required', 'required');
+  }
+  else
+  {
+    datetime.removeAttribute('required');
+  }
+      // let timer = e.parentNode.parentNode.nextElementSibling;
+      // if(e.options[e.selectedIndex].value == 'Scheduled')
+      // {
+      //     timer.classList.remove('hide');
+      //     timer.innerHTML = '<div class="col-md-6">'+
+      //                     '<div class="form-group">'+
+      //                         '<label for="open">Publish Time</label>'+
+      //                         '<input type="datetime-local" class="form-control" name="open" id="open" value="{{$value->open}}">'+
+      //                     '</div>'+
+      //                 '</div>'+
+      //                 '<div class="col-md-6">'+
+      //                     '<div class="form-group">'+
+      //                         '<label for="close">Close Time</label>'+
+      //                         '<input type="datetime-local" class="form-control" name="close" id="close" value="{{$value->close}}">'+
+      //                     '</div>'+
+      //                 '</div>';
+      // }
+      // else
+      // {
+      //     timer.innerHTML = '';
+      //     timer.classList.add('hide');
+      // }
     }
 
     // onload call to the status change

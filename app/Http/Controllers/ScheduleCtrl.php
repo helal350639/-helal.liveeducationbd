@@ -61,7 +61,7 @@ class ScheduleCtrl extends Controller
         Sms::where('id', $sms->id)->update(['status' => 'Sent']);
       }
 
-      \Log::info('Schedule SMS Test ' . now());
+      \Log::info('Schedule: SMS Test ' . now());
     }
   }
 
@@ -105,7 +105,7 @@ class ScheduleCtrl extends Controller
         Email::where('id', $email->id)->update(['status' => 'Sent']);
       }
 
-      \Log::info('Schedule Test ' . now());
+      \Log::info('Schedule: Email Test ' . now());
     }
   }
 }

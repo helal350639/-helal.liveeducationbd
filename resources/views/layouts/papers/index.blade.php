@@ -24,7 +24,7 @@ $source = New SourceCtrl;
     <div class="col-xs-12">
       <div class="box">
         <div class="box-body">
-          <form action="{{route('paper.search')}}" method="POST">
+          <form action="{{route('paper.search')}}" method="GET">
             @csrf
             <div class="col-md-3">
               <div class="form-group">

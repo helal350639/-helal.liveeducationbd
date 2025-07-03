@@ -83,15 +83,6 @@ class SyllabusCtrl extends Controller
             unset($data['_token']);
         }
 
-        if(isset($data['status']))
-        {
-            $data['status'] = 'Active';
-        }
-        else
-        {
-            $data['status'] = 'Deactive';
-        }
-
         $data['created_by'] = Auth::id();
 
         try{

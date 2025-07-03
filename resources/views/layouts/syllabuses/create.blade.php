@@ -39,9 +39,6 @@
                         <label for="">Batch</label>
                         <select name="batch_id" id="batch_id" class="form-control select2" required onchange="getDepartments(this)">
                             <option value="">Select One</option>
-                            {{-- @foreach($batches as $val)
-                            <option value="{{$val->id}}">{{$val->name}}</option>
-                            @endforeach --}}
                         </select>
                     </div>
                 </div>
@@ -50,13 +47,10 @@
                         <label for="">Department</label>
                         <select name="department_id" id="department_id" class="form-control select2">
                             <option value="">Select One</option>
-                            {{-- @foreach($departments as $val)
-                            <option value="{{$val->id}}">{{$val->name}}</option>
-                            @endforeach --}}
                         </select>
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-8">
                     <div class="form-group">
                         <label for="name">Syllabus Name</label>
                         <input type="text" class="form-control" name="name" id="name" required>
@@ -74,11 +68,24 @@
                         <textarea class="form-control" name="details" id="details" rows="5"></textarea>
                     </div>
                 </div>
-                <div class="col-md-12">
+                <div class="col-md-12 no-padding">
+                  <div class="col-md-6">
                     <div class="form-group">
-                        <label>Status:</label><br>
-                        <label for="status"><input type="checkbox" name="status" id="status"> Active</label>
+                        <label for="status">Status</label>
+                        <select class="form-control" name="status" id="status" onchange="Status(this)" required>
+                            <option value="">Select One</option>
+                            <option value="Unpublished">Unpublished</option>
+                            <option value="Published">Published</option>
+                            <option value="Scheduled">Scheduled</option>
+                        </select>
                     </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="">Date & Time</label>
+                    <input type="datetime-local" class="form-control" name="datetime" id="datetime">
+                  </div>
+                </div>
                 </div>
             </div> <!-- /.box body -->
             <div class="box-footer">
@@ -93,6 +100,18 @@
 @section('scripts')
 <script src="/assets/summernote/summernote.min.js"></script>
 <script>
+  function Status(e)
+  {
+    const datetime = document.getElementById('datetime');
+    if(e.options[e.selectedIndex].value == 'Scheduled')
+    {
+      datetime.setAttribute('required', 'required');
+    }
+    else
+    {
+      datetime.removeAttribute('required');
+    }
+  }
 
     // on change course get batches
     function getBatches(e)

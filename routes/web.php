@@ -272,8 +272,8 @@ Route::middleware(['auth'])->group(function()
       Route::post('copy-store', 'copyStore')->name('paper.copy.store');
       Route::get('recheck_result/{id}', 'reCheckResult')->name('paper.recheck.result');
       Route::get('detach/{paperId}/{questionId}', 'detachQuestion')->name('paper.detach.question');
-      Route::post('search', 'search')->name('paper.search');
     });
+    Route::get('paper-search', 'search')->name('paper.search');
 	});
 
 	Route::controller(BatchCtrl::class)->group(function()

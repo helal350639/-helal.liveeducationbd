@@ -47,9 +47,6 @@ $source = New SourceCtrl;
                         <label for="">Batch</label>
                         <select name="batch_id" id="batch_id" class="form-control select2" onchange="getDepartments(this)">
                             <option value="">Select One</option>
-                            {{-- @foreach($batches as $val)
-                            <option value="{{$val->id}}">{{$val->name}}</option>
-                            @endforeach --}}
                         </select>
                     </div>
                 </div>
@@ -58,23 +55,9 @@ $source = New SourceCtrl;
                         <label for="">Department</label>
                         <select name="department_id" id="department_id" class="form-control select2">
                             <option value="">Select One</option>
-                            {{-- @foreach($departments as $val)
-                            <option value="{{$val->id}}">{{$val->name}}</option>
-                            @endforeach --}}
                         </select>
                     </div>
                 </div>
-                {{-- <div class="col-md-3">
-                    <div class="form-group">
-                        <label for="">Group (Optional)</label>
-                        <select name="group_id" id="group_id" class="form-control select2">
-                            <option value="">Select One</option>
-                            @foreach($groups as $val)
-                            <option value="{{$val->id}}">{{$val->name}}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div> --}}
                 <div class="col-md-12">
                     <div class="form-group">
                         <label for="header">Header</label>

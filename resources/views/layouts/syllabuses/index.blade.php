@@ -60,7 +60,15 @@ $source = New SourceCtrl;
                   <td>{{$value->batch ? $value->batch->name : ''}}</td>
                   <td>{{$value->course ? $value->course->name : ''}}</td>
                   <td>
-                    <label class="text-{{$value->status == 'Published'? 'success':'warning'}}">{{$value->status}}</label>
+                    @if($value->status == 'Published')
+                    <span class="label label-success">{{$value->status}}</span>
+                    @elseif($value->status == 'Scheduled')
+                    <span class="label label-info">{{$value->status}}</span>
+                    <br>
+                    <small>{{$source->dtformat($value->datetime)}}</small>
+                    @else
+                    <span class="label label-warning">{{$value->status}}</span>
+                    @endif
                   </td>
                   <td>
                     <a href="{{route('syllabus.add.question', ['syllabus', $value->id])}}" title="Add Questions" class="btn btn-info btn-sm"><i class="fa fa-plus"></i></a>

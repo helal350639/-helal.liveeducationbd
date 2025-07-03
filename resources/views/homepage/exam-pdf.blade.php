@@ -60,14 +60,14 @@ if($user)
 
                 @if($syllabuses->count())
 
-                  @foreach($syllabuses as $key => $paper)
+                  @foreach($syllabuses as $key => $syllabus)
 
                     <div class="col-lg-8 col-md-10 col-sm-12">
                       <div class="border accordion-body-content d-flex justify-content-between align-items-center flex-wrap p-3 py-2">
                         <div class="text d-flex align-items-center list-content">
                           <div class="course_exam-icon">
                             <div class="circular-progress" title="Provided Answer" data-inner-circle-color="#def3ff" data-percentage="6" data-progress-color="rgb(137 24 26)" data-bg-color="rgb(137 24 26 / 70%)" style="background: #fff; font-size:25px; border:1px solid #ddd; color:#1CAB55">
-                              @if($paper->open < date('Y-m-d') && $paper->close > date('Y-m-d'))
+                              @if($syllabus->open <= now() && $syllabus->close >= now())
                               <i class="fa fa-file-pdf"></i>
                               @else
                               <i class="fa fa-file-pdf" style="color:red"></i>
@@ -75,17 +75,18 @@ if($user)
                             </div>
                           </div>
                           <p class="exam-title ps-1" style="width: 100%">
-                            <span>{{ $paper->name }}</span>
-                            <span style="float:right;">{{ $source->dformat($paper->open) }} </span>
+                            <span>{{ $syllabus->name }}</span>
+                            <span style="float:right;">{{ $source->dformat($syllabus->open) }} </span>
                             <br>
-                            <span style="font-size: 12px; font-weight: 700; color: #1CAB55;"> (প্রশ্ন -{{$paper->questions()->count()}}টি) </span>
+                            <span style="font-size: 12px; font-weight: 700; color: #1CAB55;"> (প্রশ্ন -{{$syllabus->questions()->count()}}টি) </span>
                           </p>
                         </div>
                         <div class="v-button d-flex flex-wrap gap-2">
-                          <a href="{{route('student.syllabus', $paper->id)}}" class="btn btn-sm btn-info text-white"> পড়ুন </a>
-                          <a href="{{route('students.syllabus.pdf', $paper->id)}}" class="btn btn-sm btn-warning"> ডাউনলোড </a>
-                          @if($paper->close < date('Y-m-d H:i:s'))
-                          <p></p>
+                          @if($syllabus->status == 'Scheduled')
+                          প্রকাশিত হবেঃ {{$source->dtformat($syllabus->datetime)}}
+                          @else
+                          <a href="{{route('student.syllabus', $syllabus->id)}}" class="btn btn-sm btn-info text-white"> পড়ুন </a>
+                          <a href="{{route('students.syllabus.pdf', $syllabus->id)}}" class="btn btn-sm btn-warning"> ডাউনলোড </a>
                           @endif
                         </div>
                       </div>
