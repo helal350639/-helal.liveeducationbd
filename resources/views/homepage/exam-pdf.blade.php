@@ -7,6 +7,11 @@ if($user)
 {
   $student = \App\Models\Student::find($user->id);
 }
+
+$now = now();
+$past = new DateTime();
+$past->modify('+11 minutes');
+$now = $past->format('Y-m-d H:i:s');
 @endphp
 
 @extends('homepage')
@@ -67,7 +72,7 @@ if($user)
                         <div class="text d-flex align-items-center list-content">
                           <div class="course_exam-icon">
                             <div class="circular-progress" title="Provided Answer" data-inner-circle-color="#def3ff" data-percentage="6" data-progress-color="rgb(137 24 26)" data-bg-color="rgb(137 24 26 / 70%)" style="background: #fff; font-size:25px; border:1px solid #ddd; color:#1CAB55">
-                              @if($syllabus->open <= now() && $syllabus->close >= now())
+                              @if($syllabus->open <= $now && $syllabus->close >= $now)
                               <i class="fa fa-file-pdf"></i>
                               @else
                               <i class="fa fa-file-pdf" style="color:red"></i>

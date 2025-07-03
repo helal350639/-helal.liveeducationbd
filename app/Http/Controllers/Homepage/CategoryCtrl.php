@@ -281,7 +281,12 @@ class CategoryCtrl extends Controller
   //
   public function syllabus($type, $batch_id, $department_id)
   {
-    $scheduled_syllabus = Syllabus::where('status', 'Scheduled')->where('datetime', '<=', now())->get();
+    $now = now();
+    $past = new DateTime();
+    $past->modify('+11 minutes');
+    $now = $past->format('Y-m-d H:i:s');
+
+    $scheduled_syllabus = Syllabus::where('status', 'Scheduled')->where('datetime', '<=', $now)->get();
     if($scheduled_syllabus)
     {
       foreach($scheduled_syllabus as $row)
@@ -289,7 +294,7 @@ class CategoryCtrl extends Controller
         Syllabus::where('id', $row->id)->update(['status' => 'Published']);
       }
     }
-    
+
     $department = Department::find($department_id);
     $syllabuses = Syllabus::orderBy('id', 'ASC')
     ->whereIn('status', ['Published', 'Scheduled'])
