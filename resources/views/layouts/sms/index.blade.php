@@ -54,8 +54,6 @@ function student($ids)
                 <tr>
                   <th>Id</th>
                   <th>Title</th>
-                  <th>Details</th>
-                  <th>Students</th>
                   <th>Batches</th>
                   <th>Created At</th>
                   <th>Status</th>
@@ -64,9 +62,7 @@ function student($ids)
                 @foreach($smses as $value)
                 <tr>
                   <td>{{$value->id}}</td>
-                  <td>{{$value->name}}</td>
-                  <td>{{$value->details}}</td>
-                  <td>{{student($value->student_id)}}</td>
+                  <td>{{$value->title}}</td>
                   <td>{{batch($value->batch_id)}}</td>
                   <td>{{$source->dtformat($value->created_at)}}</td>
                   <td>
@@ -81,7 +77,7 @@ function student($ids)
                     @endif
                   </td>
                   <td>
-                    {{-- <a href="{{route('sms.show', $value->id)}}" class="label label-info" title="Details"><i class="fa fa-file-text"></i></a> --}}
+                    <a href="{{route('sms.show', $value->id)}}" class="btn btn-info" title="Details"><i class="fa fa-file-text"></i></a>
                     <a href="{{route('sms.edit', $value->id)}}" class="btn btn-warning btn-sm" title="Edit"><i class="fa fa-edit"></i></a>
                     <form style="display: inline" action="{{route('sms.destroy', $value->id)}}" method="POST">
                       @csrf

@@ -133,8 +133,8 @@ class SmsCtrl extends Controller
      */
     public function show($id)
     {
-        $sms = Sms::find($id);
-        return view('layouts.sms.read', compact('sms'));
+      $sms = Sms::find($id);
+      return view('layouts.sms.read', compact('sms'));
     }
 
     /**

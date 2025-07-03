@@ -1,16 +1,30 @@
 @php
 use \App\Http\Controllers\SourceCtrl;
 $source = New SourceCtrl;
+
+function batch($ids)
+{
+  $batches = \App\Models\Batch::whereIn('id', json_decode($ids))->pluck('name')->toArray();
+  return implode(' || ', $batches);
+}
+
+function student($ids)
+{
+  $students = \App\Models\Student::whereIn('id', json_decode($ids))->pluck('name')->toArray();
+  return implode(' || ', $students);
+}
+$value = $sms;
 @endphp
 
+
 @extends('dashboard')
-@section('title', 'Group Details')
+@section('title', 'Sms Details')
 @section('content')
   <!-- Content Header (Page header) -->
     <section class="content-header">
-      <h1>Group Details</h1>
+      <h1>Sms Details</h1>
       <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Groups</a></li>
+        <li><a href="#"><i class="fa fa-dashboard"></i> Smses</a></li>
         <li class="active">Details</li>
       </ol>    
     </section>
@@ -21,44 +35,62 @@ $source = New SourceCtrl;
       <div class="col-md-8"><!-- general form elements -->
         <div class="box box-primary">
           <div class="box-header with-border">
-            <h4 class="box-title">Group Information</h4>
+            <h4 class="box-title">Sms Information</h4>
           </div>
-          <div class="col-md-12 text-right toolbar-icon">
-            <a href="{{route('group.create')}}" title="Add New" class="label label-info"><i class="fa fa-plus"></i></a>
-            <a href="{{route('group.edit', $group->id)}}" class="label label-warning" title="Edit this"><i class="fa fa-edit"></i></a>
-          </div>
-          <div class="col-md-12">
-            <table class="table">
+          <div class="box-body">
+            <div class="col-md-12 text-right toolbar-icon">
+              <a href="{{route('sms.create')}}" title="Add New" class="label label-info"><i class="fa fa-plus"></i></a>
+              <a href="{{route('sms.edit', $value->id)}}" class="label label-warning" title="Edit this"><i class="fa fa-edit"></i></a>
+            </div>
+            <div class="col-md-12">
+              <table class="table">
                 <tbody>
                   <tr>
-                    <th style="width: 200px;">Name:</th>
-                    <td>{{$group->name}}</td>
+                    <th style="width: 200px;">Title:</th>
+                    <td>{{$value->title}}</td>
                   </tr>
                   <tr>
                     <th>Details:</th>
-                    <td>{{$group->details}}</td>
+                    <td>{!!$value->details!!}</td>
                   </tr>
-                
-                   <tr>
+                  <tr>
+                    <th>Batches:</th>
+                    <td>{{batch($value->batch_id)}}</td>
+                  </tr>
+                  <tr>
+                    <th>Students:</th>
+                    <td>{{student($value->student_id)}}</td>
+                  </tr>
+                  <tr>
                     <th>Status:</th>
                     <td>
-                      <span class="label label-primary">{{$group->status}}</span>
+                      @if($value->status == 'Sent')
+                      <span class="label label-success">{{$value->status}}</span>
+                      @elseif($value->status == 'Scheduled')
+                      <span class="label label-info">{{$value->status}}</span>
+                      <br>
+                      <small>{{$source->dtformat($value->datetime)}}</small>
+                      @else
+                      <span class="label label-warning">{{$value->status}}</span>
+                      @endif
                     </td>
                   </tr>
                   <tr>
                     <th>Record Created On:</th>
-                    <td>{{$source->dtformat($group->created_at)}} </td>
+                    <td>{{$source->dtformat($value->created_at)}} </td>
                   </tr>
                   <tr>
                     <th>Record Updated On:</th>
-                    <td>{{$source->dtformat($group->updated_at)}} </td>
+                    <td>{{$source->dtformat($value->updated_at)}} </td>
                   </tr>
-              </tbody>
-            </table>
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
-      </div><!-- /.box -->
-    </div><!--/.col (left) -->
+
+        </div><!-- /.box -->
+      </div><!-- /.col -->
+    </div><!--/.row -->
   </section><!-- /.content -->
    
 @endsection
