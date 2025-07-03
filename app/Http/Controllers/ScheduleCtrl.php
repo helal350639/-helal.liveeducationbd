@@ -28,7 +28,7 @@ class ScheduleCtrl extends Controller
     {
       $past = new DateTime();
       // $past->modify('+6 hours 11 minutes');
-      $past->modify('+10 minutes');
+      $past->modify('+11 minutes');
       $now = $past->format('Y-m-d H:i:s');
     }
     
@@ -74,7 +74,7 @@ class ScheduleCtrl extends Controller
     {
       $past = new DateTime();
       // $past->modify('+6 hours 11 minutes');
-      $past->modify('+10 minutes');
+      $past->modify('+11 minutes');
       $now = $past->format('Y-m-d H:i:s');
     }
     
