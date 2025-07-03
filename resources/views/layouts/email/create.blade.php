@@ -55,23 +55,23 @@
                     </div>
                 </div>
                 
+                <div class="col-md-6">
+                  <div class="form-group">
+                      <label>Status:</label><br>
+                      <select name="status" id="status" class="form-control" required onchange="checkStatus(this)">
+                        <option value="">Select One</option>
+                        <option value="Scheduled">Scheduled</option>
+                        <option value="Sent">Sent</option>
+                        <option value="Unsent">Unsent</option>
+                      </select>
+                  </div>
+              </div>
               <div class="col-md-6">
                 <div class="form-group">
-                    <label>Status:</label><br>
-                    <select name="status" id="status" class="form-control" required onchange="checkStatus(this)">
-                      <option value="">Select One</option>
-                      <option value="Scheduled">Scheduled</option>
-                      <option value="Sent">Sent</option>
-                      <option value="Unsent">Unsent</option>
-                    </select>
+                  <label for="">Date & Time:</label>
+                  <input type="datetime-local" name="datetime" class="form-control" id="datetime">
                 </div>
-            </div>
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="">Data & Time:</label>
-                <input type="datetime-local" name="datetime" class="form-control" id="datetime">
               </div>
-            </div>
             </div> <!-- /.box body -->
             <div class="box-footer">
                 <button type="submit" class="btn btn-primary pull-right" id="sentBtn"><i class="fa fa-send"></i> Send</button>

@@ -195,15 +195,15 @@ class EmailCtrl extends Controller
 
         if(isset($data['_method']))
         {
-            unset($data['_method']);
+          unset($data['_method']);
         }
 
         try {
             Email::where('id', $id)->update($data);
         }
-        catch(\E $e)
+        catch(\Exception $e)
         {
-            return $e;
+            return $e->getMessage();
         }
         
         Session::flash('success', 'The email successfully Updated!');

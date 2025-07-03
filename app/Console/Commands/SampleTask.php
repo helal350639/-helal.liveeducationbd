@@ -26,6 +26,7 @@ class SampleTask extends Command
      */
     public function handle()
     {
+      ScheduleCtrl::scheduleSms();
       ScheduleCtrl::scheduleEmail();
       // \Log::info('Schedule Test ' . now());
     }

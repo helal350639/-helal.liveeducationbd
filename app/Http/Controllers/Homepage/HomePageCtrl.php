@@ -369,7 +369,7 @@ class HomePageCtrl extends Controller
 
   public function scheduleTest()
   {
-    return ScheduleCtrl::scheduleEmail();
-    // return ScheduleCtrl::scheduleSms();
+    // return ScheduleCtrl::scheduleEmail();
+    return ScheduleCtrl::scheduleSms();
   }
 }

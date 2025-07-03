@@ -48,20 +48,42 @@
                 <div class="clearfix"></div>
                 <div class="col-md-12">
                     <div class="form-group">
+                        <label for="details">Suggested Text</label>
+                        <select id="suggested_text" class="form-control" onchange="suggested(this)">
+                          <option value="">Select One</option>
+                          <option value="This is first selected text">This is first selected text</option>
+                          <option value="This is second selected text">This is second selected text</option>
+                          <option value="This is third selected text">This is third selected text</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
                         <label for="details">SMS Details</label>
                         <textarea class="form-control" name="details" id="details" rows="5" required onkeyup="charCount(this)"></textarea>
                         <p style="color: red">160 Characters = 1 SMS | <b>Character Count: <span id="char_count">160</span></b> | SMS Count: <span id="sms_count">1</span></p>
                     </div>
                 </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label>Status:</label><br>
-                        <label for="status"><input type="checkbox" name="status" id="status"> Active</label>
-                    </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                      <label>Status:</label><br>
+                      <select name="status" id="status" class="form-control" required onchange="checkStatus(this)">
+                        <option value="">Select One</option>
+                        <option value="Scheduled">Scheduled</option>
+                        <option value="Sent">Sent</option>
+                        <option value="Unsent">Unsent</option>
+                      </select>
+                  </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="">Date & Time:</label>
+                  <input type="datetime-local" name="datetime" class="form-control" id="datetime">
                 </div>
+              </div>
             </div> <!-- /.box body -->
             <div class="box-footer">
-                <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-send"></i> Send</button>
+                <button type="submit" class="btn btn-primary pull-right" id="sentBtn"><i class="fa fa-save"></i> Save</button>
             </div>
         </form>
     </div> <!-- /.box -->
@@ -71,16 +93,48 @@
 @endsection
 @section('scripts')
 <script>
-    function charCount(e)
-    {
-        let char_count = document.getElementById('char_count');
-        let sms_count = document.getElementById('sms_count');
-        
-        char_count.innerHTML = e.value.length;
+  function suggested(e)
+  {
+    const details = document.getElementById('details');
+    // console.log(details);
+    details.innerHTML = e.options[e.selectedIndex].value;
+  }
+  
+  function charCount(e)
+  {
+      let char_count = document.getElementById('char_count');
+      let sms_count = document.getElementById('sms_count');
+      
+      char_count.innerHTML = e.value.length;
 
-        smsCount = Math.ceil(e.value.length / 160);
-        sms_count.innerHTML = smsCount;
+      smsCount = Math.ceil(e.value.length / 160);
+      sms_count.innerHTML = smsCount;
+  }
+    
+  const datatime = document.getElementById('datetime')
+  const sentBtn = document.getElementById('sentBtn')
+  function checkStatus(e)
+  {
+    const option = e.options[e.selectedIndex];
+    if(option.value == 'Sent')
+    {
+      sentBtn.innerHTML = '<i class="fa fa-send"></i> Send';
     }
+    else
+    {
+      sentBtn.innerHTML = '<i class="fa fa-save"></i> Save';
+    }
+
+    if(option.value == 'Scheduled')
+    {
+      datetime.setAttribute('required', 'required');
+    }
+    else
+    {
+      datetime.removeAttribute('required');
+    }
+  }
+
     function getStudents(e)
     {
         let ids = Array.from(e.selectedOptions).map(({value}) => value);

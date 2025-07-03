@@ -38,7 +38,7 @@ function student($ids)
         <div class="box-header">
           <h3 class="box-title">List of Email</h3>
               <div class="box-tools">
-                <a href="{{route('email.create')}}" class="btn btn-sm btn-info"><i class="fa fa-send"></i> Send Email</a>
+                <a href="{{route('email.create')}}" class="btn btn-sm btn-info"><i class="fa fa-send"></i> Compose Email</a>
                 {{-- <div class="input-group input-group-sm" style="float:right; width: 150px;margin-left:15px">
                   <input type="text" name="table_search" class="form-control pull-right" placeholder="Search">
 

@@ -63,8 +63,7 @@ function check_student($id, $student)
                       <select class="form-control select2" name="student_id[]" id="student_id" multiple>
                         @foreach($students as $student)
                           <option value="{{$student->id}}" {{check_student($student->id, $student_ids) ? 'selected' : ''}}>{{$student->name}}</option>
-                          @endforeach
-                          
+                        @endforeach
                       </select>
                   </div>
               </div>
@@ -88,7 +87,7 @@ function check_student($id, $student)
             </div>
             <div class="col-md-6">
               <div class="form-group">
-                <label for="">Data & Time:</label>
+                <label for="">Date & Time:</label>
                 <input type="datetime-local" name="datetime" class="form-control" id="datetime" value="{{$email->datetime}}">
               </div>
             </div>

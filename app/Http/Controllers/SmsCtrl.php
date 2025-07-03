@@ -68,15 +68,6 @@ class SmsCtrl extends Controller
             unset($data['_token']);
         }
 
-        // if(isset($data['status']))
-        // {
-        //     $data['status'] = 'Active';
-        // }
-        // else
-        // {
-        //     $data['status'] = 'Deactive';
-        // }
-
         $batch_ids = $data['batch_id'];
 
         $students = Student::leftJoin('batch_student', 'batch_student.student_id', 'students.id')
@@ -85,7 +76,6 @@ class SmsCtrl extends Controller
 
         $student_contacts = $students->pluck('students.contact')->toArray();
         $student_ids = $students->pluck('students.id')->toArray();
-        // ->get();
 
         $smsable_contact = '';
 
@@ -108,28 +98,27 @@ class SmsCtrl extends Controller
         }
         else
         {
-            $smsable_contact = arrayMapping($student_contacts);
+          $smsable_contact = arrayMapping($student_contacts);
         }
-
-        // dd($smsable_contact);
 
         $data['batch_id'] = json_encode($data['batch_id']);
 
         $data['student_id'] = json_encode($student_ids);
         $data['sms_send_by'] = Auth::id();
 
-        /** ------------- send sms by gateway --------------- */ 
-        $source->sms_send($smsable_contact, $data['details']);
+        if($data['status'] == 'Sent')
+        {
+          /** ------------- send sms by gateway --------------- */ 
+          $source->sms_send($smsable_contact, $data['details']);
+        }
 
-        try{
-            Sms::insert($data);
+        try {
+          Sms::insert($data);
         }
         catch(\Exception $e)
         {
-            return $e->getMessage();
+          return $e->getMessage();
         }
-
-        // $batch = Sms::orderBy('id', 'DESC')->first();
         
         Session::flash('success', 'SMS Send successfull');
 
@@ -156,8 +145,17 @@ class SmsCtrl extends Controller
      */
     public function edit($id)
     {
+      $batches = Batch::where('status', 'Active')
+      ->orderBy('id', 'DESC')
+      ->select('id', 'name')
+      ->get();
+
         $sms = Sms::find($id);
-        return view('layouts.sms.edit', compact('sms'));
+        $student_str = json_decode($sms->student_id);
+        $student_ids = array_map('intval', $student_str);
+
+        $students = Student::whereIn('id', $student_ids)->get();
+        return view('layouts.sms.edit', compact('batches', 'students', 'sms'));
     }
 
     /**
@@ -169,10 +167,12 @@ class SmsCtrl extends Controller
      */
     public function update(Request $request, $id)
     {
-        $this->validate($request, [
-            'name'      => 'required|max:255',
-            'details'   => 'nullable|max:1000',
-        ]);
+      $source = new SourceCtrl;
+      $this->validate($request, [
+          'batch_id'  => 'required|array',
+          'student_id'  => 'nullable|array',
+          'details'   => 'nullable|max:1000',
+      ]);
         
         $data = $request->all();
 
@@ -185,12 +185,12 @@ class SmsCtrl extends Controller
             unset($data['_method']);
         }
 
-        try{
-            Sms::where('id', $id)->update($data);
+        try {
+          Sms::where('id', $id)->update($data);
         }
-        catch(\E $e)
+        catch(\Exception $e)
         {
-            return $e;
+            return $e->getMessage();
         }
         
         Session::flash('success', 'The sms successfully Updated!');
@@ -228,7 +228,6 @@ class SmsCtrl extends Controller
     public function getBatchStudents($batch_ids_str)
     {
         $batch_ids = explode(',', $batch_ids_str);
-        // dd($batch_ids);
         $students = Student::leftJoin('batch_student', 'batch_student.student_id', 'students.id')
         ->leftJoin('batches', 'batches.id', 'batch_student.batch_id')
         ->whereIn('batch_student.batch_id', $batch_ids)

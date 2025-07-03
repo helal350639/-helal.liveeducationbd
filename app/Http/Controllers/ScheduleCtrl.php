@@ -21,9 +21,47 @@ class ScheduleCtrl extends Controller
 {
   static function scheduleSms()
   {
-    $sms = Sms::all();
-    dd($sms);
-    return 'schedule sms';
+    $source = new SourceCtrl;
+
+    $now = now();
+    if(App::environment('production'))
+    {
+      $past = new DateTime();
+      $past->modify('+6 hours 11 minutes');
+      $now = $past->format('Y-m-d H:i:s');
+    }
+    
+    $smses = Sms::where('status', 'Scheduled')
+    ->where('datetime', '<=', $now)
+    ->get();
+
+    if($smses)
+    {
+      foreach($smses as $sms)
+      {
+        //string to array that have value only string
+        $student_array = json_decode($sms->student_id);
+
+        // array numbers/actual array
+        $student_ids = array_map('intval', $student_array);
+        $student_contacts = Student::whereIn('id', $student_ids)
+        ->pluck('contact')->toArray();
+
+        $contact = array_map(function($num)
+        {
+          return '+88'.$num;
+        }, $student_contacts);
+
+        $smsable_contact = implode(', ', $contact);
+        
+        /** ------------- send sms by gateway --------------- */ 
+        $source->sms_send($smsable_contact, $sms->details);
+
+        Sms::where('id', $sms->id)->update(['status' => 'Sent']);
+      }
+
+      \Log::info('Schedule SMS Test ' . now());
+    }
   }
 
   static function scheduleEmail()
@@ -37,7 +75,6 @@ class ScheduleCtrl extends Controller
       $past->modify('+6 hours 11 minutes');
       $now = $past->format('Y-m-d H:i:s');
     }
-    // dd($now);
     
     $emails = Email::where('status', 'Scheduled')
     ->where('datetime', '<=', $now)
