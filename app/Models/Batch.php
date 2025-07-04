@@ -48,7 +48,7 @@ class Batch extends Model
 
     public function complain()
     {
-        return $this->hasOne(Complain::class, 'batch_id');
+      return $this->hasOne(Complain::class, 'batch_id');
     }
 
     public function routines()

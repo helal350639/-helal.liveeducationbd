@@ -100,6 +100,7 @@ class ComplainCtrl extends Controller
     public function show($id)
     {
         $complain = Complain::find($id);
+        // dd($complain);
 
         if($complain->status == "New")
         {

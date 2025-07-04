@@ -42,7 +42,7 @@ $value = $complain;
                   </tr>
                   <tr>
                     <th>Department:</th>
-                    <td>{{$value->department}}</td>
+                    <td>{{$value->department ? $value->department->name : ''}}</td>
                   </tr>
                   <tr>
                     <th>Details:</th>

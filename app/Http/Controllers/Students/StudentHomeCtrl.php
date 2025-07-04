@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Students;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\SourceCtrl;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use App\Models\Course;
 use App\Models\Paper;
@@ -771,15 +772,16 @@ class StudentHomeCtrl extends Controller
 
   public function complainStore(Request $request)
   {
-    $this->validate($request, [
+    $this->Validate($request, [
       'name' => 'required|string',
       'email' => 'required|string',
       'contact' => 'required|string',
-      'department' => 'required|string',
+      // 'department' => 'required|string',
       'details' => 'required|string',
     ]);
 
     $data = $request->all();
+
     if(isset($data['_token']))
     {
       unset($data['_token']);
@@ -794,9 +796,9 @@ class StudentHomeCtrl extends Controller
       Session::flash('success', 'আমরা আপনের মতামতটি গ্রহণ করেছি। আপনার বিনয়ী মতামতের জন্য ধন্যবাদ।');
       return redirect()->route('students.complain');
     }
-    catch(\E $e)
+    catch(\Exception $e)
     {
-      return $e;
+      return $e->getMessage();
     }
   }
 
