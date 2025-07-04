@@ -53,7 +53,7 @@ $source = New SourceCtrl;
                   <td>{{$val->name}}</td>
                   <td>{{$val->email}}</td>
                   <td>{{$val->contact}}</td>
-                  <td>{{$val->department}}</td>
+                  <td>{{$val->department ? $val->department->name : ''}}</td>
                   <td>
                     @if($val->status == 'Replied')
                     <span class="label label-success">{{$val->status}}</span>
