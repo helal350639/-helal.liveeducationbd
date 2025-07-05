@@ -776,7 +776,8 @@ class StudentHomeCtrl extends Controller
       'name' => 'required|string',
       'email' => 'required|string',
       'contact' => 'required|string',
-      // 'department' => 'required|string',
+      'batch_id' => 'nullable|string',
+      'department_id' => 'nullable|string',
       'details' => 'required|string',
     ]);
 
@@ -794,7 +795,7 @@ class StudentHomeCtrl extends Controller
     try {
       Complain::insert($data);
       Session::flash('success', 'আমরা আপনের মতামতটি গ্রহণ করেছি। আপনার বিনয়ী মতামতের জন্য ধন্যবাদ।');
-      return redirect()->route('students.complain');
+      return redirect()->route('students.dashboard');
     }
     catch(\Exception $e)
     {

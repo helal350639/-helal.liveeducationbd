@@ -48,19 +48,12 @@ if($user)
                     <input type="text" name="contact" class='form-control' required placeholder="010 00 000 000" value="{{$user?$user->contact:''}}"/>
                   </div>
                 </div>
-                {{-- <div class="form-group">
-                  <label for="department">আপনার ডিপার্টমেন্ট</label>
-                  <div class="input-group">
-                    <span class="input-group-text"><i class="fa fa-sitemap"></i></span>
-                    <input type="text" name="department" class="form-control" />
-                  </div>
-                </div> --}}
                 @if($user && $student->batches)
                 <div class="form-group">
-                  <label for="department">আপনার ব্যাচ নির্বাচন করুন</label>
+                  <label for="batch_id">আপনার ব্যাচ নির্বাচন করুন</label>
                   <div class="input-group">
-                    <span class="input-group-text"><i class="fa fa-sitemap"></i></span>
-                    <select name="department" class="form-control" >
+                    <span class="input-group-text"><i class="fa fa-square"></i></span>
+                    <select name="batch_id" class="form-control" id="batch_id" {{$student->batches ? 'required': ''}}>
                       <option value="">Select One</option>
                       @foreach($student->batches as $batch)
                       <option value="{{$batch->id}}">{{$batch->name}}</option>
@@ -69,11 +62,19 @@ if($user)
                   </div>
                 </div>
                 @endif
-                <div class="row">
-                  <div class="col-xs-12">
-                    {{-- @include('/partials.google_recaptcha') --}}
-                    {{-- <br> --}}
+                <div class="form-group">
+                  <label for="department_id">আপনার ডিপার্টমেন্ট</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="fa fa-sitemap"></i></span>
+                    <select name="department_id" class="form-control" id="department_id" {{$student->departments ? 'required' : ''}}>
+                      <option value="">Select One</option>
+                      @foreach($student->departments as $department)
+                      <option value="{{$department->id}}">{{$department->name}}</option>
+                      @endforeach
+                    </select>
                   </div>
+                </div>
+                <div class="row">
                   <div class="col-md-12">
                     <div class="form-group">
                       <label class="details">আপনার অভিযোগ লিখুন</label>
