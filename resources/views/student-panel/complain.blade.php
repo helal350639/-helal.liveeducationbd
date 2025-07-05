@@ -53,7 +53,7 @@ if($user)
                   <label for="batch_id">আপনার ব্যাচ নির্বাচন করুন</label>
                   <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-square"></i></span>
-                    <select name="batch_id" class="form-control" id="batch_id" {{$student->batches ? 'required': ''}}>
+                    <select name="batch_id" class="form-control" id="batch_id" {{$student->batches->count() ? 'required': ''}}>
                       <option value="">Select One</option>
                       @foreach($student->batches as $batch)
                       <option value="{{$batch->id}}">{{$batch->name}}</option>
@@ -66,7 +66,7 @@ if($user)
                   <label for="department_id">আপনার ডিপার্টমেন্ট</label>
                   <div class="input-group">
                     <span class="input-group-text"><i class="fa fa-sitemap"></i></span>
-                    <select name="department_id" class="form-control" id="department_id" {{$student->departments ? 'required' : ''}}>
+                    <select name="department_id" class="form-control" id="department_id" {{$student->departments->count() ? 'required' : ''}}>
                       <option value="">Select One</option>
                       @foreach($student->departments as $department)
                       <option value="{{$department->id}}">{{$department->name}}</option>
