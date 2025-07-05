@@ -260,10 +260,10 @@ class ChapterCtrl extends Controller
     public function search(Request $request)
     {
       $data = $request->all();
-      $search = $data['search'];
       $chapters = Chapter::orderBy('id', 'DESC');
-      if($search)
+      if(isset($data['search']))
       {
+        $search = $data['search'];
         $chapters = $chapters->where('name', 'like', '%'.$search.'%');
       }
       $chapters = $chapters->paginate(25);

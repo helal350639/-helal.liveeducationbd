@@ -251,10 +251,10 @@ class SubjectCtrl extends Controller
   public function search(Request $request)
   {
     $data = $request->all();
-    $search = $data['search'];
     $subjects = Subject::orderBy('id', 'DESC');
-    if($search)
+    if(isset($data['search']))
     {
+      $search = $data['search'];
       $subjects = $subjects->where('name', 'like', '%'.$search.'%')
       ->orWhere('code', 'like', '%'.$search.'%');
     }
