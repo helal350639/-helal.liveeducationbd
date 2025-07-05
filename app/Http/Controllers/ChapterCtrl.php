@@ -27,10 +27,20 @@ class ChapterCtrl extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $chapters = Chapter::orderBy('id','DESC')->paginate(25);
-        return view('layouts.chapters.index', compact('chapters'));
+      $search = $request->input('search');
+      // dd($search);
+      $chapters = Chapter::query()
+      ->when($search, function($query, $search)
+      {
+        return $query->where('name', 'like', "%{$search}%");
+      })
+      ->orderBy('id','DESC')
+      ->paginate(2)
+      ->appends(['search' => $search]);
+      // $chapters = Chapter::orderBy('id','DESC')->paginate(25);
+      return view('layouts.chapters.index', compact('chapters'));
     }
 
     /**
@@ -266,7 +276,7 @@ class ChapterCtrl extends Controller
         $search = $data['search'];
         $chapters = $chapters->where('name', 'like', '%'.$search.'%');
       }
-      $chapters = $chapters->paginate(25);
+      $chapters = $chapters->paginate(2);
       
       return view('layouts.chapters.index', compact('chapters'));
     }

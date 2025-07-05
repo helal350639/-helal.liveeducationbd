@@ -250,7 +250,7 @@ Route::middleware(['auth'])->group(function()
 	Route::controller(ChapterCtrl::class)->group(function()
 	{
 		Route::get('get_chapters/{subject_id}', 'getChapters');
-    Route::get('search-chapter', 'search')->name('chapter.search');
+    Route::get('search-chapter/{data?}', 'search')->name('chapter.search');
 	});
 
 	Route::controller(FilterCtrl::class)->group(function()

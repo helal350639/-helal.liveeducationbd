@@ -26,7 +26,7 @@ $source = New SourceCtrl;
                 <a href="{{route('chapter.create')}}" class="btn btn-sm btn-info">
                   <i class="fa fa-plus"></i> Add
                 </a>
-                <form action="{{route('chapter.search')}}" method="GET" class="input-group input-group-sm" style="float:right; width: 150px;margin-left:15px">
+                <form action="{{route('chapter.index')}}" method="GET" class="input-group input-group-sm" style="float:right; width: 150px;margin-left:15px">
                   <input type="text" name="search" class="form-control pull-right" placeholder="Chapter Name">
 
                   <div class="input-group-btn">
