@@ -26,13 +26,13 @@ $source = New SourceCtrl;
                 <a href="{{route('department.create')}}" class="btn btn-sm btn-info">
                   <i class="fa fa-plus"></i> Add
                 </a>
-                {{-- <div class="input-group input-group-sm" style="float:right; width: 150px;margin-left:15px">
-                  <input type="text" name="table_search" class="form-control pull-right" placeholder="Search">
+                <form action="{{route('department.index')}}" method="GET" class="input-group input-group-sm" style="float:right; width: 150px;margin-left:15px">
+                  <input type="text" name="search" class="form-control pull-right" placeholder="Name" value="{{request('search')}}">
 
                   <div class="input-group-btn">
-                    <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
+                    <button type="submit" class="btn btn-info"><i class="fa fa-search"></i></button>
                   </div>
-                </div> --}}
+                </form>
               </div>
             </div>
             <!-- /.box-header -->
@@ -69,7 +69,6 @@ $source = New SourceCtrl;
                   </td>
                   <td>
                     <a href="{{route('students.add', [$val->id, 'Department'])}}" class="btn btn-primary btn-sm" title="Add Students"><i class="fa fa-user-plus"></i></a>
-                    {{-- <a href="{{route('filter.show',$val->id)}}" class="label label-info" title="filter Details"><i class="fa fa-file-text"></i></a> --}}
                     <a href="{{route('department.edit', $val->id)}}" class="btn btn-warning btn-sm" title="Edit this filter"><i class="fa fa-edit"></i></a>
                     <form style="display: inline" action="{{route('department.destroy', $val->id)}}" method="POST">
                       @csrf
@@ -83,7 +82,7 @@ $source = New SourceCtrl;
             <!-- /.box-body -->
             <div class="box-footer clearfix">
               <div class="pagination-sm no-margin pull-right">
-                {{-- {{$vals->links()}} --}}
+                {{$departments->links()}}
               </div>
             </div>
           </div>

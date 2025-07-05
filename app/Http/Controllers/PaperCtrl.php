@@ -62,7 +62,7 @@ class PaperCtrl extends Controller
       ->paginate(25)
       ->appends($request->all());
 
-      return view('layouts.papers.index', compact('papers', 'courses', 'batches', 'departments'));
+      return view('layouts.papers.index', compact('papers', 'courses', 'batches', 'departments', 'course_id'));
     }
 
     /**

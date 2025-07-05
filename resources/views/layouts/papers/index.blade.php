@@ -31,7 +31,7 @@ $source = New SourceCtrl;
                 <select name="course_id" id="course_id" class="form-control" onchange="getBatches(this)">
                   <option value="">Select One</option>
                   @foreach($courses as $course)
-                  <option value="{{$course->id}}" {{isset($data['course_id']) && $data['course_id'] == $course->id ? 'selected': ''}}>{{$course->name}}</option>
+                  <option value="{{$course->id}}" {{request('course_id') == $course->id ? 'selected': ''}}>{{$course->name}}</option>
                   @endforeach
                 </select>
               </div>
@@ -42,7 +42,7 @@ $source = New SourceCtrl;
                 <select name="batch_id" id="batch_id" class="form-control" onchange="getDepartments(this)">
                   <option value="">Select One</option>
                   @foreach($batches as $batch)
-                  <option value="{{$batch->id}}" {{isset($data['batch_id']) && $data['batch_id'] == $batch->id ? 'selected': ''}}>{{$batch->name}}</option>
+                  <option value="{{$batch->id}}" {{request('batch_id') == $batch->id ? 'selected': ''}}>{{$batch->name}}</option>
                   @endforeach
                 </select>
               </div>
@@ -53,7 +53,7 @@ $source = New SourceCtrl;
                 <select name="department_id" id="department_id" class="form-control">
                   <option value="">Select One</option>
                   @foreach($departments as $department)
-                  <option value="{{$department->id}}" {{isset($data['department_id']) && $data['department_id'] == $department->id ? 'selected': ''}}>{{$department->name}}</option>
+                  <option value="{{$department->id}}" {{request('department_id') == $department->id ? 'selected': ''}}>{{$department->name}}</option>
                   @endforeach
                 </select>
               </div>

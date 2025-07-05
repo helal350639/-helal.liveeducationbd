@@ -25,14 +25,22 @@ class DepartmentCtrl extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $departments = Department::leftJoin('courses', 'courses.id', 'departments.course_id')
-        ->orderBy('id','desc')
-        ->select('departments.*', 'courses.name as course_name')
-        ->get();
-        // dd($departments[0]->courses()->get());
-        return view('layouts.departments.index', compact('departments'));
+      $search = $request->input('search');
+
+      $departments = Department::query()
+      ->when($search, function($query, $search)
+      {
+        $query->where('departments.name', 'like', "%{$search}%");
+      })
+      ->leftJoin('courses', 'courses.id', 'departments.course_id')
+      ->orderBy('id','desc')
+      ->select('departments.*', 'courses.name as course_name')
+      ->paginate(25)
+      ->appends(['search' => $search]);
+      
+      return view('layouts.departments.index', compact('departments'));
     }
 
     /**

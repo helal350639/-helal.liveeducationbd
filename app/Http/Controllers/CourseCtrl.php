@@ -23,10 +23,17 @@ class CourseCtrl extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $courses = Course::orderBy('id','desc')->get();
-        return view('layouts.courses.index',compact('courses'));
+      $search = $request->input('search');
+      $courses = Course::query()
+      ->when($search, function($query, $search)
+      {
+        $query->where('name', 'like', "%{$search}%");
+      })->orderBy('id','desc')
+      ->paginate(25)
+      ->appends(['search' => $search]);
+      return view('layouts.courses.index', compact('courses'));
     }
 
     /**

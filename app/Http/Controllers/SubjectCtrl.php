@@ -36,7 +36,8 @@ class SubjectCtrl extends Controller
         $query->where('name', 'like', "%{$search}%");
       })
       ->orderBy('id','DESC')
-      ->paginate(25)->appends(['search' => $search]);
+      ->paginate(25)
+      ->appends(['search' => $search]);
       
       return view('layouts.subjects.index', compact('subjects'));
     }

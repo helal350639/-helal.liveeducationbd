@@ -24,10 +24,20 @@ class SemesterCtrl extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $semesters = Semester::orderBy('id','DESC')->paginate(25);
-        return view('layouts.semesters.index', compact('semesters'));
+      $search = $request->input('search');
+
+      $semesters = Semester::query()
+      ->when($search, function($query, $search)
+      {
+        $query->where('semesters.name', 'like', "%{$search}%");
+      })
+      ->orderBy('id','DESC')
+      ->paginate(25)
+      ->appends(['search' => $search]);
+
+      return view('layouts.semesters.index', compact('semesters'));
     }
 
     /**

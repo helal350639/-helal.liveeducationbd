@@ -24,12 +24,21 @@ class FilterCtrl extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $filters = Filter::with(['courses'])
-        ->orderBy('filters.id','desc')
-        ->paginate(25);
-        return view('layouts.filters.index', compact('filters'));
+      $search = $request->input('search');
+
+      $filters = Filter::query()
+      ->when($search, function($query, $search)
+      {
+        $query->where('name', 'like', "%{$search}%");
+      })
+      ->with(['courses'])
+      ->orderBy('filters.id','desc')
+      ->paginate(25)
+      ->appends(['search' => $search]);
+      
+      return view('layouts.filters.index', compact('filters'));
     }
 
     /**

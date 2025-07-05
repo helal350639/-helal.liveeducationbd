@@ -28,9 +28,17 @@ class OrderCtrl extends Controller
    * @return \Illuminate\Http\Response
    */
 
-  public function index()
+  public function index(Request $request)
   {
-    $orders = Order::leftJoin('batches', 'batches.id', 'orders.batch_id')
+    $search = $request->input('search');
+    $orders = Order::query()
+    ->when($search, function ($query, $search)
+    {
+      $query->where('orders.name', 'like', "%{$search}%")
+      ->orWhere('orders.email', 'like', "%{$search}%")
+      ->orWhere('orders.phone', 'like', "%{$search}%");
+    })
+    ->leftJoin('batches', 'batches.id', 'orders.batch_id')
     ->leftJoin('departments', 'departments.id', 'orders.department_id')
     ->leftJoin('students', 'students.id', 'orders.student_id')
     ->leftJoin('batch_student', function($join) {
@@ -44,7 +52,8 @@ class OrderCtrl extends Controller
     'batch_student.student_id as batch_has_student'
     )
     ->groupBy('orders.id', 'orders.student_id', 'orders.batch_id', 'orders.department_id', 'orders.name', 'orders.email', 'orders.phone', 'orders.amount', 'orders.address', 'orders.status', 'orders.transaction_id', 'orders.currency', 'orders.created_at', 'batches.name', 'departments.name', 'students.name', 'batch_student.student_id')
-    ->paginate(25);
+    ->paginate(25)
+    ->appends(['search' => $search]);
     return view('layouts.orders.index', compact('orders'));
   }
 

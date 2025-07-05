@@ -24,13 +24,22 @@ class SubFilterCtrl extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $subfilters = SubFilter::leftJoin('filters', 'filters.id', 'sub_filters.filter_id')
-        ->orderBy('id','desc')
-        ->select('sub_filters.*', 'filters.name as filter_name')
-        ->get();
-        return view('layouts.subfilters.index',compact('subfilters'));
+      $search = $request->input('search');
+
+      $subfilters = SubFilter::query()
+      ->when($search, function($query, $search)
+      {
+        $query->where('sub_filters.name', 'like', "%{$search}%");
+      })
+      ->leftJoin('filters', 'filters.id', 'sub_filters.filter_id')
+      ->orderBy('id','desc')
+      ->select('sub_filters.*', 'filters.name as filter_name')
+      ->paginate(25)
+      ->appends(['search' => $search]);
+
+      return view('layouts.subfilters.index',compact('subfilters'));
     }
 
     /**
