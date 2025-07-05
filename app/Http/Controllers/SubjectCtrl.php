@@ -247,5 +247,20 @@ class SubjectCtrl extends Controller
         })->select('id', 'name')->get();
         return response()->json(['data' => $items]);
     }
+
+  public function search(Request $request)
+  {
+    $data = $request->all();
+    $search = $data['search'];
+    $subjects = Subject::orderBy('id', 'DESC');
+    if($search)
+    {
+      $subjects = $subjects->where('name', 'like', '%'.$search.'%')
+      ->orWhere('code', 'like', '%'.$search.'%');
+    }
+    $subjects = $subjects->paginate(25);
+    
+    return view('layouts.subjects.index', compact('subjects'));
+  }
     
 }

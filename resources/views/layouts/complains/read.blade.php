@@ -80,15 +80,17 @@ $value = $complain;
         </div>
       </div><!-- /.box -->
       <div class="col-md-4">
-        <div class="box col-md-12">
+        <div class="box box-info col-md-12">
+          <div class="box-header">
+            <h4 for="">Reply to this message</h4>
+          </div>
           <form action="{{route('complain.reply')}}" method="post">
             @csrf
             <input type="hidden" name="complain_id" value="{{$value->id}}">
             <div class="form-group">
-              <label for="">Reply to this message</label>
               <textarea name="reply_message" id="" cols="30" rows="10" class="form-control" placeholder="Type your message..."></textarea>
             </div>
-            <button type="submit" class="btn btn-info">Reply</button>
+            <button type="submit" class="btn btn-info pull-right">Reply</button>
             <br><br>
           </form>
         </div>

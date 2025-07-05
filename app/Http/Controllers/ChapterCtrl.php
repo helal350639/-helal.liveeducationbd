@@ -256,5 +256,19 @@ class ChapterCtrl extends Controller
         })->select('id', 'name')->get();
         return response()->json(['data' => $items]);
     }
+
+    public function search(Request $request)
+    {
+      $data = $request->all();
+      $search = $data['search'];
+      $chapters = Chapter::orderBy('id', 'DESC');
+      if($search)
+      {
+        $chapters = $chapters->where('name', 'like', '%'.$search.'%');
+      }
+      $chapters = $chapters->paginate(25);
+      
+      return view('layouts.chapters.index', compact('chapters'));
+    }
     
 }

@@ -236,6 +236,7 @@ Route::middleware(['auth'])->group(function()
 	{
 		Route::get('get_sems_subjects/{semester_id}', 'getSemsSubjects');
 		Route::get('get_subjects/{department_id}', 'getSubjects');
+    Route::get('search-subject', 'search')->name('subject.search');
 	});
 
 	Route::controller(QuestionCtrl::class)->group(function()
@@ -249,6 +250,7 @@ Route::middleware(['auth'])->group(function()
 	Route::controller(ChapterCtrl::class)->group(function()
 	{
 		Route::get('get_chapters/{subject_id}', 'getChapters');
+    Route::get('search-chapter', 'search')->name('chapter.search');
 	});
 
 	Route::controller(FilterCtrl::class)->group(function()
