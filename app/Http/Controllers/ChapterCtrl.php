@@ -30,16 +30,15 @@ class ChapterCtrl extends Controller
     public function index(Request $request)
     {
       $search = $request->input('search');
-      // dd($search);
       $chapters = Chapter::query()
       ->when($search, function($query, $search)
       {
         return $query->where('name', 'like', "%{$search}%");
       })
       ->orderBy('id','DESC')
-      ->paginate(2)
+      ->paginate(25)
       ->appends(['search' => $search]);
-      // $chapters = Chapter::orderBy('id','DESC')->paginate(25);
+
       return view('layouts.chapters.index', compact('chapters'));
     }
 
@@ -265,20 +264,5 @@ class ChapterCtrl extends Controller
             $query->whereIn('subject_id', $arr);
         })->select('id', 'name')->get();
         return response()->json(['data' => $items]);
-    }
-
-    public function search(Request $request)
-    {
-      $data = $request->all();
-      $chapters = Chapter::orderBy('id', 'DESC');
-      if(isset($data['search']))
-      {
-        $search = $data['search'];
-        $chapters = $chapters->where('name', 'like', '%'.$search.'%');
-      }
-      $chapters = $chapters->paginate(2);
-      
-      return view('layouts.chapters.index', compact('chapters'));
-    }
-    
+    }    
 }

@@ -26,7 +26,7 @@ $source = New SourceCtrl;
                 <a href="{{route('subject.create')}}" class="btn btn-sm btn-info">
                   <i class="fa fa-plus"></i> Add
                 </a>
-                <form action="{{route('subject.search')}}" method="GET" class="input-group input-group-sm" style="float:right; width: 150px;margin-left:15px">
+                <form action="{{route('subject.index')}}" method="GET" class="input-group input-group-sm" style="float:right; width: 150px;margin-left:15px">
                   <input type="text" name="search" class="form-control pull-right" placeholder="Code, Subject Name">
 
                   <div class="input-group-btn">

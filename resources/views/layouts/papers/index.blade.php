@@ -24,8 +24,7 @@ $source = New SourceCtrl;
     <div class="col-xs-12">
       <div class="box">
         <div class="box-body">
-          <form action="{{route('paper.search')}}" method="GET">
-            @csrf
+          <form action="{{route('paper.index')}}" method="GET">
             <div class="col-md-3">
               <div class="form-group">
                 <label for="course_id">Course</label>

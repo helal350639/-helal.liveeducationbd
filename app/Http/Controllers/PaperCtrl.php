@@ -35,13 +35,32 @@ class PaperCtrl extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
       $courses = Course::where('status', 'Active')->get();
       $batches = Batch::where('status', 'Active')->get();
       $departments = Department::where('status', 'Active')->get();
-      $papers = Paper::orderBy('id','DESC')
-      ->paginate(25);
+
+      $course_id = $request->input('course_id');
+      $batch_id = $request->input('batch_id');
+      $department_id = $request->input('department_id');
+
+      $papers = Paper::query()
+      ->when($course_id, function($query, $course_id)
+      {
+        return $query->where('course_id', $course_id);
+      })
+      ->when($batch_id, function($query, $batch_id)
+      {
+        return $query->where('batch_id', $batch_id);
+      })
+      ->when($department_id, function($query, $department_id)
+      {
+        return $query->where('department_id', $department_id);
+      })
+      ->orderBy('id','DESC')
+      ->paginate(25)
+      ->appends($request->all());
 
       return view('layouts.papers.index', compact('papers', 'courses', 'batches', 'departments'));
     }
@@ -507,34 +526,5 @@ class PaperCtrl extends Controller
             ]
         );
         // return 'I am responding from server with id:'.$qid;
-    }
-
-    public function search(Request $request)
-    {
-      $data = $request->all();
-      
-      $courses = Course::where('status', 'Active')->get();
-      $batches = Batch::where('status', 'Active')->get();
-      $departments = Department::where('status', 'Active')->get();
-
-      $papers = Paper::orderBy('id','DESC');
-
-      if(isset($data['course_id']))
-      {
-        $papers = $papers->where('course_id', $data['course_id']);
-      }
-      
-      if(isset($data['batch_id']))
-      {
-        $papers = $papers->where('batch_id', $data['batch_id']);
-      }
-
-      if(isset($data['department_id']))
-      {
-        $papers = $papers->where('department_id', $data['department_id']);
-      }
-      $papers = $papers->paginate(25);
-
-      return view('layouts.papers.index', compact('papers', 'courses', 'batches', 'departments', 'data'));
     }
 }

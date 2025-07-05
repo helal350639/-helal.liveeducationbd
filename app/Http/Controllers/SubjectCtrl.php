@@ -26,10 +26,19 @@ class SubjectCtrl extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $subjects = Subject::orderBy('id','DESC')->paginate(25);
-        return view('layouts.subjects.index', compact('subjects'));
+      $search = $request->input('search');
+
+      $subjects = Subject::query()
+      ->when($search, function($query, $search)
+      {
+        $query->where('name', 'like', "%{$search}%");
+      })
+      ->orderBy('id','DESC')
+      ->paginate(25)->appends(['search' => $search]);
+      
+      return view('layouts.subjects.index', compact('subjects'));
     }
 
     /**
@@ -246,21 +255,5 @@ class SubjectCtrl extends Controller
             $query->whereIn('semester_id', $arr);
         })->select('id', 'name')->get();
         return response()->json(['data' => $items]);
-    }
-
-  public function search(Request $request)
-  {
-    $data = $request->all();
-    $subjects = Subject::orderBy('id', 'DESC');
-    if(isset($data['search']))
-    {
-      $search = $data['search'];
-      $subjects = $subjects->where('name', 'like', '%'.$search.'%')
-      ->orWhere('code', 'like', '%'.$search.'%');
-    }
-    $subjects = $subjects->paginate(25);
-    
-    return view('layouts.subjects.index', compact('subjects'));
-  }
-    
+    }    
 }
