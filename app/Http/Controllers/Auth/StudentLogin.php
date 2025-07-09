@@ -94,20 +94,20 @@ class StudentLogin extends Controller
     
         // Find or create user
         $user = Student::updateOrCreate(
-            [
-                'email' => $socialUser->getEmail(),
-            ],
-            [
-                'name' => $socialUser->getName(),
-                'password' => bcrypt(str()->random(16)), // Random password
-                'image' => $socialUser->getAvatar(),
-                'status' => 'Active',
-                'github_id' => $socialUser->getId(),
-            ]);
+          [
+              'email' => $socialUser->getEmail(),
+          ],
+          [
+            'name' => $socialUser->getName(),
+            'password' => bcrypt(str()->random(16)), // Random password
+            'image' => $socialUser->getAvatar(),
+            'status' => 'Active',
+            'github_id' => $socialUser->getId(),
+          ]);
     
         Auth::guard('student')->loginUsingId($user->id);
     
-        return redirect()->intended(route('students.my-course'));
+        return redirect()->intended(route('students.dashboard'));
     }
 
     public function oAuthGoogle()
@@ -116,19 +116,19 @@ class StudentLogin extends Controller
     
         // Find or create user
         $user = Student::updateOrCreate(
-            [
-                'email' => $socialUser->getEmail(),
-            ],
-            [
-                'name' => $socialUser->getName(),
-                'password' => bcrypt(str()->random(16)), // Random password
-                'image' => $socialUser->getAvatar(),
-                'status' => 'Active',
-                'google_id' => $socialUser->getId(),
-            ]);
-    
-        Auth::guard('student')->loginUsingId($user->id);
-    
-        return redirect()->intended(route('students.my-course'));
+          [
+            'email' => $socialUser->getEmail(),
+          ],
+          [
+            'name' => $socialUser->getName(),
+            'password' => bcrypt(str()->random(16)), // Random password
+            'image' => $socialUser->getAvatar(),
+            'status' => 'Active',
+            'google_id' => $socialUser->getId(),
+          ]);
+  
+      Auth::guard('student')->loginUsingId($user->id);
+  
+      return redirect()->intended(route('students.dashboard'));
     }
 }

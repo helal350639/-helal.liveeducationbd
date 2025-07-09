@@ -192,12 +192,11 @@ $value = $batch;
               </div>
               <br>
 
-                <div class="table-responsive">
-                  <table class="table table-bordered" id="routine">
-                    
-                  
-                  </table>
-                </div>
+              <div class="table-responsive">
+                <table class="table table-bordered" id="routine">
+                  <!-- routine will write here -->
+                </table>
+              </div>
                 
             </div>
           </div>
@@ -456,17 +455,13 @@ $value = $batch;
             @endif
           </div>
         <div class="modal-footer">
-
-          {{-- <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button> --}}
           
           <button class="btn btn-primary btn-block btn-lg" onsubmit="return confirm('Double check you provided information.')">পেমেন্ট এর জন্য এগিয়ে যান</button>
           <div class="clearfix"></div>
         </div>
       </form>
-    </div>
-    <!-- /.modal-content -->
-  </div>
-  <!-- /.modal-dialog -->
+    </div> <!-- /.modal-content -->
+  </div> <!-- /.modal-dialog -->
 </div>
 
 @endsection
@@ -582,16 +577,27 @@ $value = $batch;
 
   function dateCheck(date)
   {
-    let currentDate = new Date();
+    function dateOnly(now)
+    {
+      return now.getFullYear() + '-' +
+      String(now.getMonth() + 1).padStart(2, '0') + '-' +
+      String(now.getDate()).padStart(2, '0');
+    }
+
+    let now = new Date();
     let targetDate = new Date(date.replace(' ', 'T'));
 
     // Compare timestamps (in milliseconds)
-    if (currentDate.getTime() >= targetDate.getTime()) {
-      return 'Next';
-    } else if(currentDate.getTime() < targetDate.getTime()) {
-      return 'Pending';
-    } else {
+    if (dateOnly(now) > dateOnly(targetDate))
+    {
       return 'Completed';
+    } else if(dateOnly(now) == dateOnly(targetDate))
+    {
+      return 'Next';
+    }
+    else
+    {
+      return 'Pending';
     }
 
   }
@@ -654,8 +660,6 @@ $value = $batch;
 
           subjectRow = '', departmentRow = '';
         });
-
-        //item->exam_at >= date("Y-m-d") ? "Next" || item->exam_at < date("Y-m-d") ? "Completed" : "Pending"
 
         // finally make the table
         tableData += ''+
