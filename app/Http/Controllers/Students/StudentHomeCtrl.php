@@ -312,66 +312,83 @@ class StudentHomeCtrl extends Controller
 
   public function examShow($id)
   {
+    // get authenicate user
     $user = Auth::guard('student')->user();
+
+    // get the exist exam count
     $exams = Exam::where('paper_id', $id)
     ->where('student_id', $user->id)
     ->where('status', 'Completed')
     ->count();
+
+    // find the paper details
     $paper = Paper::find($id);
+
     // if on the paper settings has exam limitation and exam limitation number is less than already examed count on this paper. So it will redirect to the result page. Otherwise it will redirect to the exam start page.
     if($paper->exam_limit && $paper->exam_limit <= $exams)
     {
-      //find paper
-      $exams = Exam::where('paper_id', $paper->id)
-      ->where('student_id', $user->id)
-      ->get();
-      $exam_id = Exam::where('paper_id', $paper->id)->orderBy('id', 'DESC')->first()->id;
-      $mcq_ids = Choice::where('exam_id', $exam_id)->pluck('mcq_id')->toArray();
-      $dbmcqs = McqItem::whereIn('id', $mcq_ids)->whereNotNull('correct_answer')->get();
+      // //find paper
+      // $exams = Exam::where('paper_id', $paper->id)
+      // ->where('student_id', $user->id)
+      // ->get();
+      // $exam_id = Exam::where('paper_id', $paper->id)->orderBy('id', 'DESC')->first()->id;
+      // $mcq_ids = Choice::where('exam_id', $exam_id)->pluck('mcq_id')->toArray();
+      // $dbmcqs = McqItem::whereIn('id', $mcq_ids)->whereNotNull('correct_answer')->get();
 
-      $questions = $paper->questions()->count();
-      $answered = count($mcq_ids);
-      $correct = $dbmcqs->count();
-      $wrong = $answered - $correct;
-      $no_answered = $questions - $answered;
-      $marks = ($paper->mark * $correct) - ($wrong * $paper->minus);
+      // $questions = $paper->questions()->count();
+      // $answered = count($mcq_ids);
+      // $correct = $dbmcqs->count();
+      // $wrong = $answered - $correct;
+      // $no_answered = $questions - $answered;
+      // $marks = ($paper->mark * $correct) - ($wrong * $paper->minus);
 
-      $result = [
-        'questions' => $questions,
-        'answered' => $answered,
-        'correct' => $correct,
-        'wrong' => $wrong,
-        'no_answered' => $no_answered,
-        'marks' => $marks,
-      ];
+      // $result = [
+      //   'questions' => $questions,
+      //   'answered' => $answered,
+      //   'correct' => $correct,
+      //   'wrong' => $wrong,
+      //   'no_answered' => $no_answered,
+      //   'marks' => $marks,
+      // ];
 
-      return view('student-panel.exam-show', compact('paper', 'result', 'exams'));
+      $exam = $exams = $result = null;
+
+      return view('student-panel.exam-show', compact('paper', 'result', 'exams', 'exam'));
+
+      // return redirect()->route('students.result', $id);
     }
-
-    //insert exam to the database with status 'live'
-    try {
-      $live_exam = Exam::insert([
-        'student_id' => $user->id,
-        'paper_id' => $id,
-        'start_at' => date('Y-m-d H:i:s'),
-        'status' => 'Live',
-        'created_at' => date('Y-m-d H:i:s')
-      ]);
-
-      if($live_exam)
-      {
-        // find out the last exam entry for this user
-        $exam = Exam::where('paper_id', $id)
-        ->where('student_id', $user->id)
-        ->orderBy('id', 'DESC')
-        ->first();
-        
-        return view('student-panel.exam-show', compact('paper', 'exam'));
-      }
-    }
-    catch(\Exception $e)
+    else
     {
-      return $e;
+
+      //insert exam to the database with status 'live'
+      try {
+        $live_exam = Exam::create([
+          'student_id' => $user->id,
+          'paper_id' => $id,
+          'start_at' => date('Y-m-d H:i:s'),
+          'status' => 'Live',
+          'created_at' => date('Y-m-d H:i:s')
+        ]);
+  
+        if($live_exam)
+        {
+          // find out the last exam entry for this user
+          $exam = Exam::where('paper_id', $id)
+          ->where('student_id', $user->id)
+          ->orderBy('id', 'DESC')
+          ->first();
+          
+          return view('student-panel.exam-show', compact('paper', 'exam'));
+        }
+        else
+        {
+          return redirect()->route('students.instruction', $id);
+        }
+      }
+      catch(\Exception $e)
+      {
+        return $e->getMessage();
+      }
     }
 
     return back();
@@ -485,7 +502,7 @@ class StudentHomeCtrl extends Controller
     $paper = Paper::find($request->paper_id);
 
     // if choice any question the do this action
-    if($request->mcq_id)
+    if($request->exam_id && $request->mcq_id)
     {
       $question_ids = explode(',', $request->question_id); 
       $mcq_ids = explode(',', $request->mcq_id);
@@ -505,18 +522,8 @@ class StudentHomeCtrl extends Controller
     $success = false;
 
     try {
-      $result = Exam::where('id', $request->exam_id)->update([
-        'end_at'    => date('Y-m-d H:i:s'),
-        'answer'    => $answered,
-        'correct'   => $correct,
-        'wrong'     => $wrong,
-        'no_answer' => $no_answered,
-        'mark'      => $marks,
-        'status'    => 'Completed',
-        'updated_at' => date('Y-m-d H:i:s')
-      ]);
 
-      if($mcq_ids)
+      if($request->exam_id && $mcq_ids)
       {
         for($x = 0; $x < count($question_ids); $x++)
         {
@@ -526,16 +533,27 @@ class StudentHomeCtrl extends Controller
             'mcq_id' => $mcq_ids[$x]
           ]);
         }
+
+        $result = Exam::where('id', $request->exam_id)->update([
+          'end_at'    => date('Y-m-d H:i:s'),
+          'answer'    => $answered,
+          'correct'   => $correct,
+          'wrong'     => $wrong,
+          'no_answer' => $no_answered,
+          'mark'      => $marks,
+          'status'    => 'Completed',
+          'updated_at' => date('Y-m-d H:i:s')
+        ]);
+
+        if($result)
+        {
+          $success = true;
+        }
       }
     }
-    catch(\E $e)
+    catch(\Exception $e)
     {
-      return $e;
-    }
-
-    if($result)
-    {
-      $success = true;
+      return $e->getMessage();
     }
     
     $exam = Exam::find($request->exam_id);

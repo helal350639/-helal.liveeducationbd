@@ -1,5 +1,3 @@
-{{-- contact verification --}}
-<p>This is a contact verify model</p>
 <div class="modal fade" id="modal-contact" style="margin-top:60px">
   <div class="modal-dialog">
     <div class="modal-content">

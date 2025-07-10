@@ -504,6 +504,6 @@ class StudentCtrl extends Controller
 
         Auth::guard('student')->loginUsingId($user->id);
     
-        return redirect()->intended(route('students.my-course'));
+        return redirect()->intended(route('students.dashboard'));
     }
 }

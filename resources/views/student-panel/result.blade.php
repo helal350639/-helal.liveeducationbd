@@ -42,9 +42,6 @@ function position($user_mark, $candidates, $marks)
   .items{background: #fff; text-align: center; color:#000; margin:5px; padding:10px}
 </style>
 
-    <!-- Content Header (Page header) -->
-    <section class="content-header"></section>
-
     <!-- Main content -->
     <section class="our_courses no-padding" id="content">
       <div class="container">
@@ -56,7 +53,7 @@ function position($user_mark, $candidates, $marks)
         $total_mark = $paper->questions->count() * $paper->mark;
         $user_mark = number_format($value->mark / $total_mark * $paper->candidate);
         @endphp
-        <div class="col-md-6 col-md-offset-3 result no-padding mt-3" id="result">
+        <div class="col-md-6 offset-md-3 result no-padding mt-3" id="result">
           <div class="card p-3">
             <div style="text-align: center">
               <img src="/img/logo.png" alt="" style="max-width:100px">
@@ -195,8 +192,10 @@ function position($user_mark, $candidates, $marks)
         </div>
       </div>
       @endif
-      
-      {{-- @include('partials.back-button') --}}
+
+      <p class="text-center p-3">
+        <a class="btn btn-warning" href="{{route('students.dashboard')}}">Back to the Dashboard</a>
+      </p>
         
       </div>
     </section> <!-- /.content -->

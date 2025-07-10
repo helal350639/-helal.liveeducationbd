@@ -17,38 +17,48 @@ if($exam)
 }
 @endphp
 
-@extends('student')
-@section('title', 'Course')
-@section('content')
-<style>
-  .checkbox{padding-left: 25px}
-  .panel ::-webkit-scrollbar{width: 5px;}
-  ::-webkit-scrollbar-thumb{background-color: #ddd}
-  .mcqitems{list-style: none; padding-left: 10px}
-  .mcqitems li{padding:5px; max-width: 300px;}
-  .mcqitems li:first-child{margin-top:10px}
-  .mcqitems li label{ display: bl/ock;border-radius: 15px;border:1px solid #ddd; padding: 5px 15px; color: #444; cursor: pointer; font-weight: normal; max-width: 300px; width: 100%}
-  .mcqitems li input[type="radio"]{width: 20px;height: 20px; margin-right: 5px; padding-top:5px}
-  .mcqitems li span{vertical-align: top}
-  .banner{margin-top:15px}
-  .banner img{width:100%}
-  .timer{font-weight: bold; font-size: 20px; text-align: center; color:#666; border:2px solid; border-radius:10px}
-  .time span{ border:2px solid #444; color:ddd}
-  .sticky{position: fixed; top:50px; left: 0; right: 0; z-index: 999999;}
-  #fixed{text-align: center}
-  .selected{background:lightblue;}
-  .result table th{text-align: right}
-  .loading{display:none; text-align: center; background:rgba(0,0,0,0.6);position:fixed; z-index:99999; top:0; right:0; bottom:0;left:0; padding-top:10%;}
-  .loading span{font-size:42px; position: absolute;top:20px; right:20px}
-  .loading p{color:#fff; margin:-50px auto; font-size:18px; max-width:300px; text-align:center}
-  .exam-name{text-align: center;width:100%;font-weight:bold;padding-bottom:15px}
-  .question-title{display: inline; font-weight:bold;float:left; padding-right:5px}
-  .question-title-text{display: inline;text-align:justify}
-  .question-title-main{background-color:none}
-</style>
-
-    <!-- Content Header (Page header) -->
-    <section class="content-header"></section>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <link rel="icon" href="/img/logo.png" />
+  <title>Exam</title>
+  <link rel="stylesheet" href="{{'/web/assets/vendors/slick/slick.css'}}" />
+  <link rel="stylesheet" href="{{'/web/assets/vendors/slick/slick-theme.css'}}"/>
+  <link rel="stylesheet" href="{{'/web/assets/css/bootstrap.min.css'}}" />
+  <link rel="stylesheet" href="{{'/web/css/style.css?v=1.3.3'}}" />
+  <link rel="stylesheet" href="{{'/web/assets/css/style2b24.css?v=3.8.25'}}" />
+  <style>
+    .checkbox{padding-left: 25px}
+    .panel ::-webkit-scrollbar{width: 5px;}
+    ::-webkit-scrollbar-thumb{background-color: #ddd}
+    .mcqitems{list-style: none; padding-left: 10px}
+    .mcqitems li{padding:5px; max-width: 300px;}
+    .mcqitems li:first-child{margin-top:10px}
+    .mcqitems li label{ display: bl/ock;border-radius: 15px;border:1px solid #ddd; padding: 5px 15px; color: #444; cursor: pointer; font-weight: normal; max-width: 300px; width: 100%; padding-top: 10px}
+    .mcqitems li input[type="radio"]{width: 20px;height: 20px; margin-right: 5px; padding-top:5px}
+    .mcqitems li span{vertical-align: top}
+    .banner{margin-top:15px}
+    .banner img{width:100%}
+    .timer{font-weight: bold; font-size: 20px; text-align: center; color:#666; border:2px solid; border-radius:10px}
+    .time span{ border:2px solid #444; color:ddd}
+    .sticky{position: fixed; top:0px; left: 0; right: 0; z-index: 999999;}
+    #fixed{text-align: center}
+    .selected{background:lightblue;}
+    .result table th{text-align: right}
+    .loading{display:none; text-align: center; background:rgba(0,0,0,0.6);position:fixed; z-index:99999; top:0; right:0; bottom:0;left:0; padding-top:10%;}
+    .loading span{font-size:42px; position: absolute;top:20px; right:20px}
+    .loading p{color:#fff; margin:-50px auto; font-size:18px; max-width:300px; text-align:center}
+    .exam-name{text-align: center;width:100%;font-weight:bold;padding-bottom:15px}
+    .question-title{display: inline; font-weight:bold;float:left; padding-right:5px}
+    .question-title-text{display: inline;text-align:justify}
+    .question-title-main{background-color:none}
+  </style>
+</head>
+<body>
 
     <!-- Main content -->
     <section class="our_courses" id="content">
@@ -56,50 +66,60 @@ if($exam)
         @if($exam_id)
           <div class="card" id="fixed">
             <div class="row">
-            <div class="col-4">
-              Questions: <b>{{$paper->questions->count()}}</b>
+              <div class="col-4">
+                Questions: <b>{{$paper->questions->count()}}</b>
+              </div>
+              <div class="col-4">
+                <div class="timer"><span id="timer">00:00</span></div>
+              </div>
+              <div class="col-4">
+                Solved: <b id="solved">0</b>
+              </div>
+              <div class="clearfix"></div>
             </div>
-            <div class="col-4">
-              <div class="timer"><span id="timer">00:00</span></div>
+          </div>
+          <div class="row" id="questions_panel">
+            <div class="banner">
+              <img src="{{$paper->banner}}" alt=""/>
             </div>
-            <div class="col-4">
-              Solved: <b id="solved">0</b>
+            <div class="box col-md-12">
+              <div class="header" style="text-align:center">{!! $paper->header !!} </div>
+              <p class="exam-name">Exam No: {{$paper->name}}</p>
             </div>
-            <div class="clearfix"></div>
-          </div>
-        </div>
-        <div class="row" id="questions_panel">
-          <div class="banner">
-            <img src="{{$paper->banner}}" alt=""/>
-          </div>
-          <div class="box col-md-12">
-            <div class="header" style="text-align:center">{!! $paper->header !!} </div>
-            <p class="exam-name">Exam No: {{$paper->name}}</p>
-          </div>
 
-          <!-- multiple questions area -->
-          <div class="col-md-12 no-padding" id="questions-area">
-            <!-- load all questions here -->
-          </div> <!--/.col -->
+            <!-- multiple questions area -->
+            <div class="col-md-12 no-padding" id="questions-area">
+              <!-- load all questions here -->
+            </div> <!--/.col -->
 
-          <button class="btn btn-info btn-lg pull-right" onclick="submitExam()" style="display: none" id="submit-btn">Submit</button>
-        </div><!-- /.row -->
+            <button class="btn btn-info btn-lg pull-right" onclick="submitExam()" style="display: none" id="submit-btn">Submit</button>
+          </div><!-- /.row -->
         @else
-        <p>We are getting trouble to sit you to the exam, right now. Please try again later. <a href="{{route('students.exam')}}">Go back to the exam page</a></p>
+          <p class="text-center">Exam limit exited. 
+            <a href="{{route('students.dashboard')}}">Go back to the Dashboard</a>
+          </p>
+
         @endif
         
       </div>
     </section> <!-- /.content -->
 
-  <!-- loading section -->
-<div id="loading" class="loading">
-  {{-- <span onclick="this.parentNode.style.display='none'"><i class="fa fa-times"></i></span> --}}
-  <img src="/img/loading.webp" alt="">
-  <p>আপনার রেজালটশীট ও সলুশন পেপার প্রস্তুত করা হচ্ছে। <br>অনুগ্রহ পূর্বক অপেক্ষা করুন...</p>
-</div>
+    <!-- loading section -->
+    <div id="loading" class="loading">
+      {{-- <span onclick="this.parentNode.style.display='none'"><i class="fa fa-times"></i></span> --}}
+      <img src="/img/loading.webp" alt="">
+      <p>আপনার রেজালটশীট ও সলুশন পেপার প্রস্তুত করা হচ্ছে। <br>অনুগ্রহ পূর্বক অপেক্ষা করুন...</p>
+    </div>
+    <div class="footer" id="Footer" style="background: #fff"></div>
 
-@endsection
-@section('scripts')
+{{-- @endsection
+@section('scripts') --}}
+
+<script src="{{'/web/assets/js/jquery-3.6.0.min.js'}}"></script>
+<script src="{{'/web/assets/js/bootstrap.bundle.min.js'}}" defer></script>
+<script src="{{'/web/assets/vendors/slick/slick.min.js'}}" defer></script>
+<script src="{{'/web/assets/js/main.js'}}" defer></script>
+
 <script>
   //load all questions
   let questions_area = document.getElementById('questions-area');
@@ -113,18 +133,13 @@ if($exam)
         }
       });
 
-    // let formData = new FormData();
-    // formData.append('paper_id', '{{$paper->id}}');
-
     $.ajax({
       url: '{{route("students.exam.questions", "")}}/'+paper_id,
       type: 'GET',
-      // data: formData,
       cache: false,
       contentType: false,
       processData: false,
       success: function(data){
-        // console.log(data.questions.data.length);
         if(data.success == true && data.questions.data.length > 0){
           // call to the data writer on the html
           writeQuestion(data);
@@ -159,19 +174,14 @@ if($exam)
       if (distance < 600){
         // unbind to prevent excessive firing
         $(window).off('scroll', scrollProducts);
-        // console.log('we reached the bottom');
 
         $.ajax({
           type: 'GET',
           url: '{{route("students.exam.questions", "")}}/'+paper_id+'?page=' + page,
           success: function(data) {
-            // console.log("success!");
-            // $('#container').append(data).fadeIn();
             // rebind after successful update
             if(data.success == true && data.questions.data.length > 0)
             {
-              // console.log(data.qeustions.last_page);
-              // last_page = data.questions.last_page;
               // call to the data writer on the html
               writeQuestion(data);
             }
@@ -313,7 +323,7 @@ if($exam)
   // navbar fixed on scroll
   window.onscroll = function(){
     let filterParent = document.getElementById('fixed');
-    if(document.body.scrollTop >= 100 || document.documentElement.scrollTop >= 100)
+    if(document.body.scrollTop >= 0 || document.documentElement.scrollTop >= 0)
     {
       filterParent.classList.add('sticky');
     }
@@ -403,6 +413,8 @@ if($exam)
     // console.log(qids);
   }
 
+  let submitted = false;
+
   // push to the database method
   function pushToDatabase(formData)
   {
@@ -420,17 +432,9 @@ if($exam)
       contentType: false,
       processData: false,
       success: function(data){
-        // console.log(data);
         if(data.success == true)
         {
-          // let content = document.getElementById('content');
-          // let result_hidden = document.getElementById('result_hidden');
-          // let question = document.getElementById('question');
-          // let answer = document.getElementById('answer');
-          // let correct = document.getElementById('correct');
-          // let wrong = document.getElementById('wrong');
-          // let no_answer = document.getElementById('no_answer');
-          // let marks = document.getElementById('marks');
+          submitted = true;
           let message = document.getElementById('message');
           let msg = 'পরীক্ষা সম্পূর্ণ হয়েছে, পরবর্তী ধাপে যাওয়ার জন্য ok করুন';
 
@@ -438,10 +442,7 @@ if($exam)
           {
             msg = data.message;
           }
-
-          // alert(msg);
-          // loading.style.display = 'none';
-          // content.innerHTML = result_hidden.innerHTML;
+          
           window.location.href = '{{route("students.result", [$paper->id, "after"])}}';
           loading.style.display = 'none';
         }
@@ -449,7 +450,6 @@ if($exam)
         {
           retryPushtoDatabase(formData);
         }
-        // qcount.innerHTML = data.qcount.attached.length;
       },
       error: function(data){
         // if fail to store retry to push it
@@ -462,8 +462,6 @@ if($exam)
   // if fail retry to push to the database
   function retryPushtoDatabase(formData)
   {
-    // let formData = localStorage.getItem('formdata');
-    // console.log(JSON.parse(formData));
     setTimeout(() => {
       // push to database
       pushToDatabase(formData);
@@ -475,41 +473,25 @@ if($exam)
   function showResult($data)
   {
     let content = document.getElementById('content');
-    //
   }
+
+  //back button navigation is disabled
+  history.pushState(null, null, window.location.href);
+  window.onpopstate = function () {
+      history.pushState(null, null, window.location.href);
+      alert("Back button navigation is disabled.");
+  };
+
+  window.addEventListener('beforeunload', function (e) {
+    if(submitted == false)
+    {
+      e.preventDefault();
+      e.returnValue = ''; // For most browsers
+    }
+  });
+
+
+  </script>
   
-  </script>
-
-  <script type="text/javascript">
-  // document.addEventListener("keydown", function (e)
-  // {
-  //   if ((e.ctrlKey && e.key === 'r') || e.key === 'F5')
-  //   {
-  //     e.preventDefault();
-  //     alert("Page reload is disabled.");
-  //   }
-  // });
-
-  //reload block
-  // window.onbeforeunload = function() { return "Your work will be lost."; };
-//   window.addEventListener("beforeunload", function (e) {
-//     e.preventDefault();
-//     e.returnValue = ''; // Required for most browsers.
-// });
-
-//back button navigation is disabled
-history.pushState(null, null, window.location.href);
-window.onpopstate = function () {
-    history.pushState(null, null, window.location.href);
-    alert("Back button navigation is disabled.");
-};
-
-  </script>
-  {{-- <script type="text/javascript">
-    function disableF5(e) { if ((e.which || e.keyCode) == 116 || (e.which || e.keyCode) == 82) e.preventDefault(); };
-    
-    $(document).ready(function(){
-         $(document).on("keydown", disableF5);
-    });
-    </script> --}}
-@endsection
+</body>
+</html>

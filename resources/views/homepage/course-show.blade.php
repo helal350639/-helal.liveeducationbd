@@ -590,14 +590,14 @@ $value = $batch;
     // Compare timestamps (in milliseconds)
     if (dateOnly(now) > dateOnly(targetDate))
     {
-      return 'Completed';
+      return '<span class="text-success">Completed</span>';
     } else if(dateOnly(now) == dateOnly(targetDate))
     {
-      return 'Next';
+      return '<span class="text-info">Next</span>';
     }
     else
     {
-      return 'Pending';
+      return '<span class="text-warning">Pending</span>';
     }
 
   }
