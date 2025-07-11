@@ -17,7 +17,7 @@
         <div class="box-header with-border">
             <h3 style="color: #800" class="box-title">Circular Details</h3>
         </div>
-        <form action="{{route('circular.store')}}" method="POST">
+        <form action="{{route('circular.store')}}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="box-body">
                 <div class="col-md-12">
