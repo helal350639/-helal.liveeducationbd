@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Homepage;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\ScheduleCtrl;
+use App\Http\Controllers\CircularCtrl;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Course;
@@ -21,6 +22,7 @@ use App\Models\Page;
 use App\Models\Complain;
 use App\Models\Routine;
 use App\Models\RoutineItemRow;
+use App\Models\Circular;
 use Auth;
 use Session;
 
@@ -65,9 +67,28 @@ class HomePageCtrl extends Controller
     $array = json_decode($json, true);
     $about = (object) $array;
 
-    // dd($complains);
+    $circular = new CircularCtrl();
+    $circulars = $circular->circulars();
+
+    // dd($circulars);
     
-    return view('homepage.index', compact('courses', 'sliders', 'batches', 'teachers', 'complains', 'about'));
+    return view('homepage.index', compact('courses', 'sliders', 'batches', 'teachers', 'complains', 'about', 'circulars'));
+  }
+
+  public function circular($key)
+  {
+    $circulars = Circular::orderBy('id', 'DESC')
+    ->where('type', $key)
+    ->where('status', 'Published')
+    ->get();
+
+    return view('homepage.circular', compact('circulars'));
+  }
+
+  public function circularShow($id)
+  {
+    $circular = Circular::find($id);
+    return view('homepage.circular-read', compact('circular'));
   }
 
   public function comingSoon()
@@ -322,11 +343,6 @@ class HomePageCtrl extends Controller
       return 'Page Not Found! <a href="/">Back</a>';
     }
     return view('homepage.single-page', compact('page'));
-  }
-
-  public function circular()
-  {
-    return view('homepage.circular');
   }
 
   public function resultList($paper_id)

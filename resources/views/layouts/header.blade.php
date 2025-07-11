@@ -366,6 +366,29 @@ if($complains)
 
         <li class="treeview">
           <a href="#">
+            <i class="fa fa-gear"></i> <span>Homepage Settings</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li>
+              <a href="/page"><i class="fa fa-copy"></i> Pages</a>
+            </li>
+            <li>
+              <a href="/about-us"><i class="fa fa-copy"></i> About Us</a>
+            </li>
+            <li>
+              <a href="/circular"><i class="fa fa-copy"></i> Circulars</a>
+            </li>
+            <li>
+              <a href="#"><i class="fa fa-youtube"></i> Videos</a>
+            </li>
+          </ul>
+        </li>
+
+        <li class="treeview">
+          <a href="#">
             <i class="fa fa-gear"></i> <span>Settings</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
@@ -374,8 +397,6 @@ if($complains)
           <ul class="treeview-menu">
             <li><a href="{{ route('profile') }}"><i class="fa fa-user"></i> Profile</a></li>
             <li><a href="/change_password"><i class="fa fa-lock"></i> Change Password</a></li>
-            <li><a href="/page"><i class="fa fa-copy"></i> Pages</a></li>
-            <li><a href="/about-us"><i class="fa fa-copy"></i> About Us</a></li>
           </ul>
         </li>
         

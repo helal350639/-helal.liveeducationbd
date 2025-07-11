@@ -1,0 +1,222 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\Filter;
+use App\Models\SubFilter;
+use App\Models\Role;
+use App\Models\Circular;
+use Auth;
+use Image;
+use Toastr;
+use File;
+use Session;
+use Validator;
+
+class CircularCtrl extends Controller
+{
+    public function __construct()
+    {
+      $this->middleware('auth');
+    }
+
+    public function circulars($key = null)
+    {
+      $circulars = [
+        '৯ম & অন্যান্য জব সার্কুলার',
+        'ডিপ্লোমা জব সার্কুলার',
+        '১১ - ২০ তম গ্রেডের জব সার্কুলার',
+        'বে-সরকারি জব সার্কুলার'
+      ];
+
+      if($key === null)
+      {
+        return $circulars;
+      }
+      else
+      {
+        return $circulars[$key];
+      }
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+      $circulars = Circular::orderBy('id','desc')->paginate(25);
+      return view('layouts.circulars.index',compact('circulars'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+      $circulars = (object) $this->circulars();
+      return view('layouts.circulars.create', compact('circulars'));
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        $source = new SourceCtrl;
+        $validator = Validator::make($request->all(), [
+            'type' => 'required|number',
+            'title' => 'required|string',
+            'published_at' => 'nullable|string',
+            'start_at' => 'nullable|string',
+            'end_at' => 'nullable|string',
+            'admit_to' => 'nullable|string',
+            'position' => 'required|string',
+            'fee' => 'nullable|string',
+            'url' => 'nullable|url',
+            'details' => 'nullable|string',
+            'status' => 'nullable|string',
+            'pdf'   => 'nullable|mimes:jpeg,jpg,png,pdf|max:1000',
+        ]);
+        
+        $data = $request->all();
+
+        if(isset($data['_token']))
+        {
+          unset($data['_token']);
+        }
+
+        try {
+
+          if($request->hasFile('pdf'))
+          {
+            $data['pdf'] = $source->uploadImage($data['pdf'], 'circulars/');
+          }
+          
+          $circular = Circular::create($data);
+          return redirect()->route('circular.show', $circular->id);
+        }
+        catch(\Eexception $e)
+        {
+          return $e->getMessage();
+        }
+        return back();
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\subfilter  $subfilter
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        $circular = Circular::find($id);
+        return view('layouts.circulars.read', compact('circular'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  \App\subfilter  $subfilter
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+      $circulars = $this->circulars();
+      $circular = Circular::find($id);
+      return view('layouts.circulars.edit', compact('circulars', 'circular'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\subfilter  $subfilter
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {        
+      $source = new SourceCtrl;
+      $validator = Validator::make($request->all(), [
+          'type' => 'required|string',
+          'title' => 'required|string',
+          'published_at' => 'nullable|string',
+          'start_at' => 'nullable|string',
+          'end_at' => 'nullable|string',
+          'admit_to' => 'nullable|string',
+          'position' => 'required|string',
+          'fee' => 'nullable|string',
+          'url' => 'nullable|url',
+          'details' => 'nullable|string',
+          'status' => 'nullable|string',
+          'pdf'   => 'nullable|mimes:jpeg,jpg,png,pdf|max:1000',
+      ]);
+      
+      $data = $request->all();
+
+      if(isset($data['_token']))
+      {
+        unset($data['_token']);
+      }
+
+      if(isset($data['_method']))
+      {
+        unset($data['_method']);
+      }
+
+      $x_circular = Circular::find($id);
+
+      try {
+
+        if($request->hasFile('pdf'))
+        {
+          $data['pdf'] = $source->uploadImage($data['pdf'], 'circulars/');
+        }
+        
+        $circular = Circular::where('id', $id)->update($data);
+
+        if($request->hasFile('pdf') && File::exists($x_circular->pdf))
+        {
+          File::delete($x_circular->pdf);
+        }
+
+        Session::flash('success', 'The circular successfully updated.');
+        return redirect()->route('circular.show', $id);
+      }
+      catch(\Eexception $e)
+      {
+        return $e->getMessage();
+      }
+      return back();
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\subfilter  $subfilter
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        $file = Circular::find($id);
+        $xfile = public_path($file->pdf);
+           
+        if (File::exists($xfile)) {
+            File::delete($xfile);
+        }
+        $file->delete();
+
+        Session::flash('success', 'The circular successfully deleted.');
+        
+        return redirect()->route('circular.index');
+    }
+    
+}

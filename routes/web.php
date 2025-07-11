@@ -53,7 +53,8 @@ Route::controller(HomePageCtrl::class)->group(function()
 	Route::get('home/course/{id}', 'courseShow')->name('home.course.show');
 	Route::get('home/pages/{slug}', 'page')->name('home.page');
   Route::get('home/coming-soon', 'comingSoon')->name('home.coming-soon');
-  Route::get('home/circular', 'circular')->name('home.circular');
+  Route::get('home/circular/{id?}', 'circular')->name('home.circular');
+  Route::get('home/circular-details/{id}', 'circularShow')->name('home.circular.show');
   Route::get('home/results/{paper}', 'resultList')->name('home.results');
   Route::get('home/routine-filter/{id}/{department?}', 'routineFilter')->name('home.routine.filter');
 });
@@ -219,6 +220,7 @@ Route::middleware(['auth'])->group(function()
 	Route::resource('routine', 'RoutineCtrl');
 	Route::resource('sms', 'SmsCtrl');
 	Route::resource('email', 'EmailCtrl');
+	Route::resource('circular', 'CircularCtrl');
 
 	/** -------------------- Custom Routes ------------------ */
 	Route::controller(DepartmentCtrl::class)->group(function()

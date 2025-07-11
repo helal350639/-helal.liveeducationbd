@@ -194,22 +194,22 @@ class QuestionCtrl extends Controller
         $source = new SourceCtrl;
 
         $validator = Validator::make($request->all(), [
-            'course_id'      => 'required|array',
-            'department_id'  => 'required|array',
-            'semester_id'    => 'nullable|array',
-            'subject_id'     => 'nullable|array',
-            'chapter_id'     => 'nullable|array',
-            'title'          => 'required|string',
-            'answer'         => 'nullable|string',
-            'answer_file'    => 'nullable|array',
-            'video'          => 'nullable|string',
-            'image'          => 'nullable|image|mimes:jpeg,jpg,png,gif|max:500',
-            'items'          => 'nullable|array',
-            'item_img'       => 'nullable|array',
-            'correct'        => 'nullable|array',
-            'filter'         => 'nullable|array',
-            'label'          => 'nullable|array',
-            'explanation'    => 'nullable',
+          'course_id'      => 'required|array',
+          'department_id'  => 'required|array',
+          'semester_id'    => 'nullable|array',
+          'subject_id'     => 'nullable|array',
+          'chapter_id'     => 'nullable|array',
+          'title'          => 'required|string',
+          'answer'         => 'nullable|string',
+          'answer_file'    => 'nullable|array',
+          'video'          => 'nullable|string',
+          'image'          => 'nullable|image|mimes:jpeg,jpg,png,gif|max:500',
+          'items'          => 'nullable|array',
+          'item_img'       => 'nullable|array',
+          'correct'        => 'nullable|array',
+          'filter'         => 'nullable|array',
+          'label'          => 'nullable|array',
+          'explanation'    => 'nullable',
         ]);
 
         if($validator->fails())

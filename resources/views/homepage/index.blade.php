@@ -6,6 +6,7 @@ if($user)
   $student = \App\Models\Student::find($user->id);
 }
 @endphp
+
 @extends('homepage')
 @section('title', 'হোম')
 @section('content')
@@ -509,19 +510,25 @@ if($user)
 
       <div class="home-services-area">
         <div class="row" style="--bs-gutter-x: 0.3rem !important;">
+
+          @foreach($circulars as $key => $value)
+
           <div class="col-md-3 col-6 mb-1 dropdown bcs-jobs" id="home-services-area-one">
-            <a href="{{route('home.circular')}}">
+            <a href="{{route('home.circular', $key)}}">
               <div class="my-home-service premium-course-box">
                 <div class="my-home-service-icon">
                   <img src="/web/img/pdf-logo.jpg" alt="" loading="lazy">
                 </div>
                 <div class="my-home-service-content">
-                  <h3>৯ম & অন্যান্য জব সার্কুলার</h3>
+                  <h3>{{$value}}</h3>
                 </div>
               </div>
             </a>
           </div>
-          <div class="col-md-3 col-6 mb-1 dropdown bcs-jobs" id="home-services-area-one">
+
+          @endforeach
+
+          {{-- <div class="col-md-3 col-6 mb-1 dropdown bcs-jobs" id="home-services-area-one">
             <a href="{{route('home.circular')}}">
               <div class="my-home-service premium-course-box">
                 <div class="my-home-service-icon">
@@ -556,7 +563,8 @@ if($user)
                 </div>
               </div>
             </a>
-          </div>
+          </div> --}}
+
         </div>
       </div>
 
