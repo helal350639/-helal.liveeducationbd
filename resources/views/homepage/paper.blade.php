@@ -67,7 +67,7 @@ if($user)
                         <div class="text d-flex align-items-center list-content">
                           <div class="course_exam-icon">
                             <div class="circular-progress" title="Provided Answer" data-inner-circle-color="#def3ff" data-percentage="6" data-progress-color="rgb(137 24 26)" data-bg-color="rgb(137 24 26 / 70%)" style="background: #fff; font-size:25px; border:1px solid #ddd; color:#1CAB55">
-                              @if($paper->open <= date('Y-m-d H:i:s') && $paper->close > date('Y-m-d H:i:s'))
+                              @if($paper->open <= now() && $paper->close > now())
                               <i class="fa fa-unlock"></i>
                               @else
                               <i class="fa fa-lock" style="color:red"></i>
@@ -76,20 +76,24 @@ if($user)
                           </div>
                           <p class="exam-title ps-1" style="width: 100%">
                             <span>{{ $paper->name }}</span>
-                            <span style="float:right;">{{ $source->dformat($paper->open) }} </span>
+                            <span style="float:right;">{{ $source->dtformat($paper->open) }} </span>
                             <br>
                             <span style="font-size: 12px; font-weight: 700; color: #1CAB55;"> (প্রশ্ন -{{$paper->questions()->count()}}টি, সময়-{{$paper->time}}মিনিট) </span>
                           </p>
                         </div>
                         <div class="v-button d-flex flex-wrap gap-2">
-                          @if($paper->close >= date('Y-m-d H:i:s'))
-                          <a href="{{route('students.instruction', $paper->id)}}" class="btn btn-sm btn-info"> পরীক্ষা দিন </a>
-                          @elseif($paper->close < date('Y-m-d H:i:s'))
-                          <a class="label label-success">
+                          @if($paper->close < now())
+                          <a class="text-success">
                             Completed
                           </a>
+                          @elseif($paper->open < now() && $paper->close > now())
+                          <a href="{{route('students.instruction', $paper->id)}}" class="btn btn-sm btn-info"> পরীক্ষা দিন </a>
+                          @elseif($paper->open > now())
+                          <a class="text-warning">
+                            Pending
+                          </a>
                           @else
-                          <a class="label label-danger">
+                          <a class="text-danger">
                             Locked
                           </a>
                           @endif
