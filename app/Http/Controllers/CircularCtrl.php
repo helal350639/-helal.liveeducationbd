@@ -83,7 +83,7 @@ class CircularCtrl extends Controller
             'url' => 'nullable|url',
             'details' => 'nullable|string',
             'status' => 'nullable|string',
-            'pdf'   => 'nullable|mimes:jpeg,jpg,png,pdf|max:1000',
+            'pdf'   => 'nullable|mimes:jpeg,jpg,png,pdf|max:10000',
         ]);
         
         $data = $request->all();
@@ -157,7 +157,7 @@ class CircularCtrl extends Controller
           'url' => 'nullable|url',
           'details' => 'nullable|string',
           'status' => 'nullable|string',
-          'pdf'   => 'nullable|mimes:jpeg,jpg,png,pdf|max:1000',
+          'pdf'   => 'nullable|mimes:jpeg,jpg,png,pdf|max:10000',
       ]);
       
       $data = $request->all();
