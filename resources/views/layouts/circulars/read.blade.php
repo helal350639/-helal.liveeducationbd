@@ -32,7 +32,11 @@ $value = $circular;
             <a href="{{route('circular.index')}}" title="View" class="label label-success"><i class="fa fa-list"></i></a>
             <a href="{{route('circular.edit', $value->id)}}" class="label label-warning" title="Edit this"><i class="fa fa-edit"></i></a>
             
-            {{-- <a href="{{route('circular.delete',$value->id)}}" class="label label-danger" onclick="return confirm('Are you sure want to delete this account!');" title="Delete this account"><i class="fa fa-close"></i></a> --}}
+            <form style="display: inline" action="{{route('circular.destroy', $value->id)}}" method="POST">
+              @csrf
+              @method('DELETE')
+              <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this one?')"><i class="fa fa-trash"></i></button>
+            </form>
             
           </div>
           <div class="col-md-12">
@@ -82,7 +86,7 @@ $value = $circular;
                   <tr>
                     <th>PDF</th>
                     <td>
-                      <a target="_blank" href="{{$value->pdf}}"><i class="fa fa-file"></i></a>
+                      <h3><a class="text-danger" target="_blank" href="{{$value->pdf}}"><i class="fa fa-file-pdf-o"></i></a><h3>
                     </td>
                   </tr>
                 

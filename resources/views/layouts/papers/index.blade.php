@@ -115,11 +115,11 @@ $source = New SourceCtrl;
                   <td>
                     <a href="{{route('paper.show', $value->id)}}" class="btn btn-info" title="Details"><i class="fa fa-file-text"></i></a>
                     <a href="{{route('paper.edit', $value->id)}}" class="btn btn-warning btn-sm" title="Edit this value"><i class="fa fa-edit"></i></a>
-                    {{-- <form style="display: inline" action="{{route('paper.destroy', $value->id)}}" method="POST">
+                    <form style="display: inline" action="{{route('paper.destroy', $value->id)}}" method="POST">
                       @csrf
                       @method('DELETE')
                       <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this one?')"><i class="fa fa-trash"></i></button>
-                    </form> --}}
+                    </form>
                   </td>
                 </tr>
                 @endforeach

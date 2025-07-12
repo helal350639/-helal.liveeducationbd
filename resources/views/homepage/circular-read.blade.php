@@ -67,16 +67,20 @@ $value = $circular;
                           </tr>
                           <tr>
                             <th>নিয়োগ বিজ্ঞপ্তির pdf: </th>
-                            <td><a target="_blank" href="{{$value->pdf}}"></a></td>
+                            <td>
+                              <h2>
+                                <a target="_blank" href="{{$value->pdf}}" class="text-danger"><i class="fa fa-file-pdf"></i></a>
+                              </h2>
+                            </td>
                           </tr>
                         </table>
 
                         <h4 class="text-center">নিয়োগ বিজ্ঞপ্তির ছবিঃ </h4>
-                        <object data="{{$value->pdf}}" type="application/pdf" width="100%" height="600px">
+                        <iframe src="{{$value->pdf}}" type="application/pdf" width="100%" height="600px">
                           <p>Your browser does not support PDFs.
                             <a href="path/to/file.pdf">Download the PDF</a>.
                           </p>
-                        </object>
+                        </iframe>
                       </div>
                     </div>
                   </div>
