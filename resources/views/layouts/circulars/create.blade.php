@@ -76,13 +76,19 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <label for="url">Link/url</label>
-                        <input type="url" class="form-control" name="url" id="url" required>
+                        <input type="url" class="form-control" name="url" id="url">
                     </div>
+                </div>
+                <div class="col-md-12">
+                  <div class="form-group">
+                      <label for="image">Image/s</label>
+                      <input type="file" class="form-control" name="image[]" id="image" multiple>
+                  </div>
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
                         <label for="pdf">PDF File</label>
-                        <input type="file" class="form-control" name="pdf" id="pdf">
+                        <input type="file" class="form-control" name="pdf" id="pdf" accept="application/pdf">
                     </div>
                 </div>
                 <div class="col-md-12">

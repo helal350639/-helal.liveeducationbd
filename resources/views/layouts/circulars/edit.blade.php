@@ -81,13 +81,31 @@ $value = $circular;
               <div class="col-md-12">
                   <div class="form-group">
                       <label for="url">Link/url</label>
-                      <input type="url" class="form-control" name="url" id="url" required value="{{$value->url}}">
+                      <input type="url" class="form-control" name="url" id="url" value="{{$value->url}}">
                   </div>
               </div>
               <div class="col-md-12">
                   <div class="form-group">
+                      <label for="image">Image</label>
+                      <input type="file" class="form-control" name="image[]" id="image" multiple>
+                  </div>
+                  <p>
+                    @if($value->image)
+                      @php
+                      $img_array = json_decode($value->image);
+                      @endphp
+                      @foreach($img_array as $image)
+                      <a target="_blank" href="{{$image}}">
+                        <img src="{{$image}}" alt="" width="100">
+                      </a>
+                      @endforeach
+                    @endif
+                  </p>
+              </div>
+              <div class="col-md-12">
+                  <div class="form-group">
                       <label for="pdf">PDF File</label>
-                      <input type="file" class="form-control" name="pdf" id="pdf">
+                      <input type="file" class="form-control" name="pdf" id="pdf" accept="application/pdf">
                   </div>
               </div>
               <div class="col-md-12">

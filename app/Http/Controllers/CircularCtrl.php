@@ -83,10 +83,12 @@ class CircularCtrl extends Controller
             'url' => 'nullable|url',
             'details' => 'nullable|string',
             'status' => 'nullable|string',
-            'pdf'   => 'nullable|mimes:jpeg,jpg,png,pdf|max:10000',
+            'image'   => 'nullable|mimes:jpeg,jpg,png|max:10000',
+            'pdf'   => 'nullable|mimes:pdf|max:10000',
         ]);
         
         $data = $request->all();
+        // dd($data);
 
         if(isset($data['_token']))
         {
@@ -94,6 +96,17 @@ class CircularCtrl extends Controller
         }
 
         try {
+
+          if($request->hasFile('image'))
+          {
+            $images = [];
+            foreach($data['image'] as $image)
+            {
+              $img = $source->uploadImage($image, 'circulars/');
+              array_push($images, $img);
+              $data['image'] = json_encode($images);
+            }
+          }
 
           if($request->hasFile('pdf'))
           {
@@ -157,10 +170,13 @@ class CircularCtrl extends Controller
           'url' => 'nullable|url',
           'details' => 'nullable|string',
           'status' => 'nullable|string',
-          'pdf'   => 'nullable|mimes:jpeg,jpg,png,pdf|max:10000',
+          'image'   => 'nullable|mimes:jpeg,jpg,png|max:10000',
+          'pdf'   => 'nullable|mimes:pdf|max:10000',
       ]);
       
       $data = $request->all();
+
+      // dd($data);
 
       if(isset($data['_token']))
       {
@@ -176,12 +192,36 @@ class CircularCtrl extends Controller
 
       try {
 
+        if($request->hasFile('image'))
+        {
+          $images = [];
+          foreach($data['image'] as $image)
+          {
+            $img = $source->uploadImage($image, 'circulars/');
+            array_push($images, $img);
+            $data['image'] = $images;
+          }
+        }
+
         if($request->hasFile('pdf'))
         {
           $data['pdf'] = $source->uploadImage($data['pdf'], 'circulars/');
         }
         
         $circular = Circular::where('id', $id)->update($data);
+
+        if($request->hasFile('image'))
+        {
+          $img_array = json_decode($x_circular->image);
+          foreach($img_array as $image)
+          {
+            $img_path = public_path($image);
+            if(File::exists($img_path))
+            {
+              File::delete($img_path);
+            }
+          }
+        }
 
         if($request->hasFile('pdf') && File::exists($x_circular->pdf))
         {
@@ -208,14 +248,27 @@ class CircularCtrl extends Controller
     {
         $file = Circular::find($id);
         $xfile = public_path($file->pdf);
-           
-        if (File::exists($xfile)) {
-            File::delete($xfile);
+
+        if($xfile->image)
+        {
+          $img_array = json_decode($file->image);
+          foreach($img_array as $image)
+          {
+            $img_path = public_path($image);
+            if(File::exists($img_path))
+            {
+              File::delete($img_path);
+            }
+          }
+        }
+
+        if(File::exists($xfile))
+        {
+          File::delete($xfile);
         }
         $file->delete();
 
-        Session::flash('success', 'The circular successfully deleted.');
-        
+        Session::flash('success', 'The circular successfully deleted.');        
         return redirect()->route('circular.index');
     }
     

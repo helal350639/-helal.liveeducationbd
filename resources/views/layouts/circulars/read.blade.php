@@ -10,6 +10,9 @@ $value = $circular;
 @extends('dashboard')
 @section('title', 'Circular Details')
 @section('content')
+  <style>
+    .circular-image img{border:5px solid #ddd}
+  </style>
   <!-- Content Header (Page header) -->
     <section class="content-header">
       <h1>Circular Details</h1>
@@ -81,33 +84,49 @@ $value = $circular;
                 </tr>
                 <tr>
                   <th>Details</th>
-                    <td>{{$value->details}}</td>
-                  </tr>
-                  <tr>
-                    <th>PDF</th>
-                    <td>
-                      <h3><a class="text-danger" target="_blank" href="{{$value->pdf}}"><i class="fa fa-file-pdf-o"></i></a><h3>
-                    </td>
-                  </tr>
+                  <td>{{$value->details}}</td>
+                </tr>
+                <tr>
+                  <th>Image/s</th>
+                  <td>
+                    @if($value->image)
+                      @php
+                      $img_array = json_decode($value->image);
+                      @endphp
+
+                      @foreach($img_array as $image)
+                      <a target="_blank" href="{{$image}}" class="circular-image">
+                        <img src="{{$image}}" alt="" width="150">
+                      </a>
+                      @endforeach
+                    @endif
+                  </td>
+                </tr>
+                <tr>
+                  <th>PDF</th>
+                  <td>
+                    <h3><a class="text-danger" target="_blank" href="{{$value->pdf}}"><i class="fa fa-file-pdf-o"></i></a><h3>
+                  </td>
+                </tr>
                 
-                   <tr>
-                    <th>Status:</th>
-                    <td>
-                      @if($value->status == 'Published')
-                      <span class="label label-success">{{$value->status}}</span>
-                      @else
-                      <span class="label label-danger">{{$value->status}}</span>
-                      @endif
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>Record Created On:</th>
-                    <td>{{$source->dtformat($value->created_at)}} </td>
-                  </tr>
-                  <tr>
-                    <th>Record Updated On:</th>
-                    <td>{{$source->dtformat($value->updated_at)}} </td>
-                  </tr>
+                <tr>
+                  <th>Status:</th>
+                  <td>
+                    @if($value->status == 'Published')
+                    <span class="label label-success">{{$value->status}}</span>
+                    @else
+                    <span class="label label-danger">{{$value->status}}</span>
+                    @endif
+                  </td>
+                </tr>
+                <tr>
+                  <th>Record Created On:</th>
+                  <td>{{$source->dtformat($value->created_at)}} </td>
+                </tr>
+                <tr>
+                  <th>Record Updated On:</th>
+                  <td>{{$source->dtformat($value->updated_at)}} </td>
+                </tr>
               </tbody>
             </table>
           </div>

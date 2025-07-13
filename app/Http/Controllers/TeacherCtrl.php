@@ -152,12 +152,11 @@ class TeacherCtrl extends Controller
             'contact'   => 'required',
             'email'     => 'required',
             'status'    => 'nullable|max:30',
-            'web'    => 'nullable|max:30',
+            'web'       => 'nullable|max:30',
             'image'     => 'nullable|image|mimes:jpeg,jpg,png,gif|max:1000'
         ]);
         
         $data = $request->all();
-        // dd($data);
 
         $obj = Teacher::find($id);
         $obj->name       = $request->input('name');
@@ -165,7 +164,7 @@ class TeacherCtrl extends Controller
         $obj->contact    = $request->input('contact');
         $obj->email      = $request->input('email');
         $obj->status     = isset($data['status']) ? 'Active' : 'Inactive';
-        $obj->web     = isset($data['web']) ? 'Yes' : '';
+        $obj->web        = isset($data['web']) ? 'Yes' : '';
         $obj->updated_by = Auth::id();
 
         if($request->hasFile('image'))

@@ -68,20 +68,27 @@ $value = $circular;
                           <tr>
                             <th>নিয়োগ বিজ্ঞপ্তির pdf: </th>
                             <td>
+                              @if($value->pdf)
                               <h2>
                                 <a target="_blank" href="{{$value->pdf}}" class="text-danger"><i class="fa fa-file-pdf"></i></a>
                               </h2>
+                              @endif
                             </td>
                           </tr>
                         </table>
 
                         <h4 class="text-center">নিয়োগ বিজ্ঞপ্তির ছবিঃ </h4>
                         <div class="container">
-                          <iframe src="{{$value->pdf}}" type="application/pdf" class="responsive-iframe" width="100%" style="min-height: 600px">
-                            <p>Your browser does not support PDFs.
-                              <a href="{{$value->pdf}}">Download the PDF</a>.
-                            </p>
-                          </iframe>
+                          @if($value->image)
+                            @php
+                            $img_array = json_decode($value->image);
+                            @endphp
+                            @foreach($img_array as $image)
+                            <a target="_blank" href="{{$image}}">
+                              <img src="{{$image}}" alt="" style="max-width: 100%">
+                            </a>
+                            @endforeach
+                          @endif
                         </div>
                       </div>
                     </div>

@@ -37,14 +37,10 @@ class SourceCtrl extends Controller
   public function uploadImage($file, $path, $size = null)
   {
     $file_name = uniqid().'.'.$file->getClientOriginalExtension();
-    // if($size)
-    // {
-    //   $file = Image::make($file->getRealPath());
-    //   $file->resize($size['w'], $size['h']);
-    // }
-    $base_path = base_path('public/uploads/'.$path);
-    $file->move($base_path, $file_name);
-    return '/uploads/'.$path.$file_name;
+    $path = 'uploads/'.$path;
+    $file->move(public_path($path), $file_name);
+    $fileUrl = '/'.$path.$file_name;
+    return $fileUrl;
   }
 
   public function dformat($date)

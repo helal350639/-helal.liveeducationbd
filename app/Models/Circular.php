@@ -18,6 +18,7 @@ class Circular extends Model
     'url',
     'details',
     'status',
+    'image',
     'pdf'
   ];
 }
