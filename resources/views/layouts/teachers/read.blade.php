@@ -78,57 +78,6 @@ $value = $teacher;
                       @endif
                     </td>
                   </tr>
-                  {{-- <tr>
-                    <td colspan="2"><h4>Sales & Connections</h4></td>
-                  </tr>
-                  <tr>
-                    <th>Courses</th>
-                    <td>
-                      @if($value->courses)
-                      @foreach($value->courses as $course)
-                      <span class="btn btn-success btn-xs">
-                        {{$course->name}}
-                      </span>
-                      @endforeach
-                      @endif
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>Departments</th>
-                    <td>
-                      @if($value->departments)
-                      @foreach($value->departments as $course)
-                      <span class="btn btn-primary btn-xs">
-                        {{$course->name}}
-                      </span>
-                      @endforeach
-                      @endif
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>Batches</th>
-                    <td>
-                      @if($value->batches)
-                      @foreach($value->batches as $course)
-                      <span class="btn btn-info btn-xs">
-                        {{$course->name}}
-                      </span>
-                      @endforeach
-                      @endif
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>Groups</th>
-                    <td>
-                      @if($value->groups)
-                      @foreach($value->groups as $course)
-                      <span class="btn btn-default btn-xs">
-                        {{$course->name}}
-                      </span>
-                      @endforeach
-                      @endif
-                    </td>
-                  </tr> --}}
               </tbody>
             </table>
           </div>

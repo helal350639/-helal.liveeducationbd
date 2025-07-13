@@ -57,8 +57,18 @@
                 
                   <p class="text-center"><img src="{{$user->image}}" alt=""  style="max-width:150px" /></p>
                 </div>
-                <div class="checkbox"><b>Status: &nbsp; </b>
-                  <label><input type="checkbox" name="status" value="Active" {{$user->status == 'Active'? 'checked': ''}}> Active</label>
+                <div class="form-group">
+                  <label>
+                    <input type="checkbox" name="status" id="status" style="width: 15px; height:15px" {{$user->status == 'Active' ?'checked':''}}>
+                    <span style="margin-top:-10px">Status</span>
+                  </label>
+
+                    &nbsp;
+                
+                  <label>
+                    <input type="checkbox" name="web" id="web" style="width: 15px; height:15px" {{$user->web == 'Yes' ? 'checked':''}}> 
+                    <span style="margin-top:-10px">Web</span>
+                  </label>
                 </div>
 
               </div> <!-- /.box-body -->

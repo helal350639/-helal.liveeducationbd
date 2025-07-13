@@ -2,13 +2,6 @@
 use \App\Http\Controllers\SourceCtrl;
 $source = New SourceCtrl;
 $value = $paper;
-
-// $deptId = [];
-
-// if($paper->department)
-// {
-//     array_push($deptIds, $val->id);
-// }
 @endphp
 
 @extends('dashboard')
@@ -75,17 +68,6 @@ $value = $paper;
                         </select>
                     </div>
                 </div>
-                {{-- <div class="col-md-3">
-                    <div class="form-group">
-                        <label for="">Group</label>
-                        <select name="group_id" id="group_id" class="form-control select2">
-                            <option value="">Select One</option>
-                            @foreach($groups as $val)
-                            <option value="{{$val->id}}" {{$value->group_id == $val->id? 'selected': ''}}>{{$val->name}}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div> --}}
                 <div class="col-md-12">
                     <div class="form-group">
                         <label for="header">Header</label>
@@ -134,13 +116,13 @@ $value = $paper;
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="open">Exam Start Time</label>
-                                <input type="datetime-local" class="form-control" name="open" id="open" value="{{$value->open}}">
+                                <input type="datetime-local" class="form-control" name="open" id="open" value="{{$value->open}}" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="close">Exam Finished Time</label>
-                                <input type="datetime-local" class="form-control" name="close" id="close" value="{{$value->close}}">
+                                <input type="datetime-local" class="form-control" name="close" id="close" value="{{$value->close}}" required>
                             </div>
                         </div>
                     </div>
