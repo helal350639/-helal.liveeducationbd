@@ -210,7 +210,7 @@ class CircularCtrl extends Controller
         
         $circular = Circular::where('id', $id)->update($data);
 
-        if($request->hasFile('image'))
+        if($request->hasFile('image') && $x_circular->image)
         {
           $img_array = json_decode($x_circular->image);
           foreach($img_array as $image)
@@ -249,7 +249,7 @@ class CircularCtrl extends Controller
         $file = Circular::find($id);
         $xfile = public_path($file->pdf);
 
-        if($xfile->image)
+        if($file->image)
         {
           $img_array = json_decode($file->image);
           foreach($img_array as $image)

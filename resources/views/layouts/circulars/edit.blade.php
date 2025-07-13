@@ -21,6 +21,11 @@ $value = $circular;
         <div class="box-header with-border">
             <h3 style="color: #800" class="box-title">Circular Details</h3>
         </div>
+        <div class="col-md-12 text-right toolbar-icon">
+          <a href="{{route('circular.create')}}" title="Add New One" class="label label-info"><i class="fa fa-plus"></i></a>
+          <a href="{{route('circular.index')}}" title="View" class="label label-success"><i class="fa fa-list"></i></a>
+        </div>
+
         <form action="{{route('circular.update', $circular)}}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
@@ -105,7 +110,16 @@ $value = $circular;
               <div class="col-md-12">
                   <div class="form-group">
                       <label for="pdf">PDF File</label>
-                      <input type="file" class="form-control" name="pdf" id="pdf" accept="application/pdf">
+                      <div class="input-group">
+                        <input type="file" class="form-control" name="pdf" id="pdf" accept="application/pdf">
+                        <div class="input-group-addon">
+                          @if($value->pdf)
+                          <a target="_blank" href="{{$value->pdf}}">
+                            View PDF <i class="fa fa-file-pdf-o text-danger"></i>
+                          </a>
+                          @endif
+                        </div>
+                      </div>
                   </div>
               </div>
               <div class="col-md-12">

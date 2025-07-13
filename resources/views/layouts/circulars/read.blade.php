@@ -105,7 +105,13 @@ $value = $circular;
                 <tr>
                   <th>PDF</th>
                   <td>
-                    <h3><a class="text-danger" target="_blank" href="{{$value->pdf}}"><i class="fa fa-file-pdf-o"></i></a><h3>
+                    @if($value->pdf)
+                    <h3>
+                      <a class="text-danger" target="_blank" href="{{$value->pdf}}">
+                        <i class="fa fa-file-pdf-o"></i>
+                      </a>
+                      <h3>
+                    @endif
                   </td>
                 </tr>
                 
