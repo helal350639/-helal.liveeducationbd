@@ -23,6 +23,7 @@ use App\Models\Complain;
 use App\Models\Routine;
 use App\Models\RoutineItemRow;
 use App\Models\Circular;
+use App\Models\CircularType;
 use Auth;
 use Session;
 
@@ -66,21 +67,24 @@ class HomePageCtrl extends Controller
     $json = Storage::get('about.json');
     $array = json_decode($json, true);
     $about = (object) $array;
-
-    $circular = new CircularCtrl();
-    $circulars = $circular->circulars();
+    
+    $circulars = CircularType::where('status', 'Active')->get();
 
     // dd($circulars);
     
     return view('homepage.index', compact('courses', 'sliders', 'batches', 'teachers', 'complains', 'about', 'circulars'));
   }
 
-  public function circular($key)
+  public function circular($id)
   {
-    $circulars = Circular::orderBy('id', 'DESC')
-    ->where('type', $key)
-    ->where('status', 'Published')
-    ->get();
+     $circular_type = CircularType::find($id);
+    
+     $circulars = $circular_type->circulars()
+      ->orderBy('id', 'DESC')
+      ->where('status', 'Published')
+      ->get();
+
+      // dd($circulars);
 
     return view('homepage.circular', compact('circulars'));
   }

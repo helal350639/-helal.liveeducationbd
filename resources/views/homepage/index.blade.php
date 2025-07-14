@@ -514,56 +514,19 @@ if($user)
           @foreach($circulars as $key => $value)
 
           <div class="col-md-3 col-6 mb-1 dropdown bcs-jobs" id="home-services-area-one">
-            <a href="{{route('home.circular', $key)}}">
+            <a href="{{route('home.circular', $value->id)}}">
               <div class="my-home-service premium-course-box">
                 <div class="my-home-service-icon">
                   <img src="/web/img/pdf-logo.jpg" alt="" loading="lazy">
                 </div>
                 <div class="my-home-service-content">
-                  <h3>{{$value}}</h3>
+                  <h3>{{$value->name}}</h3>
                 </div>
               </div>
             </a>
           </div>
 
           @endforeach
-
-          {{-- <div class="col-md-3 col-6 mb-1 dropdown bcs-jobs" id="home-services-area-one">
-            <a href="{{route('home.circular')}}">
-              <div class="my-home-service premium-course-box">
-                <div class="my-home-service-icon">
-                  <img src="/web/img/pdf-logo.jpg" alt="" loading="lazy">
-                </div>
-                <div class="my-home-service-content">
-                  <h3>ডিপ্লোমা জব সার্কুলার</h3>
-                </div>
-              </div>
-            </a>
-          </div>
-          <div class="col-md-3 col-6 mb-1 dropdown bcs-jobs" id="home-services-area-one">
-            <a href="{{route('home.circular')}}">
-              <div class="my-home-service premium-course-box">
-                <div class="my-home-service-icon">
-                  <img src="/web/img/pdf-logo.jpg" alt="" loading="lazy">
-                </div>
-                <div class="my-home-service-content">
-                  <h3>১১ - ২০ তম গ্রেডের জব সার্কুলার</h3>
-                </div>
-              </div>
-            </a>
-          </div>
-          <div class="col-md-3 col-6 mb-1 dropdown bcs-jobs" id="home-services-area-one">
-            <a href="{{route('home.circular')}}">
-              <div class="my-home-service premium-course-box">
-                <div class="my-home-service-icon">
-                  <img src="/web/img/pdf-logo.jpg" alt="" loading="lazy">
-                </div>
-                <div class="my-home-service-content">
-                  <h3>বে-সরকারি জব সার্কুলার</h3>
-                </div>
-              </div>
-            </a>
-          </div> --}}
 
         </div>
       </div>

@@ -220,6 +220,7 @@ Route::middleware(['auth'])->group(function()
 	Route::resource('routine', 'RoutineCtrl');
 	Route::resource('sms', 'SmsCtrl');
 	Route::resource('email', 'EmailCtrl');
+	Route::resource('circular-type', 'CircularTypeCtrl');
 	Route::resource('circular', 'CircularCtrl');
 
 	/** -------------------- Custom Routes ------------------ */

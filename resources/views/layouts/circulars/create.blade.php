@@ -23,10 +23,9 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <label for="name">Circular Type</label>
-                        <select class="form-control select2" name="type" id="type" required>
-                            <option value="">Select One</option>
-                            @foreach($circulars as $key => $val)
-                            <option value="{{$key}}">{{$val}}</option>
+                        <select class="form-control select2" multiple name="type[]" id="type" required>
+                            @foreach($circular_types as $key => $val)
+                            <option value="{{$val->id}}">{{$val->name}}</option>
                             @endforeach
                         </select>
                     </div>
@@ -70,7 +69,7 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="fee">Application Fee</label>
-                        <input type="number" class="form-control" name="fee" id="fee" required placeholder="00.00">
+                        <input type="text" class="form-control" name="fee" id="fee" placeholder="00.00">
                     </div>
                 </div>
                 <div class="col-md-12">
@@ -106,6 +105,14 @@
                           <option value="Unpublished">Unpublished</option>
                         </select>
                     </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <br>
+                    <label for="notify">
+                      <input type="checkbox" name="notify" id="notify"> Notify to the students?
+                    </label>
+                  </div>
                 </div>
             </div> <!-- /.box body -->
             <div class="box-footer">

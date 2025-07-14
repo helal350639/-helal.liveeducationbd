@@ -20,5 +20,10 @@ class Circular extends Model
     'status',
     'image',
     'pdf'
-  ];
+  ];  
+  
+  public function circularType()
+  {
+    return $this->belongsToMany(CircularType::class);
+  }
 }

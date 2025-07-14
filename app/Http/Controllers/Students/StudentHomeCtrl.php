@@ -20,6 +20,7 @@ use App\Models\Syllabus;
 use App\Models\Complain;
 use App\Models\Order;
 use App\Models\Routine;
+use App\Models\Circular;
 use Auth;
 use Session;
 use Mail;
@@ -85,6 +86,8 @@ class StudentHomeCtrl extends Controller
     ->select('orders.*', 'batches.name')
     ->get();
 
+    $circulars = Circular::where('status', 'Published')->count();
+
     $data = [
       'course' => $mycourses,
       'free_exam' => $free_exam,
@@ -93,7 +96,7 @@ class StudentHomeCtrl extends Controller
       'routine' => $routine,
       'exam_pdf' => $exam_pdf,
       'e-book' => '0',
-      'circular' => '0'
+      'circular' => $circulars
     ];
 
     return view('student-panel.dashboard', compact('data', 'student', 'orders'));

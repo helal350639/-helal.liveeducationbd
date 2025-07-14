@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Filter;
-use App\Models\SubFilter;
+use App\Models\CircularType;
 use App\Models\Role;
 use App\Models\Circular;
+use App\Models\Notification;
 use Auth;
 use Image;
 use Toastr;
@@ -58,8 +58,8 @@ class CircularCtrl extends Controller
      */
     public function create()
     {
-      $circulars = (object) $this->circulars();
-      return view('layouts.circulars.create', compact('circulars'));
+      $circular_types = CircularType::where('status', 'Active')->get();
+      return view('layouts.circulars.create', compact('circular_types'));
     }
 
     /**
@@ -72,7 +72,7 @@ class CircularCtrl extends Controller
     {
         $source = new SourceCtrl;
         $validator = Validator::make($request->all(), [
-            'type' => 'required|number',
+            'type' => 'required|array',
             'title' => 'required|string',
             'published_at' => 'nullable|string',
             'start_at' => 'nullable|string',
@@ -88,11 +88,17 @@ class CircularCtrl extends Controller
         ]);
         
         $data = $request->all();
-        // dd($data);
 
         if(isset($data['_token']))
         {
           unset($data['_token']);
+        }
+
+        $types = $data['type'];
+
+        if(isset($data['type']))
+        {
+          unset($data['type']);
         }
 
         try {
@@ -114,6 +120,18 @@ class CircularCtrl extends Controller
           }
           
           $circular = Circular::create($data);
+          $circular->circularType()->attach($types);
+
+          if(isset($data['notify']))
+          {
+            Notification::create([
+              'title' => $data['title'],
+              'route' => 'home.circular.show',
+              'type_id' => $id,
+              'type' => 'circular',
+            ]);
+          }
+
           return redirect()->route('circular.show', $circular->id);
         }
         catch(\Eexception $e)
@@ -131,8 +149,8 @@ class CircularCtrl extends Controller
      */
     public function show($id)
     {
-        $circular = Circular::find($id);
-        return view('layouts.circulars.read', compact('circular'));
+      $circular = Circular::find($id);
+      return view('layouts.circulars.read', compact('circular'));
     }
 
     /**
@@ -143,9 +161,9 @@ class CircularCtrl extends Controller
      */
     public function edit($id)
     {
-      $circulars = $this->circulars();
+      $circular_types = CircularType::where('status', 'Active')->get();
       $circular = Circular::find($id);
-      return view('layouts.circulars.edit', compact('circulars', 'circular'));
+      return view('layouts.circulars.edit', compact('circular_types', 'circular'));
     }
 
     /**
@@ -159,7 +177,7 @@ class CircularCtrl extends Controller
     {        
       $source = new SourceCtrl;
       $validator = Validator::make($request->all(), [
-          'type' => 'required|string',
+          'type' => 'required|array',
           'title' => 'required|string',
           'published_at' => 'nullable|string',
           'start_at' => 'nullable|string',
@@ -176,8 +194,6 @@ class CircularCtrl extends Controller
       
       $data = $request->all();
 
-      // dd($data);
-
       if(isset($data['_token']))
       {
         unset($data['_token']);
@@ -186,6 +202,13 @@ class CircularCtrl extends Controller
       if(isset($data['_method']))
       {
         unset($data['_method']);
+      }
+
+      $types = $data['type'];
+
+      if(isset($data['type']))
+      {
+        unset($data['type']);
       }
 
       $x_circular = Circular::find($id);
@@ -209,6 +232,18 @@ class CircularCtrl extends Controller
         }
         
         $circular = Circular::where('id', $id)->update($data);
+        $last_circular = Circular::find($id);
+        $last_circular->circularType()->sync($types);
+
+        if(isset($data['notify']))
+        {
+          Notification::create([
+            'title' => $data['title'],
+            'route' => 'home.circular.show',
+            'type_id' => $id,
+            'type' => 'circular',
+          ]);
+        }
 
         if($request->hasFile('image') && $x_circular->image)
         {

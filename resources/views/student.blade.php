@@ -3,6 +3,9 @@
 use \App\Http\Controllers\SourceCtrl;
 $source = New SourceCtrl;
 
+use \App\Models\Notification;
+$notifications = Notification::select('id', 'title', 'route', 'type_id')->get();
+
 $user = [];
 if(Auth::guard('student')->user())
 {
@@ -77,6 +80,8 @@ function active($name)
         }
         #Home_add{margin-top: 15px}
       }
+      .notification-indicator-number {
+      }
     </style>
 </head>
 <body>
@@ -91,16 +96,23 @@ function active($name)
           </div>
           <div class="moblie-icon">
 
-            <div class="dropdown">
-              <a href="javascript:void(0)" class="dropdown-/toggle text-warning" id="Bell" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: black;">
-                <i class="fa fa-bell"></i>
-              </a>
-              <ul class="dropdown-menu" aria-labelledby="Bell">
-                <li class="nav-item">
-                  <a class="nav-link" href="javascript:void(0)">...</a>
-                </li>
-              </ul>
-            </div>
+            @if($notifications)
+
+          <div class="dropdown" style="padding-right: 15px">
+            <a href="javascript:void(0)" class="dropdown-toggle text-warning" id="Bell" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: black;">
+              <i class="fa fa-bell"></i>
+            </a>
+            {{-- <span class="notification-indicator-number">1</span> --}}
+            <ul class="dropdown-menu" aria-labelledby="Bell">
+              @foreach($notifications as $val)
+              <li class="nav-item">
+                <a class="nav-link" href="{{$val->route && $val->id ? route($val->route, $val->type_id):'#'}}">{{$val->title}}</a>
+              </li>
+              @endforeach
+            </ul>
+          </div>
+
+          @endif
 
             @if(!empty($user))
               <div class="dropdown user user-menu">
@@ -125,7 +137,7 @@ function active($name)
                     <div class="clearfix"></div>
                   </div>
 
-                  <li><a class="dropdown-item" href="{{route('students.dashboard')}}">ড্যাশবোর্ড</a></li>
+                  <li><a class="dropdown-item" href="{{route('students.dashboard')}}">স্টুডেন্ট ড্যাশবোর্ড</a></li>
                   <li>
                     <a class="dropdown-item" href="{{route('students.my-syllabus')}}">সিলেবাস সমূহ</a>
                   </li>
@@ -244,7 +256,7 @@ function active($name)
             </li>
             <li class="nav-item">
               <a class="nav-link" href="{{route('students.dashboard')}}">
-                ড্যাশবোর্ড
+                স্টুডেন্ট ড্যাশবোর্ড
               </a>
             </li>
             <li class="nav-item">
@@ -308,6 +320,24 @@ function active($name)
             </form>
           </ul>
 
+          @if($notifications)
+
+          <div class="dropdown" style="padding-right: 15px">
+            <a href="javascript:void(0)" class="dropdown-toggle text-warning" id="Bell" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: black;">
+              <i class="fa fa-bell"></i>
+            </a>
+            {{-- <span class="notification-indicator-number">1</span> --}}
+            <ul class="dropdown-menu" aria-labelledby="Bell">
+              @foreach($notifications as $val)
+              <li class="nav-item">
+                <a class="nav-link" href="{{$val->route && $val->id ? route($val->route, $val->type_id):'#'}}">{{$val->title}}</a>
+              </li>
+              @endforeach
+            </ul>
+          </div>
+
+          @endif
+
           @if(!empty($user))
           <div class="dropdown user user-menu d-none d-lg-block">
             <div class="dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -331,7 +361,7 @@ function active($name)
                 </h4>
               </div>
 
-                <li><a class="dropdown-item" href="{{route('students.dashboard')}}">ড্যাশবোর্ড</a></li>
+                <li><a class="dropdown-item" href="{{route('students.dashboard')}}">স্টুডেন্ট ড্যাশবোর্ড</a></li>
                 <li>
                   <a class="dropdown-item" href="{{route('students.my-syllabus')}}">সিলেবাস সমূহ</a>
                 </li>

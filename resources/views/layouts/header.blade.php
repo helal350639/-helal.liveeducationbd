@@ -246,7 +246,7 @@ if($complains)
           </ul>
         </li>
 
-        <li class="treeview">
+        {{-- <li class="treeview">
           <a href="#">
             <i class="fa fa-object-group"></i>
             <span>Groups</span>
@@ -258,7 +258,7 @@ if($complains)
             <li><a href="{{route('group.create')}}"><i class="fa fa-pencil"></i> Create Group</a></li>
             <li><a href="{{route('group.index')}}"><i class="fa fa-object-group"></i> View Groups</a></li>
           </ul>
-        </li>
+        </li> --}}
        
         <li class="treeview">
           <a href="#">
@@ -377,6 +377,9 @@ if($complains)
             </li>
             <li>
               <a href="/about-us"><i class="fa fa-copy"></i> About Us</a>
+            </li>
+            <li>
+              <a href="/circular-type"><i class="fa fa-copy"></i> Circular Types</a>
             </li>
             <li>
               <a href="/circular"><i class="fa fa-copy"></i> Circulars</a>

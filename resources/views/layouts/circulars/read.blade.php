@@ -51,7 +51,11 @@ $value = $circular;
                   </tr>
                   <tr>
                     <th>Type:</th>
-                    <td>{{$circulars->circulars($value->type)}}</td>
+                    <td>
+                      @foreach($value->circularType()->get() as $val)
+                      <label class="label label-primary">{{$val->name}}</label>
+                      @endforeach
+                    </td>
                   </tr>
                   <tr>
                     <th>Publish Date</th>

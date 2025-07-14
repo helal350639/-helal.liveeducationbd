@@ -170,7 +170,7 @@ font-size: 16px;
       <div class="row">
          <div class="col-md-12">
             <div class="section-title text-center mb-4">
-               <h2> ড্যাশবোর্ড </h2>
+               <h2> স্টুডেন্ট ড্যাশবোর্ড </h2>
                <hr class="w-25 mx-auto bg-danger" />
                <p style="font-size: 24px;"> Registration ID: <span style=" font-weight: 700; color: #080;">{{$source->numset($user->id, 6)}}</span></p>
             </div>
@@ -284,7 +284,7 @@ font-size: 16px;
          </div>
          <div class="col-6 col-lg-3">
             <div class="card card-body shadow-sm">
-               <a href="#">
+               <a href="{{route('homepage')}}#circular">
                   <div class="corce_exam_mobile_res">
                      <div>
                         <span>নিয়োগ বিজ্ঞপ্তি</span>

@@ -45,7 +45,6 @@ $source = New SourceCtrl;
                 <tr>
                   <th>Id</th>
                   <th>Title</th>
-                  <th>Type</th>
                   <th>Publish Date</th>
                   <th>Apply Start</th>
                   <th>Deadline</th>
@@ -59,7 +58,6 @@ $source = New SourceCtrl;
                 <tr>
                   <td>{{$value->id}}</td>
                   <td>{{$value->title}}</td>
-                  <td>{{$circular->circulars($value->type)}}</td>
                   <td>{{$source->dformat($value->published_at)}}</td>
                   <td>{{$source->dformat($value->start_at)}}</td>
                   <td>{{$source->dformat($value->end_at)}}</td>
