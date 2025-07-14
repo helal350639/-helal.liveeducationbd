@@ -544,17 +544,18 @@ if($user)
         </h1>
       </div>
     </div>
-    <div class="our-story-event-area col-md-6 offset-md-3 py-5">
+    <div class="our-story-event-area col-md-12 py-5">
       <div class="row g-3 g-lg-4">
 
         @foreach($teachers as $teacher)
-          <a href="{{route('home.coming-soon')}}" class="col-6 col-lg-4 mb-5 text-decoration-none">
-            <div class="event-area-content" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{{$teacher->designation}}">
+          <a href="{{route('home.coming-soon')}}" class="col-6 col-lg-2 mb-5 text-decoration-none">
+            <div class="event-area-content" data-bs-toggle="tooltip" data-bs-placement="bottom">
               <div class="event-icon">
                 <img src="{{$teacher->image ? $teacher->image : '/img/avatar.png'}}" srcset="" alt="Teacher Image" style="height: 90px; border: 4px solid #1CAB55; border-radius: 50%;" loading="lazy">
               </div>
               <div class="event-content">
                 <h3 class="text-uppercase text-black">{{$teacher->name}}</h3>
+                <p>{!! $teacher->designation !!}</p>
               </div>
             </div>
           </a>
