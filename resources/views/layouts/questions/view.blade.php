@@ -242,7 +242,7 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
         </div><!-- /.box -->
       </div>
       
-      <div id="loading" class="loading hid/e">
+      <div id="loading" class="loading hide">
         <img src="/img/loading.gif" alt="">
       </div>
 
