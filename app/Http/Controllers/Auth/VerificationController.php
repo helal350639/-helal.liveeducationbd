@@ -79,12 +79,14 @@ class VerificationController extends Controller
             'success' => true,
             'result' => $result
         ], 200);
+        
     }
 
     public function otpCheck(Request $request)
     {
         $this->Validate($request, [
-            'otp' => 'required|string|min:4|max:6'
+            'otp' => 'required|string|min:4|max:6',
+            'study' => 'required|string|max:255'
         ]);
 
         $otp = Session::get('_otp');
@@ -93,6 +95,7 @@ class VerificationController extends Controller
             try {
                 Student::where('id', Auth::guard('student')->id())->update([
                     'contact' => $otp['contact'],
+                    'studying' => $request->study,
                     'contact_verify' => 'Yes'
                 ]);
             }

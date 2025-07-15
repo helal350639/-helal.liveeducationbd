@@ -65,6 +65,7 @@ function check($id)
                   <th>Name</th>
                   <th>Email</th>
                   <th>Contact</th>
+                  <th>Studying</th>
                   <th>Status</th>
                   <th>Created By</th>
                   <th>Created On</th>
@@ -82,6 +83,7 @@ function check($id)
                 <td>{{$value->name}}</td>
                 <td>{{$value->email}}</td>
                 <td>{{$value->contact}}</td>
+                <td>{{$value->studying}}</td>
                 <td>
                   @if($value->status == "Active")
                   <span class="label label-success">{{$value->status}}</span>

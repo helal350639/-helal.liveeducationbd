@@ -1,3 +1,6 @@
+<style>
+  .error{color:red}
+</style>
 <div class="modal fade" id="modal-contact" style="margin-top:60px">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -22,6 +25,23 @@
 {{-- contact verification end --}}
 
 <script>
+  function checkStudy(e)
+  {
+    if(e.options[e.selectedIndex].value == 'Others')
+    {
+      let elm = document.createElement('div');
+      elm.setAttribute('class', 'form-group');
+      elm.innerHTML = '<label>Write that you are studying</label>'+
+      '<input name="other" id="other" class="form-control" required>'+
+      '<p class="error"></p>';
+      e.parentNode.parentNode.append(elm);
+      e.parentNode.nextElementSibling.lastChild.focus();
+    }
+    else if(e.parentNode.nextElementSibling)
+    {
+      e.parentNode.nextElementSibling.remove();
+    }
+  }
 
   @if(Auth::guard('student')->user() && Auth::guard('student')->user()->contact == null)
   
@@ -68,9 +88,20 @@
           if(data.success === true)
           {
             contactBody.innerHTML = '<div class="form-group">'+
-              '<label for="">OTP: </label>'+
+              '<label for="">OTP: <span class="error">4 digit number has been sent by SMS.</span> </label>'+
               '<input type="number" name="otp" id="otp-number" class="form-control" placeholder="xxxx"/>'+
-              '<p style="color:red">Please check your phone. 4 digit number has been sent by SMS.</p>'+
+              '<p style="color:red">Check your mobile phone SMS. </p>'+
+            '</div>'+
+            '<div class="form-group">'+
+              '<label for="">What are you studying? </label>'+
+              '<select name="study" id="study" class="form-control" onchange="checkStudy(this)" required >'+
+                '<option value="">Select One</option>'+
+                '<option value="জব প্রস্তুতি (ডিপ্লোমা-ইন-ইঞ্জিনিয়ারিং)">জব প্রস্তুতি (ডিপ্লোমা-ইন-ইঞ্জিনিয়ারিং)</option>'+
+                '<option value="পলিটেকনিক স্টুডেন্ট">পলিটেকনিক স্টুডেন্ট</option>'+
+                '<option value="জেনারেল স্টুডেন্ট">জেনারেল স্টুডেন্ট</option>'+
+                '<option value="Others">Others</option>'+
+              '</select>'+
+              '<p class="error"></p>'+
             '</div>';
 
             contactFooter.innerHTML = '<button type="button" class="btn btn-info" onclick="confirm()">Confirm</button>';
@@ -92,37 +123,88 @@
 
   function confirm()
   {
-    let modalId = document.getElementById('modal-contact');
-    let otp = document.getElementById('otp-number');
-    $.ajaxSetup({
-      headers: {
-        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-      }
-    });
+    let submit = false;
+    let studyOptions = '';
+    const modalId = document.getElementById('modal-contact');
+    const otp = document.getElementById('otp-number');
+    const study = document.getElementById('study');
+    const other = document.getElementById('other');
+    if(otp.value == '')
+    {
+      otp.style.borderColor = 'red';
+      submit = false;
+    }
+    else
+    {
+      submit = true;
+    }
 
-    var formData = new FormData();
-    formData.append('otp', otp.value);
+    if(study.options[study.selectedIndex].value == '')
+    {
+      study.style.borderColor = 'red';
+      study.nextElementSibling.innerHTML = 'Choose a option';
+      submit = false;
+    }
+    else
+    {
+      submit = true;
+    }
 
-    $.ajax({
-      url: '{{route("otp-check")}}',
-      type: 'POST',
-      data: formData,
-      processData: false,
-      contentType: false,
-      success: function(data){
-        if(data.success == true)
-        {
-          modalId.style.display = 'none';
-          alert('Contact verification successfull');
+    if(study.options[study.selectedIndex].value == 'Others' &&  other.value == '')
+    {
+      submit = false;
+      other.style.borderColor = 'red';
+      other.focus();
+
+      other.nextElementSibling.innerHTML = 'Fill out this field.';
+    }
+    else
+    {
+      submit = true;
+    }
+
+    if(study.options[study.selectedIndex].value == 'Others')
+    {
+      studyOptions = other.value;
+    }
+    else
+    {
+      studyOptions = study.options[study.selectedIndex].value;
+    }
+
+    if(submit == true)
+    {
+      $.ajaxSetup({
+        headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
-        else
-        {
-          alert(data.message);
-        }
-      },
-      error: function(data){
-        console.log(data);
-      },
-    });
+      });
+
+      var formData = new FormData();
+      formData.append('otp', otp.value);
+      formData.append('study', studyOptions);
+
+      $.ajax({
+        url: '{{route("otp-check")}}',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(data){
+          if(data.success == true)
+          {
+            modalId.style.display = 'none';
+            alert('Contact verification successfull');
+          }
+          else
+          {
+            alert(data.message);
+          }
+        },
+        error: function(data){
+          console.log(data);
+        },
+      });
+    }
   }
 </script>
