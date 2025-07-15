@@ -242,8 +242,8 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
         </div><!-- /.box -->
       </div>
       
-      <div id="loading" class="loading hide">
-        <img src="/img/loading.png" alt="">
+      <div id="loading" class="loading hid/e">
+        <img src="/img/loading.gif" alt="">
       </div>
 
       {{-- <div class="alert hi/de" style="background:#fff;right:0">///</div> --}}
@@ -392,7 +392,7 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
   {
     //loading image view
     loading.classList.remove('hide');
-    
+
       let ids = Array.from(e.selectedOptions).map(({value}) => value);
 
       $.ajax({
