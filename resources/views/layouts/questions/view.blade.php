@@ -243,7 +243,7 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
       </div>
       
       <div id="loading" class="loading hide">
-        <img src="/img/logo_animation.png" alt="">
+        <img src="/img/loading.png" alt="">
       </div>
 
       {{-- <div class="alert hi/de" style="background:#fff;right:0">///</div> --}}
@@ -292,6 +292,8 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
 
   function getDepartments(e)
   {
+    loading.classList.remove('hide');
+
     let ids = Array.from(e.selectedOptions).map(({value}) => value);
 
     $.ajax({
@@ -314,6 +316,8 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
             $("#subject_id").html('')
             $("#chapter_id").html('')
           }
+          //hide loading image
+          loading.classList.add('hide');
         },
         error: function(data) {
           console.log('data error');
@@ -323,6 +327,8 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
 
   function getSemesters(e)
   {
+    loading.classList.remove('hide');
+
       let ids = Array.from(e.selectedOptions).map(({value}) => value);
       let department = document.getElementById('department_id');
       let preElm = department.parentNode.parentNode;
@@ -371,6 +377,8 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
                       preElm.nextElementSibling.remove()
                   }
               }
+          //hide loading image
+          loading.classList.add('hide');
           },
           error: function(data) { 
                   console.log('data error');
@@ -382,6 +390,9 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
 
   function getSubjects(e)
   {
+    //loading image view
+    loading.classList.remove('hide');
+    
       let ids = Array.from(e.selectedOptions).map(({value}) => value);
 
       $.ajax({
@@ -402,6 +413,8 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
                   $("#subject_id").html('')
                   $("#chapter_id").html('')
               }
+            //hide loading image
+            loading.classList.add('hide');
           },
           error: function(data) { 
                   console.log('data error');
@@ -411,6 +424,9 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
 
   function getSemsSubjects(e)
   {
+    //loading image view
+    loading.classList.remove('hide');
+
       let ids = Array.from(e.selectedOptions).map(({value}) => value);
 
       $.ajax({
@@ -431,6 +447,8 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
                   $("#subject_id").html('')
                   $("#chapter_id").html('')
               }
+          //hide loading image
+          loading.classList.add('hide');
           },
           error: function(data) { 
                   console.log('data error');
@@ -440,6 +458,9 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
 
   function getChapters(e)
   {
+    //loading image view
+    loading.classList.remove('hide');
+
       let ids = Array.from(e.selectedOptions).map(({value}) => value);
 
       $.ajax({
@@ -459,9 +480,11 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
               }else{
                   $("#chapter_id").html('')
               }
+          //hide loading image
+          loading.classList.add('hide');
           },
           error: function(data) { 
-                  console.log('data error');
+            console.log('data error');
           }
       });
   }
