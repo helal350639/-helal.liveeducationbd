@@ -129,7 +129,7 @@ function checkIn($id, $arr)
               <div class="col-md-12">
                   <div class="form-group">
                       <label for="details">Details</label>
-                      <textarea class="form-control" name="details" id="details" rows="5">{{$value->details}}</textarea>
+                      <textarea class="form-control" name="details" id="details" rows="5" >{{$value->details}}</textarea>
                   </div>
               </div>
               <div class="col-md-6">

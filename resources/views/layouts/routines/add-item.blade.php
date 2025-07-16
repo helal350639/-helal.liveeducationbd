@@ -27,49 +27,53 @@
               <a href="{{route('routine.index')}}" title="View" class="label label-success"><i class="fa fa-list"></i></a>
             </div>
         </div>
-        <table class="table table-bordered">
-          <tr>
-            <th>ID</th>
-            <th>Exam Name/No</th>
-
-            @foreach($subjects as $subject)
-            <th>{{$subject->name}}</th>
-            @endforeach
-
-            @foreach($departments as $department)
-            <th>{{$department->name}}</th>
-            @endforeach
-
-            <th>Date & Time</th>
-            <th width=70>Action</th>
-          </tr>
-
-          @foreach($routine_rows as $key => $item)
-          <tr>
-            <td>{{$item->id}}</td>
-            <td>{{$item->paper_name}}</td>
-
-            @foreach($item->subjects as $subject)
-            <td>{!!$subject->chapter!!}</td>
-            @endforeach
-
-            @foreach($item->departments as $department)
-            <td>{!!$department->details!!}</td>
-            @endforeach
-
-            <td>{{$item->exam_at}}</td>
-            <td>
-              <a class="btn btn-warning btn-xs" href="{{route('routine.item.edit', $item->id)}}">
-                <i class="fa fa-pencil"></i>
-              </a>
-              <a class="btn btn-danger btn-xs" href="{{route('routine.item.delete', $item->id)}}" onclick="return confirm('Are you sure, you want to delete this?')">
-                <i class="fa fa-trash"></i>
-              </a>
-            </td>
-          </tr>
-          @endforeach
-
-        </table>
+        <div class="box-body">
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <tr>
+                <th>ID</th>
+                <th>Exam Name/No</th>
+    
+                @foreach($subjects as $subject)
+                <th>{{$subject->name}}</th>
+                @endforeach
+    
+                @foreach($departments as $department)
+                <th>{{$department->name}}</th>
+                @endforeach
+    
+                <th>Date & Time</th>
+                <th width=70>Action</th>
+              </tr>
+    
+              @foreach($routine_rows as $key => $item)
+              <tr>
+                <td>{{$item->id}}</td>
+                <td>{{$item->paper_name}}</td>
+    
+                @foreach($item->subjects as $subject)
+                <td>{!!$subject->chapter!!}</td>
+                @endforeach
+    
+                @foreach($item->departments as $department)
+                <td>{!!$department->details!!}</td>
+                @endforeach
+    
+                <td>{{$item->exam_at}}</td>
+                <td>
+                  <a class="btn btn-warning btn-xs" href="{{route('routine.item.edit', $item->id)}}">
+                    <i class="fa fa-pencil"></i>
+                  </a>
+                  <a class="btn btn-danger btn-xs" href="{{route('routine.item.delete', $item->id)}}" onclick="return confirm('Are you sure, you want to delete this?')">
+                    <i class="fa fa-trash"></i>
+                  </a>
+                </td>
+              </tr>
+              @endforeach
+    
+            </table>
+          </div>
+        </div>
       </div>
       <div class="clearfix"></div>
     </div>
