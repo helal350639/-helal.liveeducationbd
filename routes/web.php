@@ -222,6 +222,9 @@ Route::middleware(['auth'])->group(function()
 	Route::resource('email', 'EmailCtrl');
 	Route::resource('circular-type', 'CircularTypeCtrl');
 	Route::resource('circular', 'CircularCtrl');
+	Route::resource('ad', 'AdCtrl');
+	Route::resource('video', 'VideoCtrl');
+	Route::resource('service', 'ServiceCtrl');
 
 	/** -------------------- Custom Routes ------------------ */
 	Route::controller(DepartmentCtrl::class)->group(function()

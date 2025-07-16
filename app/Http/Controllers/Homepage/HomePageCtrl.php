@@ -24,6 +24,7 @@ use App\Models\Routine;
 use App\Models\RoutineItemRow;
 use App\Models\Circular;
 use App\Models\CircularType;
+use App\Models\Ad;
 use Auth;
 use Session;
 
@@ -70,9 +71,9 @@ class HomePageCtrl extends Controller
     
     $circulars = CircularType::where('status', 'Active')->get();
 
-    // dd($circulars);
+    $ads = Ad::where('status', 'Active')->limit(3)->get();
     
-    return view('homepage.index', compact('courses', 'sliders', 'batches', 'teachers', 'complains', 'about', 'circulars'));
+    return view('homepage.index', compact('courses', 'sliders', 'batches', 'teachers', 'complains', 'about', 'circulars', 'ads'));
   }
 
   public function circular($id)

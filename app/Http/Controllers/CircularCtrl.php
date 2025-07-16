@@ -21,25 +21,6 @@ class CircularCtrl extends Controller
       $this->middleware('auth');
     }
 
-    public function circulars($key = null)
-    {
-      $circulars = [
-        '৯ম & অন্যান্য জব সার্কুলার',
-        'ডিপ্লোমা জব সার্কুলার',
-        '১১ - ২০ তম গ্রেডের জব সার্কুলার',
-        'বে-সরকারি জব সার্কুলার'
-      ];
-
-      if($key === null)
-      {
-        return $circulars;
-      }
-      else
-      {
-        return $circulars[$key];
-      }
-    }
-
     /**
      * Display a listing of the resource.
      *
@@ -134,7 +115,7 @@ class CircularCtrl extends Controller
 
           return redirect()->route('circular.show', $circular->id);
         }
-        catch(\Eexception $e)
+        catch(\Exception $e)
         {
           return $e->getMessage();
         }
@@ -266,7 +247,7 @@ class CircularCtrl extends Controller
         Session::flash('success', 'The circular successfully updated.');
         return redirect()->route('circular.show', $id);
       }
-      catch(\Eexception $e)
+      catch(\Exception $e)
       {
         return $e->getMessage();
       }

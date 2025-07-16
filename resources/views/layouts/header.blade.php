@@ -373,6 +373,15 @@ if($complains)
           </a>
           <ul class="treeview-menu">
             <li>
+              <a href="{{route('ad.index')}}"><i class="fa fa-copy"></i> Ads</a>
+            </li>
+            {{-- <li>
+              <a href="{{route('video.index')}}"><i class="fa fa-youtube"></i> Videos</a>
+            </li> --}}
+            {{-- <li>
+              <a href="{{route('service.index')}}"><i class="fa fa-copy"></i> Services</a>
+            </li> --}}
+            <li>
               <a href="/page"><i class="fa fa-copy"></i> Pages</a>
             </li>
             <li>
@@ -383,9 +392,6 @@ if($complains)
             </li>
             <li>
               <a href="/circular"><i class="fa fa-copy"></i> Circulars</a>
-            </li>
-            <li>
-              <a href="#"><i class="fa fa-youtube"></i> Videos</a>
             </li>
           </ul>
         </li>

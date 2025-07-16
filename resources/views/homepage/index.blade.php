@@ -19,11 +19,16 @@ if($user)
 <section id="Home_add">
   <div class="container-fluid">
     <div class="row">
+      @foreach($ads as $key => $val)
+      @if($key == 0)
       <div class="col-lg-2" style="padding: calc(var(--bs-gutter-x)* .0)!important;">
         <div class="home-1st-add-image">
-          <a href="{{route('home.coming-soon')}}"><img src="/web/img/ad1.jpg" alt="" srcset="" loading="lazy"></a>
+          <a href="{{route('home.coming-soon')}}">
+            <img src="{{$val->image}}" alt="" srcset="" loading="lazy">
+          </a>
         </div>
       </div>
+      @elseif($key == 1)
       <div class="col-lg-7 col-md-12" style="
         padding-left: calc(var(--bs-gutter-x) * 0.08) !important;
         padding-right: calc(var(--bs-gutter-x) * 0.08) !important;
@@ -31,17 +36,21 @@ if($user)
         padding-bottom: 0 !important;">
         <div class="home-2nd-add-image">
           <a href="#">
-            <img src="/web/img/eid_mubarak.jpg?v=1.12" alt="" srcset="" loading="lazy">
+            <img src="{{$val->image}}" alt="" srcset="" loading="lazy">
           </a>
         </div>
       </div>
+      @elseif($key == 2)
       <div class="col-lg-3" style="padding: 0 !important;">
         <div class="home-3rd-add-image dropdown">
           <a href="{{route('home.coming-soon')}}" class="dropdown-/toggle" id="home3rdAddDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-          <img src="/web/img/ad3.jpg" alt="" loading="lazy" srcset="">
+          <img src="{{$val->image}}" alt="" loading="lazy" srcset="">
           </a>
         </div>
       </div>
+      @endif
+      @endforeach
+
     </div>
   </div>
 </section>
