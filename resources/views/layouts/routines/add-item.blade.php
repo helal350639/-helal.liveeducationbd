@@ -265,7 +265,7 @@
     //this script for text editor
     $(document).ready(function() {
         $('.editor').summernote({
-          toolbar: [],
+          toolbar: [['view', ['fullscreen', 'codeview']]],
             height: 100
         });
     });

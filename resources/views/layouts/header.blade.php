@@ -375,12 +375,12 @@ if($complains)
             <li>
               <a href="{{route('ad.index')}}"><i class="fa fa-copy"></i> Ads</a>
             </li>
-            {{-- <li>
+            <li>
               <a href="{{route('video.index')}}"><i class="fa fa-youtube"></i> Videos</a>
-            </li> --}}
-            {{-- <li>
+            </li>
+            <li>
               <a href="{{route('service.index')}}"><i class="fa fa-copy"></i> Services</a>
-            </li> --}}
+            </li>
             <li>
               <a href="/page"><i class="fa fa-copy"></i> Pages</a>
             </li>

@@ -57,6 +57,7 @@ Route::controller(HomePageCtrl::class)->group(function()
   Route::get('home/circular-details/{id}', 'circularShow')->name('home.circular.show');
   Route::get('home/results/{paper}', 'resultList')->name('home.results');
   Route::get('home/routine-filter/{id}/{department?}', 'routineFilter')->name('home.routine.filter');
+  Route::get('service-details/{id}', 'serviceShow')->name('home.service.show');
 });
 
 Route::controller(CategoryCtrl::class)->group(function()

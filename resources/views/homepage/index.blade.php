@@ -11,6 +11,10 @@ if($user)
 @section('title', 'হোম')
 @section('content')
 
+<style>
+  .teacher_title{font-size:16px!important}
+</style>
+
 <!-- preloader --> 
 <div class="preloader text-center">
   <img src="/web/img/preloader.gif" alt="">
@@ -102,80 +106,31 @@ if($user)
               </div>
             </div>
             <div class="col-md-12 col-lg-4">
+              @if($main_video)
               <div class="main-banner-video">
                 <div class="ratio ratio-16x9" style="width: 100%; height: 0; padding-bottom: 49.25%;" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="...">
-                  <iframe id="videoIframe2" src="https://www.youtube.com/embed/lEw6fQwQXZM?si=myZrYsOTKstGK0zx" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
+                  <iframe id="videoIframe2" src="https://www.youtube.com/embed/{{$main_video->url}}?si=myZrYsOTKstGK0zx" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
                   <!-- Transparent overlay to trigger the click event -->
-                  <div onclick="showVideoModal('https://www.youtube.com/embed/lEw6fQwQXZM?autoplay=1')" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;">
+                  <div onclick="showVideoModal('https://www.youtube.com/embed/{{$main_video->url}}?autoplay=1')" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;">
                   </div>
                 </div>
               </div>
+              @endif
               <div class="home-video-feature-area mt-2">
                 <div class="row">
+                  @foreach($videos as $video)
                   <div class="col-4">
                     <div class="home-feature-video">
                       <div class="ratio ratio-1x1"
                         style="position: relative; width: 100%; height: 0; padding-bottom: 100%;">
                         <img class="img img-thumbnail-custom lazyload" src="/web/img/video-icon.png" alt="Recent Job Solution Banner" style="position: absolute; top: 9%; left: 0; width: 100%; height: 76%;" srcset="">
                         <!-- Transparent overlay to trigger the click event -->
-                        <div onclick="showVideoModal('https://www.youtube.com/embed/lEw6fQwQXZM?autoplay=1')" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;">
+                        <div onclick="showVideoModal('https://www.youtube.com/embed/{{$video->url}}?autoplay=1')" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;">
                         </div>
-                      </div>
+                      </div> 
                     </div>
                   </div>
-                  <div class="col-4">
-                    <div class="home-feature-video">
-                        <div class="ratio ratio-1x1"
-                          style="position: relative; width: 100%; height: 0; padding-bottom: 100%;">
-                          <img class="img img-thumbnail-custom lazyload" src="/web/img/video-icon.png" alt="Teachers Tips & Advice Banner" style="position: absolute; top: 9%; left: 0; width: 100%; height: 76%;" srcset="">
-                          <!-- Transparent overlay to trigger the click event -->
-                          <div onclick="showVideoModal('https://www.youtube.com/embed/lEw6fQwQXZM?autoplay=1')"
-                              style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;">
-                          </div>
-                        </div>
-                    </div>
-                  </div>
-                  <div class="col-4">
-                    <div class="home-feature-video">
-                      <div class="ratio ratio-1x1" style="position: relative; width: 100%; height: 0; padding-bottom: 100%;">
-                        <img class="img img-thumbnail-custom lazyload" src="/web/img/video-icon.png" alt="APP Website Uses Rules Banner" style="position: absolute; top: 9%; left: 0; width: 100%; height: 76%;" srcset="">
-                        <!-- Transparent overlay to trigger the click event -->
-                        <div onclick="showVideoModal('https://www.youtube.com/embed/lEw6fQwQXZM?autoplay=1')" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;">
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-4">
-                    <div class="home-feature-video">
-                      <div class="ratio ratio-1x1" style="position: relative; width: 100%; height: 0; padding-bottom: 100%;">
-                        <img class="img img-thumbnail-custom lazyload" src="/web/img/video-icon.png" alt="APP Website Uses Rules Banner" style="position: absolute; top: 9%; left: 0; width: 100%; height: 76%;" srcset="">
-                        <!-- Transparent overlay to trigger the click event -->
-                        <div onclick="showVideoModal('https://www.youtube.com/embed/lEw6fQwQXZM?autoplay=1')" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;">
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-4">
-                    <div class="home-feature-video">
-                      <div class="ratio ratio-1x1" style="position: relative; width: 100%; height: 0; padding-bottom: 100%;">
-                        <img class="img img-thumbnail-custom lazyload" src="/web/img/video-icon.png" alt="APP Website Uses Rules Banner" style="position: absolute; top: 9%; left: 0; width: 100%; height: 76%;" srcset="">
-                        <!-- Transparent overlay to trigger the click event -->
-                        <div onclick="showVideoModal('https://www.youtube.com/embed/lEw6fQwQXZM?autoplay=1')" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;">
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-4">
-                    <div class="home-feature-video">
-                      <div class="ratio ratio-1x1" style="position: relative; width: 100%; height: 0; padding-bottom: 100%;">
-                        <img class="img img-thumbnail-custom lazyload" src="/web/img/video-icon.png" alt="APP Website Uses Rules Banner" style="position: absolute; top: 9%; left: 0; width: 100%; height: 76%;" srcset="">
-                        <!-- Transparent overlay to trigger the click event -->
-                        <div onclick="showVideoModal('https://www.youtube.com/embed/lEw6fQwQXZM?autoplay=1')" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;">
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
+                  @endforeach
                 </div>
               </div>
             </div>
@@ -557,13 +512,13 @@ if($user)
       <div class="row g-3 g-lg-4">
 
         @foreach($teachers as $teacher)
-          <a href="{{route('home.coming-soon')}}" class="col-6 col-lg-2 mb-5 text-decoration-none">
+          <a href="javascript:void(0)" class="col-6 col-lg-3 mb-5 text-decoration-none">
             <div class="event-area-content" data-bs-toggle="tooltip" data-bs-placement="bottom">
               <div class="event-icon">
                 <img src="{{$teacher->image ? $teacher->image : '/img/avatar.png'}}" srcset="" alt="Teacher Image" style="height: 90px; border: 4px solid #1CAB55; border-radius: 50%;" loading="lazy">
               </div>
               <div class="event-content">
-                <h3 class="text-uppercase text-black">{{$teacher->name}}</h3>
+                <h3 class="text-uppercase text-black teacher_title">{{$teacher->name}}</h3>
                 <p>{!! $teacher->designation !!}</p>
               </div>
             </div>
@@ -585,150 +540,22 @@ if($user)
     </div>
     <div class="home-services-area">
       <div class="row" style="--bs-gutter-x: 0.3rem !important;">
+
+        @foreach($services as $service)
         <div class="col-md-3 col-6 mb-2 dropdown bcs-jobs" id="home-services-area-one">
-          <a href="{{route('home.coming-soon')}}">
+          <a href="{{route('home.service.show', $service->id)}}">
             <div class="my-home-service premium-course-box">
               <div class="my-home-service-icon">
-                <img src="/web/img/it-books.png" alt="" loading="lazy">
+                <img src="{{$service->image ? $service->image : '/web/img/it-books.png'}}" alt="" loading="lazy">
               </div>
               <div class="my-home-service-content">
-                <h3>Diploma-in-Engineering Job Preparation</h3>
+                <h3>{{$service->title}}</h3>
               </div>
             </div>
           </a>
         </div>
-        <div class="col-md-3 col-6 mb-1" id="home-services-area-two" data-toggle="tooltip" data-placement="bottom" title="Tooltip on bottom">
-          <a href="{{route('home.coming-soon')}}">
-            <div class="my-home-service premium-course-box" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="...">
-              <div class="my-home-service-icon">
-                <img src="/web/img/it-books.png" alt="" loading="lazy">
-              </div>
-              <div class="my-home-service-content">
-                <h3>Live MCQ Exam</h3>
-              </div>
-            </div>
-          </a>
-        </div>
-        <div class="col-md-3 col-6 mb-1" id="home-services-area-three">
-          <a href="{{route('home.coming-soon')}}">
-            <div class="my-home-service premium-course-box" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="...">
-              <div class="my-home-service-icon">
-                <img src="/web/img/it-books.png" alt="" loading="lazy">
-              </div>
-              <div class="my-home-service-content">
-                <h3>Written Exam</h3>
-              </div>
-            </div>
-          </a>
-        </div>
-        <div class="col-md-3 col-6 mb-1" id="home-services-area-four">
-          <a href="{{route('home.coming-soon')}}">
-            <div class="my-home-service premium-course-box" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="...">
-              <div class="my-home-service-icon">
-                <img src="/web/img/it-books.png" alt="" loading="lazy">
-              </div>
-              <div class="my-home-service-content">
-                <h3>Online Class</h3>
-              </div>
-            </div>
-          </a>
-        </div>
-        <div class="col-md-3 col-6 mb-1" id="home-services-area-four">
-          <a href="{{route('home.coming-soon')}}">
-            <div class="my-home-service premium-course-box" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="...">
-              <div class="my-home-service-icon">
-                <img src="/web/img/it-books.png" alt="" loading="lazy">
-              </div>
-              <div class="my-home-service-content">
-                <h3>Recoded Courses</h3>
-              </div>
-            </div>
-          </a>
-        </div>
-        <div class="col-md-3 col-6 mb-1" id="home-services-area-four">
-          <a href="{{route('home.coming-soon')}}">
-            <div class="my-home-service premium-course-box" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="...">
-              <div class="my-home-service-icon">
-                <img src="/web/img/it-books.png" alt="" loading="lazy">
-              </div>
-              <div class="my-home-service-content">
-                <h3>11-20 Grade Job Preparation</h3>
-              </div>
-            </div>
-          </a>
-        </div>
-        <div class="col-md-3 col-6 mb-1" id="home-services-area-four">
-          <a href="{{route('home.coming-soon')}}">
-            <div class="my-home-service premium-course-box" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="...">
-              <div class="my-home-service-icon">
-                <img src="/web/img/it-books.png" alt="" loading="lazy">
-              </div>
-              <div class="my-home-service-content">
-                <h3>Live Chat</h3>
-              </div>
-            </div>
-          </a>
-        </div>
-        <div class="col-md-3 col-6 mb-1" id="home-services-area-four">
-          <a href="{{route('home.coming-soon')}}">
-            <div class="my-home-service premium-course-box" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="...">
-              <div class="my-home-service-icon">
-                <img src="/web/img/it-books.png" alt="" loading="lazy">
-              </div>
-              <div class="my-home-service-content">
-                <h3>Free Exam</h3>
-              </div>
-            </div>
-          </a>
-        </div>
-        <div class="col-md-3 col-6 mb-1" id="home-services-area-four">
-          <a href="{{route('home.coming-soon')}}">
-            <div class="my-home-service premium-course-box" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="...">
-              <div class="my-home-service-icon">
-                <img src="/web/img/it-books.png" alt="" loading="lazy">
-              </div>
-              <div class="my-home-service-content">
-                <h3>Free live Class</h3>
-              </div>
-            </div>
-          </a>
-        </div>
-        <div class="col-md-3 col-6 mb-1" id="home-services-area-four">
-          <a href="{{route('home.coming-soon')}}">
-            <div class="my-home-service premium-course-box" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="...">
-              <div class="my-home-service-icon">
-                <img src="/web/img/it-books.png" alt="" loading="lazy">
-              </div>
-              <div class="my-home-service-content">
-                <h3>Polytechnic Stady</h3>
-              </div>
-            </div>
-          </a>
-        </div>
-        <div class="col-md-3 col-6 mb-1" id="home-services-area-four">
-          <a href="{{route('home.coming-soon')}}">
-            <div class="my-home-service premium-course-box" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="...">
-              <div class="my-home-service-icon">
-                <img src="/web/img/it-books.png" alt="" loading="lazy">
-              </div>
-              <div class="my-home-service-content">
-                <h3>Duet Admission</h3>
-              </div>
-            </div>
-          </a>
-        </div>
-        <div class="col-md-3 col-6 mb-1" id="home-services-area-four">
-          <a href="{{route('home.coming-soon')}}">
-            <div class="my-home-service premium-course-box" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="...">
-              <div class="my-home-service-icon">
-                <img src="/web/img/it-books.png" alt="" loading="lazy">
-              </div>
-              <div class="my-home-service-content">
-                <h3>Online Book</h3>
-              </div>
-            </div>
-          </a>
-        </div>
+        @endforeach
+        
       </div>
     </div>
   </div>

@@ -54,9 +54,11 @@ $source = New SourceCtrl;
                     </a>
                   </td>
                   <td>
-                    <a target="_blank" href="{{$value->image}}">
-                      {{$value->image}}
+                    @if($value->url)
+                    <a target="_blank" href="https://youtube.com/watch?v={{$value->url}}">
+                      Watch Video
                     </a>
+                    @endif
                   </td>
                   <td>
                     <span class="label label-{{$value->status == 'Active'?'success':'danger'}}">{{$value->status}}</span>

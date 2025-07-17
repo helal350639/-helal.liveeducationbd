@@ -25,6 +25,8 @@ use App\Models\RoutineItemRow;
 use App\Models\Circular;
 use App\Models\CircularType;
 use App\Models\Ad;
+use App\Models\Video;
+use App\Models\Service;
 use Auth;
 use Session;
 
@@ -72,8 +74,14 @@ class HomePageCtrl extends Controller
     $circulars = CircularType::where('status', 'Active')->get();
 
     $ads = Ad::where('status', 'Active')->limit(3)->get();
+    $videos = Video::where('status', 'Active')
+    ->whereNotNull('url')
+    ->get();
+
+    $main_video = Video::where('status', 'Active')->where('main', 'Yes')->first();
+    $services = Service::orderBy('id', 'DESC')->where('status', 'Active')->get();
     
-    return view('homepage.index', compact('courses', 'sliders', 'batches', 'teachers', 'complains', 'about', 'circulars', 'ads'));
+    return view('homepage.index', compact('courses', 'sliders', 'batches', 'teachers', 'complains', 'about', 'circulars', 'ads', 'videos', 'main_video', 'services'));
   }
 
   public function circular($id)
@@ -94,6 +102,12 @@ class HomePageCtrl extends Controller
   {
     $circular = Circular::find($id);
     return view('homepage.circular-read', compact('circular'));
+  }
+
+  public function serviceShow($id)
+  {
+    $service = Service::find($id);
+    return view('homepage.service-read', compact('service'));
   }
 
   public function comingSoon()

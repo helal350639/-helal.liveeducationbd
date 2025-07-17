@@ -62,6 +62,10 @@ class VideoCtrl extends Controller
         }
 
         $data['status'] = isset($data['status']) ? 'Active' : 'Deactive';
+        
+        $parts = parse_url($data['url']);
+        parse_str($parts['query'], $queryParams);
+        $data['url'] = $queryParams['v'] ?? null;
 
         try {
 
@@ -134,8 +138,20 @@ class VideoCtrl extends Controller
       }
 
       $data['status'] = isset($data['status']) ? 'Active' : 'Deactive';
+      $data['main'] = isset($data['main']) ? 'Yes' : '';
 
       $x_video = Video::find($id);
+      
+      if(isset($data['url']))
+      {
+        $parts = parse_url($data['url']);
+        parse_str($parts['query'], $queryParams);
+        $data['url'] = $queryParams['v'] ?? null;
+      }
+      else
+      {
+        $data['url'] = $x_video->url;
+      }
 
       try {
 

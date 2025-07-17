@@ -36,7 +36,7 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <label for="url">URL</label>
-                        <input type="url" class="form-control" name="url" id="url">
+                        <input type="url" class="form-control" name="url" id="url" placeholder="https://www.youtube.com/watch?v=dfk8fdfd7">
                     </div>
                 </div>
                 <div class="col-md-12">

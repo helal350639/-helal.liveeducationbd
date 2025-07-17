@@ -22,13 +22,13 @@ $value = $video;
     <div class="col-md-10"> <!-- general form elements -->
       <div class="box box-primary">
         <div class="box-header with-border">
-          <h3 style="color: #800" class="box-title">Ad Details</h3>
+          <h3 style="color: #800" class="box-title">Video Details</h3>
         </div>
         <div class="col-md-12 text-right toolbar-icon">
-          <a href="{{route('ad.create')}}" title="Add New" class="label label-info"><i class="fa fa-plus"></i></a>
-          <a href="{{route('ad.index')}}" class="label label-success" title="View"><i class="fa fa-list"></i></a>            
+          <a href="{{route('video.create')}}" title="Add New" class="label label-info"><i class="fa fa-plus"></i></a>
+          <a href="{{route('video.index')}}" class="label label-success" title="View"><i class="fa fa-list"></i></a>            
         </div>
-        <form action="{{route('ad.update', $value)}}" method="POST" enctype="multipart/form-data">
+        <form action="{{route('video.update', $value)}}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             <div class="box-body">
@@ -46,12 +46,24 @@ $value = $video;
                 <div class="clearfix"></div>
                 <div class="col-md-12">
                     <div class="form-group">
-                        <label for="details">Details</label>
-                        <textarea class="form-control editor" name="details" id="details" rows="5">{{$value->details}}</textarea>
+                        <label for="url">URL</label>
+                        <input type="url" class="form-control" name="url" id="url" placeholder="https://www.youtube.com/watch?v=dfk8fdfd7">
                     </div>
+                    <iframe src="https://youtube.com/embed/{{$video->url}}" frameborder="0" allowfullscreen></iframe>
                 </div>
                 <div class="col-md-12">
                   <div class="form-group">
+                    <br>
+                    <label>Set as main video</label>
+                    <br>
+                      <label for="main">
+                          <input type="checkbox" name="main" id="main" {{$value->main == 'Yes'? 'checked':''}} /> Yes
+                      </label>
+                  </div>
+                </div>
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <br>
                       <label for="status">
                           <input type="checkbox" name="status" id="status" {{$value->status == 'Active'? 'checked':''}} /> Status
                       </label>

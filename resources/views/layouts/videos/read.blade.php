@@ -41,7 +41,9 @@ $source = new SourceCtrl;
                 <tr>
                   <th>Video</th>
                   <td>
-                    <iframe src="{{$video->url}}" frameborder="0"></iframe>
+                    @if($video->url)
+                    <iframe src="https://youtube.com/embed/{{$video->url}}" frameborder="0" allowfullscreen></iframe>
+                    @endif
                   </td>
                 </tr>
                 <tr>
