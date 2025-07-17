@@ -76,6 +76,7 @@ class HomePageCtrl extends Controller
     $ads = Ad::where('status', 'Active')->limit(3)->get();
     $videos = Video::where('status', 'Active')
     ->whereNotNull('url')
+    ->whereNull('main')
     ->get();
 
     $main_video = Video::where('status', 'Active')->where('main', 'Yes')->first();
