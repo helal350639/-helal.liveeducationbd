@@ -59,7 +59,7 @@ class PaperCtrl extends Controller
         return $query->where('department_id', $department_id);
       })
       ->orderBy('id','DESC')
-      ->paginate(25)
+      ->paginate(5)
       ->appends($request->all());
 
       return view('layouts.papers.index', compact('papers', 'courses', 'batches', 'departments', 'course_id'));
@@ -136,8 +136,16 @@ class PaperCtrl extends Controller
      */
     public function show($id)
     {
-        $paper = Paper::find($id);
+      $paper = Paper::find($id);
+      if($paper)
+      {
         return view('layouts.papers.read', compact('paper'));
+      }
+      else
+      {
+        Session::flash('error', 'The question paper mabybe deleted or not found!');
+        return redirect()->route('paper.index');
+      }
     }
 
     public function view($id)
@@ -253,7 +261,8 @@ class PaperCtrl extends Controller
         $paper->delete();
 
         Session::flash('success', 'The question paper successfully deleted!');
-        return redirect()->route('paper.index');
+        // return redirect()->route('paper.index');
+        return back();
     }
 
     //custom routes
