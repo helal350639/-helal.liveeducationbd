@@ -45,7 +45,7 @@ class HomePageCtrl extends Controller
     // ->whereRaw('DATE(reg_end_at) >= ?', [date('Y-m-d H:i:s')])
     ->where('web', 'Yes')
     ->orderBy('id', 'DESC')
-    ->limit('5')
+    // ->limit('5')
     ->get();
 
     // Active batches

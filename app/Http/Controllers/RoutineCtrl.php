@@ -105,8 +105,11 @@ class RoutineCtrl extends Controller
             {
               $data['pdf'] = $source->uploadImage($data['pdf'], 'routine/');
             }
-            // Routine::insert($data);
+            
             $routine = Routine::create($data);
+
+            $routine->subjects()->attach($subjects);
+            $routine->departments()->attach($departments);
 
             // insert subjects columns
             foreach($subjects as $subject)
