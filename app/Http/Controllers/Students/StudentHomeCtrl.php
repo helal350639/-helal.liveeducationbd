@@ -328,7 +328,7 @@ class StudentHomeCtrl extends Controller
     $paper = Paper::find($id);
 
     // if on the paper settings has exam limitation and exam limitation number is less than already examed count on this paper. So it will redirect to the result page. Otherwise it will redirect to the exam start page.
-    if($paper->exam_limit && $paper->exam_limit <= $exams)
+    if($paper->exam_limit && intval($paper->exam_limit) <= $exams)
     {
       // //find paper
       // $exams = Exam::where('paper_id', $paper->id)
@@ -362,7 +362,6 @@ class StudentHomeCtrl extends Controller
     }
     else
     {
-
       //insert exam to the database with status 'live'
       try {
         $live_exam = Exam::create([
