@@ -83,6 +83,16 @@ function active($name)
       .notification-indicator-number {
       }
     </style>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0DK9PN2V96"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-0DK9PN2V96');
+    </script>
 </head>
 <body>
   <header id="Header">
