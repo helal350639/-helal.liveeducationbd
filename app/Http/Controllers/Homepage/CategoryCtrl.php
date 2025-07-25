@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Course;
 use App\Models\Batch;
 use App\Models\Department;
+use App\Models\Question;
 use App\Models\Paper;
 use App\Models\Syllabus;
 use App\Models\Exam;
@@ -137,6 +138,16 @@ class CategoryCtrl extends Controller
       ->select('batches.id', 'batches.name', 'batches.banner', 'routines.batch_id');
     }
 
+    if($type == 'Recorded Courses')
+    {
+      $batches = $batches->leftJoin('courses', 'courses.id', 'batches.course_id')
+      ->leftJoin('course_question', 'course_question.course_id', 'courses.id')
+      ->leftJoin('questions', 'questions.id', 'course_question.question_id')
+      ->where('questions.type', 'Video')
+      ->groupBy('batches.id', 'batches.name', 'batches.banner')
+      ->select('batches.id', 'batches.name', 'batches.banner');
+    }
+
     //finally execute the query
     $batches = $batches->get();
     // dd($batches);
@@ -242,6 +253,14 @@ class CategoryCtrl extends Controller
       ->select('departments.id', 'departments.name');
     }
 
+    if($type == 'Recorded Courses')
+    {
+      $departments = $departments->leftJoin('department_question', 'department_question.department_id', 'departments.id')->leftJoin('questions', 'questions.id', 'department_question.question_id')
+      ->where('questions.type', 'Video')
+      ->groupBy('departments.id', 'departments.name', 'batch_department.batch_id', 'batch_department.department_id')
+      ->select('departments.id', 'departments.name', 'batch_department.batch_id', 'batch_department.department_id');
+    }
+
     $departments = $departments->get();
 
     // dd($departments);
@@ -270,6 +289,11 @@ class CategoryCtrl extends Controller
     {
       return $this->routine($type, $batch_id, $department_id);
     }
+
+    if($type == 'Recorded Courses')
+    {
+      return $this->recordedCourses($type, $batch_id, $department_id);
+    }    
 
     return $type.': Under development';
   }
@@ -388,5 +412,17 @@ class CategoryCtrl extends Controller
     // dd($results);
 
     return view('homepage.result', compact('type', 'batch', 'department', 'results'));
+  }
+
+  public function recordedCourses($type, $batch_id, $department_id)
+  {
+    $batch = Batch::find($batch_id);
+    $department = Department::find($department_id);
+
+    $questions = $department->questions()->where('type', 'Video')
+    ->where('status', 'Active')
+    ->get();
+
+    return view('homepage.recorded-courses', compact('questions', 'batch', 'department'));
   }
 }

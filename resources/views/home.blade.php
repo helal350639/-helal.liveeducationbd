@@ -10,6 +10,7 @@
 		}
 		.content-header, .content-header > .breadcrumb > li > a{color:#fff}
 	</style>
+
 </head>
 
 <body class="layout-top-nav">

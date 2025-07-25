@@ -183,6 +183,7 @@ Route::middleware('auth:student')->group(function()
 Route::middleware(['auth'])->group(function()
 {
 	Route::get('/home', 'HomeCtrl@index')->name('home');
+  Route::get('/google-analytics', [HomeCtrl::class, 'googleAnalytics'])->name('google.analytics');
 	Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 	// profile

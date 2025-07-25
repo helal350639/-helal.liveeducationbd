@@ -13,6 +13,9 @@ use App\Models\Question;
 use App\Models\Filter;
 use App\Models\Order;
 
+use Spatie\Analytics\Facades\Analytics;
+use Spatie\Analytics\Period;
+
 class HomeCtrl extends Controller
 {
     /**
@@ -44,8 +47,26 @@ class HomeCtrl extends Controller
           'questions' => Question::count(),
           'filters' => Filter::count(),
         ];
+
         return view('layouts.index', compact('data'));
     }
+
+    public function googleAnalytics()
+    {
+      $analyticsData = Analytics::fetchVisitorsAndPageViews(Period::days(14));
+
+      $labels = $analyticsData->pluck('date')->map(fn($date) => $date?->format('Y-m-d'))->toArray();
+
+      $visits = $analyticsData->pluck('visitors')->toArray();
+
+      // $labels = [0];
+      // $visits = [50];
+
+      // dd($labels, $visits, $analyticsData);
+
+      return view('layouts.google-analytics', compact('labels', 'visits'));
+    }
+
 
     /*
       public function someAdminStuff(Request $request)

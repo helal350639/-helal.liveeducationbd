@@ -202,7 +202,7 @@ class QuestionCtrl extends Controller
           'title'          => 'required|string',
           'answer'         => 'nullable|string',
           'answer_file'    => 'nullable|array',
-          'video'          => 'nullable|string',
+          'video'          => 'nullable|url',
           'image'          => 'nullable|image|mimes:jpeg,jpg,png,gif|max:500',
           'items'          => 'nullable|array',
           'item_img'       => 'nullable|array',
@@ -287,6 +287,14 @@ class QuestionCtrl extends Controller
             unset($data['answer_file']);
         }
 
+        // video url to embed url convert
+        if($data['type'] == 'Video')
+        {
+          $parts = parse_url($data['video']);
+          parse_str($parts['query'], $queryParams);
+          $data['video'] = $queryParams['v'] ?? null;
+        }
+
         $data['status'] = 'Active';
         $data['created_at'] = date('Y-m-d H:i:s');
         $data['updated_at'] = null;
@@ -312,19 +320,19 @@ class QuestionCtrl extends Controller
             // insert mcq items
             for($x = 0; count($items) > $x; $x++)
             {
-                try {
-                    McqItem::insert([
-                        'question_id' => $mcq->id,
-                        'item' => $items[$x],
-                        'correct_answer' => isset($correct[0]) && $x == $correct[0] ? true : null,
-                        'image' => isset($imgs[$x]) ? $source->uploadImage($imgs[$x], 'questions/mcqs/items/') : null,
-                        'image_style' => null,
-                    ]);
-                }
-                catch(\E $e)
-                {
-                    return $e;
-                }
+              try {
+                McqItem::insert([
+                  'question_id' => $mcq->id,
+                  'item' => $items[$x],
+                  'correct_answer' => isset($correct[0]) && $x == $correct[0] ? true : null,
+                  'image' => isset($imgs[$x]) ? $source->uploadImage($imgs[$x], 'questions/mcqs/items/') : null,
+                  'image_style' => null,
+                ]);
+              }
+              catch(\Exception $e)
+              {
+                  return $e->getMessage();
+              }
             }
 
             $mcq->filters()->attach($filters);
@@ -435,7 +443,7 @@ class QuestionCtrl extends Controller
             'answer'         => 'nullable|string',
             'answer_file'    => 'nullable|array',
             'fileid'         => 'nullable|array',
-            'video'          => 'nullable|string',
+            'video'          => 'nullable|url',
             'image'          => 'nullable|image|mimes:jpeg,jpg,png,gif|max:500',
             'items'          => 'nullable|array',
             'itemid'          => 'nullable|array',
@@ -529,6 +537,14 @@ class QuestionCtrl extends Controller
         {
             $fileid = $data['fileid'];
             unset($data['fileid']);
+        }
+
+        // video url to embed url convert
+        if($data['type'] == 'Video')
+        {
+          $parts = parse_url($data['video']);
+          parse_str($parts['query'], $queryParams);
+          $data['video'] = $queryParams['v'] ?? null;
         }
 
         $data['status'] = $request->status;

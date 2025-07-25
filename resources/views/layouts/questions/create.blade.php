@@ -658,8 +658,8 @@ function selectType(e)
     {
         Answer.innerHTML = '<div class="col-md-12 no-padding">'+
             '<div class="form-group">'+
-                '<label for="">Input Video Embeded Code</label>'+
-                '<textarea class="form-control editor" name="video" id="video" rows="7" placeholder="Embeded Youtube/Vimo or other video code"></textarea>'+
+                '<label for="">Input Video URL</label>'+
+                '<input type="url" class="form-control" name="video" id="video" placeholder="https://www.youtube.com/watch?v=DFDDFE8dDFd" required>'+
                 '</div>'+
             '</div>';
     }

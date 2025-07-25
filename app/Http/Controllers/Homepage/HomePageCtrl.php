@@ -58,7 +58,7 @@ class HomePageCtrl extends Controller
     // teachers
     $teachers = Teacher::where('status', 'Active')
     ->where('web', 'Yes')
-    ->orderBy('id', 'DESC')
+    ->orderBy('id', 'ASC')
     ->select('id', 'name', 'designation', 'image')
     ->get();
 

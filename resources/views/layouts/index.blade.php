@@ -119,7 +119,6 @@ $new = $confirmed = $completed = $cancelled = 0;
         <div class="clearfix visible-sm-block"></div>
       </div>
       <div class="row">
-
         <div class="col-md-6">
           <!-- AREA CHART -->
           <div class="box box-primary">
@@ -136,10 +135,8 @@ $new = $confirmed = $completed = $cancelled = 0;
               <div class="chart">
                 <canvas id="areaChart" style="height:250px"></canvas>
               </div>
-            </div>
-            <!-- /.box-body -->
-          </div>
-          <!-- /.box -->
+            </div> <!-- /.box-body -->
+          </div> <!-- /.box -->
 
           <!-- DONUT CHART -->
           <div class="box box-danger">
@@ -154,10 +151,8 @@ $new = $confirmed = $completed = $cancelled = 0;
             </div>
             <div class="box-body">
               <canvas id="pieChart" style="height:250px"></canvas>
-            </div>
-            <!-- /.box-body -->
-          </div>
-          <!-- /.box -->
+            </div> <!-- /.box-body -->
+          </div> <!-- /.box -->
 
         </div>
         <!-- /.col (LEFT) -->
@@ -177,10 +172,8 @@ $new = $confirmed = $completed = $cancelled = 0;
               <div class="chart">
                 <canvas id="lineChart" style="height:250px"></canvas>
               </div>
-            </div>
-            <!-- /.box-body -->
-          </div>
-          <!-- /.box -->
+            </div> <!-- /.box-body -->
+          </div> <!-- /.box -->
 
           <!-- BAR CHART -->
           <div class="box box-success">
@@ -197,15 +190,11 @@ $new = $confirmed = $completed = $cancelled = 0;
               <div class="chart">
                 <canvas id="barChart" style="height:230px"></canvas>
               </div>
-            </div>
-            <!-- /.box-body -->
-          </div>
-          <!-- /.box -->
+            </div> <!-- /.box-body -->
+          </div> <!-- /.box -->
 
-        </div>
-        <!-- /.col (RIGHT) -->
-      </div>
-      <!-- /.row -->
+        </div> <!-- /.col (RIGHT) -->
+      </div> <!-- /.row -->
 
     </section>
 
@@ -214,6 +203,7 @@ $new = $confirmed = $completed = $cancelled = 0;
 @endsection
 
 @section('scripts')
+
 <script>
   $(function () {
     /* ChartJS
@@ -420,4 +410,5 @@ $new = $confirmed = $completed = $cancelled = 0;
     barChart.Bar(barChartData, barChartOptions)
   })
 </script>
+
 @endsection
