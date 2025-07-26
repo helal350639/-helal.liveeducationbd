@@ -140,19 +140,14 @@ class CategoryCtrl extends Controller
 
     if($type == 'Recorded Courses')
     {
-      $batches = $batches
-      ->leftJoin('batch_department', 'batch_department.batch_id', 'batches.id')
-      ->leftJoin('departments', 'departments.id', 'batch_department.department_id')
-      ->leftJoin('department_question', 'department_question.department_id', 'questions.id')
-      // ->leftJoin('courses', 'courses.id', 'batches.course_id')
-      // ->leftJoin('course_question', 'course_question.course_id', 'courses.id')
-      // ->leftJoin('questions', 'questions.id', 'course_question.question_id')
-      ->where('questions.type', 'Video')
-      ->where('questions.status', 'Active')
-      ->groupBy('batches.id', 'batches.name', 'batches.banner')
-      ->select('batches.id', 'batches.name', 'batches.banner');
+      $batches = $batches->whereHas('course.questions', function ($q) {
+        $q->where('type', 'Video');
+      })
+      // ->whereHas('department.questions', function ($q) {
+      //   $q->where('type', 'Video');
+      // })
+      ->whereRaw('DATE(end_at) > ?', date('Y-m-d H:i:s'));
     }
-
     //finally execute the query
     $batches = $batches->get();
     // dd($batches);
@@ -260,8 +255,13 @@ class CategoryCtrl extends Controller
 
     if($type == 'Recorded Courses')
     {
-      $departments = $departments->leftJoin('department_question', 'department_question.department_id', 'departments.id')->leftJoin('questions', 'questions.id', 'department_question.question_id')
+      // $departments = $departments->whereHas('departments.questions', function($q){
+      //   return $q->where('type', 'Video');
+      // });
+      $departments = $departments->leftJoin('department_question', 'department_question.department_id', 'departments.id')
+      ->leftJoin('questions', 'questions.id', 'department_question.question_id')
       ->where('questions.type', 'Video')
+      ->where('questions.status', 'Active')
       ->groupBy('departments.id', 'departments.name', 'batch_department.batch_id', 'batch_department.department_id')
       ->select('departments.id', 'departments.name', 'batch_department.batch_id', 'batch_department.department_id');
     }
@@ -424,7 +424,8 @@ class CategoryCtrl extends Controller
     $batch = Batch::find($batch_id);
     $department = Department::find($department_id);
 
-    $questions = $department->questions()->where('type', 'Video')
+    $questions = $department->questions()
+    ->where('type', 'Video')
     ->where('status', 'Active')
     ->get();
 
