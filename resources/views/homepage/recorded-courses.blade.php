@@ -66,7 +66,7 @@ if($user)
                   </div>
                   <div class="package-exam-content mx-lg-3">
                     <div class="package-exam-title pt-3">
-                      {!! substr($value->title, 0, 20) !!}
+                      {!! substr($value->title, 0, 30) !!}
                     </div>
                   </div>
                 </div>

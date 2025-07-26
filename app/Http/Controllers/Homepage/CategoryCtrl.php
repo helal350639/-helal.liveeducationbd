@@ -140,12 +140,13 @@ class CategoryCtrl extends Controller
 
     if($type == 'Recorded Courses')
     {
-      $batches = $batches->leftJoin('courses', 'courses.id', 'batches.course_id')
+      $batches = $batches
+      ->leftJoin('courses', 'courses.id', 'batches.course_id')
       ->leftJoin('course_question', 'course_question.course_id', 'courses.id')
       ->leftJoin('questions', 'questions.id', 'course_question.question_id')
       ->where('questions.type', 'Video')
-      ->groupBy('batches.id', 'batches.name', 'batches.banner')
-      ->select('batches.id', 'batches.name', 'batches.banner');
+      ->groupBy('batches.id', 'batches.name', 'batches.banner', 'courses.id')
+      ->select('batches.id', 'batches.name', 'batches.banner', 'courses.id');
     }
 
     //finally execute the query
