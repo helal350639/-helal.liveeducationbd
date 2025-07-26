@@ -131,7 +131,9 @@ $correct_answer = '';
                   @else
                   <tr>
                     <th>Video:</th>
-                    <td>{!! $value->video !!}</td>
+                    <td>
+                      <iframe src="https://www.youtube.com/embed/{{$value->video}}" frameborder="0"></iframe>
+                    </td>
                   </tr>
                   @endif
                   <tr>
