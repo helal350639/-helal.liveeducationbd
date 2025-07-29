@@ -69,7 +69,7 @@ function active($name)
       }
       @media(min-width:769px){
         .logo-img{
-          max-width: 60px!important;
+          max-width: 170px!important;
         }
       }
       @media(max-width:768px){
@@ -428,7 +428,7 @@ function active($name)
               <div class="footer-logo-content mb-lg-5">
                   <div class="footer-logo">
                       <div class="footer-logo-image">
-                          <img src="/web/img/logo.png?v=1.1.1" alt="" srcset="">
+                          <img src="/web/img/logo.png?v=1.1.1" alt="" srcset="" width="170">
                       </div>
                   </div>
                   <div class="footer-logo-text">
