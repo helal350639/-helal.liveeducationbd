@@ -74,7 +74,7 @@ function active($name)
       }
       @media(max-width:768px){
         .logo-img{
-          max-width: 40px!important;
+          max-width: 120px!important;
         }
         #Home_add{margin-top: 15px}
       }
