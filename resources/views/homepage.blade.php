@@ -27,7 +27,7 @@ function active($name)
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <link rel="icon" href="/img/logo.png?v=1.1.1" />
+    <link rel="icon" href="/img/logo.png?v=1.1.2" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="robots" content="index" />
     <meta property="description" content="" />
@@ -47,7 +47,7 @@ function active($name)
     <link rel="stylesheet" href="{{'/web/assets/vendors/slick/slick-theme.css'}}"/>
     <link rel="stylesheet" href="{{'/web/assets-old/css/owl.carousel.min.css'}}" />
     <!-- Custom CSS (With Cache Busting) -->
-    <link rel="stylesheet" href="{{'/web/assets/css/style2b24.css?v=3.8.25'}}" />
+    <link rel="stylesheet" href="{{'/web/assets/css/style2b24.css?v=3.8.35'}}" />
     <link rel="stylesheet" href="{{'/web/assets/css/responsive2b24.css?v=3523'}}" />
     <link rel="stylesheet" href="{{'/web/css/style.css?v=1.3.3'}}" />
     <style>
@@ -428,7 +428,7 @@ function active($name)
               <div class="footer-logo-content mb-lg-5">
                   <div class="footer-logo">
                       <div class="footer-logo-image">
-                          <img src="/web/img/logo.png?v=1.1.1" alt="" srcset="" width="170">
+                          <img src="/web/img/logo.png?v=1.1.2" alt="">
                       </div>
                   </div>
                   <div class="footer-logo-text">
