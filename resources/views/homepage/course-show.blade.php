@@ -172,7 +172,8 @@ $value = $batch;
           @endif
 
           @if($routine)
-          <div class="card card-default mt-5 p-3">
+          <div class="card card-default mt-5 p-3" style=" left:0; right:0;">
+            <span class="pull-right" style="position: absolute;right:10px" onclick="viewFullMode(this)"><i class="fa fa-external-link"></i></span>
             <div class="card-heading">
               <h4>এক্সাম/ক্লাস রুটিন</h4>
             </div>
@@ -192,7 +193,7 @@ $value = $batch;
               </div>
               <br>
 
-              <div class="table-responsive">
+              <div class="table-responsive" style="max-height: 400px">
                 <table class="table table-bordered" id="routine">
                   <!-- routine will write here -->
                 </table>
@@ -466,7 +467,43 @@ $value = $batch;
 
 @endsection
 @section('scripts')
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
+  function downloadPDF() {
+    const element = document.getElementById('routine');
+    html2pdf()
+      .set({
+        margin: 10,
+        filename: 'download.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      })
+      .from(element)
+      .save();
+  }
+</script>
+
+<script>
+
+  function viewFullMode(e)
+  {
+    if(e.parentNode.style.position != 'absolute')
+    {
+      e.parentNode.style = 'position:absolute; z-index:99999; left:0; right:0';
+      e.firstElementChild.classList.remove('fa-external-link');
+      e.firstElementChild.classList.add('fa-close');
+      e.firstElementChild.style.color = 'red';
+    }
+    else
+    {
+      e.parentNode.style = 'position:relative; left:0; right:0';
+      e.firstElementChild.classList.add('fa-external-link');
+      e.firstElementChild.classList.remove('fa-close');
+      e.firstElementChild.style.color = 'black';
+    }
+  }
   //eheck login
   function checkLogin()
   {

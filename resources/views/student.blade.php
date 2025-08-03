@@ -71,12 +71,12 @@ function active($name)
       }
       @media(min-width:769px){
         .logo-img{
-          max-width: 60px!important;
+          max-width: 170px;
         }
       }
       @media(max-width:768px){
         .logo-img{
-          max-width: 40px!important;
+          max-width: 120px;
         }
         #Home_add{margin-top: 15px}
       }
@@ -100,7 +100,7 @@ function active($name)
       <div class="container">
         <div class="mobile-menu d-flex justify-content-between align-items-center">
           <div class="main-logo">
-            <a href="#">
+            <a href="/">
               <img src="/web/img/logo.png" alt="Logo" class="logo-img">
             </a>
           </div>
@@ -600,8 +600,8 @@ function active($name)
   <script src="{{'/web/assets/js/main.js'}}" defer></script>
 
   <!-- Toastr JS -->
-  <link rel="stylesheet" href="{{'/web/assets/ajax/libs/toastr.js/latest/toastr.min.css'}}" />
-  <script src="{{'/web/assets/ajax/libs/toastr.js/latest/toastr.min.js'}}"></script>
+  {{-- <link rel="stylesheet" href="{{'/web/assets/ajax/libs/toastr.js/latest/toastr.min.css'}}" />
+  <script src="{{'/web/assets/ajax/libs/toastr.js/latest/toastr.min.js'}}"></script> --}}
 
   <!-- Sweet Alert -->
   <script async src="{{'/web/assets/npm/sweetalert2%4011.7.3/dist/sweetalert2.all.min.js'}}"></script>
@@ -630,12 +630,12 @@ function active($name)
         const preloader = document.querySelector('.preloader');
 
         // Start flush animation immediately
-        preloader.style.animation = 'flush 1s ease-in-out forwards';
+        // preloader.style.animation = 'flush 1s ease-in-out forwards';
 
         // Remove preloader after the animation ends
-        preloader.addEventListener('animationend', function() {
-          preloader.remove();
-        });
+        // preloader.addEventListener('animationend', function() {
+        //   preloader.remove();
+        // });
       });
 
     </script>
