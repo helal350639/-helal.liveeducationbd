@@ -41,19 +41,22 @@ class HomePageCtrl extends Controller
     ->where('web', 'Yes')
     ->get();
 
-    $sliders = Batch::where('status', 'Active')
-    // ->whereRaw('DATE(reg_end_at) >= ?', [date('Y-m-d H:i:s')])
-    ->where('web', 'Yes')
-    ->orderBy('id', 'DESC')
+    $sliders = $batches = [];
+    $batchQuery = Batch::where('status', 'Active')
+    ->whereRaw('DATE(reg_end_at) >= ?', [now()])
+    ->orderBy('id', 'DESC');
+
+    $batches = $batchQuery->limit(8)->get();
+    $sliders = $batchQuery->where('web', 'Yes')
     // ->limit('5')
     ->get();
 
     // Active batches
-    $batches = Batch::where('status', 'Active')
-    ->whereRaw('DATE(reg_end_at) >= ?', [date('Y-m-d H:i:s')])
-    ->limit(8)
-    ->orderBy('id', 'DESC')
-    ->get();
+    // $batches = Batch::where('status', 'Active')
+    // ->whereRaw('DATE(reg_end_at) >= ?', [date('Y-m-d H:i:s')])
+    // ->limit(8)
+    // ->orderBy('id', 'DESC')
+    // ->get();
 
     // teachers
     $teachers = Teacher::where('status', 'Active')
