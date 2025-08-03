@@ -584,12 +584,12 @@ function active($name)
         const preloader = document.querySelector('.preloader');
 
         // Start flush animation immediately
-        // preloader.style.animation = 'flush 1s ease-in-out forwards';
+        preloader.style.animation = 'flush 1s ease-in-out forwards';
 
         // Remove preloader after the animation ends
-        // preloader.addEventListener('animationend', function() {
-        //   preloader.remove();
-        // });
+        preloader.addEventListener('animationend', function() {
+          preloader.remove();
+        });
       });
 
     </script>
