@@ -187,20 +187,23 @@ Route::middleware(['auth'])->group(function()
     Route::get('/visitors', 'visitors')->name('visitors');
     Route::get('/google-analytics', 'googleAnalytics')->name('google.analytics');
   });
-  
+
 	Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-	// profile
-	Route::get('profile', 'UserCtrl@profile')->name('profile');
-	Route::get('profile/edit', 'UserCtrl@profileEdit')->name('profile.edit');
-	Route::put('profile/update', 'UserCtrl@profileUpdate')->name('profile.update');
-
-	//password change
-	Route::get('/change_password', 'UserCtrl@changePassword')->name('user.password.change');
-	Route::put('/change_password', 'UserCtrl@updatePassword')->name('user.change.password');
 	
 	//user routes
 	Route::resource('/user', 'UserCtrl');
+  Route::controller(UserCtrl::class)->group(function()
+  {
+    // profile
+    Route::get('profile', 'profile')->name('profile');
+    Route::get('profile/edit', 'profileEdit')->name('profile.edit');
+    Route::put('profile/update', 'profileUpdate')->name('profile.update');
+  
+    //password change
+    Route::get('/change_password', 'changePassword')->name('user.password.change');
+    Route::put('/change_password', 'updatePassword')->name('user.change.password');
+  });
 
 	/** -------------------- Resource Routes --------------- */
 	Route::resource('filter', 'FilterCtrl');
@@ -372,7 +375,7 @@ Route::middleware(['auth'])->group(function()
   });
 
   // database backup
-  Route::get('/download-database', [BackupController::class, 'downloadDatabase'])->name('database.download');
+  Route::get('/download-database', [BackupController::class, 'downloadRawSql'])->name('database.download');
 	
 });
 

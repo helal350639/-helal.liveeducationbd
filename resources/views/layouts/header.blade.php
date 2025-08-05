@@ -406,6 +406,11 @@ if($complains)
           <ul class="treeview-menu">
             <li><a href="{{ route('profile') }}"><i class="fa fa-user"></i> Profile</a></li>
             <li><a href="/change_password"><i class="fa fa-lock"></i> Change Password</a></li>
+            <li>
+              <a href="{{route('database.download')}}" onclick="return confirm('Are you sure, you want to download database file?')">
+                <i class="fa fa-database"></i> Download Database
+              </a>
+            </li>
           </ul>
         </li>
         

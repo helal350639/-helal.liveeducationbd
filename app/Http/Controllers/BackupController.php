@@ -31,4 +31,19 @@ class BackupController extends Controller
     // Return the file as download
     return response()->download($filePath)->deleteFileAfterSend(true);
   }
+
+  public function downloadRawSql()
+{
+    $dbName = env('DB_DATABASE');
+    $fileName = "backup-{$dbName}-" . date('Ymd_His') . ".sql";
+
+    $command = "mysqldump -u" . env('DB_USERNAME') .
+               " -p'" . env('DB_PASSWORD') . "' " .
+               $dbName . " > " . storage_path("app/{$fileName}");
+
+    exec($command);
+
+    return response()->download(storage_path("app/{$fileName}"))->deleteFileAfterSend();
+}
+
 }
