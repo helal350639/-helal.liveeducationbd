@@ -11,6 +11,7 @@ use App\Models\Chapter;
 use App\Models\Question;
 use App\Models\Filter;
 use App\Models\Order;
+use App\Models\Visitor;
 use Carbon\Carbon;
 use Auth;
 use DB;
@@ -74,7 +75,9 @@ class HomeCtrl extends Controller
       $dates = $visitors->pluck('date');
       $totals = $visitors->pluck('total');
 
-      return view('layouts.visitors', compact('dates', 'totals'));
+      $all_visitors = Visitor::all();
+
+      return view('layouts.visitors', compact('dates', 'totals', 'all_visitors'));
     }
 
     public function googleAnalytics()

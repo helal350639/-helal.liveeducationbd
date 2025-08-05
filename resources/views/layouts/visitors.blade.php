@@ -23,12 +23,12 @@
       <table class="table table-borderd" style="background: #fff">
         <tr>
           <th>Date</th>
-          <th>Visitors</th>
+          <th>Visitor's  IP</th>
         </tr>
-        @foreach($dates as $key => $date)
+        @foreach($all_visitors as $value)
         <tr>
-          <td>{{$date}}</td>
-          <td>{{$totals[$key]}}</td>
+          <td>{{$value->visited_at}}</td>
+          <td>{{$value->ip_address}}</td>
         </tr>
         @endforeach
       </table>
