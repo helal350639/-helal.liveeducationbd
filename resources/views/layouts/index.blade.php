@@ -123,7 +123,9 @@ $new = $confirmed = $completed = $cancelled = 0;
           <!-- AREA CHART -->
           <div class="box box-primary">
             <div class="box-header with-border">
-              <h3 class="box-title">Area Chart</h3>
+              <h3 class="box-title">Area Chart
+                {{-- Daily Visitors --}}
+              </h3>
 
               <div class="box-tools pull-right">
                 <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
@@ -137,7 +139,9 @@ $new = $confirmed = $completed = $cancelled = 0;
               </div>
             </div> <!-- /.box-body -->
           </div> <!-- /.box -->
+        </div>
 
+        <div class="col-md-6">
           <!-- DONUT CHART -->
           <div class="box box-danger">
             <div class="box-header with-border">
@@ -197,9 +201,7 @@ $new = $confirmed = $completed = $cancelled = 0;
       </div> <!-- /.row -->
 
     </section>
-
-
-
+    
 @endsection
 
 @section('scripts')
@@ -218,6 +220,8 @@ $new = $confirmed = $completed = $cancelled = 0;
     // Get context with jQuery - using jQuery's .get() method.
     var areaChartCanvas = $('#areaChart').get(0).getContext('2d')
     // This will get the first returned node in the jQuery collection.
+    // let label = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
+    // let data = [65, 59, 80, 81, 56, 55, 40];
     var areaChart       = new Chart(areaChartCanvas)
 
     var areaChartData = {
@@ -242,6 +246,25 @@ $new = $confirmed = $completed = $cancelled = 0;
           pointHighlightFill  : '#fff',
           pointHighlightStroke: 'rgba(60,141,188,1)',
           data                : [28, 48, 40, 19, 86, 27, 90]
+        }
+      ]
+    }    
+    
+    const label = @json($dates);
+    const total = @json($totals);
+
+    var ChartData = {
+      labels  : @json($dates),
+      datasets: [
+        {
+          label               : 'Visitors',
+          fillColor           : 'rgba(60,141,188,0.9)',
+          strokeColor         : 'rgba(60,141,188,0.8)',
+          pointColor          : '#3b8bba',
+          pointStrokeColor    : 'rgba(60,141,188,1)',
+          pointHighlightFill  : '#fff',
+          pointHighlightStroke: 'rgba(60,141,188,1)',
+          data                : @json($totals)
         }
       ]
     }
@@ -406,7 +429,7 @@ $new = $confirmed = $completed = $cancelled = 0;
       maintainAspectRatio     : true
     }
 
-    barChartOptions.datasetFill = false
+    // barChartOptions.datasetFill = false
     barChart.Bar(barChartData, barChartOptions)
   })
 </script>

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Auth;
 use App\Models\Course;
 use App\Models\Department;
 use App\Models\Semester;
@@ -12,9 +11,13 @@ use App\Models\Chapter;
 use App\Models\Question;
 use App\Models\Filter;
 use App\Models\Order;
+use Carbon\Carbon;
+use Auth;
+use DB;
 
 use Spatie\Analytics\Facades\Analytics;
 use Spatie\Analytics\Period;
+
 
 class HomeCtrl extends Controller
 {
@@ -35,20 +38,43 @@ class HomeCtrl extends Controller
      */
     public function index()
     {
-        Auth::user()->authorizeRoles(['SuperAdmin', 'Admin', 'Editor', 'Sales']);
-        $data = [
-          'success_orders' => Order::whereIn('status', ['Processing', 'Complete'])->count(),
-          'orders' => Order::count(),
-          'courses' => Course::count(),
-          'departments' => Department::count(),
-          'semesters' => Semester::count(),
-          'subjects' => Subject::count(),
-          'chapters' => Chapter::count(),
-          'questions' => Question::count(),
-          'filters' => Filter::count(),
-        ];
+      Auth::user()->authorizeRoles(['SuperAdmin', 'Admin', 'Editor', 'Sales']);
+      $data = [
+        'success_orders' => Order::whereIn('status', ['Processing', 'Complete'])->count(),
+        'orders' => Order::count(),
+        'courses' => Course::count(),
+        'departments' => Department::count(),
+        'semesters' => Semester::count(),
+        'subjects' => Subject::count(),
+        'chapters' => Chapter::count(),
+        'questions' => Question::count(),
+        'filters' => Filter::count(),
+      ];
 
-        return view('layouts.index', compact('data'));
+      $visitors = \DB::table('visitors')
+        ->selectRaw('DATE(visited_at) as date, COUNT(*) as total')
+        ->groupByRaw('DATE(visited_at)')
+        ->orderBy('date', 'ASC')
+        ->get();
+
+      $dates = $visitors->pluck('date');
+      $totals = $visitors->pluck('total');
+
+      return view('layouts.index', compact('data', 'dates', 'totals'));
+    }
+
+    public function visitors()
+    {
+      $visitors = \DB::table('visitors')
+        ->selectRaw('DATE(visited_at) as date, COUNT(*) as total')
+        ->groupByRaw('DATE(visited_at)')
+        ->orderBy('date', 'ASC')
+        ->get();
+
+      $dates = $visitors->pluck('date');
+      $totals = $visitors->pluck('total');
+
+      return view('layouts.visitors', compact('dates', 'totals'));
     }
 
     public function googleAnalytics()

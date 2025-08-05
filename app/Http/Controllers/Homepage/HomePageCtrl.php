@@ -27,6 +27,7 @@ use App\Models\CircularType;
 use App\Models\Ad;
 use App\Models\Video;
 use App\Models\Service;
+use App\Models\Visitor;
 use Auth;
 use Session;
 
@@ -36,6 +37,11 @@ class HomePageCtrl extends Controller
 
   public function index()
   {
+    Visitor::insert([
+      'ip_address' => request()->ip(),
+      'visited_at' => now(),
+    ]);
+
     $courses = Course::orderBy('id', 'ASC')
     ->where('status', 'Active')
     ->where('web', 'Yes')

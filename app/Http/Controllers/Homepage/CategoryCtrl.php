@@ -54,8 +54,23 @@ class CategoryCtrl extends Controller
     {
       return view('homepage.job-batch', compact('type', 'course', 'batches'));
     }
+
+    if($type == 'Recorded Courses')
+    {
+      // return 'This page is under development';
+      return $this->courseDepartment($type, $course_id, $dashboard = null);
+    }
     
     return view('homepage.batch', compact('type', 'course', 'batches'));
+  }
+
+  public function courseDepartment($type, $course_id, $dashboard = null)
+  {
+    $course = Course::find($course_id);
+    $departments = $course->departments()->get();
+    $batch = $course;
+    // return 'under development';
+    return view('homepage.department', compact('type', 'batch', 'departments'));
   }
 
   // this batches for [exam, result, exam_pdf...] showing on the homepage everywhere 
