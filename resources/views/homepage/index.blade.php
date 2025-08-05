@@ -171,7 +171,8 @@ if($user)
         <p class="pointer-cursor text-center">Online Classes</p>
       </a>
 
-      <a href="{{route('category.courses', 'Recorded Courses')}}" class="emergency-box">
+      {{-- <a href="{{route('category.courses', 'Recorded Courses')}}" class="emergency-box"> --}}
+        <a href="javascript:void()" class="emergency-box">
         <img src="/web/img/recorded-course.png" alt="Students Review" class="img-fluid">
         <p class="pointer-cursor text-center">Recorded Courses</p>
       </a>
