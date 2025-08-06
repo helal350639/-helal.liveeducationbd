@@ -81,7 +81,7 @@ if($user)
                           </div>
                           <div class="package-exam-content" id="custom-package-exam-content">
                             <div class="package-exam-title pt-3" id="custom-package-exam-title">
-                              <h2><a href="{{route('home.course.show', $value->id)}}">{{mb_substr($value->name, 0, 18)}}</a></h2>
+                              <h2><a href="{{route('home.course.show', $value->id)}}">{{$value->name}}</a></h2>
                             </div>
                             <div class="row gy-2 button-and-price">
                                 <div class="col-12">
@@ -319,7 +319,7 @@ if($user)
               </div>
               <div class="package-exam-content mx-2 mx-lg-3">
                 <div class="package-exam-title pt-3">
-                  <h2><a href="{{route('home.course.show', $batch->id)}}">{{mb_substr($batch->name, 0, 18)}}</a></h2>
+                  <h2><a href="{{route('home.course.show', $batch->id)}}">{{$batch->name}}</a></h2>
                 </div>
                 <div class="row button-and-price pb-3 pb-lg-4">
                   <div class="col">

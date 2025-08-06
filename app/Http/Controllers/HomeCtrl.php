@@ -75,7 +75,7 @@ class HomeCtrl extends Controller
       $dates = $visitors->pluck('date');
       $totals = $visitors->pluck('total');
 
-      $all_visitors = Visitor::all();
+      $all_visitors = Visitor::orderBy('visited_at', 'DESC')->paginate(25);
 
       return view('layouts.visitors', compact('dates', 'totals', 'all_visitors'));
     }

@@ -32,6 +32,9 @@
         </tr>
         @endforeach
       </table>
+      <div class="pagination-sm no-margin pull-right">
+        {{$all_visitors->links()}}
+      </div>
     </div>
   </div>
 </div>
