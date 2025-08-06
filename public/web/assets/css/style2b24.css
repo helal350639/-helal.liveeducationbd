@@ -715,7 +715,6 @@ img {
 .exam-package-area .package-exam-content .package-exam-title h2 {
   margin-bottom: 0px;
   font-size: 22px;
-  min-height: 80px;
   text-align: left;
 }
 
@@ -723,6 +722,12 @@ img {
   color: #000;
   font-size: 18px;
   font-weight: 500;
+}
+
+@media (min-width: 577px){
+  .exam-package-area .package-exam-content .package-exam-title h2 {
+    min-height: 80px;
+  }
 }
 
 @media (max-width: 575.98px) {

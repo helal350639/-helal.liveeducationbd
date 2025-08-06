@@ -47,7 +47,7 @@ function active($name)
     <link rel="stylesheet" href="{{'/web/assets/vendors/slick/slick-theme.css'}}"/>
     <link rel="stylesheet" href="{{'/web/assets-old/css/owl.carousel.min.css'}}" />
     <!-- Custom CSS (With Cache Busting) -->
-    <link rel="stylesheet" href="{{'/web/assets/css/style2b24.css?v=3.8.37'}}" />
+    <link rel="stylesheet" href="{{'/web/assets/css/style2b24.css?v=3.8.38'}}" />
     <link rel="stylesheet" href="{{'/web/assets/css/responsive2b24.css?v=3523'}}" />
     <link rel="stylesheet" href="{{'/web/css/style.css?v=1.3.3'}}" />
     <style>
