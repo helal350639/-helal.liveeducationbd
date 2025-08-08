@@ -257,17 +257,16 @@ if($exam)
     }
   }
   
+  @if($end_time)
   // Set the date we're counting down to
-  // var countDownDate = new Date("Oct 27, 2024 12:47:25").getTime();
+  // date format: "Oct 27, 2024 12:47:25";
   var countDownDate = new Date("{{$source->dtcformat($end_time)}}").getTime();
-  // var countDownDate = new Date().getTime();
   
   // Update the count down every 1 second
   var x = setInterval(function() {
   
     // Get today's date and time
     var now = new Date().getTime();
-    // var now = new Date("{{$source->dtcformat($end_time)}}").getTime();
       
     // Find the distance between now and the count down date
     var distance = countDownDate - now;
@@ -319,6 +318,9 @@ if($exam)
       document.getElementById('questions_panel').innerHTML = '<div class="box box-warning"><a class="btn btn-warning" href="{{route("students.exam")}}">Back</div>';
     }
   }, 1000);
+  @else
+  alert('We are getting an issue. Please contact with service provider');
+  @endif
 
   // navbar fixed on scroll
   window.onscroll = function(){

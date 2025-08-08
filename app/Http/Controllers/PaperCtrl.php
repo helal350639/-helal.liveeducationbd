@@ -59,7 +59,7 @@ class PaperCtrl extends Controller
         return $query->where('department_id', $department_id);
       })
       ->orderBy('id','DESC')
-      ->paginate(5)
+      ->paginate(25)
       ->appends($request->all());
 
       return view('layouts.papers.index', compact('papers', 'courses', 'batches', 'departments', 'course_id'));
