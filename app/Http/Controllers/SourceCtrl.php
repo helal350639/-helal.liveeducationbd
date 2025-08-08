@@ -185,4 +185,9 @@ class SourceCtrl extends Controller
   {
     return str_pad($num, $count, '0', STR_PAD_LEFT);
   }
+
+  public function timeIncrease($time)
+  {
+    return $time+10;
+  }
 }
