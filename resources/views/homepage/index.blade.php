@@ -25,7 +25,7 @@ if($user)
     <div class="row">
       @foreach($ads as $key => $val)
       @if($key == 0)
-      <div class="col-lg-2" style="padding: calc(var(--bs-gutter-x)* .0)!important;">
+      <div class="col-lg-3" style="padding: calc(var(--bs-gutter-x)* .0)!important;">
         <div class="home-1st-add-image">
           <a href="{{route('home.coming-soon')}}">
             <img src="{{$val->image}}" alt="" srcset="" loading="lazy">
@@ -33,7 +33,7 @@ if($user)
         </div>
       </div>
       @elseif($key == 1)
-      <div class="col-lg-7 col-md-12" style="
+      <div class="col-lg-6 col-md-12" style="
         padding-left: calc(var(--bs-gutter-x) * 0.08) !important;
         padding-right: calc(var(--bs-gutter-x) * 0.08) !important;
         padding-top: 0 !important;
@@ -304,6 +304,18 @@ if($user)
           
         </div>
       </div>
+
+      <style>
+        .all-courses-area{
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+        }
+        .exam-package-area{
+          flex: 1;
+          box-sizing: border-box
+        }
+      </style>
 
       <div class="all-courses-area">
         <div class="row g-2 g-md-3 g-lg-4">
