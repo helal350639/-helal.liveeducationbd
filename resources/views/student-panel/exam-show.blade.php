@@ -107,10 +107,10 @@ if($exam)
     </section> <!-- /.content -->
 
     <!-- loading section -->
-    {{-- <div id="loading" class="loading">
+    <div id="loading" class="loading">
       <img src="/img/loading.webp" alt="">
       <p>আপনার রেজালটশীট ও সলুশন পেপার প্রস্তুত করা হচ্ছে। <br>অনুগ্রহ পূর্বক অপেক্ষা করুন...</p>
-    </div> --}}
+    </div>
     <div class="footer" id="Footer" style="background: #fff"></div>
 
 {{-- @endsection

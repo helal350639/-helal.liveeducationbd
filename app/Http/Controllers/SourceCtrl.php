@@ -188,6 +188,6 @@ class SourceCtrl extends Controller
 
   public function timeIncrease($time)
   {
-    return $time+10;
+    return $time+13;
   }
 }
