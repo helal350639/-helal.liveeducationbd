@@ -2,13 +2,13 @@
 use \App\Http\Controllers\SourceCtrl;
 $source = New SourceCtrl;
 $user = Auth::guard('student')->user();
-$end_time = date('Y-m-d H:i:s', strtotime('+'.$paper->time.' minutes', strtotime(date('Y-m-d H:i:s'))));
+$end_time = date('Y-m-d H:i:s', strtotime('+'.$paper->time.' minutes', strtotime(now())));
 $questions = $paper->questions;
 if($paper->random == 'Yes')
 {
   // $questions = $paper->questions()->inRandomOrder()->get();
 }
-$start_at = strtotime(date('Y-m-d H:i:s'));
+$start_at = strtotime(now());
 
 $exam_id = null;
 if($exam)
