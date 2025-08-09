@@ -46,7 +46,6 @@ class RoutineItemCtrl extends Controller
     ->with(['subjects', 'departments'])
     ->select('routine_item_rows.*')
     ->get();
-    // dd($routine_rows);
 
     return view('layouts.routines.add-item', compact('routine', 'papers', 'subjects', 'departments', 'routine_rows'));
   }
@@ -54,8 +53,6 @@ class RoutineItemCtrl extends Controller
   public function addItemPost(Request $request)
   {
     $data = $request->all();
-
-    // dd($data);
 
     try {
 
@@ -87,14 +84,31 @@ class RoutineItemCtrl extends Controller
     {
       return $e->getMessage();
     }
+    
+    return redirect()->route('routine.item.show', $data['routine_id']);
+  }
 
-    // return $this->addItem($data['routine_id']);
-    return redirect()->route('routine.add-item', $data['routine_id']);
+  public function showItem($id)
+  {
+    $routine = Routine::find($id);
+    $papers = Paper::orderBy('id', 'DESC')->get();
+
+    $subjects = $routine->subjects()->get();
+
+    $departments = $routine->departments()->get();
+
+    $routine_rows = RoutineItemRow::where('routine_item_rows.routine_id', $id)
+    ->with(['subjects', 'departments'])
+    ->select('routine_item_rows.*')
+    ->get();
+
+    return view('layouts.routines.show-item', compact('routine', 'papers', 'subjects', 'departments', 'routine_rows'));
   }
 
   public function editItem($id)
   {
     $routine_row = RoutineItemRow::find($id);
+
     $routine = Routine::find($routine_row->routine_id);
     $papers = Paper::orderBy('id', 'DESC')->get();
 
@@ -121,8 +135,6 @@ class RoutineItemCtrl extends Controller
   public function update(Request $request, $id)
   {
     $data = $request->all();
-
-    // dd($id);
 
     try {
 
@@ -157,7 +169,7 @@ class RoutineItemCtrl extends Controller
     }
 
     Session::flash('success', 'Routine item successfully updated.');
-    return redirect()->route('routine.add-item', $data['routine_id']);
+    return redirect()->route('routine.item.show', $data['routine_id']);
   }
 
 

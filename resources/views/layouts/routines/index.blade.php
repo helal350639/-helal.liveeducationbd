@@ -73,7 +73,7 @@ $source = New SourceCtrl;
                 <td>
                   {{-- <a href="{{route('routine.show', $value->id)}}" class="btn btn-info" title="Details"><i class="fa fa-file-text"></i></a> --}}
 
-                  <a href="{{route('routine.add-item', $value->id)}}" class="btn btn-info" title="Add Item"><i class="fa fa-list"></i></a>
+                  <a href="{{route('routine.item.show', $value->id)}}" class="btn btn-info" title="Add Item"><i class="fa fa-list"></i></a>
 
                   <a href="{{route('routine.edit', $value->id)}}" class="btn btn-warning btn-sm" title="Edit this value"><i class="fa fa-edit"></i></a>
 

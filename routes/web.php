@@ -366,6 +366,7 @@ Route::middleware(['auth'])->group(function()
 
     Route::get('routine/edit-item/{id}', 'editItem')->name('routine.item.edit');    
     Route::put('routine/item/update/{id}', 'update')->name('routine.item-update');
+    Route::get('routine/show-item/{id}', 'showItem')->name('routine.item.show'); 
   });
 
   Route::controller(HomePageSettingCtrl::class)->group(function()
