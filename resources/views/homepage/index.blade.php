@@ -307,7 +307,7 @@ if($user)
 
       <style>
         .all-courses-area{
-          display: flex;
+          /* display: flex; */
           flex-wrap: wrap;
           gap: 10px;
         }
