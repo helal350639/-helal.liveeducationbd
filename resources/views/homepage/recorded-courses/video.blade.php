@@ -50,14 +50,15 @@ if($user)
         <div class="row">
           <!-- Content Header (Page header) -->
           <div class="title-area text-center">
-            <h1> {{$batch->name}} </h1>
+            <h1> {{$title}} </h1>
           </div>
         </div>
 
         <div class="row">
           <div class="all-courses-area">
             <div class="row g-2 g-md-3 g-lg-4">
-              @foreach($questions as $value)
+              @if($videos->count())
+              @foreach($videos as $value)
 
               <div class="col-6 col-lg-3 mt-4">
                 <div class="exam-package-area" onclick="showVideoModal('https://www.youtube.com/embed/{{$value->video}}?autoplay=1')">
@@ -72,6 +73,9 @@ if($user)
                 </div>
               </div>
               @endforeach
+              @else
+              <p class="text-center">Videos not published.</p>
+              @endif
             </div>
           </div>
         </div> <!-- /.row -->

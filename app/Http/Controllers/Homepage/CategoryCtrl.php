@@ -15,6 +15,8 @@ use App\Models\Routine;
 use App\Models\RoutineSubjectColumn;
 use App\Models\RoutineDepartmentColumn;
 use App\Models\RoutineItemRow;
+use App\Models\Subject;
+use App\Models\Semester;
 use Auth;
 use DateTime;
 
@@ -34,11 +36,58 @@ class CategoryCtrl extends Controller
       $title = $type;
     }
 
-    $courses = Course::where('status', 'Active')
-    ->where('web', 'Yes')
-    ->get();
+    if($type == 'Recorded Courses')
+    {
+      $subjects = Subject::where('status', 'Active')->get();
+      $departments = Department::where('status', 'Active')->get();
+      $semesters = Semester::where('status', 'Active')->get();
+      $videos = Question::where('status', 'Active')
+      ->OrderBy('id', 'DESC')
+      ->where('type', 'Video')
+      ->get();
+
+      return view('homepage.recorded-courses.job-video', compact('subjects', 'departments', 'semesters', 'subjects', 'videos'));
+    }
+    else
+    {
+      $courses = Course::where('status', 'Active')
+      ->where('web', 'Yes')
+      ->get();
+    }
     
     return view('homepage.course', compact('type', 'title', 'courses'));
+  }
+
+  // recorded videos
+  public function recordedVideo($type, $id)
+  {
+    $title = '';
+    $videos = [];
+    if($type == 'Subject')
+    {
+      $subject = Subject::find($id);
+      $videos = $subject->questions()->where('Type', 'Video')->get();
+      $title = $subject->name; 
+    }
+    if($type == 'Semester')
+    {
+      $semester = Semester::find($id);
+      $videos = $semester->questions()->where('Type', 'Video')->get();
+      $title = $semester->name;
+    }
+    if($type == 'Department')
+    {
+      $department = Department::find($id);
+      $videos = $department->questions()->where('Type', 'Video')->get();
+      $title = $department->name;
+    }
+
+    if(empty($videos))
+    {
+      return back();
+    }
+
+    return view('homepage.recorded-courses.video', compact('videos', 'title'));
   }
 
   // batches query according to the course id

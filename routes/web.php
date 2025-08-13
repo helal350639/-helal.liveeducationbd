@@ -74,6 +74,7 @@ Route::controller(CategoryCtrl::class)->group(function()
     Route::get('paper/{type}/{batch}/{department?}', 'paper')->name('category.paper');
     Route::get('result-option', 'resultOption')->name('category.result.option');
     Route::get('check-method/{type}/{batch}/{department?}', 'checkMethod')->name('category.check-method');
+    Route::get('recored-course/{type?}/{id}', 'recordedVideo')->name('category.recorded-video');
   });
 });
 
