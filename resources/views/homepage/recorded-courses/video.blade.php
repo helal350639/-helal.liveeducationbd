@@ -50,15 +50,15 @@ if($user)
         <div class="row">
           <!-- Content Header (Page header) -->
           <div class="title-area text-center">
-            <h1> {{$title}} </h1>
+            <h1> {{$batch->name}} </h1>
           </div>
         </div>
 
         <div class="row">
           <div class="all-courses-area">
             <div class="row g-2 g-md-3 g-lg-4">
-              @if($videos->count())
-              @foreach($videos as $value)
+              @if($questions->count())
+              @foreach($questions as $value)
 
               <div class="col-6 col-lg-3 mt-4">
                 <div class="exam-package-area" onclick="showVideoModal('https://www.youtube.com/embed/{{$value->video}}?autoplay=1')">

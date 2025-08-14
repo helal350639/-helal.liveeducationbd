@@ -36,24 +36,9 @@ class CategoryCtrl extends Controller
       $title = $type;
     }
 
-    if($type == 'Recorded Courses')
-    {
-      $subjects = Subject::where('status', 'Active')->get();
-      $departments = Department::where('status', 'Active')->get();
-      $semesters = Semester::where('status', 'Active')->get();
-      $videos = Question::where('status', 'Active')
-      ->OrderBy('id', 'DESC')
-      ->where('type', 'Video')
-      ->get();
-
-      return view('homepage.recorded-courses.job-video', compact('subjects', 'departments', 'semesters', 'subjects', 'videos'));
-    }
-    else
-    {
-      $courses = Course::where('status', 'Active')
-      ->where('web', 'Yes')
-      ->get();
-    }
+    $courses = Course::where('status', 'Active')
+    ->where('web', 'Yes')
+    ->get();
     
     return view('homepage.course', compact('type', 'title', 'courses'));
   }
@@ -361,7 +346,8 @@ class CategoryCtrl extends Controller
 
     if($type == 'Recorded Courses')
     {
-      return $this->recordedCourses($type, $batch_id, $department_id);
+      // return $this->recordedCourses($type, $batch_id, $department_id);
+      return $this->videoSubjects($type, $batch_id, $department_id);
     }    
 
     return $type.': Under development';
@@ -483,6 +469,20 @@ class CategoryCtrl extends Controller
     return view('homepage.result', compact('type', 'batch', 'department', 'results'));
   }
 
+  public function videoSubjects($type, $batch_id, $department_id)
+  {
+    
+      $subjects = Subject::where('status', 'Active')->get();
+      $departments = Department::where('status', 'Active')->get();
+      $semesters = Semester::where('status', 'Active')->get();
+      $videos = Question::where('status', 'Active')
+      ->OrderBy('id', 'DESC')
+      ->where('type', 'Video')
+      ->get();
+
+      return view('homepage.recorded-courses.job-video', compact('subjects', 'departments', 'semesters', 'subjects', 'videos'));
+  }
+
   public function recordedCourses($type, $batch_id, $department_id)
   {
     $batch = Batch::find($batch_id);
@@ -493,6 +493,6 @@ class CategoryCtrl extends Controller
     ->where('status', 'Active')
     ->get();
 
-    return view('homepage.recorded-courses', compact('questions', 'batch', 'department'));
+    return view('homepage.recorded-courses.video', compact('questions', 'batch', 'department'));
   }
 }

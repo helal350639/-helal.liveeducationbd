@@ -27,12 +27,12 @@ $value = $batch;
     <section class="container p-5">
       <div class="row">
         <!-- Content Header (Page header) -->
-        <div class="content-header">
+        <div class="content-header text-center">
           <h1>Course Checkout</h1>
         </div>
       </div>
       <div class="row">
-        <div class="col-md-6 col-md-offset-3 pricing">
+        <div class="col-md-6 offset-md-3 pricing">
           <!-- Apply to the course -->
           <form action="{{route('students.course.apply')}}" method="post">
             @csrf
@@ -54,7 +54,7 @@ $value = $batch;
                 <input type="hidden" name="total" value="{{$value->net_price}}" />
                   <h3>
                     @if($value->discount) 
-                    <del> &#2547;{{$source->point0($value->price)}}</del> &nbsp; <span class="label label-warning"> &#2547;{{$source->point0($value->discount)}} ছাড়</span>
+                    <del> &#2547;{{$source->point0($value->price + $value->fee)}}</del> &nbsp; <span class="label label-warning"> &#2547;{{$source->point0($value->discount)}} ছাড়</span>
                     @endif
                     <b> &nbsp; &#2547;{{$source->point0($value->net_price)}}</b>
                     </h3>
@@ -88,7 +88,11 @@ $value = $batch;
                     </tr>
                     <tr>
                       <td>অন্যান্য ফী </td>
-                      <th>&#2547; 0</th>
+                      <th>&#2547; {{$source->point0($value->fee)}}</th>
+                    </tr>
+                    <tr>
+                      <td>ডিস্কাউন্ট </td>
+                      <th>&#2547; {{$source->point0($value->discount)}}</th>
                     </tr>
                     <tr style="font-size:18px">
                       <th>মোট =</th>
@@ -106,8 +110,16 @@ $value = $batch;
                 <a class="btn btn-info" href="{{route('students.my-course')}}">আমার কোর্স এ ফিরে যান</a>
                 
                 @else
-                
-                <button class="btn btn-primary btn-block btn-lg" onsubmit="return confirm('Double check you provided information.')">পেমেন্ট এর জন্য এগিয়ে যান</button>
+
+                  @if($value->price < 1)
+
+                  <button class="btn btn-primary btn-block btn-lg" onsubmit="return confirm('Double check you provided information.')">কনফার্ম করুন</button>
+
+                  @else
+
+                  <button class="btn btn-primary btn-block btn-lg" onsubmit="return confirm('Double check you provided information.')">পেমেন্ট এর জন্য এগিয়ে যান</button>
+
+                  @endif
                 @endif
                 <div class="clearfix"></div>
               </div>

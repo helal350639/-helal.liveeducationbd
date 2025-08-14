@@ -135,6 +135,24 @@ class StudentHomeCtrl extends Controller
 
     $user = Auth::guard('student')->user();
     $student = Student::find($user->id);
+    $batch = Batch::find($request->batch_id);
+    // for free course apply
+    if($batch->price < 1)
+    {
+      try {
+        // $student = Student::find($data['student_id']);
+        $student->batches()->attach($data['batch_id']);
+        $student->departments()->attach($data['department_id']);  
+        
+        Session::flash('success', 'The course successfully applied.');
+        return redirect()->route('students.my-course');
+      }
+      catch(\Exception $e)
+      {
+        return $e->getMessage();
+      }
+    }
+
     if($student->courses()->find($request->course_id))
     {
       Session::flash('error', 'You already applied to the course.');

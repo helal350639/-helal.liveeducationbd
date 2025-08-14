@@ -26,12 +26,12 @@ $value = $batch;
     <section class="container p-5">
       <div class="row">
         <!-- Content Header (Page header) -->
-        <div class="content-header">
+        <div class="content-header text-center">
           <h1>Course Confirm</h1>
         </div>
       </div>
       <div class="row">
-        <div class="col-md-6 pricing pd-3">
+        <div class="col-md-6 offset-md-3 pricing pd-3">
           <!-- Apply to the course -->
           <form action="{{route('payment.proceed')}}" method="post">
             @csrf
@@ -52,7 +52,7 @@ $value = $batch;
               <div class="card-heading">
                 <h3>
                   @if($value->discount) 
-                  <del> &#2547;{{$source->point0($value->price)}}</del> &nbsp; <span class="label label-warning"> &#2547;{{$source->point0($value->discount)}} ছাড়</span>
+                  <del> &#2547;{{$source->point0($value->price + $value->fee)}}</del> &nbsp; <span class="label label-warning"> &#2547;{{$source->point0($value->discount)}} ছাড়</span>
                   @endif
                   <b> &nbsp; &#2547;{{$source->point0($value->net_price)}}</b>
                   </h3>
@@ -82,7 +82,11 @@ $value = $batch;
                   </tr>
                   <tr>
                     <td>অন্যান্য ফী </td>
-                    <th>&#2547; 0</th>
+                    <th>&#2547; {{$source->point0($value->fee)}}</th>
+                  </tr>
+                  <tr>
+                    <td>ডিস্কাউন্ট </td>
+                    <th>&#2547; {{$source->point0($value->discount)}}</th>
                   </tr>
                   <tr>
                     <th>মোট =</th>

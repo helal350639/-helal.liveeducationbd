@@ -113,7 +113,7 @@ $value = $batch;
               <div class="card-heading p-3">
                 <h3>
                   @if($value->discount && $value->offer_end_at && $value->offer_end_at > date('Y-m-d H:i:s')) 
-                  <del> &#2547;{{$source->point0($value->price)}}</del> &nbsp; <span class="label label-warning"> &#2547;{{$source->point0($value->discount)}} ছাড়</span>
+                  <del> &#2547;{{$source->point0($value->price+$value->fee)}}</del> &nbsp; <span class="label label-warning"> &#2547;{{$source->point0($value->discount)}} ছাড়</span>
                   @endif
                   <b> &nbsp; &#2547;{{$source->point0($value->net_price)}}</b>
                   </h3>

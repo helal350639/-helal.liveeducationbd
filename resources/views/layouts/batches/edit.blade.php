@@ -69,19 +69,25 @@ foreach($batch->teachers as $val)
                         </select>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="form-group">
                         <label for="price">Price</label>
                         <input type="number" class="form-control" name="price" id="price" required value="{{$batch->price}}" step="0.01" placeholder="0.00 Tk." onkeyup="calcPrice()">
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="fee">Extra Fee</label>
+                        <input type="number" class="form-control" name="fee" id="fee" required value="{{$batch->fee}}" step="0.01" placeholder="0.00 Tk." onkeyup="calcPrice()">
+                    </div>
+                </div>
+                <div class="col-md-3">
                     <div class="form-group">
                         <label for="discount">Discount</label>
                         <input type="number" class="form-control" name="discount" id="discount" value="{{$batch->discount}}" step="0.01" placeholder="0.00 Tk." onkeyup="calcPrice()">
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="form-group">
                         <label for="net_price">Net Price</label>
                         <input type="number" class="form-control" name="net_price" id="net_price" value="{{$batch->net_price}}" step="0.01" placeholder="0.00 Tk.">
@@ -234,10 +240,11 @@ foreach($batch->teachers as $val)
 function calcPrice()
 {
     let price = document.getElementById('price');
+    let fee = document.getElementById('fee');
     let discount = document.getElementById('discount');
     let net_price = document.getElementById('net_price');
 
-    net_price.value = Number(price.value - discount.value).toFixed(2);
+    net_price.value = (Number(price.value) + Number(fee.value) - discount.value).toFixed(2);
 }
 
     // get department on select the course
