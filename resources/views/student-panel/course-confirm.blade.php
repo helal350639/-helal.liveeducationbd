@@ -78,7 +78,7 @@ $value = $batch;
                   </tr>
                   <tr>
                     <td>কোর্সটির মূল্য </td>
-                    <th>&#2547; {{$value->net_price}}</th>
+                    <th>&#2547; {{$value->price+$value->fee}}</th>
                   </tr>
                   <tr>
                     <td>অন্যান্য ফী </td>
