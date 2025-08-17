@@ -13,6 +13,9 @@ if($user)
 
 <style>
   .teacher_title{font-size:16px!important}
+  .package-exam-title a{
+    color: #000
+  }
 </style>
 
 <!-- preloader --> 
@@ -81,7 +84,9 @@ if($user)
                           </div>
                           <div class="package-exam-content" id="custom-package-exam-content">
                             <div class="package-exam-title pt-3" id="custom-package-exam-title">
-                              <h2><a href="{{route('home.course.show', $value->id)}}">{{$value->name}}</a></h2>
+                              <h2 style="min-height:80px">
+                                <a href="{{route('home.course.show', $value->id)}}">{{$value->name}}</a>
+                              </h2>
                             </div>
                             <div class="row gy-2 button-and-price">
                                 <div class="col-12">
@@ -309,90 +314,49 @@ if($user)
         .flex-container {
           display: flex;
           flex-wrap: wrap;
-          align-items: stretch
+          align-items: stretch;
+          column-gap: 15px
         }
         
-        .flex-box {
-          /* flex: 1 1 300px; */
-          display: flex;
-          flex-direction: column
-        }
         </style>
 
       <div class="all-courses-area">
-        <div class="row g-2 g-md-3 g-lg-4 flex/-container">
+        <div class="row g-2 g-md-3 g-lg-4 flex-container">
 
           @foreach($batches as $batch)
-          {{-- <div class="flex-box">
-            <div class="exam-package-area">
-              <div class="package-exam-image">
-                <a href="{{route('home.course.show', $batch->id)}}">
-                <img src="{{ $batch->banner? $batch->banner : '/img/course.png'}}" alt="" loading="lazy" />
-                </a>
-              </div>
 
-              <div class="package-exam-content mx-2 mx-lg-3">
-                <h4>
-                  <a href="{{route('home.course.show', $batch->id)}}">{{$batch->name}}</a>
-                </h4>
-                <div class="row button-and-price pb-3 pb-lg-4">
-                  <div class="col text-end">
-                    <div class="package-exam-button">
-                      <a href="{{route('home.course.show', $batch->id)}}">
-                        <div class="custom-btn btn-12">
-                          <span>ক্লিক করুন!</span><span>কোর্সটি কিনুন</span>
-                        </div>
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
+          <div class="col-6 col-lg-3 mt-4 exam-package-area p-0">
+            <div class="package-exam-image">
+              <a href="{{route('home.course.show', $batch->id)}}">
+              <img src="{{ $batch->banner? $batch->banner : '/img/course.png'}}" alt="" loading="lazy" />
+              </a>
             </div>
-        </div> --}}
-
-          <div class="col-6 col-lg-3 mt-4 flex/-box">
-            <div class="exam-package-area">
-              <div class="package-exam-image">
-                <a href="{{route('home.course.show', $batch->id)}}">
-                <img src="{{ $batch->banner? $batch->banner : '/img/course.png'}}" alt="" loading="lazy" />
-                </a>
-              </div>
-              <div class="package-exam-content mx-2 mx-lg-3">
-                <div class="package-exam-title pt-3">
-                  <h2>
-                    <a href="{{route('home.course.show', $batch->id)}}">{{$batch->name}}</a>
-                  </h2>
+            <div class="package-exam-title pt-3 p-2">
+              <h5>
+                <a href="{{route('home.course.show', $batch->id)}}">{{$batch->name}}</a>
+              </h5>
+            </div>
+            <div class="package-exam-content mx-2 mx-lg-3">
+              
+              <div class="button-and-price pb-3 pb-lg-4">
+                <div class="package-exam-price">
+                  <div class="package-exam-total-price text-muted">
+                    <s class="text-muted">৳ {{number_format($batch->price, 0)}}</s>
+                  </div>
+                  <div class="package-exam-discount-price">৳ {{number_format($batch->price - $batch->discount, 0)}}</div>
                 </div>
-                <div class="row button-and-price pb-3 pb-lg-4">
-                  <div class="col">
-                    {{-- <div class="package-exam-rating">
-                      <i class="fas fa-star"></i>
-                      <i class="fas fa-star"></i>
-                      <i class="fas fa-star"></i>
-                      <i class="fas fa-star"></i>
-                      <i class="far fa-star"></i>
-                    </div> --}}
-                    <div class="package-exam-price">
-                      <div class="package-exam-total-price text-muted">
-                        <s class="text-muted">৳ {{number_format($batch->price, 0)}}</s>
-                      </div>
-                      <div class="package-exam-discount-price">৳ {{number_format($batch->price - $batch->discount, 0)}}</div>
+              <div class="text-end">
+                <div class="package-exam-button">
+                  <a href="{{route('home.course.show', $batch->id)}}">
+                    <div class="custom-btn btn-12">
+                      <span>ক্লিক করুন!</span>
+                      <span>কোর্সটি কিনুন</span>
                     </div>
-                  </div>
-                  <div class="col text-end">
-                    <div class="package-exam-button">
-                      {{-- <div class="package-exam-details">
-                        <a href="{{route('home.course.show', $batch->id)}}">View Details </a>
-                      </div> --}}
-                      <a href="{{route('home.course.show', $batch->id)}}">
-                        <div class="custom-btn btn-12">
-                          <span>ক্লিক করুন!</span><span>কোর্সটি কিনুন</span>
-                        </div>
-                      </a>
-                    </div>
-                  </div>
+                  </a>
                 </div>
               </div>
+                
+            </div>
             </div>
           </div>
 

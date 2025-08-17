@@ -23,7 +23,7 @@ $value = $batch;
 </style>
 
     <!-- Main content -->
-    <section class="container p-5">
+    <section class="container p-md-5">
       <div class="row">
         <!-- Content Header (Page header) -->
         <div class="content-header text-center">

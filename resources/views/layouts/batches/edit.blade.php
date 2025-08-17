@@ -127,6 +127,12 @@ foreach($batch->teachers as $val)
                         </select>
                     </div>
                 </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="extra_student">Extra Students (Optional)</label>
+                        <input class="form-control" type="number" name="extra_student" value="{{$val->extra_student}}">
+                    </div>
+                </div>
                 <div class="col-md-12">
                     <div class="form-group">
                       <label><input type="checkbox" name="status" id="status" value="{{$batch->status}}" style="width: 15px; height:15px" {{$batch->status == 'Active' ?'checked':''}}> <span style="margin-top:-10px">Status</span></label>

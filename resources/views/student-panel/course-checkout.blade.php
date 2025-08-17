@@ -24,7 +24,7 @@ $value = $batch;
 </style>
 
     <!-- Main content -->
-    <section class="container p-5">
+    <section class="container p-md-5">
       <div class="row">
         <!-- Content Header (Page header) -->
         <div class="content-header text-center">
@@ -103,8 +103,12 @@ $value = $batch;
                 </div>
               </div>
               <div class="card-footer">
+                  
+                <p style="text-align: left">
+                  <input type="checkbox" required id="agree"> I agree to the <a href="{{route('home.page', 'terms-condition')}}">Terms & Condition</a>, <a href="{{route('home.page', 'privacy-policy')}}">Privacy Policy</a> and  <a href="{{route('home.page', 'return-policy')}}">Fund Return Policy</a>.
+                </p>
       
-                {{-- <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button> --}}
+                <br>
                 @if(!empty($user->id) && $value->students()->where('id', $user->id)->first())
                 <h4>আপনি কোর্সটি কিনেছেন</h4>
                 <a class="btn btn-info" href="{{route('students.my-course')}}">আমার কোর্স এ ফিরে যান</a>

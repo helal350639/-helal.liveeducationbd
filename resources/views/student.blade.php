@@ -30,7 +30,7 @@ function active($name)
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <link rel="icon" href="/img/logo.png" />
+    <link rel="icon" href="/web/img/favicon.png?v=1.1.2" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="robots" content="index" />
     <meta property="description" content="" />
@@ -101,7 +101,7 @@ function active($name)
         <div class="mobile-menu d-flex justify-content-between align-items-center">
           <div class="main-logo">
             <a href="/">
-              <img src="/web/img/logo.png" alt="Logo" class="logo-img">
+              <img src="/web/img/logo.png?v=1.1.2" alt="Logo" class="logo-img">
             </a>
           </div>
           <div class="moblie-icon">

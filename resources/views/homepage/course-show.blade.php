@@ -121,6 +121,7 @@ $value = $batch;
                   <p style="color: red">ডিস্কাউন্ট অফারের মেয়াদ <b>{{$source->dtformat($value->offer_end_at)}}</b></p>
                   @endif
                 <p>{{$value->subtitle}}</p>
+                <p style="color:#c00; text-align:center">এই কোর্সটি করছেন {{$value->students->count() + $value->extra_student}} জন </p>
               </div>
               <div class="card-footer">
                 @if(!empty($user->id) && $value->students()->where('id', $user->id)->first())
@@ -129,12 +130,8 @@ $value = $batch;
                   @if($value->reg_end_at && date('Y-m-d H:i:s') > $value->reg_end_at )
                   <p class="text-danger">রেজিস্ট্রেশানের মেয়াদ শেষ</p>
                   @else
-                  
-                  <p style="text-align: left">
-                    <input type="checkbox" required id="agree"> I agree to the <a href="{{route('home.page', 'terms-condition')}}">Terms & Condition</a>, <a href="{{route('home.page', 'privacy-policy')}}">Privacy Policy</a> and  <a href="{{route('home.page', 'return-policy')}}">Fund Return Policy</a>.
-                  </p>
                   <br>
-                  <button type="button" onclick="checkLogin()" href="{{route('students.course.checkout', $batch->id)}}" class="btn btn-success btn-block btn-lg">কোর্সটি কিনুন</button>
+                  <a href="{{route('students.course.checkout', $batch->id)}}" class="btn btn-success btn-lg w-100">কোর্সটি কিনুন</a>
                   @endif
                 @endif
                 <div class="clearfix"></div>
@@ -150,7 +147,7 @@ $value = $batch;
         </div> <!--/.col-left-->
         
         <div class="col col-md-8 order-md-first">
-          <div class="card card-info mb-5 p-3">
+          <div class="card card-info mb-5 p-3" style="background-image: linear-gradient(15deg,#01beed,#00060a); color:#eee">
             <div class="card-heading">
               <h3>{{$value->name}}</h3>
               @if($value->reg_end_at && $value->reg_end_at > date('Y-m-d H:i:s'))

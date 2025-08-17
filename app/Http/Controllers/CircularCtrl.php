@@ -103,12 +103,12 @@ class CircularCtrl extends Controller
           $circular = Circular::create($data);
           $circular->circularType()->attach($types);
 
-          if(isset($data['notify']))
+          if(isset($data['notify']) && $circular)
           {
             Notification::create([
               'title' => $data['title'],
               'route' => 'home.circular.show',
-              'type_id' => $id,
+              'type_id' => $circular->id,
               'type' => 'circular',
             ]);
           }
