@@ -121,7 +121,12 @@ $value = $batch;
                   <p style="color: red">ডিস্কাউন্ট অফারের মেয়াদ <b>{{$source->dtformat($value->offer_end_at)}}</b></p>
                   @endif
                 <p>{{$value->subtitle}}</p>
-                <p style="color:#c00; text-align:center">এই কোর্সটি করছেন {{$value->students->count() + $value->extra_student}} জন </p>
+                <table class="table table-bordered">
+                  <tr>
+                    <td style="color:#1CAB55">এই কোর্সটি করছেন</td>
+                    <th style="color:#1CAB55">{{$value->students->count() + $value->extra_student}} জন </th>
+                  </tr>
+                </table>
               </div>
               <div class="card-footer">
                 @if(!empty($user->id) && $value->students()->where('id', $user->id)->first())

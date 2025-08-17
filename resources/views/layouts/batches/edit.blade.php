@@ -130,7 +130,7 @@ foreach($batch->teachers as $val)
                 <div class="col-md-4">
                     <div class="form-group">
                         <label for="extra_student">Extra Students (Optional)</label>
-                        <input class="form-control" type="number" name="extra_student" value="{{$val->extra_student}}">
+                        <input class="form-control" type="number" name="extra_student" value="{{$batch->extra_student}}">
                     </div>
                 </div>
                 <div class="col-md-12">
