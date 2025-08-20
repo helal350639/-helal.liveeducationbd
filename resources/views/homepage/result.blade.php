@@ -8,8 +8,6 @@ if($user)
   $student = \App\Models\Student::find($user->id);
 }
 
-// $student_batch = $student->batches()->get();
-// dd($student_batch);
 @endphp
 
 @extends('homepage')
