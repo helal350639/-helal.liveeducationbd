@@ -117,14 +117,11 @@ $value = $batch;
                   @endif
                   <b> &nbsp; &#2547;{{$source->point0($value->net_price)}}</b>
                   </h3>
-                  @if($value->offer_end_at && $value->offer_end_at > date('Y-m-d H:i:s'))
-                  <p style="color: red">ডিস্কাউন্ট অফারের মেয়াদ <b>{{$source->dtformat($value->offer_end_at)}}</b></p>
-                  @endif
                 <p>{{$value->subtitle}}</p>
                 <table class="table table-bordered">
                   <tr>
-                    <td style="color:#1CAB55">এই কোর্সটি করছেন</td>
-                    <th style="color:#1CAB55">{{$value->students->count() + $value->extra_student}} জন </th>
+                    <td style="color:#1CAB55"> <i class="fa fa-users"></i> এই কোর্সটি করছেন</td>
+                    <th style="color:#1CAB55; text-align:right">{{$value->students->count() + $value->extra_student}} জন </th>
                   </tr>
                 </table>
               </div>
@@ -135,7 +132,11 @@ $value = $batch;
                   @if($value->reg_end_at && date('Y-m-d H:i:s') > $value->reg_end_at )
                   <p class="text-danger">রেজিস্ট্রেশানের মেয়াদ শেষ</p>
                   @else
-                  <br>
+                  
+                  @if($value->offer_end_at && $value->offer_end_at > now())
+                  <p style="color: red; font-size:12px">ডিস্কাউন্ট অফারের মেয়াদ {{$source->dformat($value->offer_end_at)}}</p>
+                  @endif
+
                   <a href="{{route('students.course.checkout', $batch->id)}}" class="btn btn-success btn-lg w-100">কোর্সটি কিনুন</a>
                   @endif
                 @endif
@@ -143,7 +144,7 @@ $value = $batch;
               </div>
               @if($value->what_is)
               <div class="card-body">
-                <h3>এই কোর্সে যা থাকছে</h3>
+                <h4><u>এই কোর্সে যা থাকছেঃ</u></h4>
                 {!! $value->what_is !!}
               </div>
               @endif
@@ -173,7 +174,7 @@ $value = $batch;
           </div>
           @endif
 
-          @if($routine)
+          @if(!empty($routine))
           <div class="card card-default mt-5 p-3" style=" left:0; right:0;">
             <span class="pull-right" style="position: absolute;right:10px" onclick="viewFullMode(this)"><i class="fa fa-external-link"></i></span>
             <div class="card-heading">
@@ -641,7 +642,7 @@ $value = $batch;
 
   }
 
-  @if($routine)
+  @if(!empty($routine))
   // routine filter
   function getRoutine(e)
   {

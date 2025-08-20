@@ -121,7 +121,7 @@ class StudentHomeCtrl extends Controller
     // $batches = Batch::where('status', 'Active')->get();
     $departments = $batch->departments()->where('status', 'Active')->get();
     $groups = Group::where('status', 'Active')->get();
-    return view('student-panel.course-show', compact('batch', 'departments', 'groups'));
+    return view('homepage.course-show', compact('batch', 'departments', 'groups'));
   }
 
   public function applyCourse(Request $request)

@@ -11,9 +11,13 @@ if($complains)
     <!-- Logo -->
     <a href="/home" class="logo">
       <!-- mini logo for sidebar mini 50x50 pixels -->
-      <span class="logo-mini"><img src="{{asset('/img/logo.png?v=3008')}}" width="50"></span>
+      <span class="logo-mini">
+        <img src="{{asset('/img/favicon.png?v=3008')}}" width="50">
+      </span>
       <!-- logo for regular state and mobile devices -->
-      <span class="logo-lg"><img src="{{asset('/img/logo.png?v=3008')}}" class="img-responsive" style="width: 100px;margin:auto"></span>
+      <span class="logo-lg">
+        <img src="{{asset('/img/logo.png?v=3008')}}" class="img-responsive" style="width: 160px; margin:auto">
+      </span>
     </a>
     <!-- Header Navbar: style can be found in header.less -->
     <nav class="navbar navbar-static-top">

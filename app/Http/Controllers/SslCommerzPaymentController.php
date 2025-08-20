@@ -221,7 +221,11 @@ class SslCommerzPaymentController extends Controller
           $student = Student::find($order_details->student_id);
 
           //synchronize batch by student id
-          $student->batches()->attach($order_details->batch_id);
+          // if(!$student->batches()->where('batch_id', $order_details->batch_id)->count())
+          // {
+            $student->batches()->attach($order_details->batch_id);
+          // }
+          
           DB::table('batch_student')
           ->where('student_id', $order_details->student_id)
           ->updateOrInsert([
