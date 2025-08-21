@@ -15,8 +15,9 @@ use App\Models\Routine;
 use App\Models\RoutineSubjectColumn;
 use App\Models\RoutineDepartmentColumn;
 use App\Models\RoutineItemRow;
-use App\Models\Subject;
 use App\Models\Semester;
+use App\Models\Subject;
+use App\Models\Chapter;
 use Auth;
 use DateTime;
 
@@ -48,31 +49,34 @@ class CategoryCtrl extends Controller
   {
     $title = '';
     $videos = [];
-    if($type == 'Subject')
-    {
-      $subject = Subject::find($id);
-      $videos = $subject->questions()->where('Type', 'Video')->get();
-      $title = $subject->name; 
-    }
-    if($type == 'Semester')
-    {
-      $semester = Semester::find($id);
-      $videos = $semester->questions()->where('Type', 'Video')->get();
-      $title = $semester->name;
-    }
-    if($type == 'Department')
-    {
-      $department = Department::find($id);
-      $videos = $department->questions()->where('Type', 'Video')->get();
-      $title = $department->name;
-    }
+    $chapter = Chapter::find($id);
+    $questions = $chapter->questions()->where('type', 'Video')->get();
+    // if($type == 'Subject')
+    // {
+    //   $subject = Subject::find($id);
+    //   $videos = $subject->questions()->where('Type', 'Video')->get();
+    //   $title = $subject->name; 
+    // }
+    // if($type == 'Semester')
+    // {
+    //   $semester = Semester::find($id);
+    //   $videos = $semester->questions()->where('Type', 'Video')->get();
+    //   $title = $semester->name;
+    // }
+    // if($type == 'Department')
+    // {
+    //   $department = Department::find($id);
+    //   $videos = $department->questions()->where('Type', 'Video')->get();
+    //   $title = $department->name;
+    // }
 
-    if(empty($videos))
-    {
-      return back();
-    }
+    // if(empty($videos))
+    // {
+    //   return back();
+    // }
+    $title = 'Recorded Videos';
 
-    return view('homepage.recorded-courses.video', compact('videos', 'title'));
+    return view('homepage.recorded-courses.video', compact('questions', 'title'));
   }
 
   // batches query according to the course id
@@ -206,7 +210,7 @@ class CategoryCtrl extends Controller
   }
 
   // department query for polytechnic study and where need directly call to the departments
-  public function departments($type)
+  public function departments($type, $semester_id)
   {
     $title = '';
 
@@ -214,14 +218,16 @@ class CategoryCtrl extends Controller
       $title = 'Polytechnic Study';
     }
 
-    $departments = Department::all();
-    return view('homepage.polytechnic-department', compact('type', 'title', 'departments'));
+    $semester = Semester::find($semester_id);
+
+    $departments = $semester->departments()->get();
+    return view('homepage.polytechnic-studies.department', compact('type', 'title', 'departments'));
   }
 
-  public function semester($type)
+  public function semesters($type)
   {
     $semesters = Semester::all();
-    return view('homepage.polytechnic-semester', compact('type', 'semesters'));
+    return view('homepage.polytechnic-studies.semester', compact('type', 'semesters'));
   }
 
   // department query according to the batch id
@@ -346,8 +352,7 @@ class CategoryCtrl extends Controller
 
     if($type == 'Recorded Courses')
     {
-      // return $this->recordedCourses($type, $batch_id, $department_id);
-      return $this->videoSubjects($type, $batch_id, $department_id);
+      return $this->subjects($type, $batch_id, $department_id);
     }    
 
     return $type.': Under development';
@@ -469,26 +474,25 @@ class CategoryCtrl extends Controller
     return view('homepage.result', compact('type', 'batch', 'department', 'results'));
   }
 
-  public function videoSubjects($type, $batch_id, $department_id)
-  {
-    
+  public function subjects($type, $batch_id = null, $department_id)
+  {    
       $subjects = Subject::where('status', 'Active')->get();
-      $departments = Department::where('status', 'Active')->get();
-      $semesters = Semester::where('status', 'Active')->get();
-      $videos = Question::where('status', 'Active')
-      ->OrderBy('id', 'DESC')
-      ->where('type', 'Video')
-      ->get();
-
-      return view('homepage.recorded-courses.job-video', compact('subjects', 'departments', 'semesters', 'subjects', 'videos'));
+      return view('homepage.recorded-courses.subject', compact('subjects'));
   }
 
-  public function recordedCourses($type, $batch_id, $department_id)
+  public function chapters($type, $subject_id)
+  {
+    $subject = Subject::find($subject_id);
+    $chapters = $subject->chapters()->get();
+    return view('homepage.recorded-courses.chapter', compact('chapters'));
+  }
+
+  public function recordedCourses($type, $batch_id = null, $chapter_id)
   {
     $batch = Batch::find($batch_id);
-    $department = Department::find($department_id);
+    $chapter = Chapter::find($chapter_id);
 
-    $questions = $department->questions()
+    $questions = $chapter->questions()
     ->where('type', 'Video')
     ->where('status', 'Active')
     ->get();

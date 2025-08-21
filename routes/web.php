@@ -3,7 +3,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-// use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
@@ -68,14 +68,17 @@ Route::controller(CategoryCtrl::class)->group(function()
     Route::get('courses/{type?}', 'courses')->name('category.courses');
     Route::get('batch/{type?}/{course}', 'batch')->name('category.batch');
 
-    Route::get('departments/{type}', 'departments')->name('category.departments');
+    Route::get('semesters/{type}', 'semesters')->name('category.semesters');
+    Route::get('departments/{type}/{semester?}', 'departments')->name('category.departments');
 
     Route::get('batches/{type?}/{dashboard?}', 'batches')->name('category.batches');
     Route::get('department/{type}/{batch?}/{dashboard?}', 'department')->name('category.department');
     Route::get('paper/{type}/{batch}/{department?}', 'paper')->name('category.paper');
     Route::get('result-option', 'resultOption')->name('category.result.option');
     Route::get('check-method/{type}/{batch}/{department?}', 'checkMethod')->name('category.check-method');
-    Route::get('recored-course/{type?}/{id}', 'recordedVideo')->name('category.recorded-video');
+    Route::get('subjects/{type}/{batch?}/{department?}', 'subjects')->name('category.subjects');
+    Route::get('chapters/{type}/{subject?}', 'chapters')->name('category.chapters');
+    Route::get('recorded-course/{type?}/{chapter?}', 'recordedVideo')->name('category.recorded-video');
   });
 });
 
@@ -404,7 +407,7 @@ Route::get('reboot', function ()
   Artisan::call('cache:clear');
   Artisan::call('view:clear');
   Artisan::call('route:clear');
-  Artisan::call('config:cache');
-  Artisan::call('view:cache');
-  dd('System Successfully Rebooted');
+  Artisan::call('config:clear');
+  Artisan::call('view:clear');
+  return redirect('/')->with('success', 'Application cache cleared!');
 });

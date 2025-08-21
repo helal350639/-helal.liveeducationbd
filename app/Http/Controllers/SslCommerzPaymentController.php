@@ -109,8 +109,6 @@ class SslCommerzPaymentController extends Controller
         $post_data['value_c'] = $department->name;
         $post_data['value_d'] = "";
 
-        // dd($post_data);
-
         $sslc = new SslCommerzNotification();
         # initiate(Transaction Data , false: Redirect to SSLCOMMERZ gateway/ true: Show all the Payement gateway here )
         $payment_options = $sslc->makePayment($post_data, 'hosted');
@@ -197,8 +195,6 @@ class SslCommerzPaymentController extends Controller
         $source = new SourceCtrl;
         $studentctrl = new StudentHomeCtrl;
 
-        // echo "Transaction is Successful";
-
         $tran_id = $request->input('tran_id');
         $amount = $request->input('amount');
         $currency = $request->input('currency');
@@ -221,10 +217,10 @@ class SslCommerzPaymentController extends Controller
           $student = Student::find($order_details->student_id);
 
           //synchronize batch by student id
-          // if(!$student->batches()->where('batch_id', $order_details->batch_id)->count())
-          // {
+          if(!$student->batches()->where('batch_id', $order_details->batch_id)->count())
+          {
             $student->batches()->attach($order_details->batch_id);
-          // }
+          }
           
           DB::table('batch_student')
           ->where('student_id', $order_details->student_id)
@@ -242,7 +238,7 @@ class SslCommerzPaymentController extends Controller
           ]);
 
           //send sms
-          if($student->contact)
+          if($student->contact && env('APP_ENV') != 'local')
           {
               $source->sms_send('88'.$student->contact, 'Your course has been successfully purchased. For more information, please visit liveeducationbd.com');
           }

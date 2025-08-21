@@ -28,7 +28,7 @@ $user = Auth::guard('student')->user();
               @if($departments->count())
                 @foreach($departments as $value)
                 <div class="col-md-3 col-6 mb-1 dropdown bcs-jobs" id="home-services-area-one">
-                  <a href="#">
+                  <a href="{{route('category.subjects', ['Recorded Courses','Polytechnic', $value->id])}}">
                     <div class="my-home-service premium-course-box">
                       <div class="my-home-service-icon">
                         <img src="/web/img/department.png" alt="" loading="lazy">
@@ -43,7 +43,7 @@ $user = Auth::guard('student')->user();
               @else
               <div class="card card-default">
                 <div class="card-body text-center">
-                  No Batch Available Departments
+                  No Available Departments
                 </div>
               </div>
               @endif

@@ -192,8 +192,11 @@ class StudentHomeCtrl extends Controller
   {
     try {
       $student = Student::find($data['student_id']);
-      $student->batches()->attach($data['batch_id']);
-      $student->departments()->attach($data['department_id']);
+      if(!$student->batches()->where('student_id', $student->id)->count())
+      {
+        $student->batches()->attach($data['batch_id']);
+        $student->departments()->attach($data['department_id']);
+      }
 
       return true;
     }
@@ -304,8 +307,6 @@ class StudentHomeCtrl extends Controller
     else{
       return redirect()->route('students.instruction', $id);
     }
-
-    // dd($check);
     
     return view('student-panel.check', compact('paper', 'check'));
   }
@@ -348,35 +349,9 @@ class StudentHomeCtrl extends Controller
     // if on the paper settings has exam limitation and exam limitation number is less than already examed count on this paper. So it will redirect to the result page. Otherwise it will redirect to the exam start page.
     if($paper->exam_limit && intval($paper->exam_limit) <= $exams)
     {
-      // //find paper
-      // $exams = Exam::where('paper_id', $paper->id)
-      // ->where('student_id', $user->id)
-      // ->get();
-      // $exam_id = Exam::where('paper_id', $paper->id)->orderBy('id', 'DESC')->first()->id;
-      // $mcq_ids = Choice::where('exam_id', $exam_id)->pluck('mcq_id')->toArray();
-      // $dbmcqs = McqItem::whereIn('id', $mcq_ids)->whereNotNull('correct_answer')->get();
-
-      // $questions = $paper->questions()->count();
-      // $answered = count($mcq_ids);
-      // $correct = $dbmcqs->count();
-      // $wrong = $answered - $correct;
-      // $no_answered = $questions - $answered;
-      // $marks = ($paper->mark * $correct) - ($wrong * $paper->minus);
-
-      // $result = [
-      //   'questions' => $questions,
-      //   'answered' => $answered,
-      //   'correct' => $correct,
-      //   'wrong' => $wrong,
-      //   'no_answered' => $no_answered,
-      //   'marks' => $marks,
-      // ];
-
       $exam = $exams = $result = null;
 
       return view('student-panel.exam-show', compact('paper', 'result', 'exams', 'exam'));
-
-      // return redirect()->route('students.result', $id);
     }
     else
     {
@@ -421,7 +396,6 @@ class StudentHomeCtrl extends Controller
     // serve questions according to the paper
     $paper = Paper::find($paper_id);
     $questions = $paper->questions()->select('id', 'title')->with('mcqitems')->paginate(5);
-    // dd($questions);
 
     $success = false;
     if(!is_null($questions))
@@ -495,7 +469,7 @@ class StudentHomeCtrl extends Controller
     $paper = Paper::find($id);
     $exam = $paper->exams()->where('student_id', $user->id)->first();
     $choices = Choice::where('exam_id', $exam->id)->pluck('question_id', 'mcq_id')->toArray();
-    
+
     return view('student-panel.your-exam-paper', compact('paper', 'choices', 'exam'));
   }
 

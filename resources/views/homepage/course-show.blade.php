@@ -11,7 +11,6 @@ $value = $batch;
 @endphp
 
 @extends('student')
-@section('title', 'Course')
 @section('stylesheets')
 <meta name="description" content="{{$batch->subtitle}}"/>
 <meta name="keywords" content="{{$batch->name}}"/>
@@ -54,7 +53,6 @@ $value = $batch;
 <meta name="twitter:image:width" content="1200"/>
 <meta name="twitter:image:height" content="630"/>
 <meta name="twitter:image:alt" content="{{$batch->name}}"/>
-
 <title>{{$batch->name}}</title>
 
 @endsection
@@ -123,6 +121,14 @@ $value = $batch;
                     <td style="color:#1CAB55"> <i class="fa fa-users"></i> এই কোর্সটি করছেন</td>
                     <th style="color:#1CAB55; text-align:right">{{$value->students->count() + $value->extra_student}} জন </th>
                   </tr>
+                  {{-- <tr>
+                    <td><i class="fa fa-streaming"></i> Live Class</td>
+                    <th>{{$value->live_classes}}</th>
+                  </tr>
+                  <tr>
+                    <td><i class="fa fa-video"></i> Record Class</td>
+                    <th>{{$value->questions}}</th>
+                  </tr> --}}
                 </table>
               </div>
               <div class="card-footer">

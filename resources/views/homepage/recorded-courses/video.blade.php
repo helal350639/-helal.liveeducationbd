@@ -42,6 +42,17 @@ if($user)
   }
 }
 .exam-package-area{cursor: pointer;}
+
+.flex-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    /* column-gap: 15px */
+  }
+  .flex-box{
+    display: flex;
+    flex-direction: column;
+  }
 </style>
 
     <!-- Main content -->
@@ -50,13 +61,13 @@ if($user)
         <div class="row">
           <!-- Content Header (Page header) -->
           <div class="title-area text-center">
-            <h1> {{$batch->name}} </h1>
+            <h1> {{$title}} </h1>
           </div>
         </div>
 
         <div class="row">
           <div class="all-courses-area">
-            <div class="row g-2 g-md-3 g-lg-4">
+            <div class="row g-2 g-md-3 g-lg-4 flex-container">
               @if($questions->count())
               @foreach($questions as $value)
 
@@ -67,7 +78,7 @@ if($user)
                   </div>
                   <div class="package-exam-content mx-lg-3">
                     <div class="package-exam-title pt-3">
-                      {!! substr($value->title, 0, 30) !!}
+                      {!! $value->title !!}
                     </div>
                   </div>
                 </div>

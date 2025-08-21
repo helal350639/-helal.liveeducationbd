@@ -90,13 +90,13 @@ if($user)
                             </div>
                             <div class="row gy-2 button-and-price">
                                 <div class="col-12">
-                                  <div class="package-exam-rating">
+                                  {{-- <div class="package-exam-rating">
                                       <i class="fas fa-star"></i>
                                       <i class="fas fa-star"></i>
                                       <i class="fas fa-star"></i>
                                       <i class="fas fa-star"></i>
                                       <i class="far fa-star"></i>
-                                  </div>
+                                  </div> --}}
                                 </div>
                                 <div class="col-12">
                                   <a href="{{route('home.course.show', $value->id)}}" class="btn btn_warning text-white bg-brand w-100"> বিস্তারিত দেখুন <i class="fa-solid fa-arrow-right"></i></a>
@@ -176,13 +176,13 @@ if($user)
         <p class="pointer-cursor text-center">Online Classes</p>
       </a>
 
-      {{-- <a href="{{route('category.batches', 'Recorded Courses')}}" class="emergency-box"> --}}
-        <a href="javascript:void()" class="emergency-box">
+      <a href="{{route('category.batches', 'Recorded Courses')}}" class="emergency-box">
+        {{-- <a href="javascript:void()" class="emergency-box"> --}}
         <img src="/web/img/recorded-course.png" alt="Students Review" class="img-fluid">
         <p class="pointer-cursor text-center">Recorded Courses</p>
       </a>
 
-      <a href="{{route('category.departments', 'Polytechnic')}}" class="emergency-box">
+      <a href="{{route('category.semesters', 'Polytechnic')}}" class="emergency-box">
         <img src="/web/img/politechnic.jpg" alt="" class="img-fluid">
         <p class="pointer-cursor text-center">Polytechnic Study</p>
       </a>
@@ -315,7 +315,7 @@ if($user)
           display: flex;
           flex-wrap: wrap;
           align-items: stretch;
-          column-gap: 15px
+          /* column-gap: 10px */
         }
         
         </style>
@@ -325,7 +325,8 @@ if($user)
 
           @foreach($batches as $batch)
 
-          <div class="col-6 col-lg-3 mt-4 exam-package-area p-0">
+          <div class="col-6 col-lg-3 mt-4 p-2">
+            <div class="exam-package-area"> 
             <div class="package-exam-image">
               <a href="{{route('home.course.show', $batch->id)}}">
               <img src="{{ $batch->banner? $batch->banner : '/img/course.png'}}" alt="" loading="lazy" />
@@ -357,8 +358,9 @@ if($user)
               </div>
                 
             </div>
-            </div>
           </div>
+        </div>
+        </div>
 
           @endforeach
 
