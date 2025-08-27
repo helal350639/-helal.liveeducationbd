@@ -2,6 +2,7 @@
 use \App\Http\Controllers\SourceCtrl;
 $source = New SourceCtrl;
 $value = $syllabus;
+// dd($value);
 @endphp
 
 @extends('dashboard')
@@ -96,10 +97,10 @@ $value = $syllabus;
                         <div class="form-group">
                             <label for="status">Status</label>
                             <select class="form-control" name="status" id="status" onchange="Status(this)">
-                                <option value="">Select One</option>
-                                <option value="Unpublished" {{$value->status == 'Unpublished'? 'selected':''}}>Unpublished</option>
-                                <option value="Published" {{$value->status == 'Published'? 'selected':''}}>Published</option>
-                                {{-- <option value="Scheduled" {{$value->status == 'Scheduled'? 'selected':''}}>Scheduled</option> --}}
+                              <option value="">Select One</option>
+                              <option value="Unpublished" {{$value->status == 'Unpublished'? 'selected':''}}>Unpublished</option>
+                              <option value="Published" {{$value->status == 'Published'? 'selected':''}}>Published</option>
+                              <option value="Scheduled" {{$value->status == 'Scheduled'? 'selected':''}}>Scheduled</option>
                             </select>
                         </div>
                     </div>

@@ -335,8 +335,6 @@ class SyllabusCtrl extends Controller
           unset($data['_method']);
         }
 
-        // $data['status'] = isset($data['status']) ? 'Active' : 'Deactive';
-
         $data['created_by'] = Auth::id();
 
         // dd($data);
