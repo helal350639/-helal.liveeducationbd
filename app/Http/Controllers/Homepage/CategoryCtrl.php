@@ -409,13 +409,11 @@ class CategoryCtrl extends Controller
 
       $routine_rows = RoutineItemRow::where('routine_item_rows.routine_id', $routine->id)
       ->with(['subjects', 'departments' => function($query) use($department_id){
-        $query->where('id', $department_id);
+        $query->where('department_id', $department_id);
       }])
       ->select('routine_item_rows.*')
       ->get();
     }
-
-    // dd($routines);
 
     return view('homepage.exam-routine-view', compact('batch', 'routine', 'subjects', 'departments', 'routine_rows'));
   }
