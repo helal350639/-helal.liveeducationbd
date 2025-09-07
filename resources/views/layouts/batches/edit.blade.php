@@ -69,25 +69,37 @@ foreach($batch->teachers as $val)
                         </select>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <div class="form-group">
                         <label for="price">Price</label>
                         <input type="number" class="form-control" name="price" id="price" required value="{{$batch->price}}" step="0.01" placeholder="0.00 Tk." onkeyup="calcPrice()">
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <div class="form-group">
                         <label for="fee">Extra Fee</label>
                         <input type="number" class="form-control" name="fee" id="fee" required value="{{$batch->fee}}" step="0.01" placeholder="0.00 Tk." onkeyup="calcPrice()">
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <div class="form-group">
                         <label for="discount">Discount</label>
                         <input type="number" class="form-control" name="discount" id="discount" value="{{$batch->discount}}" step="0.01" placeholder="0.00 Tk." onkeyup="calcPrice()">
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="referrer_bonus">Referrer Bonus</label>
+                        <input type="number" class="form-control" name="referrer_bonus" id="referrer_bonus" required value="{{$batch->referrer_bonus}}" step="0.01" placeholder="0.00 Tk." onkeyup="calcPrice()">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="reference_discount">Reference Discount</label>
+                        <input type="number" class="form-control" name="reference_discount" id="reference_discount" value="{{$batch->reference_discount}}" step="0.01" placeholder="0.00 Tk." onkeyup="calcPrice()">
+                    </div>
+                </div>
+                <div class="col-md-4">
                     <div class="form-group">
                         <label for="net_price">Net Price</label>
                         <input type="number" class="form-control" name="net_price" id="net_price" value="{{$batch->net_price}}" step="0.01" placeholder="0.00 Tk.">
@@ -248,9 +260,13 @@ function calcPrice()
     let price = document.getElementById('price');
     let fee = document.getElementById('fee');
     let discount = document.getElementById('discount');
+    let referrer_bonus = document.getElementById('referrer_bonus');
+    let reference_discount = document.getElementById('reference_discount');
     let net_price = document.getElementById('net_price');
 
-    net_price.value = (Number(price.value) + Number(fee.value) - discount.value).toFixed(2);
+    net_price.value = (Number(price.value) + Number(fee.value) - Number(discount.value)).toFixed(2);
+
+    // + Number(referrer_bonus.value)+(Number(reference_discount.value)
 }
 
     // get department on select the course

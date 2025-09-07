@@ -8,6 +8,12 @@ if($user)
   $student = \App\Models\Student::find($user->id);
 }
 $value = $batch;
+$reference_discount = 0;
+
+if($value->reference_discount && Session::get('batch-referrer') && Session::get('batch-referrer')['batch'] == $batch->id){
+  $reference_discount = $value->reference_discount;
+}
+                    
 @endphp
 
 @extends('student')
@@ -56,7 +62,7 @@ $value = $batch;
                     @if($value->discount) 
                     <del> &#2547;{{$source->point0($value->price + $value->fee)}}</del> &nbsp; <span class="label label-warning"> &#2547;{{$source->point0($value->discount)}} ছাড়</span>
                     @endif
-                    <b> &nbsp; &#2547;{{$source->point0($value->net_price)}}</b>
+                    <b> &nbsp; &#2547;{{$source->point0($value->net_price - $reference_discount)}}</b>
                     </h3>
                     @if($value->offer_end_at)
                     <p style="color: red">ডিস্কাউন্ট অফারের মেয়াদ <b>{{$source->dtformat($value->offer_end_at)}}</b></p>
@@ -94,9 +100,15 @@ $value = $batch;
                       <td>ডিস্কাউন্ট </td>
                       <th>&#2547; {{$source->point0($value->discount)}}</th>
                     </tr>
+                    @if($reference_discount)
+                    <tr>
+                      <td>রিফারেন্স ডিস্কাউন্ট </td>
+                      <th>&#2547; {{$source->point0($value->reference_discount)}}</th>
+                    </tr>
+                    @endif
                     <tr style="font-size:18px">
                       <th>মোট =</th>
-                      <th>&#2547; {{$source->point0($value->net_price)}}</th>
+                      <th>&#2547; {{$source->point0($value->net_price - $reference_discount)}}</th>
                     </tr>
                   </table>
                 @endif

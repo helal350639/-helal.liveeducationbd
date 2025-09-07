@@ -47,21 +47,9 @@ if($user)
                   <h2><a href="{{route('home.course.show', $value->id)}}">{{substr($value->name, 0, 20)}}</a></h2>
                 </div>
                 <div class="row button-and-price pb-3 pb-lg-4">
-                  <div class="col">
-                    <div class="package-exam-rating">
-                      <i class="fas fa-star"></i>
-                      <i class="fas fa-star"></i>
-                      <i class="fas fa-star"></i>
-                      <i class="fas fa-star"></i>
-                      <i class="far fa-star"></i>
-                    </div>
-                  </div>
-                  <div class="col text-end">
-                    <div class="package-exam-button">
-                      <div class="package-exam-details">
-                        <a href="{{route('home.course.show', $value->id)}}">View Details </a>
-                      </div>
-                    </div>
+                  <div class="col" style="color:green">
+                    Referrer Bonus: <b>{{$value->referrer_bonus?$value->referrer_bonus:0}}</b>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="handleClick(this)" href="{{route('student.batch-reference', [$value->id, Auth::id()])}}">Copy Reference Link</button>
                   </div>
                 </div>
               </div>
@@ -82,4 +70,21 @@ if($user)
       
     </div>
     </section> <!-- /.content -->
+
+    <script>
+      function copyToClipBoard(str){
+      const element = document.createElement('textarea');
+      element.value = str;
+      document.body.appendChild(element);
+      element.select();
+      document.execCommand('copy');
+      document.body.removeChild(element);
+      alert('Link Copied to the clipboard');
+    }
+  
+    function handleClick(e){
+      // let text = document.querySelector('#text');
+      copyToClipBoard(e.getAttribute('href'));
+    }
+    </script>
 @endsection

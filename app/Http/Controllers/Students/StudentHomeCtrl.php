@@ -21,6 +21,7 @@ use App\Models\Complain;
 use App\Models\Order;
 use App\Models\Routine;
 use App\Models\Circular;
+use App\Models\Referrer;
 use Auth;
 use Session;
 use Mail;
@@ -99,7 +100,9 @@ class StudentHomeCtrl extends Controller
       'circular' => $circulars
     ];
 
-    return view('student-panel.dashboard', compact('data', 'student', 'orders'));
+    $references = Referrer::where('referrer_id', auth()->id())->orderBy('id', 'DESC')->get();
+
+    return view('student-panel.dashboard', compact('data', 'student', 'orders', 'references'));
   }
 
   public function profile()
@@ -847,6 +850,17 @@ class StudentHomeCtrl extends Controller
   {
     $batches = Batch::all();
     return view('student-panel.routine-batch', compact('batches'));
+  }
+
+  public function batchReference($batch_id, $referrer_id)
+  {
+    $student = Student::find($referrer_id);
+    $student_batch = $student->batches()->where('id', $batch_id)->first();
+    if($batch_id && $referrer_id && $student_batch)
+    {
+      Session::put('batch-referrer', ['batch' => $batch_id, 'referrer' => $referrer_id]);      
+    }
+    return redirect()->route('home.course.show', $batch_id);
   }
 
 }

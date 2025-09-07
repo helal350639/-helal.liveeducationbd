@@ -351,6 +351,47 @@ font-size: 16px;
          <div class="col-md-12">
             <div class="card  course_exam_mobile_res">
                <div class="card-header">
+                  <h3 class="text-center f-s-32  pt-2 pd-0">Your Reference Earnings</h3>
+               </div>
+               <div class="card-body overflow-scroll">
+                  <table class="table table-striped f-s-22">
+                     <thead>
+                        <tr>
+                           <th>Student Name</th>
+                           <th>Batch</th>
+                           <th>Bonus(Tk.)</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                      @php
+                      $total_reference_bonus = 0;
+                      @endphp
+
+                      @foreach($references as $value)
+                      <tr>
+                        <td>{{$value->student->name}}</td>
+                        <td>{{$value->batch->name}}</td>
+                        <td>{{$value->referrer_bonus}}</td>
+                      </tr>
+                      @php
+                      $total_reference_bonus += $value->referrer_bonus;
+                      @endphp
+                      @endforeach
+                      <tr>
+                        <th colspan="2"></th>
+                        <th>{{$total_reference_bonus}} Tk.</th>
+                      </tr>
+
+                     </tbody>
+                  </table>
+               </div>
+            </div>
+         </div>
+      </div>
+      <div class="mt-3 row">
+         <div class="col-md-12">
+            <div class="card  course_exam_mobile_res">
+               <div class="card-header">
                   <h3 class="text-center f-s-32  pt-2 pd-0">Your Order & Payments</h3>
                </div>
                <div class="card-body overflow-scroll">

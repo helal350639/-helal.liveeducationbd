@@ -8,6 +8,11 @@ if($user)
   $student = \App\Models\Student::find($user->id);
 }
 $value = $batch;
+$reference_discount = 0;
+
+if($value->reference_discount && Session::get('batch-referrer') && Session::get('batch-referrer')['batch'] == $batch->id){
+  $reference_discount = $value->reference_discount;
+}
 @endphp
 
 @extends('student')
@@ -44,7 +49,7 @@ $value = $batch;
             <input type="hidden" name="email" value="{{$student->email}}" />
             <input type="hidden" name="phone" value="{{$student->contact}}" />
             <input type="hidden" name="address1" value="" />
-            <input type="hidden" name="total" value="{{$value->net_price}}" />
+            <input type="hidden" name="total" value="{{$value->net_price - $reference_discount}}" />
             <div class="card card-default p-3">
               <div class="penel-heading no-padding" style="text-align: center;padding:15px">
                 {{-- <img class="course-image" src="{{ $value->banner? $value->banner : '/img/course.png'}}" alt="" /> --}}
@@ -54,7 +59,7 @@ $value = $batch;
                   @if($value->discount) 
                   <del> &#2547;{{$source->point0($value->price + $value->fee)}}</del> &nbsp; <span class="label label-warning"> &#2547;{{$source->point0($value->discount)}} ছাড়</span>
                   @endif
-                  <b> &nbsp; &#2547;{{$source->point0($value->net_price)}}</b>
+                  <b> &nbsp; &#2547;{{$source->point0($value->net_price - $reference_discount)}}</b>
                   </h3>
                   @if($value->offer_end_at)
                   <p style="color: red">ডিস্কাউন্ট অফারের মেয়াদ <b>{{$source->dtformat($value->offer_end_at)}}</b></p>
@@ -88,15 +93,21 @@ $value = $batch;
                     <td>ডিস্কাউন্ট </td>
                     <th>&#2547; {{$source->point0($value->discount)}}</th>
                   </tr>
+                  @if($reference_discount)
+                  <tr>
+                    <td>রিফারেন্স ডিস্কাউন্ট </td>
+                    <th>&#2547; {{$source->point0($value->reference_discount)}}</th>
+                  </tr>
+                  @endif
                   <tr>
                     <th>মোট =</th>
-                    <th>&#2547; {{$value->net_price}}</th>
+                    <th>&#2547; {{$value->net_price - $reference_discount}}</th>
                   </tr>
                 </table>
               </div>
               @endif
               <div class="card-footer">
-                  <button class="btn btn-warning btn-block btn-lg" onsubmit="return confirm('Double check you provided information.')">&#2547; {{$value->net_price}} পেমেন্ট কনফার্ম করুন</button>
+                  <button class="btn btn-warning btn-block btn-lg" onsubmit="return confirm('Double check you provided information.')">&#2547; {{$value->net_price - $reference_discount}} পেমেন্ট কনফার্ম করুন</button>
                 <div class="clearfix"></div>
               </div>
             </div>

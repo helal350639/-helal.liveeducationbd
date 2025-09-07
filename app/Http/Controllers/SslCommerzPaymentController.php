@@ -11,7 +11,9 @@ use App\Models\Student;
 use App\Models\Batch;
 use App\Models\Department;
 use App\Models\Order;
+use App\Models\Referrer;
 use Session;
+use Auth;
 
 class SslCommerzPaymentController extends Controller
 {
@@ -41,12 +43,18 @@ class SslCommerzPaymentController extends Controller
         //find department
         $department = Department::find($request->department_id);
 
+        $totalAmount =  $batch->price + $batch->extra_fee - $batch->discount;
+        if($batch->reference_discount && Session::get('batch-referrer'))
+        {
+          $totalAmount = $totalAmount - $batch->reference_discount;
+        }
+
         # Here you have to receive all the order data to initate the payment.
         # Let's say, your oder transaction informations are saving in a table called "orders"
         # In "orders" table, order unique identity is "transaction_id". "status" field contain status of the transaction, "amount" is the order amount to be paid and "currency" is for storing Site Currency which will be checked with paid currency.
 
         $post_data = array();
-        $post_data['total_amount'] = $data['total']; # You cant not pay less than 10
+        $post_data['total_amount'] = $totalAmount; # You cant not pay less than 10
         $post_data['currency'] = "BDT";
         $post_data['tran_id'] = uniqid(); // tran_id must be unique
 
@@ -252,6 +260,21 @@ class SslCommerzPaymentController extends Controller
               'comments' => 'Hello '.$student->name.'<br> Your course has been successfully purchased. For more information, visit <a href="'.route('home.course.show', $order_details->batch_id).'">liveeducationbd.com</a>'
             ];
             $source->sendMail($data);
+          }
+
+          // keep referrer records
+          if(Session::get('batch-referrer') && Session::get('batch-referrer')['batch'] == $order_details->batch_id)
+          {
+            $referrer = Session::get('batch-referrer');
+            $batch = Batch::find($referrer['batch']);
+            Referrer::insert([
+              'batch_id' => $referrer['batch'],
+              'referrer_id' => $referrer['referrer'],
+              'referrer_bonus' => $batch->referrer_bonus,
+              'student_id' => Auth::id()
+            ]);
+
+            Session::forget('batch-referrer');
           }
         }
 

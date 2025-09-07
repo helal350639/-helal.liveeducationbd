@@ -8,6 +8,11 @@ if($user)
   $student = \App\Models\Student::find($user->id);
 }
 $value = $batch;
+$reference_discount = 0;
+
+if($value->reference_discount && Session::get('batch-referrer') && Session::get('batch-referrer')['batch'] == $batch->id){
+  $reference_discount = $value->reference_discount;
+}
 @endphp
 
 @extends('student')
@@ -111,9 +116,9 @@ $value = $batch;
               <div class="card-heading p-3">
                 <h3>
                   @if($value->discount && $value->offer_end_at && $value->offer_end_at > date('Y-m-d H:i:s')) 
-                  <del> &#2547;{{$source->point0($value->price+$value->fee)}}</del> &nbsp; <span class="label label-warning"> &#2547;{{$source->point0($value->discount)}} ছাড়</span>
+                  <del> &#2547;{{$source->point0($value->price + $value->fee)}}</del> &nbsp; <span class="label label-warning"> &#2547;{{$source->point0($value->discount)}} ছাড়</span>
                   @endif
-                  <b> &nbsp; &#2547;{{$source->point0($value->net_price)}}</b>
+                  <b> &nbsp; &#2547;{{$source->point0($value->net_price - $reference_discount)}}</b>
                   </h3>
                 <p>{{$value->subtitle}}</p>
                 <table class="table table-bordered">

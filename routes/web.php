@@ -175,6 +175,7 @@ Route::middleware('auth:student')->group(function()
       Route::post('complain', 'complainStore')->name('students.complain.store');
       Route::get('update-paper/{id}', 'updatePaperAjax')->name('paper.update.ajax');
       Route::get('profile', 'profile')->name('students.profile');
+      Route::get('batch-reference/{batch}/{referrer}', 'batchReference')->name('student.batch-reference');
     });
 	});
 
