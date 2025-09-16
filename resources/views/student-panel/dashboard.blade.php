@@ -369,8 +369,8 @@ font-size: 16px;
 
                       @foreach($references as $value)
                       <tr>
-                        <td>{{$value->student->name}}</td>
-                        <td>{{$value->batch->name}}</td>
+                        <td>{{$value->student ? $value->student->name : ''}}</td>
+                        <td>{{$value->batch ? $value->batch->name : ''}}</td>
                         <td>{{$value->referrer_bonus}}</td>
                       </tr>
                       @php
