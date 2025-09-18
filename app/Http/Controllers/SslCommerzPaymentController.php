@@ -43,7 +43,11 @@ class SslCommerzPaymentController extends Controller
         //find department
         $department = Department::find($request->department_id);
 
-        $totalAmount =  $batch->price + $batch->extra_fee - $batch->discount;
+        $totalAmount =  $batch->price + $batch->fee;
+        if($batch->discount && $batch->offer_end_at && $batch->offer_end_at > now()) {
+          $totalAmount = $totalAmount - $batch->discount;
+        }
+
         if($batch->reference_discount && Session::get('batch-referrer'))
         {
           $totalAmount = $totalAmount - $batch->reference_discount;
@@ -271,6 +275,7 @@ class SslCommerzPaymentController extends Controller
               'batch_id' => $referrer['batch'],
               'referrer_id' => $referrer['referrer'],
               'referrer_bonus' => $batch->referrer_bonus,
+              'referrer_type' => $referrer['type'],
               'student_id' => Auth::id()
             ]);
 

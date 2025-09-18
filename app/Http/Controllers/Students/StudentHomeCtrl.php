@@ -852,13 +852,13 @@ class StudentHomeCtrl extends Controller
     return view('student-panel.routine-batch', compact('batches'));
   }
 
-  public function batchReference($batch_id, $referrer_id)
+  public function batchReference($type = null, $batch_id, $referrer_id)
   {
     $student = Student::find($referrer_id);
     $student_batch = $student->batches()->where('id', $batch_id)->first();
-    if($batch_id && $referrer_id && $student_batch)
+    if($batch_id && $referrer_id && $student_batch || $type == 'teacher' && $batch_id && $referrer_id)
     {
-      Session::put('batch-referrer', ['batch' => $batch_id, 'referrer' => $referrer_id]);      
+      Session::put('batch-referrer', ['batch' => $batch_id, 'referrer' => $referrer_id, 'type' => $type]);
     }
     return redirect()->route('home.course.show', $batch_id);
   }

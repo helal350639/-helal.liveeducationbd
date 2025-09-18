@@ -9,7 +9,9 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\Auth\StudentLogin;
+use App\Http\Controllers\Auth\TeacherLoginCtrl;
 use App\Http\Controllers\Students\StudentHomeCtrl;
+use App\Http\Controllers\Teachers\TeacherHomeCtrl;
 use App\Http\Controllers\Homepage\CategoryCtrl;
 use App\Http\Controllers\Homepage\JobPreparationCtrl;
 use App\Http\Controllers\Homepage\HomePageCtrl;
@@ -175,7 +177,7 @@ Route::middleware('auth:student')->group(function()
       Route::post('complain', 'complainStore')->name('students.complain.store');
       Route::get('update-paper/{id}', 'updatePaperAjax')->name('paper.update.ajax');
       Route::get('profile', 'profile')->name('students.profile');
-      Route::get('batch-reference/{batch}/{referrer}', 'batchReference')->name('student.batch-reference');
+      Route::get('batch-reference/{type?}/{batch}/{referrer}', 'batchReference')->name('student.batch-reference');
     });
 	});
 
@@ -184,6 +186,27 @@ Route::middleware('auth:student')->group(function()
 		Route::post('contact-check', 'contactCheck')->name('contact-check');
 		Route::post('otp-check', 'otpCheck')->name('otp-check');
 	});
+});
+
+Route::prefix('teachers')->group(function()
+{
+  Route::controller(TeacherLoginCtrl::class)->group(function()
+  {
+    Route::get('/login', 'login')->name('teachers.login');
+    Route::post('/login', 'loginPost')->name('teachers.login.post');
+    Route::post('logout', 'logout')->name('teachers.logout');
+    Route::get('/auth/github/callback', 'oAuthGithub');
+    Route::get('/auth/google/callback', 'oAuthGoogle');
+  });
+});
+
+Route::middleware('auth:teacher')->prefix('teachers')->group(function()
+{
+	Route::controller(TeacherHomeCtrl::class)->group(function()
+	{
+    Route::get('/', 'dashboard')->name('teachers.dashboard');
+    Route::get('courses', 'courses')->name('teachers.courses');
+  });
 });
 
 Route::middleware(['auth'])->group(function()
@@ -206,9 +229,14 @@ Route::middleware(['auth'])->group(function()
     Route::get('profile/edit', 'profileEdit')->name('profile.edit');
     Route::put('profile/update', 'profileUpdate')->name('profile.update');
   
-    //password change
+    // password change
     Route::get('/change_password', 'changePassword')->name('user.password.change');
     Route::put('/change_password', 'updatePassword')->name('user.change.password');
+
+    // user roles
+    Route::get('user-roles', 'userRoles')->name('user-roles');
+    Route::get('edit-user-roles/{id}', 'editUserRole')->name('edit-user-role');
+    Route::put('update-user-role', 'updateUserRole')->name('update-user-role');
   });
 
 	/** -------------------- Resource Routes --------------- */

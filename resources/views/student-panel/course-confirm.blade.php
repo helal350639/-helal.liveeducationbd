@@ -8,11 +8,20 @@ if($user)
   $student = \App\Models\Student::find($user->id);
 }
 $value = $batch;
-$reference_discount = 0;
+//price calculations
+$price = $discount = $reference_discount = $selling_price = 0;
+if($value->discount && $value->offer_end_at && $value->offer_end_at > now()) {
+  $discount = $value->discount;
+}
 
 if($value->reference_discount && Session::get('batch-referrer') && Session::get('batch-referrer')['batch'] == $batch->id){
   $reference_discount = $value->reference_discount;
+  $discount = $discount + $value->reference_discount;
 }
+
+$price = $value->price + $value->fee;
+$selling_price = $price - $discount;
+//price calculation end
 @endphp
 
 @extends('student')
@@ -49,17 +58,17 @@ if($value->reference_discount && Session::get('batch-referrer') && Session::get(
             <input type="hidden" name="email" value="{{$student->email}}" />
             <input type="hidden" name="phone" value="{{$student->contact}}" />
             <input type="hidden" name="address1" value="" />
-            <input type="hidden" name="total" value="{{$value->net_price - $reference_discount}}" />
+            <input type="hidden" name="total" value="{{$price}}" />
             <div class="card card-default p-3">
               <div class="penel-heading no-padding" style="text-align: center;padding:15px">
                 {{-- <img class="course-image" src="{{ $value->banner? $value->banner : '/img/course.png'}}" alt="" /> --}}
               </div>
               <div class="card-heading">
                 <h3>
-                  @if($value->discount) 
-                  <del> &#2547;{{$source->point0($value->price + $value->fee)}}</del> &nbsp; <span class="label label-warning"> &#2547;{{$source->point0($value->discount)}} ছাড়</span>
+                  @if($discount) 
+                  <del> &#2547;{{$source->point0($price)}}</del> &nbsp; <span class="label label-warning"> &#2547;{{$source->point0($discount)}} ছাড়</span>
                   @endif
-                  <b> &nbsp; &#2547;{{$source->point0($value->net_price - $reference_discount)}}</b>
+                  <b> &nbsp; &#2547;{{$source->point0($selling_price)}}</b>
                   </h3>
                   @if($value->offer_end_at)
                   <p style="color: red">ডিস্কাউন্ট অফারের মেয়াদ <b>{{$source->dtformat($value->offer_end_at)}}</b></p>
@@ -71,7 +80,7 @@ if($value->reference_discount && Session::get('batch-referrer') && Session::get(
                 <table class="table">
                   <tr>
                     <td>কোর্স এর নাম</td>
-                    <th>{{$batch->course?$batch->course->name:''}}</th>
+                    <th>{{$batch->course ? $batch->course->name:''}}</th>
                   </tr>
                   <tr>
                     <td>ব্যাচ এর নাম</td>
@@ -83,7 +92,7 @@ if($value->reference_discount && Session::get('batch-referrer') && Session::get(
                   </tr>
                   <tr>
                     <td>কোর্সটির মূল্য </td>
-                    <th>&#2547; {{$value->price+$value->fee}}</th>
+                    <th>&#2547; {{$price-$value->fee}}</th>
                   </tr>
                   <tr>
                     <td>অন্যান্য ফী </td>
@@ -96,18 +105,18 @@ if($value->reference_discount && Session::get('batch-referrer') && Session::get(
                   @if($reference_discount)
                   <tr>
                     <td>রিফারেন্স ডিস্কাউন্ট </td>
-                    <th>&#2547; {{$source->point0($value->reference_discount)}}</th>
+                    <th>&#2547; {{$source->point0($reference_discount)}}</th>
                   </tr>
                   @endif
                   <tr>
                     <th>মোট =</th>
-                    <th>&#2547; {{$value->net_price - $reference_discount}}</th>
+                    <th>&#2547; {{$selling_price}}</th>
                   </tr>
                 </table>
               </div>
               @endif
               <div class="card-footer">
-                  <button class="btn btn-warning btn-block btn-lg" onsubmit="return confirm('Double check you provided information.')">&#2547; {{$value->net_price - $reference_discount}} পেমেন্ট কনফার্ম করুন</button>
+                  <button class="btn btn-warning btn-block btn-lg" onsubmit="return confirm('Double check you provided information.')">&#2547; {{$selling_price}} পেমেন্ট কনফার্ম করুন</button>
                 <div class="clearfix"></div>
               </div>
             </div>

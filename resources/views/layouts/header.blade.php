@@ -346,6 +346,20 @@ if($complains)
           </ul>
         </li>
 
+        @if(Auth::user()->authorizeRoles(['Teacher']))
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-users"></i> <span>Referrels</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li><a href="{{ route('order.index') }}"><i class="fa fa-circle-o"></i> View Referrels</a></li>
+          </ul>
+        </li>
+        @endif
+
         @if(Auth::user()->authorizeRoles(['SuperAdmin']))
 
         <li class="treeview">
@@ -408,6 +422,7 @@ if($complains)
             </span>
           </a>
           <ul class="treeview-menu">
+            <li><a href="{{ route('profile') }}"><i class="fa fa-user"></i> User Roles</a></li>
             <li><a href="{{ route('profile') }}"><i class="fa fa-user"></i> Profile</a></li>
             <li><a href="/change_password"><i class="fa fa-lock"></i> Change Password</a></li>
             <li>

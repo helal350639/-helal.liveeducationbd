@@ -11,6 +11,10 @@ if(Auth::guard('student')->user())
 {
   $user = Auth::guard('student')->user();
 }
+elseif(Auth::guard('teacher'))
+{
+  $user = Auth::guard('teacher')->user();
+}
 
 function active($name)
 {
@@ -263,6 +267,7 @@ function active($name)
               <a class="nav-link active" aria-current="page"
                 href="/">হোম</a>
             </li>
+            @if(auth('student')->user())
             <li class="nav-item">
               <a class="nav-link" href="{{route('students.dashboard')}}">
                 স্টুডেন্ট ড্যাশবোর্ড
@@ -315,6 +320,22 @@ function active($name)
                 </li>
               </ul>
             </li>
+
+            @endif
+
+            @if(auth('teacher')->user())
+            <li class="nav-item">
+              <a class="nav-link" href="{{route('teachers.dashboard')}}">
+                ড্যাশবোর্ড
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{route('teachers.courses')}}">
+                কোর্স সমূহ
+              </a>
+            </li>
+            @endif
+
             <form class="search_button_area mt-lg-1 desk-top-search d-none d-lg-block" action="#" method="POST" onclick="event.preventDefault()">
               <input type="hidden" name="_token" value="WlWD0OcHgoiFVuFIs7j0oumKvc7rASkRL84qLvMq" autocomplete="off">                        
               <div class="input-group">
@@ -369,6 +390,7 @@ function active($name)
                   {{$user->contact}}</small>
                 </h4>
               </div>
+              @if(auth('student')->user())
 
                 <li><a class="dropdown-item" href="{{route('students.dashboard')}}">স্টুডেন্ট ড্যাশবোর্ড</a></li>
                 <li>
@@ -386,6 +408,16 @@ function active($name)
                     <button type="submit" class="dropdown-item btn btn-warning btn-fluid" onclick="return confirm('Are you sure you want to logout?')">লগআউট</button>
                   </form>
                 </li>
+              @endif
+
+              @if(auth('teacher')->user())
+              <li>
+                <form action="{{route('teachers.logout')}}" method="post" class="btn">
+                  @csrf
+                  <button type="submit" class="dropdown-item btn btn-warning btn-fluid" onclick="return confirm('Are you sure you want to logout?')">লগআউট</button>
+                </form>
+              </li>
+              @endif
 
             </ul>
           </div>

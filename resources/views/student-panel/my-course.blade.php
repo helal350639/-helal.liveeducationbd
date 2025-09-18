@@ -49,7 +49,7 @@ if($user)
                 <div class="row button-and-price pb-3 pb-lg-4">
                   <div class="col" style="color:green">
                     Referrer Bonus: <b>{{$value->referrer_bonus?$value->referrer_bonus:0}}</b>
-                    <button type="button" class="btn btn-primary btn-sm" onclick="handleClick(this)" href="{{route('student.batch-reference', [$value->id, Auth::id()])}}">Copy Reference Link</button>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="handleClick(this)" href="{{route('student.batch-reference', ['student', $value->id, Auth::id()])}}">Copy Reference Link</button>
                   </div>
                 </div>
               </div>
