@@ -24,16 +24,20 @@ class ScheduleCtrl extends Controller
     $source = new SourceCtrl;
 
     $now = now();
+    $past = new DateTime();
     if(App::environment('production'))
     {
-      $past = new DateTime();
       // $past->modify('+6 hours 11 minutes');
       $past->modify('+11 minutes');
       $now = $past->format('Y-m-d H:i:s');
     }
+    else
+    {
+      $now = $past->format('Y-m-d H:i:s');
+    }
     
     $smses = Sms::where('status', 'Scheduled')
-    ->where('datetime', '<=', $now)
+    ->whereRaw('datetime <= ?', [$now])
     ->get();
 
     if($smses)
@@ -70,17 +74,24 @@ class ScheduleCtrl extends Controller
     $source = new SourceCtrl;
 
     $now = now();
+    // $now = date('Y-m-d H:i:s');
+    $past = new DateTime();
     if(App::environment('production'))
     {
-      $past = new DateTime();
       // $past->modify('+6 hours 11 minutes');
       $past->modify('+11 minutes');
       $now = $past->format('Y-m-d H:i:s');
     }
+    else
+    {
+      $now = $past->format('Y-m-d H:i:s');
+    }
     
     $emails = Email::where('status', 'Scheduled')
-    ->where('datetime', '<=', $now)
+    ->whereRaw('datetime <= ?', [$now])
     ->get();
+
+    dd($now, $emails);
 
     if($emails)
     {
@@ -100,9 +111,18 @@ class ScheduleCtrl extends Controller
           'comments' => $email->details
         ];
 
-        // send email to the students
-        $source->sendMail($emailData);
-        Email::where('id', $email->id)->update(['status' => 'Sent']);
+        try{
+
+          // send email to the students
+          $result = $source->sendMail($emailData);
+  
+          //update status
+          Email::where('id', $email->id)->update(['status' => 'Sent']);
+        }
+        catch(\Exception $e)
+        {
+          \Log::info($e);
+        }
       }
 
       \Log::info('Schedule: Email Test ' . now());

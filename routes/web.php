@@ -414,14 +414,14 @@ Route::middleware(['auth'])->group(function()
 	
 });
 
-// Route::controller(ScheduleCtrl::class)->group(function()
-// {
-//   Route::prefix('/schedule')->group(function()
-//   {
-//     Route::get('send-sms', 'sendSms');
-//     Route::get('send-email', 'sendEmail');
-//   });
-// });
+Route::controller(ScheduleCtrl::class)->group(function()
+{
+  Route::prefix('/schedule')->group(function()
+  {
+    Route::get('send-sms', 'sendSms');
+    Route::get('send-email', 'scheduleEmail');
+  });
+});
 
 Route::get('create-log', function(){
   Log::info('test log');
