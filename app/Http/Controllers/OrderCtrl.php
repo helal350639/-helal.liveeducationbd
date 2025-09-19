@@ -9,6 +9,7 @@ use App\Models\SubFilter;
 use App\Models\Role;
 use App\Models\Order;
 use App\Models\Student;
+use App\Models\Referrer;
 use Auth;
 use Image;
 use File;
@@ -57,6 +58,11 @@ class OrderCtrl extends Controller
     return view('layouts.orders.index', compact('orders'));
   }
 
+  public function show($id)
+  {
+    return 'Show page';
+  }
+
   public function destroy($id)
   {
     $file = Order::find($id);
@@ -96,5 +102,11 @@ class OrderCtrl extends Controller
       Session::flash('success', 'The student added to the batch and departmnet');
     }
     return back();
+  }
+
+  public function referrerOrder()
+  {
+    $referrers = Referrer::orderBy('id', 'DESC')->paginate(25);
+    return view('layouts.referrers.index', compact('referrers'));
   }
 }

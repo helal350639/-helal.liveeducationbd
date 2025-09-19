@@ -10,16 +10,21 @@ class Referrer extends Model
 
   public function batch()
   {
-    return $this->belongsTo(Batch::class);
+    return $this->belongsTo(Batch::class, 'batch_id');
   }
 
   public function student()
   {
-    return $this->belongsTo(Student::class);
+    return $this->belongsTo(Student::class, 'student_id');
   }
 
-  // public function teacher()
-  // {
-  //   return $this->belongsTo(Teacher::class);
-  // }
+  public function teacher()
+  {
+    return $this->belongsTo(Teacher::class, 'referrer_id');
+  }
+
+  public function referrer()
+  {
+    return $this->belongsTo(Student::class, 'referrer_id');
+  }
 }

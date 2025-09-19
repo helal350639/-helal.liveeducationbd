@@ -343,10 +343,11 @@ if($complains)
           </a>
           <ul class="treeview-menu">
             <li><a href="{{ route('order.index') }}"><i class="fa fa-circle-o"></i> View Orders</a></li>
+            <li><a href="{{ route('order.referrer-order') }}"><i class="fa fa-circle-o"></i> View Referrers</a></li>
           </ul>
         </li>
 
-        @if(Auth::user()->authorizeRoles(['Teacher']))
+        {{-- @if(Auth::user()->authorizeRoles(['Teacher']))
         <li class="treeview">
           <a href="#">
             <i class="fa fa-users"></i> <span>Referrels</span>
@@ -358,7 +359,7 @@ if($complains)
             <li><a href="{{ route('order.index') }}"><i class="fa fa-circle-o"></i> View Referrels</a></li>
           </ul>
         </li>
-        @endif
+        @endif --}}
 
         @if(Auth::user()->authorizeRoles(['SuperAdmin']))
 

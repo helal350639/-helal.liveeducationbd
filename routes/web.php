@@ -385,6 +385,7 @@ Route::middleware(['auth'])->group(function()
 	Route::controller(OrderCtrl::class)->group(function()
 	{
 		Route::get('order/add_to_batch/{id}', 'addToBatch')->name('student.addto.batch');
+    Route::get('referrer-order', 'referrerOrder')->name('order.referrer-order');
 	});
 
   Route::controller(RoutineCtrl::class)->group(function()
