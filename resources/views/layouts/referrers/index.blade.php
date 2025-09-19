@@ -48,36 +48,17 @@ $source = New SourceCtrl;
                 @foreach($referrers as $value)
                 <tr>
                   <td>{{$value->id}}</td>
-                  <td>{{$value->referrer_type == 'teacher' ? $value->teacher->name : $value->referrer->name}}</td>
-                  <td>{{$value->batch->name}}</td>
-                  <td>{{$value->student->name}}</td>
+                  <td>
+                    @if($value->referrer_type == 'teacher')
+                    {{ $value->teacher ? $value->teacher->name : '' }}
+                    @else
+                    {{ $value->referrer ? $value->referrer->name : '' }}
+                    @endif
+                  </td>
+                  <td>{{$value->batch ? $value->batch->name : ''}}</td>
+                  <td>{{$value->student ? $value->student->name : ''}}</td>
                   <td>{{$value->referrer_type}}</td>
                   <td>{{$value->referrer_bonus}}</td>
-                  {{-- <td>
-                    @if($value->status == 'Complete')
-                    <span class="label label-success">{{$value->status}}</span>
-                    @elseif($value->status == 'Pending')
-                    <span class="label label-warning">{{$value->status}}</span>
-                    @elseif($value->status == 'Processing')
-                    <span class="label label-primary">{{$value->status}}</span>
-                    @elseif($value->status == 'Failed')
-                    <span class="label label-default">{{$value->status}}</span>
-                    @else
-                    <span class="label label-danger">{{$value->status}}</span>
-                    @endif
-                  </td> --}}
-                  {{-- <td>
-                    @if($value->batch_has_student)
-                    <i class="text-green fa fa-check"></i>
-                    @else
-                      <i class="text-red fa fa-times"></i>
-
-                      @if($value->status == 'Processing' || $value->status == 'Success')
-                      <a href="{{route('student.addto.batch', $value->id)}}" class="btn btn-success btn-sm"><i class="fa fa-plus"></i> > <i class="fa fa-file-text"></i> </a>
-                      @endif
-
-                    @endif
-                  </td> --}}
                   {{-- <td>
                     @if(Auth::user()->authorizeRoles(['SuperAdmin']))
                     <form style="display: inline" action="{{route('order.destroy', $value->id)}}" method="POST">
