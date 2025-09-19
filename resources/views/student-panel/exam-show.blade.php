@@ -4,7 +4,8 @@ use \App\Http\Controllers\SourceCtrl;
 $source = New SourceCtrl;
 $user = Auth::guard('student')->user();
 // $end_time = date('Y-m-d H:i:s', strtotime('+'.$paper->time.' minutes', strtotime(now())));
-$end_time = now()->addMinutes($source->timeIncrease($paper->time));
+// $end_time = now()->addMinutes($source->timeIncrease($paper->time));
+$end_time = now()->addMinutes($paper->time);
 $questions = $paper->questions;
 if($paper->random == 'Yes')
 {

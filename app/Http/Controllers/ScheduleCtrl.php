@@ -25,17 +25,18 @@ class ScheduleCtrl extends Controller
 
     $now = now();
     $past = new DateTime();
-    if(App::environment('production'))
-    {
-      // $past->modify('+6 hours 11 minutes');
-      $past->modify('+11 minutes');
-      $now = $past->format('Y-m-d H:i:s');
-    }
-    else
-    {
-      $now = $past->format('Y-m-d H:i:s');
-    }
-    
+    // if(App::environment('production'))
+    // {
+    //   // $past->modify('+6 hours 11 minutes');
+    //   $past->modify('+11 minutes');
+    //   $now = $past->format('Y-m-d H:i:s');
+    // }
+    // else
+    // {
+    //   $now = $past->format('Y-m-d H:i:s');
+    // }
+    $now = $past->format('Y-m-d H:i:s');
+
     $smses = Sms::where('status', 'Scheduled')
     ->whereRaw('datetime <= ?', [$now])
     ->get();
@@ -96,7 +97,7 @@ class ScheduleCtrl extends Controller
     }
     $emails = $emails->get();
 
-    dd($now, $emails);
+    // dd($now, $emails);
 
     if($emails)
     {
