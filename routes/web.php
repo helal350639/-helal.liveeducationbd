@@ -411,8 +411,14 @@ Route::middleware(['auth'])->group(function()
 
   // database backup
   Route::get('/download-database', [BackupController::class, 'downloadRawSql'])->name('database.download');
+
+  Route::controller(ScheduleCtrl::class)->group(function()
+  {
+    Route::get('/schedule/send-email/{id?}', 'scheduleEmail')->name('schedule.send-email');
+  });
 	
 });
+//default auth auth::user end
 
 Route::controller(ScheduleCtrl::class)->group(function()
 {

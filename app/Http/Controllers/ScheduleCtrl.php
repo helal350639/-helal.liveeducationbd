@@ -69,27 +69,32 @@ class ScheduleCtrl extends Controller
     }
   }
 
-  static function scheduleEmail()
+  static function scheduleEmail($id = null)
   {
     $source = new SourceCtrl;
 
     $now = now();
     // $now = date('Y-m-d H:i:s');
     $past = new DateTime();
-    if(App::environment('production'))
-    {
-      // $past->modify('+6 hours 11 minutes');
-      $past->modify('+11 minutes');
-      $now = $past->format('Y-m-d H:i:s');
-    }
-    else
-    {
-      $now = $past->format('Y-m-d H:i:s');
-    }
+    // if(App::environment('production'))
+    // {
+    //   // $past->modify('+6 hours 11 minutes');
+    //   $past->modify('+11 minutes');
+    //   $now = $past->format('Y-m-d H:i:s');
+    // }
+    // else
+    // {
+    //   $now = $past->format('Y-m-d H:i:s');
+    // }
+    $now = $past->format('Y-m-d H:i:s');
     
     $emails = Email::where('status', 'Scheduled')
-    ->whereRaw('datetime <= ?', [$now])
-    ->get();
+    ->whereRaw('datetime <= ?', [$now]);
+    if($id)
+    {
+      $emails = $emails->where('id', $id);
+    }
+    $emails = $emails->get();
 
     dd($now, $emails);
 
@@ -125,7 +130,12 @@ class ScheduleCtrl extends Controller
         }
       }
 
-      \Log::info('Schedule: Email Test ' . now());
+      \Log::info('Schedule: Email Send at ' . now());
+
+      if($id)
+      {
+        return back()->with('success', 'Email send successful');
+      }
     }
   }
 }
