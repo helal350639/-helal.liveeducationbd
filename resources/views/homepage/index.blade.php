@@ -49,9 +49,9 @@ if($user)
       </div>
       @elseif($key == 2)
       <div class="col-lg-3" style="padding: 0 !important;">
-        <div class="home-3rd-add-image dropdown">
-          <a href="{{route('home.coming-soon')}}" class="dropdown-/toggle" id="home3rdAddDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-          <img src="{{$val->image}}" alt="" loading="lazy" srcset="">
+        <div class="home-3rd-add-image">
+          <a href="{{$val->url}}" style="display: block">
+            <img src="{{$val->image}}" alt="" loading="lazy" srcset="">
           </a>
         </div>
       </div>

@@ -42,6 +42,10 @@ $value = $ad;
                         <img src="{{$value->image}}" alt="" width="100">
                       </a>
                     </p>
+                    <div class="form-group">
+                        <label for="url">Link URL</label>
+                        <input type="url" class="form-control" name="url" id="url" placeholder="http://*" value="{{$value->url}}">
+                    </div>
                 </div>
                 <div class="clearfix"></div>
                 <div class="col-md-12">

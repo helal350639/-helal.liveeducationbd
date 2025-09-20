@@ -278,6 +278,7 @@ function active($name)
                 কোর্স সমূহ
               </a>
             </li>
+            @endif
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="/#exam-section">পরীক্ষা</a>
               <ul class="dropdown-menu" aria-labelledby="moreDropdown">
@@ -320,8 +321,6 @@ function active($name)
                 </li>
               </ul>
             </li>
-
-            @endif
 
             @if(auth('teacher')->user())
             <li class="nav-item">

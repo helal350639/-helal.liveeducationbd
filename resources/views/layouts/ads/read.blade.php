@@ -39,6 +39,10 @@ $source = new SourceCtrl;
                   </td>
                 </tr>
                 <tr>
+                  <th>Link URL</th>
+                  <td>{{$ad->url}}</td>
+                </tr>
+                <tr>
                   <th>Details</th>
                   <td>{!!$ad->details!!}</td>
                 </tr>
