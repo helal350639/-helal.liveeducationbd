@@ -341,7 +341,8 @@ class SyllabusCtrl extends Controller
 
         try {
           $syllabus = Syllabus::find($request->syllabus_id);
-          $question_ids = $syllabus->questions()->pluck('question_id')->toArray();
+          $question_ids = $syllabus->questions()->pluck('question_id')
+          ->toArray();
 
             // upload pdf file
             if($request->hasFile('pdf'))

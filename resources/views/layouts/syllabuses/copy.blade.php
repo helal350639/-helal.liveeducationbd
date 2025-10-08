@@ -104,7 +104,7 @@ $value = $syllabus;
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-12 no-padding hide">
+                    <div class="col-md-12 hide">
                         
                     </div>
                 </div>
@@ -260,57 +260,49 @@ function Status(e){
         let timer = e.parentNode.parentNode.nextElementSibling;
         if(e.options[e.selectedIndex].value == 'Scheduled')
         {
-            timer.classList.remove('hide');
-            timer.innerHTML = '<div class="col-md-6">'+
-                            '<div class="form-group">'+
-                                '<label for="open">Publish Time</label>'+
-                                '<input type="datetime-local" class="form-control" name="open" id="open" value="{{$value->open}}">'+
-                            '</div>'+
-                        '</div>'+
-                        '<div class="col-md-6">'+
-                            '<div class="form-group">'+
-                                '<label for="close">Close Time</label>'+
-                                '<input type="datetime-local" class="form-control" name="close" id="close" value="{{$value->close}}">'+
-                            '</div>'+
-                        '</div>';
+          timer.classList.remove('hide');
+          timer.innerHTML = '<div class="form-group">'+
+                              '<label for="datetime">Date & Time</label>'+
+                              '<input type="datetime-local" class="form-control" name="datetime" id="datetime" value="'+'{{$value->datetime}}'+'">'+
+                          '</div>';
         }
         else
         {
-            timer.innerHTML = '';
-            timer.classList.add('hide');
+          timer.innerHTML = '';
+          timer.classList.add('hide');
         }
     }
 
     // onload call to the status change
     Status(document.getElementById('status'));
 
-    function getsubcats(elm){
+    // function getsubcats(elm){
 
-        var catid = elm.options[elm.options.selectedIndex].value;
+        // var catid = elm.options[elm.options.selectedIndex].value;
 
-        $.ajax({
-            type: 'GET', //THIS NEEDS TO BE GET
-            url: '/get_sub_cats/'+catid,
-            success: function (data) {
+        // $.ajax({
+        //     type: 'GET', //THIS NEEDS TO BE GET
+        //     url: '/get_sub_cats/'+catid,
+        //     success: function (data) {
 
-                var obj = JSON.parse(JSON.stringify(data));
-                var sub_cat_html = "";
+        //         var obj = JSON.parse(JSON.stringify(data));
+        //         var sub_cat_html = "";
 
-                $.each(obj['subcats'], function (key, val) {
-                   sub_cat_html += "<option value="+val.id+">"+val.name+"</option>";
-                });
+        //         $.each(obj['subcats'], function (key, val) {
+        //            sub_cat_html += "<option value="+val.id+">"+val.name+"</option>";
+        //         });
 
-                if(sub_cat_html != ""){
-                    $("#sub_cat").html('<option value="">Select SubCategory</option>'+sub_cat_html)
-                }else{
-                    $("#sub_cat").html('<option value="">No SubCategory</option>')
-                }
-            },
-            error: function(data) { 
-                 console.log('data error');
-            }
-        });
-    }
+        //         if(sub_cat_html != ""){
+        //             $("#sub_cat").html('<option value="">Select SubCategory</option>'+sub_cat_html)
+        //         }else{
+        //             $("#sub_cat").html('<option value="">No SubCategory</option>')
+        //         }
+        //     },
+        //     error: function(data) { 
+        //          console.log('data error');
+        //     }
+        // });
+    // }
 
     //this script for text editor
     $(document).ready(function() {

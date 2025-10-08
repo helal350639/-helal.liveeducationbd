@@ -14,7 +14,6 @@ class Authenticate extends Middleware
      */
     protected function redirectTo($request)
     {
-      // dd($request->is('students') || $request->is('students/*'));
       if (! $request->expectsJson()) {
         if($request->is('teachers') || $request->is('teachers/*'))
         {
