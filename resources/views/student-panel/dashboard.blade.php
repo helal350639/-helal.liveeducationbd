@@ -164,7 +164,6 @@ font-size: 16px;
 }
 </style>
 
-
   <section class="dashboard p-2 py-5" style="background: #eee">
     <div class="container">
       <div class="row">
@@ -173,6 +172,9 @@ font-size: 16px;
                <h2> স্টুডেন্ট ড্যাশবোর্ড </h2>
                <hr class="w-25 mx-auto bg-danger" />
                <p style="font-size: 24px;"> Registration ID: <span style=" font-weight: 700; color: #080;">{{$source->numset($user->id, 6)}}</span></p>
+               <p style="border: 1px solid orange; color: orange">
+                <a href="{{route('students.my-course')}}">Your Reference Link</a>
+              </p>
             </div>
          </div>
       </div>
