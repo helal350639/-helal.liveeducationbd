@@ -16,6 +16,7 @@ use App\Http\Controllers\Homepage\CategoryCtrl;
 use App\Http\Controllers\Homepage\JobPreparationCtrl;
 use App\Http\Controllers\Homepage\HomePageCtrl;
 use App\Http\Controllers\Homepage\HomepageSettingCtrl;
+
 use Laravel\Socialite\Facades\Socialite;
 use App\Models\Student;
 use App;
@@ -416,6 +417,12 @@ Route::middleware(['auth'])->group(function()
   Route::controller(ScheduleCtrl::class)->group(function()
   {
     Route::get('/schedule/send-email/{id?}', 'scheduleEmail')->name('schedule.send-email');
+  });
+
+  Route::controller(ReferrerCtrl::class)->group(function()
+  {
+    Route::get('/referrer-edit/{id}', 'edit')->name('referrer.edit');
+    Route::patch('/referrer-update/{id}', 'update')->name('referrer.update');
   });
 	
 });
