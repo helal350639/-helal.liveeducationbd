@@ -276,7 +276,7 @@ class SslCommerzPaymentController extends Controller
               'referrer_id' => $referrer['referrer'],
               'referrer_bonus' => $batch->referrer_bonus,
               'referrer_type' => $referrer['type'],
-              'student_id' => Auth::id()
+              'student_id' => Auth::guard('student')->id()
             ]);
 
             Session::forget('batch-referrer');
