@@ -90,13 +90,6 @@ if($user)
                             </div>
                             <div class="row gy-2 button-and-price">
                                 <div class="col-12">
-                                  {{-- <div class="package-exam-rating">
-                                      <i class="fas fa-star"></i>
-                                      <i class="fas fa-star"></i>
-                                      <i class="fas fa-star"></i>
-                                      <i class="fas fa-star"></i>
-                                      <i class="far fa-star"></i>
-                                  </div> --}}
                                 </div>
                                 <div class="col-12">
                                   <a href="{{route('home.course.show', $value->id)}}" class="btn btn_warning text-white bg-brand w-100"> বিস্তারিত দেখুন <i class="fa-solid fa-arrow-right"></i></a>
@@ -128,7 +121,7 @@ if($user)
                     <div class="home-feature-video">
                       <div class="ratio ratio-1x1"
                         style="position: relative; width: 100%; height: 0; padding-bottom: 100%;">
-                        <img class="img img-thumbnail-custom lazyload" src="/web/img/video-icon.png" alt="Recent Job Solution Banner" style="position: absolute; top: 9%; left: 0; width: 100%; height: 76%;" srcset="">
+                        <img class="img img-thumbnail-custom lazyload" src="{{$video->image ? $video->image : 'https://img.youtube.com/vi/'.$video->url.'/maxresdefault.jpg'}}" alt="Recent Job Solution Banner" style="position: absolute; top: 9%; left: 0; width: 100%; height: 76%;" srcset="">
                         <!-- Transparent overlay to trigger the click event -->
                         <div onclick="showVideoModal('https://www.youtube.com/embed/{{$video->url}}?autoplay=1')" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;">
                         </div>

@@ -138,7 +138,7 @@ class VideoCtrl extends Controller
       }
 
       $data['status'] = isset($data['status']) ? 'Active' : 'Deactive';
-      $data['main'] = isset($data['main']) ? 'Yes' : '';
+      $data['main'] = isset($data['main']) ? 'Yes' : null;
 
       $x_video = Video::find($id);
       

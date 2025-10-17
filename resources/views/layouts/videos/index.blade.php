@@ -41,6 +41,7 @@ $source = New SourceCtrl;
                   <th>Id</th>
                   <th>Image</th>
                   <th>URL</th>
+                  <th>Main</th>
                   <th>Status</th>
                   <th>Updated At</th>
                   <th width="170">Action</th>
@@ -59,6 +60,9 @@ $source = New SourceCtrl;
                       Watch Video
                     </a>
                     @endif
+                  </td>
+                  <td>
+                    {{$value->main}}
                   </td>
                   <td>
                     <span class="label label-{{$value->status == 'Active'?'success':'danger'}}">{{$value->status}}</span>

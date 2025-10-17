@@ -29,7 +29,7 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <label for="image">Image</label>
-                        <input type="file" class="form-control" name="image" id="image" required>
+                        <input type="file" class="form-control" name="image" id="image">
                     </div>
                 </div>
                 <div class="clearfix"></div>
