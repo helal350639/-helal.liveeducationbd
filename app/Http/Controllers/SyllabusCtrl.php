@@ -26,10 +26,32 @@ class SyllabusCtrl extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $syllabus = Syllabus::orderBy('id','DESC')->paginate(25);
-        return view('layouts.syllabuses.index', compact('syllabus'));
+      $courses = Course::where('status', 'Active')->get();
+      $batches = Batch::where('status', 'Active')->get();
+      $departments = Department::where('status', 'Active')->get();
+
+      $course_id = $request->input('course_id');
+      $batch_id = $request->input('batch_id');
+      $department_id = $request->input('department_id');
+
+      $syllabus = Syllabus::orderBy('id','DESC')
+      ->when($course_id, function($query, $course_id)
+      {
+        return $query->where('course_id', $course_id);
+      })
+      ->when($batch_id, function($query, $batch_id)
+      {
+        return $query->where('batch_id', $batch_id);
+      })
+      ->when($department_id, function($query, $department_id)
+      {
+        return $query->where('department_id', $department_id);
+      })
+      ->paginate(25);
+
+      return view('layouts.syllabuses.index', compact('syllabus', 'courses', 'batches', 'departments'));
     }
     
     public function view($id)

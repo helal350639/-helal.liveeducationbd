@@ -21,6 +21,50 @@ $source = New SourceCtrl;
 <section class="content">
   <div class="row">
     <div class="col-xs-12">
+
+      <div class="box">
+        <div class="box-body">
+          <form action="{{route('paper.index')}}" method="GET">
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="course_id">Course</label>
+                <select name="course_id" id="course_id" class="form-control" onchange="getBatches(this)">
+                  <option value="">Select One</option>
+                  @foreach($courses as $course)
+                  <option value="{{$course->id}}" {{request('course_id') == $course->id ? 'selected': ''}}>{{$course->name}}</option>
+                  @endforeach
+                </select>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="batch_id">Batch</label>
+                <select name="batch_id" id="batch_id" class="form-control" onchange="getDepartments(this)">
+                  <option value="">Select One</option>
+                  @foreach($batches as $batch)
+                  <option value="{{$batch->id}}" {{request('batch_id') == $batch->id ? 'selected': ''}}>{{$batch->name}}</option>
+                  @endforeach
+                </select>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="department_id">Department</label>
+                <select name="department_id" id="department_id" class="form-control">
+                  <option value="">Select One</option>
+                  @foreach($departments as $department)
+                  <option value="{{$department->id}}" {{request('department_id') == $department->id ? 'selected': ''}}>{{$department->name}}</option>
+                  @endforeach
+                </select>
+              </div>
+            </div>
+            <div class="col-md-2"><br>
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      
       <div class="box">
         <div class="box-header">
           <h3 class="box-title">List of Syllabus</h3>
