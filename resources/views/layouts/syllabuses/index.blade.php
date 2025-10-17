@@ -24,7 +24,7 @@ $source = New SourceCtrl;
 
       <div class="box">
         <div class="box-body">
-          <form action="{{route('paper.index')}}" method="GET">
+          <form action="{{route('syllabus.index')}}" method="GET">
             <div class="col-md-3">
               <div class="form-group">
                 <label for="course_id">Course</label>
@@ -64,7 +64,7 @@ $source = New SourceCtrl;
           </form>
         </div>
       </div>
-      
+
       <div class="box">
         <div class="box-header">
           <h3 class="box-title">List of Syllabus</h3>
