@@ -99,7 +99,7 @@ $source = New SourceCtrl;
                   <td>{{$key+1}}</td>
                   <td>{{$value->name}}</td>
                   <td>
-                    
+                    {{$value->questions->count()}}
                   </td>
                   <td>{{$value->department ? $value->department->name : ''}}</td>
                   <td>{{$value->batch ? $value->batch->name : ''}}</td>
