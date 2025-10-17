@@ -87,7 +87,6 @@ $source = New SourceCtrl;
                 <tr>
                   <th>Id</th>
                   <th>Name</th>
-                  <th>Questions</th>
                   <th>Department Name</th>
                   <th>Batch Name</th>
                   <th>Course Name</th>
@@ -98,9 +97,6 @@ $source = New SourceCtrl;
                 <tr>
                   <td>{{$key+1}}</td>
                   <td>{{$value->name}}</td>
-                  <td>
-                    {{$value->questions->count()}}
-                  </td>
                   <td>{{$value->department ? $value->department->name : ''}}</td>
                   <td>{{$value->batch ? $value->batch->name : ''}}</td>
                   <td>{{$value->course ? $value->course->name : ''}}</td>
