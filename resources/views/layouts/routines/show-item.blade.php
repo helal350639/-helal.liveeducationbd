@@ -4,6 +4,7 @@
 <link href="/assets/summernote/summernote.min.css" rel="stylesheet">
 <style>
   .text-right{text-align: right}
+  .table-responsive{overflow-x: scroll; max-height: 600px}
 </style>
 @endsection
 @section('content')
