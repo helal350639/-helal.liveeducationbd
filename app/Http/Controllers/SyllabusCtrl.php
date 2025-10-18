@@ -50,7 +50,8 @@ class SyllabusCtrl extends Controller
         return $query->where('department_id', $department_id);
       })
       ->select('id', 'course_id', 'batch_id', 'department_id', 'name', 'status', 'datetime')
-      ->paginate(25);
+      ->paginate(25)
+      ->appends($request->all());
 
       return view('layouts.syllabuses.index', compact('syllabus', 'courses', 'batches', 'departments'));
     }
