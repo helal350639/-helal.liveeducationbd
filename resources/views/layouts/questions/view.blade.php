@@ -746,7 +746,7 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
       success: function(data){
         let option = '<option value="">Select One</option>';
         data.syllabus.forEach((s) => {
-          option += '<option value="'+s.id+'">'+(s.name ? s.name:"")+' - '+(s.batch ? s.batch.name:"")+'</option>';
+          option += '<option value="'+s.id+'">'+(s.name ? s.name:"")+'  __  {'+(s.batch ? s.batch.name:"")+'}</option>';
         });
         syllabus.innerHTML = option;
       },
