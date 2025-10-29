@@ -163,7 +163,7 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
                     <input type="date" name="end" id="end" class="form-control">
                   </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                   <div class="form-group">
                     <label for="">Question Title</label>
                     <input name="title" id="title" class="form-control" placeholder="Search by question's title">
@@ -171,8 +171,19 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
                 </div>
                 <div class="col-md-2">
                   <div class="form-group">
+                    <label for="">Select Syllabus</label>
+                    <select name="syllabus" id="syllabus" class="form-control">
+                      <option value="">Select One</option>
+                      @foreach($syllabuses as $syllabus)
+                      <option value="{{$syllabus->id}}">{{$syllabus->name}}</option>
+                      @endforeach
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-2">
+                  <div class="form-group">
                     <br>
-                    <input class="btn btn-primary" type="submit" value="Submit">
+                    <input class="btn btn-primary btn-block" type="submit" value="Submit">
                   </div>
                 </div>
               </div>

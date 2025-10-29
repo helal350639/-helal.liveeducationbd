@@ -240,6 +240,9 @@ $value = $syllabus;
         });
     }
 
+    //onload call to get departments
+    getDepartments(document.getElementById('batch_id'));
+
 //result view add setting
 function resultView(e)
 {
@@ -276,41 +279,12 @@ function Status(e){
     // onload call to the status change
     Status(document.getElementById('status'));
 
-    // function getsubcats(elm){
-
-        // var catid = elm.options[elm.options.selectedIndex].value;
-
-        // $.ajax({
-        //     type: 'GET', //THIS NEEDS TO BE GET
-        //     url: '/get_sub_cats/'+catid,
-        //     success: function (data) {
-
-        //         var obj = JSON.parse(JSON.stringify(data));
-        //         var sub_cat_html = "";
-
-        //         $.each(obj['subcats'], function (key, val) {
-        //            sub_cat_html += "<option value="+val.id+">"+val.name+"</option>";
-        //         });
-
-        //         if(sub_cat_html != ""){
-        //             $("#sub_cat").html('<option value="">Select SubCategory</option>'+sub_cat_html)
-        //         }else{
-        //             $("#sub_cat").html('<option value="">No SubCategory</option>')
-        //         }
-        //     },
-        //     error: function(data) { 
-        //          console.log('data error');
-        //     }
-        // });
-    // }
-
     //this script for text editor
     $(document).ready(function() {
         $('.editor').summernote({
             height: 150
         });
     });
-
-    // getsubcats(elm);
+    
 </script>
 @endsection

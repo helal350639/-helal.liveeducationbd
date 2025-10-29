@@ -170,7 +170,7 @@ function position($user_mark, $candidates, $marks)
         @endforeach
       </div>
       @elseif(isset($result['message']))
-      <div class="col-md-6 col-md-offset-3 panel panel-default">
+      <div class="col-md-6 offset-md-3 panel panel-default">
         <div class="panel-body" style="text-align: center">
           <p>{{$paper->result_message}}</p>
           <hr>

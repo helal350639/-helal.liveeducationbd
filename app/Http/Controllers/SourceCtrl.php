@@ -1,6 +1,9 @@
 <?php
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Log;
+use Swift_TransportException;
+
 use Image;
 use File;
 use Mail;
@@ -109,18 +112,59 @@ class SourceCtrl extends Controller
 
     $data = array_merge($data, $data1);
 
-    Mail::send('mail.default', $data, function($message) use ($data)
-    {
-      $message->to($data['email_to']);
+    // Mail::send('mail.default', $data, function($message) use ($data)
+    // {
+    //   $message->to($data['email_to']);
 
-      if(isset($data['email_bcc']))
-      {
-        $message->bcc($data['email_bcc']);
+    //   if(isset($data['email_bcc']))
+    //   {
+    //     $message->bcc($data['email_bcc']);
+    //   }
+
+    //   $message->subject($data['subject']);
+    //   $message->from($data['email_from'], $data['from_name']);
+    // });
+
+    try {
+      Mail::send('mail.default', $data, function($message) use ($data) {
+          $message->to($data['email_to']);
+  
+          if (isset($data['email_bcc'])) {
+              $message->bcc($data['email_bcc']);
+          }
+  
+          $message->subject($data['subject']);
+          $message->from($data['email_from'], $data['from_name']);
+      });
+  
+    } catch (Swift_TransportException $e) {
+  
+      // Check if Gmail is temporarily rejecting (450-4.2.1)
+      if (strpos($e->getMessage(), '450-4.2.1') !== false) {
+          Log::warning('Gmail rate limit hit for ' . $data['email_to']);
+  
+          // Retry after some delay (example: 1 minute)
+          sleep(60);
+  
+          // Optionally, try sending again once
+          try {
+              Mail::send('mail.default', $data, function($message) use ($data) {
+                  $message->to($data['email_to']);
+                  if (isset($data['email_bcc'])) {
+                      $message->bcc($data['email_bcc']);
+                  }
+                  $message->subject($data['subject']);
+                  $message->from($data['email_from'], $data['from_name']);
+              });
+          } catch (Swift_TransportException $e2) {
+              Log::error('Retry failed for ' . $data['email_to'] . ': ' . $e2->getMessage());
+          }
+  
+      } else {
+          // Other mail transport error
+          Log::error('Mail send failed for ' . $data['email_to'] . ': ' . $e->getMessage());
       }
-
-      $message->subject($data['subject']);
-      $message->from($data['email_from'], $data['from_name']);
-    });
+    }
   }
 
   public function host()

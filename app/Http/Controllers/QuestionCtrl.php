@@ -16,6 +16,7 @@ use App\Models\McqItem;
 use App\Models\Label;
 use App\Models\AnswerFile;
 use App\Models\User;
+use App\Models\Syllabus;
 use Auth;
 use Image;
 use Toastr;
@@ -49,6 +50,7 @@ class QuestionCtrl extends Controller
         $subjects = Subject::where('status', 'Active')->get();
         $chapters = Chapter::where('status', 'Active')->get();
         $users = User::where('status', 'Active')->get();
+        $syllabuses = Syllabus::where('status', 'Published')->get();
 
         $filters = Filter::with(['SubFilter'])->get();
 
@@ -67,13 +69,14 @@ class QuestionCtrl extends Controller
         ->where('created_at', 'like', '%'.date('Y-m-d').'%')
         ->paginate(25);
 
-        return view('layouts.questions.view', compact('courses', 'departments', 'semesters', 'subjects', 'chapters', 'cat', 'questions', 'filters', 'users'));
+        return view('layouts.questions.view', compact('courses', 'departments', 'semesters', 'subjects', 'chapters', 'cat', 'questions', 'filters', 'users', 'syllabuses'));
     }
 
     public function viewQuestionPost(Request $request)
     {
         $data = $request->all();
         $filter_ids = [];
+
         if(isset($data['filter_ids'])){
             $filter_ids = explode(',', $data['filter_ids']);
         }
@@ -142,6 +145,13 @@ class QuestionCtrl extends Controller
         if(isset($data['title']))
         {
             $questions = $questions->where('title', 'like', '%'.$data['title'].'%');
+        }
+        
+        if(isset($data['syllabus']))
+        {
+          $syllabus = Syllabus::find($data['syllabus']);
+          $questionIds = $syllabus->questions()->pluck('id')->toArray();
+          $questions = $questions->whereIn('id', $questionIds);
         }
 
         $questions = $questions->paginate(25);
