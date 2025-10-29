@@ -50,7 +50,6 @@ class QuestionCtrl extends Controller
         $subjects = Subject::where('status', 'Active')->get();
         $chapters = Chapter::where('status', 'Active')->get();
         $users = User::where('status', 'Active')->get();
-        $syllabuses = Syllabus::where('status', 'Published')->get();
 
         $filters = Filter::with(['SubFilter'])->get();
 
@@ -69,7 +68,7 @@ class QuestionCtrl extends Controller
         ->where('created_at', 'like', '%'.date('Y-m-d').'%')
         ->paginate(25);
 
-        return view('layouts.questions.view', compact('courses', 'departments', 'semesters', 'subjects', 'chapters', 'cat', 'questions', 'filters', 'users', 'syllabuses'));
+        return view('layouts.questions.view', compact('courses', 'departments', 'semesters', 'subjects', 'chapters', 'cat', 'questions', 'filters', 'users'));
     }
 
     public function viewQuestionPost(Request $request)

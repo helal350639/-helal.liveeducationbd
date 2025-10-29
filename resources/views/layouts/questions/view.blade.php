@@ -88,7 +88,7 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
                 <div class="col-md-2">
                   <div class="form-group">
                     <label for="">Department</label>
-                    <select name="department_id" id="department_id" class="form-control select2" onchange="getSemesters(this); getSubjects(this)">
+                    <select name="department_id" id="department_id" class="form-control select2" onchange="getSemesters(this); getSubjects(this); getSyllabus(this)">
                       <option value="">Select One</option>
                       @foreach($departments as $value)
                       <option value="{{$value->id}}" {{$cat['department_id'] == $value->id ? 'selected':''}}>{{$value->name}}</option>
@@ -174,9 +174,7 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
                     <label for="">Select Syllabus</label>
                     <select name="syllabus" id="syllabus" class="form-control">
                       <option value="">Select One</option>
-                      @foreach($syllabuses as $syllabus)
-                      <option value="{{$syllabus->id}}">{{$syllabus->name}}</option>
-                      @endforeach
+                      
                     </select>
                   </div>
                 </div>
@@ -191,6 +189,7 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
           </div>
         </div>
       </div>
+
       <div class="col-md-4 scroll" style="padding-left: 0">
         <div class="box filter-parent" id="filter-parent">
           @if(!is_null(Session::get('_paper')))
@@ -395,8 +394,6 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
                   console.log('data error');
           }
       });
-
-      
   }
 
   function getSubjects(e)
@@ -733,6 +730,32 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
 @endsection
 @section('scripts')
   <script>
+
+
+  // get syllabuses
+  function getSyllabus(e)
+  {
+    const syllabus = document.getElementById('syllabus');
+    const course_id = document.getElementById('course_id');
+    const department_id = e.options[e.selectedIndex];
+    
+    $.ajax({
+      type: 'GET',
+      url: '{{route("syllabus.get-syllabus")}}',
+      data: {course_id: course_id.value, department_id: department_id.value},
+      success: function(data){
+        let option = '<option value="">Select One</option>';
+        data.syllabus.forEach((s) => {
+          option += '<option value="'+s.id+'">'+(s.name ? s.name:"")+' - '+(s.batch ? s.batch.name:"")+'</option>';
+        });
+        syllabus.innerHTML = option;
+      },
+      error: function(data){
+        console.error(data);
+      }
+    });
+  }
+
     $(function () {
       $('#example1').DataTable()
       $('#example2').DataTable({

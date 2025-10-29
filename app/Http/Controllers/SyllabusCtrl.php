@@ -393,4 +393,25 @@ class SyllabusCtrl extends Controller
         return redirect()->route('syllabus.view', $last_syllabus->id);
     }
     
+   public function getSyllabus(Request $request)
+   {
+    $course = $request->input('course_id');
+    $department = $request->input('department_id');
+
+    $syllabuses = Syllabus::when($course, function($query, $course)
+    {
+      $query->where('course_id', $course);
+    })
+    ->when($department, function($query, $department)
+    {
+      $query->where('department_id', $department);
+    })
+    ->select('id', 'name', 'batch_id')
+    ->with(['batch:id,name'])
+    ->get();
+
+    return response()->json([
+      'syllabus' => $syllabuses
+    ], 200);
+   }
 }

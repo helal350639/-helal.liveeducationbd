@@ -20,6 +20,10 @@ if(!is_null(Session::get('_paper')))
 .correct{font-weight: bold; font-size:16px; color:green}
 </style>
 <div class="box-header">
+  <div class="pagination-sm no-margin pull-right">
+    {!! $questions->links() !!}
+  </div>
+  
   <h3 class="box-title">
     Questions ({{$questions->total()}})
 

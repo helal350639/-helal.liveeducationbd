@@ -355,6 +355,7 @@ Route::middleware(['auth'])->group(function()
 		Route::get('syllabus/pdf/{id}', 'pdf')->name('syllabus.pdf');
     Route::get('syllbus/copy/{id}', 'copy')->name('syllabus.copy');
     Route::post('syllbus/copy-store', 'copyStore')->name('syllabus.copy.store');
+    Route::get('get-syllabus', 'getSyllabus')->name('syllabus.get-syllabus');
 	});
 
 	Route::controller(ExamCtrl::class)->group(function()
