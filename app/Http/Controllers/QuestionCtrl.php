@@ -91,8 +91,14 @@ class QuestionCtrl extends Controller
 
         $questions = Question::orderBy('id', 'DESC')
         ->where('type', $data['type']);
-
-        if(isset($data['chapter_id']))
+        
+        if(isset($data['syllabus']))
+        {
+          $syllabus = Syllabus::find($data['syllabus']);
+          $questionIds = $syllabus->questions()->pluck('id')->toArray();
+          $questions = $questions->whereIn('id', $questionIds);
+        }
+        elseif(isset($data['chapter_id']))
         {
           $questions = $questions->whereHas('chapters', function($query) use($data){
             $query->where('chapter_id', $data['chapter_id']);
@@ -144,13 +150,6 @@ class QuestionCtrl extends Controller
         if(isset($data['title']))
         {
             $questions = $questions->where('title', 'like', '%'.$data['title'].'%');
-        }
-        
-        if(isset($data['syllabus']))
-        {
-          $syllabus = Syllabus::find($data['syllabus']);
-          $questionIds = $syllabus->questions()->pluck('id')->toArray();
-          $questions = $questions->whereIn('id', $questionIds);
         }
 
         $questions = $questions->paginate(25);
