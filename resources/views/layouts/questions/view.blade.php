@@ -334,42 +334,47 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
 
   function getDepartments(e)
   {
-    loading.classList.remove('hide');
+    if(e.options[e.selectedIndex].value != '')
+    {
+      loading.classList.remove('hide');
 
-    let ids = Array.from(e.selectedOptions).map(({value}) => value);
+      let ids = Array.from(e.selectedOptions).map(({value}) => value);
 
-    $.ajax({
-        type: 'GET', //THIS NEEDS TO BE GET
-        url: '/get_departments/' + ids,
-        success: function (data) {
+      $.ajax({
+          type: 'GET', //THIS NEEDS TO BE GET
+          url: '/get_departments/' + ids,
+          success: function (data) {
 
-          var obj = JSON.parse(JSON.stringify(data));
-          var options = '<option value="">Select One</option>';
+            var obj = JSON.parse(JSON.stringify(data));
+            var options = '<option value="">Select One</option>';
 
-          $.each(obj['data'], function (key, val) {
-            options += '<option value="'+val.id+'">'+val.name+'</option>';
-          });
+            $.each(obj['data'], function (key, val) {
+              options += '<option value="'+val.id+'">'+val.name+'</option>';
+            });
 
-          if(options != ""){
-            $("#department_id").html(options)
-          }else{
-            $("#department_id").html('')
-            $("#semester_id").html('')
-            $("#subject_id").html('')
-            $("#chapter_id").html('')
+            if(options != ""){
+              $("#department_id").html(options)
+            }else{
+              $("#department_id").html('')
+              $("#semester_id").html('')
+              $("#subject_id").html('')
+              $("#chapter_id").html('')
+            }
+            //hide loading image
+            loading.classList.add('hide');
+          },
+          error: function(data) {
+            console.log('data error');
           }
-          //hide loading image
-          loading.classList.add('hide');
-        },
-        error: function(data) {
-          console.log('data error');
-        }
-    });
+      });
+    }
   }
 
   function getSemesters(e)
   {
-    loading.classList.remove('hide');
+    if(e.options[e.selectedIndex].value != '')
+    {
+      loading.classList.remove('hide');
 
       let ids = Array.from(e.selectedOptions).map(({value}) => value);
       let department = document.getElementById('department_id');
@@ -426,12 +431,15 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
                   console.log('data error');
           }
       });
+    }
   }
 
   function getSubjects(e)
   {
-    //loading image view
-    loading.classList.remove('hide');
+    if(e.options[e.selectedIndex].value != '')
+    {
+      //loading image view
+      loading.classList.remove('hide');
 
       let ids = Array.from(e.selectedOptions).map(({value}) => value);
 
@@ -460,6 +468,9 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
                   console.log('data error');
           }
       });
+
+    }
+    
   }
 
   function getSemsSubjects(e)
@@ -498,6 +509,8 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
 
   function getChapters(e)
   {
+    if(e.options[e.selectedIndex].value != '')
+    {
     //loading image view
     loading.classList.remove('hide');
 
@@ -527,6 +540,7 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
             console.log('data error');
           }
       });
+    }
   }
 
   function showHideAnswer(e)
@@ -768,17 +782,18 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
   function getSyllabus(e)
   {
     const syllabus = document.getElementById('syllabus');
-    const course_id = document.getElementById('course_id');
-    const department_id = e.options[e.selectedIndex];
+    const department = document.getElementById('department_id');
+    const batch_id = e.options[e.selectedIndex];
+    const department_id = department.options[department.selectedIndex];
     
     $.ajax({
       type: 'GET',
       url: '{{route("syllabus.get-syllabus")}}',
-      data: {course_id: course_id.value, department_id: department_id.value},
+      data: {batch_id: batch_id.value, department_id: department_id.value},
       success: function(data){
         let option = '<option value="">Select One</option>';
         data.syllabus.forEach((s) => {
-          option += '<option value="'+s.id+'">'+(s.name ? s.name:"")+'  __  {'+(s.batch ? s.batch.name:"")+'}</option>';
+          option += '<option value="'+s.id+'">'+s.name+'</option>';
         });
         syllabus.innerHTML = option;
       },

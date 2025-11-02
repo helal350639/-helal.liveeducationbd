@@ -395,19 +395,18 @@ class SyllabusCtrl extends Controller
     
    public function getSyllabus(Request $request)
    {
-    $course = $request->input('course_id');
+    $batch = $request->input('batch_id');
     $department = $request->input('department_id');
 
-    $syllabuses = Syllabus::when($course, function($query, $course)
+    $syllabuses = Syllabus::when($batch, function($query, $batch)
     {
-      $query->where('course_id', $course);
+      $query->where('batch_id', $batch);
     })
     ->when($department, function($query, $department)
     {
       $query->where('department_id', $department);
     })
-    ->select('id', 'name', 'batch_id')
-    ->with(['batch:id,name'])
+    ->select('id', 'name')
     ->get();
 
     return response()->json([
