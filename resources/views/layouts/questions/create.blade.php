@@ -865,13 +865,15 @@ function msgHide()
     let submit = document.getElementById('btnSubmit');
     submit.removeAttribute('disabled');
 
-    console.log(document.getElementById("mcq_form").scrollIntoView());
+    document.getElementById("mcq_form").scrollIntoView();
+
+    // console.log();
 }
 
 function resetFields()
 {
     let label = document.getElementById('label');
-    label.innerHTML = '';
+    // label.innerHTML = '';
 
     // reset all filters fields
     let filters = document.getElementsByName('filter[]');
@@ -884,11 +886,11 @@ function resetFields()
     }
 
     //reset all label fields
-    let labelFields = document.getElementsByClassName('label-filters');
-    for(let l = 0; labelFields.length > l; l++)
-    {
-        labelFields[l].value = [];
-    }
+    // let labelFields = document.getElementsByClassName('label-filters');
+    // for(let l = 0; labelFields.length > l; l++)
+    // {
+    //     labelFields[l].value = [];
+    // }
 
     //reset question title and explanation fields
     $('#title').summernote('reset');

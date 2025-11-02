@@ -332,6 +332,7 @@ Route::middleware(['auth'])->group(function()
 	{
 		Route::get('get_batches/{batch_id}', 'getBatches');
 		Route::get('batch_send_sms/{id}', 'sendSMS')->name('batch.sms');
+    Route::get('batch-by-course', 'courseBatch')->name('batch.course-batch');
 	});
 
 	Route::controller(StudentCtrl::class)->group(function()

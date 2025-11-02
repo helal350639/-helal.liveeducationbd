@@ -163,6 +163,19 @@ font-size: 16px;
 }
 }
 </style>
+<style>
+  .blink-text {
+      animation: blinker 1.5s linear infinite;
+      color: red; /* Example color */
+      font-family: sans-serif; /* Example font */
+  }
+  
+  @keyframes blinker {
+      50% {
+          opacity: 0;
+      }
+  }
+  </style>
 
   <section class="dashboard p-2 py-5" style="background: #eee">
     <div class="container">
@@ -172,8 +185,8 @@ font-size: 16px;
                <h2> স্টুডেন্ট ড্যাশবোর্ড </h2>
                <hr class="w-25 mx-auto bg-danger" />
                <p style="font-size: 24px;"> Registration ID: <span style=" font-weight: 700; color: #080;">{{$source->numset($user->id, 6)}}</span></p>
-               <p style="border: 1px solid orange; color: orange">
-                <a href="{{route('students.my-course')}}">Your Reference Link</a>
+               <p style="color: white;">
+                <a class="blink-text btn btn-info" href="{{route('students.my-course')}}" >Your Reference Link: Click Now</a>
               </p>
             </div>
          </div>

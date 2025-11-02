@@ -67,6 +67,10 @@ if($user)
         </div>
       </div>
       @endif
+      <hr>
+      <div class="panel-footer">
+        <a class="btn btn-info" href="/service-details/8">রেফার করার নিয়ম ও নির্দেশনা</a>
+      </div>
       
     </div>
     </section> <!-- /.content -->

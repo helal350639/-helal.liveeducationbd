@@ -246,5 +246,23 @@ class BatchCtrl extends Controller
         ->get();
         return response()->json(['data' => $items]);
     }
+
+    public function courseBatch(Request $request)
+    {
+      $course = $request->input('course');
+      $department = $request->input('department');
+
+      $batches = Batch::where('status', 'Active')
+      ->when($course, function($query, $course)
+      {
+        $query->where('course_id', $course);
+      })
+      ->select('id', 'name')
+      ->get();
+
+      return response()->json([
+        'batches' => $batches
+      ], 200);
+    }
     
 }

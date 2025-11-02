@@ -98,7 +98,8 @@ class QuestionCtrl extends Controller
           $questionIds = $syllabus->questions()->pluck('id')->toArray();
           $questions = $questions->whereIn('id', $questionIds);
         }
-        elseif(isset($data['chapter_id']))
+        
+        if(isset($data['chapter_id']))
         {
           $questions = $questions->whereHas('chapters', function($query) use($data){
             $query->where('chapter_id', $data['chapter_id']);

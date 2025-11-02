@@ -77,7 +77,7 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
                 <div class="col-md-2">
                   <div class="form-group">
                     <label for="">Course</label>
-                    <select name="course_id" id="course_id" class="form-control select2" onchange="getDepartments(this)">
+                    <select name="course_id" id="course_id" class="form-control select2" onchange="getDepartments(this); getBatch(this)">
                       <option value="">Select One</option>
                       @foreach($courses as $value)
                       <option value="{{$value->id}}" {{$cat['course_id'] == $value->id ? 'selected':''}}>{{$value->name}}</option>
@@ -88,7 +88,7 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
                 <div class="col-md-2">
                   <div class="form-group">
                     <label for="">Department</label>
-                    <select name="department_id" id="department_id" class="form-control select2" onchange="getSemesters(this); getSubjects(this); getSyllabus(this)">
+                    <select name="department_id" id="department_id" class="form-control select2" onchange="getSemesters(this); getSubjects(this);">
                       <option value="">Select One</option>
                       @foreach($departments as $value)
                       <option value="{{$value->id}}" {{$cat['department_id'] == $value->id ? 'selected':''}}>{{$value->name}}</option>
@@ -171,6 +171,15 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
                 </div>
                 <div class="col-md-2">
                   <div class="form-group">
+                    <label for="">Select Batch</label>
+                    <select name="batch" id="batch" class="form-control" onchange="getSyllabus(this)">
+                      <option value="">Select One</option>
+                      
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-2">
+                  <div class="form-group">
                     <label for="">Select Syllabus</label>
                     <select name="syllabus" id="syllabus" class="form-control">
                       <option value="">Select One</option>
@@ -178,6 +187,7 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
                     </select>
                   </div>
                 </div>
+
                 <div class="col-md-2">
                   <div class="form-group">
                     <br>
@@ -298,6 +308,28 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
     {
       checkAll.checked = false;
     }
+  }
+
+  function getBatch(e)
+  {
+    const batch = document.getElementById('batch');
+
+    $.ajax({
+      type: 'GET',
+      url: '{{route("batch.course-batch", "")}}',
+      data: {course: e.options[e.selectedIndex].value},
+      success: function(data){
+        // console.log(data);
+        let option = '<option value="">Select One</option>';
+        data.batches.forEach((b) => {
+          option += '<option value="'+b.id+'">'+b.name+'</option>';
+        });
+        batch.innerHTML = option;
+      },
+      error: function(data){
+        console.error(data);
+      }
+    });
   }
 
   function getDepartments(e)
