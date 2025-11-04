@@ -445,7 +445,7 @@ class StudentHomeCtrl extends Controller
     $candidates = 0;
     if($paper->candidate)
     {
-      $candidates = $paper->candidate;
+      $candidates = $allExams + $paper->candidate;
     }
     else
     {
