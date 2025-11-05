@@ -335,6 +335,9 @@ function getDepartments(e)
     });
 }
 
+//onload call to get departments
+getDepartments(document.getElementById('batch_id'));
+
 // on upload show image
     function showImg(e)
     {

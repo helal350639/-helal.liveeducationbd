@@ -9,9 +9,9 @@ if($user)
 }
 
 $now = now();
-$past = new DateTime();
-$past->modify('+11 minutes');
-$now = $past->format('Y-m-d H:i:s');
+// $past = new DateTime();
+// $past->modify('+11 minutes');
+// $now = $past->format('Y-m-d H:i:s');
 @endphp
 
 @extends('homepage')
