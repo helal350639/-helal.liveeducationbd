@@ -80,8 +80,7 @@ $qcount = 0;
                     <div class="question">
                       <span style="display: inline-flex">
                         <span class="q_number">প্রশ্ন {{$qcount+1}}.</span>
-                        <span>{!! $questionData['question'] !!}</span>
-                        {{-- <span>{!! substr($questionData['question'], 3, -4) !!}</span> --}}
+                        <span>{{ preg_replace('/<\/?p>/i', '', $questionData['question']) }}</span>
                       </span>
                       @php
                       $correct_ans = '';

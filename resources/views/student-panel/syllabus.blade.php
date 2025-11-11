@@ -48,13 +48,6 @@ $qcount = 0;
               <h4 class="box-title" style="display: inline">Questions (<b>{{count($syllabus->questions)}}</b>)</h4>
               <div class="text-right toolbar-icon pull-right" style="display: inline">
                 <a href="{{route('students.syllabus.pdf', $syllabus->id)}}" class="label label-info" title="Download"><i class="fa fa-download"></i> Download PDF </a>
-                @if($syllabus->routine)
-                {{-- <a target="_blank" href="{{$syllabus->routine}}" class="label label-warning" title="Download"><i class="fa fa-download"></i> Download Routine</a> --}}
-                @endif
-                {{-- @if($syllabus->pdf)
-                <a target="_blank" href="{{$syllabus->pdf}}" class="label label-info" title="Download"><i class="fa fa-download"></i> Download PDF</a>
-                @endif --}}
-                {{-- <a href="#" class="label label-info" title="Print" onclick="printDiv()"><i class="fa fa-print"></i></a> --}}
               </div>
             </div>
           </div>
