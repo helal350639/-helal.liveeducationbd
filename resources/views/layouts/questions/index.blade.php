@@ -56,7 +56,7 @@ $source = New SourceCtrl;
                 @foreach($mcqs as $mcq)
                 <tr>
                   <td>{{$mcq->id}}</td>
-                  <td>{{ $mcq->title }}</td>
+                  <td ondblclick="QTitleEdit(this)" data-id="{{$mcq->id}}">{{ $mcq->title }}</td>
                   <td>{{ $mcq->type }}</td>
                   <td>
                     @foreach($mcq->chapters as $val)
@@ -115,18 +115,48 @@ $source = New SourceCtrl;
     </section>
     <!-- /.content -->
     @endsection
-{{-- @section('scripts')
+@section('scripts')
   <script>
-    $(function () {
-      $('#example1').DataTable()
-      $('#example2').DataTable({
-        'paging'      : true,
-        'lengthChange': false,
-        'searching'   : false,
-        'ordering'    : true,
-        'info'        : true,
-        'autoWidth'   : false
+    function QTitleEdit(e)
+    {
+      let form = '<div class="input-group">'+
+          '<input type="text" value="'+e.innerHTML+'" class="form-control">'+
+          '<span class="input-group-addon" onclick="saveTitle(this)">'+
+            '<i class="fa fa-check text-success"></i>'+
+          '</span>'+
+        '</div>';
+
+      e.innerHTML = form;
+    }
+
+    function saveTitle(e)
+    {
+      let parent = e.parentNode.parentNode
+      // console.log(parent);
+      $.ajax({
+        type: 'GET',
+        url: '{{route("question.title.save")}}',
+        data: {id:parent.dataset.id, title: e.previousElementSibling.value},
+        success: function(data){
+          // console.log(data);
+          parent.innerHTML = e.previousElementSibling.value
+        },
+        error:function(data){
+          console.error(data);
+        }
       })
-    })
+    }
+
+    // $(function () {
+    //   $('#example1').DataTable()
+    //   $('#example2').DataTable({
+    //     'paging'      : true,
+    //     'lengthChange': false,
+    //     'searching'   : false,
+    //     'ordering'    : true,
+    //     'info'        : true,
+    //     'autoWidth'   : false
+    //   })
+    // })
   </script>
-@endsection --}}
+@endsection

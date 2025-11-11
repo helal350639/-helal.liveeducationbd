@@ -295,6 +295,7 @@ Route::middleware(['auth'])->group(function()
 		Route::post('question_view', 'viewQuestionPost')->name('question.view.post');
 		Route::post('check_question_exist', 'Questions')->name('questions.title');
 		Route::get('question_search', 'QuestionSearch')->name('question.search');
+    Route::get('question-title-save', 'saveTitle')->name('question.title.save');
 	});
 
 	Route::controller(ChapterCtrl::class)->group(function()

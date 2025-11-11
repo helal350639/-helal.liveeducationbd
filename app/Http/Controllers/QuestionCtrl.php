@@ -788,5 +788,19 @@ class QuestionCtrl extends Controller
         $mcqs = Question::where('title', 'like', '%'.$request->search.'%')->paginate(25);
         return view('layouts.questions.index', compact('mcqs'));
     }
+
+    public function saveTitle(Request $request)
+    {
+      $id = $request->id;
+      $title = $request->title;
+
+      Question::where('id', $id)->update([
+        'title' => $title
+      ]);
+
+      return response()->json([
+        'question' => $title
+      ], 200);
+    }
     
 }
