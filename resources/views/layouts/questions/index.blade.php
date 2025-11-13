@@ -32,14 +32,14 @@ $source = New SourceCtrl;
               <select name="subject_id" id="" class="form-control">
                 <option value="">Select One</option>
                 @foreach($subjects as $subject)
-                <option value="{{$subject->id}}">{{$subject->name}}</option>
+                <option value="{{$subject->id}}" {{$subject_id && $subject_id == $subject->id? 'selected':''}}>{{$subject->name}}</option>
                 @endforeach
               </select>
             </div>
           </div>
           <div class="col-md-4">
             <div class="form-group">
-              <input type="text" name="title" class="form-control" placeholder="Question Title">
+              <input type="text" name="title" class="form-control" placeholder="Question Title" value="{{$title}}">
             </div>
           </div>
           <div class="col-md-4">
