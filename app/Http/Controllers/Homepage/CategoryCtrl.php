@@ -380,14 +380,22 @@ class CategoryCtrl extends Controller
       }
     }
 
+    $batch_name = '';
     $department = Department::find($department_id);
-    $syllabuses = Syllabus::orderBy('datetime', 'ASC')
+    $batch = $department->batches()->where('batch_id', $batch_id)->first();
+
+    if($batch){
+      $batch_name = $batch->name;
+    }
+
+    $syllabuses = Syllabus::orderBy('id', 'ASC')
+    ->orderBy('datetime', 'ASC')
     ->whereIn('status', ['Published', 'Scheduled'])
     ->where('batch_id', $batch_id)
     ->where('department_id', $department_id)
     ->get();
 
-    return view('homepage.exam-pdf', compact('syllabuses', 'department'));
+    return view('homepage.exam-pdf', compact('syllabuses', 'department', 'batch_name'));
   }
 
   public function routine($type, $batch_id, $department_id)

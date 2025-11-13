@@ -5,6 +5,11 @@ $source = New SourceCtrl;
 
 @extends('dashboard')
 @section('title', 'View All Questions')
+
+@section('stylesheets')
+<link href="/assets/summernote/summernote.min.css" rel="stylesheet">
+@endsection
+
 @section('content')
 <!-- Content Header (Page header) -->
 <section class="content-header">
@@ -116,36 +121,53 @@ $source = New SourceCtrl;
     <!-- /.content -->
     @endsection
 @section('scripts')
+<script src="/assets/summernote/summernote.min.js"></script>
   <script>
     function QTitleEdit(e)
     {
       let form = '<div class="input-group">'+
-          '<input type="text" value="'+e.innerHTML+'" class="form-control">'+
+          '<textarea class="form-control editor">'+e.innerHTML+'</textarea>'+
           '<span class="input-group-addon" onclick="saveTitle(this)">'+
             '<i class="fa fa-check text-success"></i>'+
           '</span>'+
         '</div>';
 
       e.innerHTML = form;
+
+      $('.editor').summernote({
+            height: 50,
+            toolbar: [
+              ['view', ['codeview']]
+            ]
+        });
     }
 
     function saveTitle(e)
     {
-      let parent = e.parentNode.parentNode
-      // console.log(parent);
+      let parent = e.parentNode.parentNode;
+      let id = parent.dataset.id;
+      let title = parent.firstElementChild.firstElementChild.value;
+      // console.log();
       $.ajax({
         type: 'GET',
         url: '{{route("question.title.save")}}',
-        data: {id:parent.dataset.id, title: e.previousElementSibling.value},
+        data: {id:id, title: title},
         success: function(data){
           // console.log(data);
-          parent.innerHTML = e.previousElementSibling.value
+          parent.innerHTML = title
         },
         error:function(data){
           console.error(data);
         }
-      })
+      });
     }
+
+    //this script for text editor
+    $(document).ready(function() {
+        $('.editor').summernote({
+            height: 150
+        });
+    });
 
     // $(function () {
     //   $('#example1').DataTable()

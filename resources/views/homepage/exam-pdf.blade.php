@@ -55,6 +55,7 @@ $now = now();
           <!-- Content Header (Page header) -->
           <div class="title-area text-center">
             <h1> {{$department->name}} </h1>
+            <h5> {{$batch_name}} </h5>
           </div>
         </div>
 
