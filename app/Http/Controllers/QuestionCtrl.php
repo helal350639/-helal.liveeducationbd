@@ -36,10 +36,27 @@ class QuestionCtrl extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $mcqs = Question::orderBy('id','DESC')->paginate(25);
-        return view('layouts.questions.index', compact('mcqs'));
+      $subject_id = $request->input('subject_id');
+      $title = $request->input('title');
+        $mcqs = Question::orderBy('id','DESC');
+        if(isset($request->subject_id))
+        {
+          $mcqs = $mcqs->whereHas('subjects', function($query) use($request){
+            $query->where('subject_id', $request->subject_id);
+          });
+        }
+        if(isset($request->title))
+        {
+          $mcqs = $mcqs->where('title', 'like', '%'.$title.'%');
+        }
+        $mcqs = $mcqs->paginate(25);
+      
+        $subjects = Subject::where('status', 'Active')
+        ->select('id', 'name')
+        ->get();
+        return view('layouts.questions.index', compact('mcqs', 'subjects'));
     }
 
     public function viewQuestion()

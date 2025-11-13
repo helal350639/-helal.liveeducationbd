@@ -23,6 +23,37 @@ $source = New SourceCtrl;
 <!-- Main content -->
 <section class="content">
   <div class="row">
+    <div class="box box-body">
+      <form action="{{route('question.index')}}" method="GET">
+        @csrf
+        <div class="row">
+          <div class="col-md-4">
+            <div class="form-group">
+              <select name="subject_id" id="" class="form-control">
+                <option value="">Select One</option>
+                @foreach($subjects as $subject)
+                <option value="{{$subject->id}}">{{$subject->name}}</option>
+                @endforeach
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <input type="text" name="title" class="form-control" placeholder="Question Title">
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="input-group-btn">
+              <button type="submit" class="btn btn-info">
+                <i class="fa fa-search"></i> Search
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="row">
     <div class="col-xs-12">
       <div class="box">
         <div class="box-header">
@@ -31,16 +62,6 @@ $source = New SourceCtrl;
                 <a href="{{route('question.create')}}" class="btn btn-info">
                   <i class="fa fa-plus"></i> Add Question
                 </a>
-                <form class="form-inline" style="display: inline;" action="{{route('question.search')}}" method="GET">
-                  @csrf
-                <div class="input-group input-group-sm" style="float:right; width: 150px;margin-left:15px">
-                  <input type="text" name="search" class="form-control pull-right" placeholder="Search" required>
-
-                  <div class="input-group-btn">
-                    <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
-                  </div>
-                </form>
-                </div>
               </div>
             </div>
             <!-- /.box-header -->
@@ -147,13 +168,11 @@ $source = New SourceCtrl;
       let parent = e.parentNode.parentNode;
       let id = parent.dataset.id;
       let title = parent.firstElementChild.firstElementChild.value;
-      // console.log();
       $.ajax({
         type: 'GET',
         url: '{{route("question.title.save")}}',
         data: {id:id, title: title},
         success: function(data){
-          // console.log(data);
           parent.innerHTML = title
         },
         error:function(data){
@@ -164,9 +183,9 @@ $source = New SourceCtrl;
 
     //this script for text editor
     $(document).ready(function() {
-        $('.editor').summernote({
-            height: 150
-        });
+      $('.editor').summernote({
+        height: 150
+      });
     });
 
     // $(function () {
