@@ -51,7 +51,7 @@ class QuestionCtrl extends Controller
       {
         $mcqs = $mcqs->where('title', 'like', '%'.$title.'%');        
       }
-      $mcqs = $mcqs->paginate(25);
+      $mcqs = $mcqs->paginate(25)->withQueryString();
     
       $subjects = Subject::where('status', 'Active')
       ->select('id', 'name')

@@ -22,7 +22,6 @@ $source = New SourceCtrl;
 </section>
 <!-- Main content -->
 <section class="content">
-  <div class="row">
     <div class="box box-body">
       <form action="{{route('question.index')}}" method="GET">
         @csrf
@@ -52,7 +51,6 @@ $source = New SourceCtrl;
         </div>
       </form>
     </div>
-  </div>
   <div class="row">
     <div class="col-xs-12">
       <div class="box">
