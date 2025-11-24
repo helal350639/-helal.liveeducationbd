@@ -66,6 +66,15 @@ foreach($semester->departments as $val)
                         <textarea class="form-control" name="details" id="details" rows="5">{{$semester->details}}</textarea>
                     </div>
                 </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="status">Status:</label>
+                        <select class="form-control" name="status" id="status">
+                          <option value="Active" {{$semester->status == 'Active' ? 'selected' : ''}}>Active</option>
+                          <option value="Deactive" {{$semester->status == 'Deactive' ? 'selected' : ''}}>Deactive</option>
+                        </select>
+                    </div>
+                </div>
             </div> <!-- /.box body -->
             <div class="box-footer">
                 <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-save"></i> Save</button>

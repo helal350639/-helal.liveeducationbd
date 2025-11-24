@@ -466,11 +466,12 @@ class StudentHomeCtrl extends Controller
     return view('student-panel.result', compact('exams', 'paper', 'result', 'passed', 'candidates'));
   }
 
+  // your exam paper
   public function examPaper($id)
   {
     $user = Auth::guard('student')->user();
     $paper = Paper::find($id);
-    $exam = $paper->exams()->where('student_id', $user->id)->first();
+    $exam = $paper->exams()->orderby('id', 'DESC')->where('student_id', $user->id)->first();
     $choices = Choice::where('exam_id', $exam->id)->pluck('question_id', 'mcq_id')->toArray();
 
     return view('student-panel.your-exam-paper', compact('paper', 'choices', 'exam'));

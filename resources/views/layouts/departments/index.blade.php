@@ -63,8 +63,8 @@ $source = New SourceCtrl;
                   <td>
                     @if($val->status == 'Active')
                     <span class="label label-success">Active</span>
-                    @elseif($val->status == 'Inactive')
-                    <span class="label label-warning">Inactive</span>
+                    @elseif($val->status == 'Deactive')
+                    <span class="label label-danger">Deactive</span>
                     @endif
                   </td>
                   <td>

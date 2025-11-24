@@ -62,6 +62,8 @@ Route::controller(HomePageCtrl::class)->group(function()
   Route::get('home/results/{paper}', 'resultList')->name('home.results');
   Route::get('home/routine-filter/{id}/{department?}', 'routineFilter')->name('home.routine.filter');
   Route::get('service-details/{id}', 'serviceShow')->name('home.service.show');
+  Route::get('books/{id}', 'books')->name('home.books');
+  Route::get('books-read/{id}', 'readBook')->name('home.book.read');
 });
 
 Route::controller(CategoryCtrl::class)->group(function()

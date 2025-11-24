@@ -28,6 +28,8 @@ use App\Models\Ad;
 use App\Models\Video;
 use App\Models\Service;
 use App\Models\Visitor;
+use App\Models\Subject;
+use App\Models\BookCategory;
 use Auth;
 use Session;
 
@@ -90,8 +92,13 @@ class HomePageCtrl extends Controller
 
     $main_video = Video::where('status', 'Active')->where('main', 'Yes')->first();
     $services = Service::orderBy('id', 'DESC')->where('status', 'Active')->get();
+
+    //book categories
+    $book_categories = BookCategory::where('status', 'Active')
+    ->select('id', 'name')
+    ->get();
     
-    return view('homepage.index', compact('courses', 'sliders', 'batches', 'teachers', 'complains', 'about', 'circulars', 'ads', 'videos', 'main_video', 'services'));
+    return view('homepage.index', compact('courses', 'sliders', 'batches', 'teachers', 'complains', 'about', 'circulars', 'ads', 'videos', 'main_video', 'services', 'book_categories'));
   }
 
   public function circular($id)
@@ -416,5 +423,25 @@ class HomePageCtrl extends Controller
   {
     // return ScheduleCtrl::scheduleEmail();
     return ScheduleCtrl::scheduleSms();
+  }
+
+  public function books($id)
+  {
+    $books = Subject::where('status', 'Active')->get();
+    return view('homepage.books.index', compact('books'));
+  }
+
+  public function readBook($id)
+  {
+    return redirect()->route('home.coming-soon');
+
+    $subject = Subject::find($id);
+    $questions = $subject->questions()->get();
+    // dd($questions);
+    if($questions)
+    {
+      return view('homepage.books.read', compact('subject', 'questions'));
+    }
+    return back();
   }
 }

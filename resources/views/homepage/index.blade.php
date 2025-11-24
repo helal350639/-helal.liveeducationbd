@@ -370,95 +370,25 @@ if($user)
     <div class="container py-3">
       <div class="row">
         <div class="title-area text-center">
-          <h2 class="fw-bold mb-4 custom-section-title">Premium Book Storage <br></h2>
+          <h2 class="fw-bold mb-4 custom-section-title">Premium Book Storage</h2>
         </div>
       </div>
       <div class="home-services-area">
         <div class="row" style="--bs-gutter-x: 0.3rem !important;">
+          @foreach($book_categories as $value)
           <div class="col-md-3 col-6 mb-1 dropdown bcs-jobs" id="home-services-area-one">
-            <a href="{{route('home.coming-soon')}}">
+            <a href="{{route('home.books', $value->id)}}">
               <div class="my-home-service premium-course-box">
                 <div class="my-home-service-icon">
                   <img src="/web/img/it-books.png" alt="" loading="lazy">
                 </div>
                 <div class="my-home-service-content">
-                  <h3>ডিপ্লোমা জব প্রস্তুতি বই ডিপার্ট্মেন্ট </h3>
+                  <h3>{{$value->name}}</h3>
                 </div>
               </div>
             </a>
           </div>
-          <div class="col-md-3 col-6 mb-1" id="home-services-area-two" data-toggle="tooltip" data-placement="bottom" title="Tooltip on bottom">
-            <a href="{{route('home.coming-soon')}}">
-              <div class="my-home-service premium-course-box" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="...">
-                <div class="my-home-service-icon">
-                  <img src="/web/img/it-books.png" alt="" loading="lazy">
-                </div>
-                <div class="my-home-service-content">
-                  <h3>রিসেন্ট জব সলুশন </h3>
-                </div>
-              </div>
-            </a>
-          </div>
-          <div class="col-md-3 col-6 mb-1" id="home-services-area-three">
-            <a href="{{route('home.coming-soon')}}">
-              <div class="my-home-service premium-course-box" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="...">
-                <div class="my-home-service-icon">
-                  <img src="/web/img/it-books.png" alt="" loading="lazy">
-                </div>
-                <div class="my-home-service-content">
-                  <h3>১১-২০ তম গ্রেডের জব প্রস্তুতি বই </h3>
-                </div>
-              </div>
-            </a>
-          </div>
-          <div class="col-md-3 col-6 mb-1" id="home-services-area-four">
-            <a href="{{route('home.coming-soon')}}">
-              <div class="my-home-service premium-course-box" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="...">
-                <div class="my-home-service-icon">
-                  <img src="/web/img/it-books.png" alt="" loading="lazy">
-                </div>
-                <div class="my-home-service-content">
-                  <h3>পলিটেকনিক একাডেমিক বই </h3>
-                </div>
-              </div>
-            </a>
-          </div>
-          <div class="col-md-3 col-6 mb-1" id="home-services-area-four">
-            <a href="{{route('home.coming-soon')}}">
-              <div class="my-home-service premium-course-box" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="...">
-                <div class="my-home-service-icon">
-                  <img src="/web/img/it-books.png" alt="" loading="lazy">
-                </div>
-                <div class="my-home-service-content">
-                  <h3>ডিপ্লোমা জব প্রস্তুতি বই নন </h3>
-                </div>
-              </div>
-            </a>
-          </div>
-          <div class="col-md-3 col-6 mb-1" id="home-services-area-four">
-            <a href="{{route('home.coming-soon')}}">
-              <div class="my-home-service premium-course-box" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="...">
-                <div class="my-home-service-icon">
-                  <img src="/web/img/it-books.png" alt="" loading="lazy">
-                </div>
-                <div class="my-home-service-content">
-                  <h3>রিটেন জব প্রস্তুতি বই </h3>
-                </div>
-              </div>
-            </a>
-          </div>
-          <div class="col-md-3 col-6 mb-1" id="home-services-area-four">
-            <a href="{{route('home.coming-soon')}}">
-              <div class="my-home-service premium-course-box" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="...">
-                <div class="my-home-service-icon">
-                  <img src="/web/img/it-books.png" alt="" loading="lazy">
-                </div>
-                <div class="my-home-service-content">
-                  <h3>ভাইভা সহায়িকা </h3>
-                </div>
-              </div>
-            </a>
-          </div>
+          @endforeach
         </div>
       </div>
     </div>

@@ -85,78 +85,72 @@ if($user)
       @include('partials.back-button')
 
     </section> <!-- /.content -->
+    <div class="preloader"></div>
+    {{-- <div id="timer"></div> --}}
 
 <script>
-  // Set the date we're counting down to
-  // var countDownDate = new Date("Oct 27, 2024 12:47:25").getTime();
-  var countDownDate = new Date("{{$source->dtcformat($value->open)}}").getTime();
-  // var countDownDate = new Date().getTime();
-  
-  // Update the count down every 1 second
-  var x = setInterval(function() {
-  
-    // Get today's date and time
-    var now = new Date().getTime();
-    // var now = new Date("{{$source->dtcformat($paper->close)}}").getTime();
-      
-    // Find the distance between now and the count down date
-    var distance = countDownDate - now;
-      
-    // Time calculations for days, hours, minutes and seconds
-    var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-      
-    // Output the result in an element with id="demo"
-    let d = h = m = s = '';
-    if(days != 0)
-    {
-      d = days+"Days ";
-    }
-    // if(hours != 0)
-    // {
-    //   h = hours+" Hours: ";
-    // }
-    // if(minutes != 0)
-    // {
-    //   m = minutes+" Minutes:";
-    // }
-    // if(seconds != 0)
-    // {
-    //   s = seconds+" Seconds";
-    // }
-    // document.getElementById("timer").innerHTML = hours + "h "
-    // + minutes + "m " + seconds + "s ";
-    document.getElementById("timer").innerHTML = d + " " + hours + " : "
-    + minutes + " : " + seconds + " ";
+  let timer = document.getElementById('timer');
+  // console.log(timer == null);
+  if(timer != null)
+  {
+    // Set the date we're counting down to
+    // var countDownDate = new Date("Oct 27, 2024 12:47:25").getTime();
+    var countDownDate = new Date("{{$source->dtcformat($value->open)}}").getTime();
+    // var countDownDate = new Date().getTime();
+    
+    // Update the count down every 1 second
+    var x = setInterval(function() {
+    
+      // Get today's date and time
+      var now = new Date().getTime();
+      // var now = new Date("{{$source->dtcformat($paper->close)}}").getTime();
+        
+      // Find the distance between now and the count down date
+      var distance = countDownDate - now;
+        
+      // Time calculations for days, hours, minutes and seconds
+      var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        
+      // Output the result in an element with id="demo"
+      let d = h = m = s = '';
+      if(days != 0)
+      {
+        d = days+"Days ";
+      }
+      // document.getElementById("timer").innerHTML = hours + "h "
+      // + minutes + "m " + seconds + "s ";
+      document.getElementById("timer").innerHTML = d + " " + hours + " : "
+      + minutes + " : " + seconds + " ";
 
-    // console.log(distance);
-      
-    // If the count down is over, write some text 
-    if (distance < 60000 && distance > 59000) {
-      // alert('10 Seconds Left!');
-      document.getElementById('timer').style.color='red';
+      // console.log(distance);
+        
+      // If the count down is over, write some text 
+      if (distance < 60000 && distance > 59000) {
+        // alert('10 Seconds Left!');
+        document.getElementById('timer').style.color='red';
 
-    }
-    if (distance < 0)
-    {      
-      // submit the form automatically
-      // submitExam();
+      }
+      if (distance < 0)
+      {      
+        // submit the form automatically
+        // submitExam();
 
-      clearInterval(x);
-      document.getElementById("timer").innerHTML = '<span style="color:#d00">অনুগ্রহ পূর্বক অপেক্ষা করুন...</span>';
-      // document.getElementById('questions_panel').innerHTML = '<div class="box box-warning"><a class="btn btn-warning" href="{{route("students.exam")}}">Back</div>';
+        clearInterval(x);
+        document.getElementById("timer").innerHTML = '<span style="color:#d00">অনুগ্রহ পূর্বক অপেক্ষা করুন...</span>';
         updatePaper();
-    }
-  }, 1000);
+      }
+    }, 1000);
+  }
 
   // update paper by ajax
   function updatePaper()
   {
     $.ajax({
       type : 'GET',
-      url : '{{route("paper.update.ajax", "$value->id")}}',
+      url : '{{route("paper.update.ajax", $value->id)}}',
       success : function(data){
         // console.log(data);
         if(data.success == true)
