@@ -61,7 +61,7 @@ $user = Auth::guard('student')->user();
             <h1> Results </h1>
           </div>
 
-          @if(isset($papers))
+          @if(isset($papers) && isset($user))
 
           <div class="row">
             <div class="col-md-12 no-padding">
@@ -123,7 +123,7 @@ $user = Auth::guard('student')->user();
             </div>
           </div> <!-- /.row -->
           @endif
-          
+
           <div class="home-services-area">
 
             <div class="row g-2 g-md-3 g-lg-4" style="--bs-gutter-x: 0.3rem !important;">

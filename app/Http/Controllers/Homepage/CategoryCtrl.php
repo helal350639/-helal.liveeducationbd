@@ -361,11 +361,15 @@ class CategoryCtrl extends Controller
   public function resultOption()
   {
     $student = Auth::guard('student')->user();
-    $paper_ids = Exam::where('student_id', $student->id)
-    ->where('created_at', 'like', date('Y-m-d').'%')
-    ->pluck('paper_id')->toArray();
-    // dd($paper_ids);
-    $papers = Paper::whereIn('id', $paper_ids)->get();
+    $papers = [];
+    
+    if($student)
+    {
+      $paper_ids = Exam::where('student_id', $student->id)
+      ->where('created_at', 'like', date('Y-m-d').'%')
+      ->pluck('paper_id')->toArray();
+      $papers = Paper::whereIn('id', $paper_ids)->get();
+    }
 
     return view('homepage.result-option', compact('student', 'papers'));
   }
