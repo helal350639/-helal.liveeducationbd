@@ -240,12 +240,6 @@ class CategoryCtrl extends Controller
     $departments = $batch->departments()
     ->where('departments.status', 'Active');
 
-    if($dashboard == 'Dashboard' && $student)
-    {
-      $student_departments = $student->departments->pluck('id')->toArray();
-      $departments = $departments->whereIn('departments.id', $student_departments);
-    }
-
     if($type == 'Free Exams' || $type == 'Premium Exams')
     {
       $departments = $departments->leftJoin('papers', 'departments.id', 'papers.department_id')
@@ -319,6 +313,13 @@ class CategoryCtrl extends Controller
       ->where('questions.status', 'Active')
       ->groupBy('departments.id', 'departments.name', 'batch_department.batch_id', 'batch_department.department_id')
       ->select('departments.id', 'departments.name', 'batch_department.batch_id', 'batch_department.department_id');
+    }
+
+    //for auth student
+    if($dashboard == 'Dashboard' && $student)
+    {
+      $student_departments = $student->departments->pluck('id')->toArray();
+      $departments = $departments->whereIn('departments.id', $student_departments);
     }
 
     $departments = $departments->get();
