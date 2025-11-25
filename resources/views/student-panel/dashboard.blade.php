@@ -242,7 +242,7 @@ font-size: 16px;
                <a href="{{route('category.result.option')}}">
                   <div class="corce_exam_mobile_res">
                      <div>
-                        <span>রেজাল্ট</span>
+                        <span>রেজাল্ট/সলুশন</span>
                         <h3>{{$data['result']}}</h3>
                      </div>
                      <div class="corce_exam-icon">

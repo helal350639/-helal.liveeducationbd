@@ -363,12 +363,14 @@ class CategoryCtrl extends Controller
   {
     $student = Auth::guard('student')->user();
     $papers = [];
+    $batch = '';
     
     if($student)
     {
-      $paper_ids = Exam::where('student_id', $student->id)
-      ->where('created_at', 'like', date('Y-m-d').'%')
-      ->pluck('paper_id')->toArray();
+      $exam = Exam::where('student_id', $student->id)
+      ->where('created_at', 'like', date('Y-m-d').'%');
+
+      $paper_ids = $exam->pluck('paper_id')->toArray();
       $papers = Paper::whereIn('id', $paper_ids)->get();
     }
 
@@ -483,8 +485,8 @@ class CategoryCtrl extends Controller
     }
 
     $results = $results->where('papers.department_id', $department_id)
-    ->groupBy('papers.id', 'papers.name')
-    ->select('papers.id', 'papers.name');
+    ->groupBy('papers.id', 'papers.name', 'papers.open')
+    ->select('papers.id', 'papers.name', 'papers.open');
     $results = $results->get();
 
     // dd($results);

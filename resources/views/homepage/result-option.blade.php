@@ -61,15 +61,13 @@ $user = Auth::guard('student')->user();
             <h1> Results </h1>
           </div>
 
-          @if(isset($papers) && isset($user))
+          @if(isset($papers) && isset($user) && $papers->count())
 
           <div class="row">
             <div class="col-md-12 no-padding">
               <div class="all-courses-area">
-                <h4 class="text-center">Recent</h4>
+                <h4 class="text-center">Recent Exams Result</h4>
                 <div class="row justify-content-center g-3">
-  
-                  @if($papers->count())
   
                     @foreach($papers as $key => $paper)
   
@@ -95,7 +93,9 @@ $user = Auth::guard('student')->user();
                             </p>
                           </div>
                           <div class="v-button d-flex flex-wrap gap-2">
+                            @if(date('Y-m-d H:i:s', strtotime($paper->open.' +12 hours')) < date('Y-m-d H:i:s'))
                             <a href="{{route('students.solution', $paper->id)}}" class="btn btn-sm btn-success"> সল্যুশন</a>
+                            @endif
   
                             @if($student && $paper->exams()->where('student_id', $student->id)->first())
   
@@ -106,7 +106,7 @@ $user = Auth::guard('student')->user();
                             @endif
                             
                             {{-- {{route('home.results', $paper->id)}} --}}
-                            <a href="{{route('home.coming-soon')}}" class="btn btn-sm btn-info text-white"> মেধাক্রম </a>
+                            {{-- <a href="{{route('home.coming-soon')}}" class="btn btn-sm btn-info text-white"> মেধাক্রম </a> --}}
                             @if($paper->close < date('Y-m-d H:i:s'))
                             <p></p>
                             @endif
@@ -115,8 +115,6 @@ $user = Auth::guard('student')->user();
                       </div>
   
                     @endforeach
-  
-                  @endif
   
                 </div>
               </div>
