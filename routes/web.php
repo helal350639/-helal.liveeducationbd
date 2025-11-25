@@ -329,6 +329,7 @@ Route::middleware(['auth'])->group(function()
       Route::get('detach/{paperId}/{questionId}', 'detachQuestion')->name('paper.detach.question');
     });
     Route::get('paper-search', 'search')->name('paper.search');
+    Route::get('get-papers/{id}', 'getPapers')->name('get.papers');
 	});
 
 	Route::controller(BatchCtrl::class)->group(function()

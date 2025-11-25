@@ -536,4 +536,14 @@ class PaperCtrl extends Controller
         );
         // return 'I am responding from server with id:'.$qid;
     }
+
+    public function getPapers($id)
+    {
+      $papers = Paper::where('department_id', $id)
+      ->select('id', 'name')
+      ->get();
+      return response()->json([
+        'papers' => $papers
+      ], 200);
+    }
 }

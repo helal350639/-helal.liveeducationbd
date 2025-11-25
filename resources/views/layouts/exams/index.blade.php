@@ -20,6 +20,60 @@ $source = New SourceCtrl;
   <div class="row">
     <div class="col-xs-12">
       <div class="box">
+        <div class="box-body">
+          <form action="{{route('exam.index')}}" method="GET">
+            <div class="col-md-2">
+              <div class="form-group">
+                <label for="course_id">Course</label>
+                <select name="course_id" id="course_id" class="form-control" onchange="getBatches(this)">
+                  <option value="">Select One</option>
+                  @foreach($courses as $course)
+                  <option value="{{$course->id}}" {{request('course_id') == $course->id ? 'selected': ''}}>{{$course->name}}</option>
+                  @endforeach
+                </select>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="form-group">
+                <label for="batch_id">Batch</label>
+                <select name="batch_id" id="batch_id" class="form-control" onchange="getDepartments(this)">
+                  <option value="">Select One</option>
+                  @foreach($batches as $batch)
+                  <option value="{{$batch->id}}" {{request('batch_id') == $batch->id ? 'selected': ''}}>{{$batch->name}}</option>
+                  @endforeach
+                </select>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="form-group">
+                <label for="department_id">Department</label>
+                <select name="department_id" id="department_id" class="form-control" onchange="getPapers(this)">
+                  <option value="">Select One</option>
+                  @foreach($departments as $department)
+                  <option value="{{$department->id}}" {{request('department_id') == $department->id ? 'selected': ''}}>{{$department->name}}</option>
+                  @endforeach
+                </select>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="form-group">
+                <label for="paper_id">Paper</label>
+                <select name="paper_id" id="paper_id" class="form-control">
+                  <option value="">Select One</option>
+                  @foreach($papers as $paper)
+                  <option value="{{$paper->id}}" {{request('paper_id') == $paper->id ? 'selected': ''}}>{{$paper->name}}</option>
+                  @endforeach
+                </select>
+              </div>
+            </div>
+            <div class="col-md-2"><br>
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="box">
         <div class="box-header">
           <h3 class="box-title">List of Exam</h3>
           <div class="box-tools">
@@ -54,8 +108,8 @@ $source = New SourceCtrl;
                 @foreach($exams as $key => $value)
                 <tr>
                   <td>{{$key+1}}</td>
-                  <td>{{$value->student->name}}</td>
-                  <td>{{str_pad($value->student->id, 6, '0', STR_PAD_LEFT)}}</td>
+                  <td>{{$value->student?$value->student->name:''}}</td>
+                  <td>{{str_pad($value->student?$value->student->id:'', 6, '0', STR_PAD_LEFT)}}</td>
                   <td>{{!empty($value->paper->department) ?$value->paper->department->name : ''}}</td>
                   <td>{{$source->tformat($value->start_at).' - '.$source->tformat($value->end_at)}}</td>
                   <td>
@@ -99,18 +153,109 @@ $source = New SourceCtrl;
     </section>
     <!-- /.content -->
     @endsection
-{{-- @section('scripts')
+@section('scripts')
   <script>
-    $(function () {
-      $('#example1').DataTable()
-      $('#example2').DataTable({
-        'paging'      : true,
-        'lengthChange': false,
-        'searching'   : false,
-        'ordering'    : true,
-        'info'        : true,
-        'autoWidth'   : false
-      })
-    })
+    function getBatches(e)
+{
+    let ids = Array.from(e.selectedOptions).map(({value}) => value);
+
+    $.ajax({
+        type: 'GET', //THIS NEEDS TO BE GET
+        url: '/get_batches/' + ids,
+        success: function (data) {
+
+            var obj = JSON.parse(JSON.stringify(data));
+            var options = '<option value="">Select One</option>';
+
+            $.each(obj['data'], function (key, val) {
+                options += '<option value="'+val.id+'">'+val.name+'</option>';
+            });
+
+            if(options != ""){
+                $("#batch_id").html(options);
+                $("#department_id").html('<option value="">Select One</option>');
+            }else{
+                $("#batch_id").html('');
+            }
+        },
+        error: function(data) { 
+                console.log('data error');
+        }
+    });
+}
+
+// on change batch get departments
+function getDepartments(e)
+{
+    let ids = Array.from(e.selectedOptions).map(({value}) => value);
+
+    $.ajax({
+        type: 'GET', //THIS NEEDS TO BE GET
+        url: '/get_departments_by_batch/' + ids,
+        success: function (data) {
+
+            var obj = JSON.parse(JSON.stringify(data));
+            var options = '<option value="">Select One</option>';
+
+            $.each(obj['data'], function (key, val) {
+                options += '<option value="'+val.id+'">'+val.name+'</option>';
+            });
+
+            if(options != ""){
+                $("#department_id").html(options)
+            }else{
+                $("#department_id").html('')
+            }
+        },
+        error: function(data) { 
+          console.log('data error');
+        }
+    });
+}
+
+  // on change batch get departments
+  function getPapers(e)
+  {
+    let current_paper = "{{request('paper_id')}}";
+    // let ids = Array.from(e.selectedOptions).map(({value}) => value);
+    let id = e.options[e.selectedIndex].value;
+
+    $.ajax({
+      type: 'GET', //THIS NEEDS TO BE GET
+      url: '/get-papers/' + id,
+      success: function (data) {
+
+          var obj = JSON.parse(JSON.stringify(data));
+          var options = '<option value="">Select One</option>';
+
+          $.each(obj['papers'], function (key, val) {
+              options += '<option value="'+val.id+'">'+val.name+'</option>';
+          });
+
+          if(options != ""){
+              $("#paper_id").html(options)
+          }else{
+              $("#paper_id").html('')
+          }
+        },
+        error: function(data) { 
+          console.log('data error');
+        }
+    });
+  }
+  // onload call
+  // getPapers(document.getElementById('paper_id'));
+
+    // $(function () {
+    //   $('#example1').DataTable()
+    //   $('#example2').DataTable({
+    //     'paging'      : true,
+    //     'lengthChange': false,
+    //     'searching'   : false,
+    //     'ordering'    : true,
+    //     'info'        : true,
+    //     'autoWidth'   : false
+    //   })
+    // })
   </script>
-@endsection --}}
+@endsection

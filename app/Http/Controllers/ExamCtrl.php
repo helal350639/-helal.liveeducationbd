@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Course;
+use App\Models\Department;
 use App\Models\Batch;
 use App\Models\Group;
 use App\Models\Exam;
@@ -27,10 +29,46 @@ class ExamCtrl extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $exams = Exam::orderBy('id','DESC')->paginate(25);
-        return view('layouts.exams.index', compact('exams'));
+      $courses = Course::where('status', 'Active')
+      ->select('id', 'name')
+      ->get();
+
+      $batches = Batch::where('status', 'Active')
+      ->select('id', 'name')
+      ->get();
+
+      $departments = Department::where('status', 'Active')
+      ->select('id', 'name')
+      ->get();
+
+      $papers = Paper::where('status', 'Published')
+      ->select('id', 'name')
+      ->get();
+
+      $course_id = $request->input('course_id');
+      $batch_id = $request->input('batch_id');
+      $department_id = $request->input('department_id');
+      $paper_id = $request->input('paper_id');
+
+      $exams = Exam::orderBy('id','DESC')
+      // ->when($course_id, function($query, $course_id){
+      //   $query->where('course_id', $course_id);
+      // })
+      // ->when($batch_id, function($query, $batch_id){
+      //   $query->where('batch_id', $batch_id);
+      // })
+      // ->when($department_id, function($query, $department_id){
+      //   $query->where('department_id', $department_id);
+      // })
+      ->when($paper_id, function($query, $paper_id){
+        $query->where('paper_id', $paper_id);
+      })
+      ->paginate(25)
+      ->withQueryString();
+
+      return view('layouts.exams.index', compact('exams', 'courses', 'batches', 'departments', 'papers'));
     }
 
     public function live()
