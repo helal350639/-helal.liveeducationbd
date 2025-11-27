@@ -470,8 +470,9 @@ class CategoryCtrl extends Controller
   {
     $batch = Batch::find($batch_id);
     $department = Department::find($department_id);
-    $results = Paper::where('exams.status', 'Completed')
-    ->leftJoin('exams', 'papers.id', 'exams.paper_id')
+    $results = Paper::whereRaw('DATE(papers.close) < ?', date('Y-m-d'))
+    // ->where('exams.status', 'Completed')
+    // ->leftJoin('exams', 'papers.id', 'exams.paper_id')
     ->where('papers.batch_id', $batch_id)
     ->orderBy('papers.open', 'ASC');
 

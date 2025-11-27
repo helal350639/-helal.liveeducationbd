@@ -36,7 +36,9 @@ $user = Auth::guard('student')->user();
                     </div>
                     <div class="package-exam-content mx-2 mx-lg-3">
                       <div class="package-exam-title pt-3">
-                        <h2><a href="{{route('category.department', [$type, $value->id])}}">{{mb_substr($value->name, 0, 20)}}</a></h2>
+                        <h2>
+                          <a href="{{route('category.department', [$type, $value->id])}}">{{$value->name}}</a>
+                        </h2>
                       </div>
                       <div class="row button-and-price pb-3 pb-lg-4">
                         <div class="col">

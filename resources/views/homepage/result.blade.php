@@ -91,9 +91,9 @@ if($user)
                           </p>
                         </div>
                         <div class="v-button d-flex flex-wrap gap-2">
-                          @if(date('Y-m-d H:i:s', strtotime($paper->open.' +12 hours')) < date('Y-m-d H:i:s'))
+                          {{-- @if(date('Y-m-d H:i:s', strtotime($paper->open.' +12 hours')) < date('Y-m-d H:i:s')) --}}
                           <a href="{{route('students.solution', $paper->id)}}" class="btn btn-sm btn-success"> সল্যুশন</a>
-                          @endif
+                          {{-- @endif --}}
 
                           @if($student && $paper->exams()->where('student_id', $student->id)->first())
 

@@ -62,7 +62,7 @@ if($user)
 
                   @foreach($papers as $key => $paper)
 
-                    <div class="col-lg-8 col-md-10 col-sm-12" title="{{$paper->open}}">
+                    <div class="col-lg-8 col-md-10 col-sm-12" title="{{$source->dtformat($paper->close)}}">
                       <div class="border accordion-body-content d-flex justify-content-between align-items-center flex-wrap p-3 py-2">
                         <div class="text d-flex align-items-center list-content">
                           <div class="course_exam-icon">
