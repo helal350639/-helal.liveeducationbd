@@ -206,6 +206,8 @@ class StudentCtrl extends Controller
      */
     public function destroy($id)
     {
+      if(Auth::user()->AuthorizeRoles('SuperAdmin'))
+      {
         $student = Student::find($id);
         if(File::exists($student->image))
         {
@@ -215,6 +217,8 @@ class StudentCtrl extends Controller
         $student->delete();
         Session::flash('success', 'Student Successfully Removed');
         return redirect()->route('student.index');
+      }
+      return back()->with('error', 'Permission Denied');
     }
 
     // ----------------------- profile route ------------

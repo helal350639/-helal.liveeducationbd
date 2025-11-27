@@ -189,6 +189,8 @@ class AnswerFileCtrl extends Controller
      */
     public function destroy($id)
     {
+      if(Auth::user()->authorizeRoles(['SuperAdmin']))
+      {
         $file = AnswerFile::find($id);
         $xfile = public_path($file->file);
            
@@ -202,6 +204,8 @@ class AnswerFileCtrl extends Controller
             'message' => 'File successfully deleted!',
             'file' => $file
         ]);
+      }
+      return back()->with('error', 'Permission Denied');
     }
     
 }

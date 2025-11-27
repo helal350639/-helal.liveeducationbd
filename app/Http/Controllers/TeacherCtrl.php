@@ -191,6 +191,8 @@ class TeacherCtrl extends Controller
      */
     public function destroy($id)
     {
+      if(Auth::user()->AuthorizeRoles('SuperAdmin'))
+      {
         $teacher = Teacher::find($id);
         if(File::exists($teacher->image))
         {
@@ -200,6 +202,8 @@ class TeacherCtrl extends Controller
         $teacher->delete();
         Session::flash('success', 'Teacher account Successfully Removed');
         return redirect()->route('teacher.index');
+      }
+      return back()->with('error', 'Permission Denied');
     }
 
     // ----------------------- profile route ------------

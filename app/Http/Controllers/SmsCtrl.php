@@ -206,22 +206,20 @@ class SmsCtrl extends Controller
      */
     public function destroy($id)
     {
-        if(Auth::user()->AuthorizeRoles('SuperAdmin'))
-        {
-            $sms = Sms::find($id);
+      if(Auth::user()->AuthorizeRoles('SuperAdmin'))
+      {
+        $sms = Sms::find($id);
 
-            // delete all relationship
-            // $sms->papers()->detach();
+        // delete all relationship
+        // $sms->papers()->detach();
 
-            //delete group table
-            $sms->delete();
+        //delete group table
+        $sms->delete();
 
-            Session::flash('Success','The sms successfully deleted');
-            return redirect()->route('sms.index');
-        }
-
-        Session::flash('error', 'Permission restricted!');
-        return back();
+        Session::flash('Success','The sms successfully deleted');
+        return redirect()->route('sms.index');
+      }
+      return back()->with('error', 'Permission Denied');
     }
 
     /** get students according to the batch */

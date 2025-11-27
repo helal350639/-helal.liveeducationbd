@@ -196,24 +196,23 @@ class SemesterCtrl extends Controller
      */
     public function destroy($id)
     {
-        if(Auth::user()->AuthorizeRoles('SuperAdmin'))
-        {
-            $semester = Semester::find($id);
+      if(Auth::user()->AuthorizeRoles('SuperAdmin'))
+      {
+        $semester = Semester::find($id);
 
-            $semester->courses()->detach();
-            $semester->departments()->detach();
-            $semester->subjects()->detach();
-            // $semester->chapters()->detach();
-            $semester->questions()->detach();
+        $semester->courses()->detach();
+        $semester->departments()->detach();
+        $semester->subjects()->detach();
+        // $semester->chapters()->detach();
+        $semester->questions()->detach();
 
-            $semester->delete();
+        $semester->delete();
 
-            Session::flash('Success','The semester successfully delete');
-            return redirect()->route('semester.index');
-        }
-
-        Session::flash('error', 'Permission restricted!');
-        return back();
+        Session::flash('Success','The semester successfully delete');
+        return redirect()->route('semester.index');
+      
+      }
+      return back()->with('error', 'Permission Denied');
     }    
 
     /** -------------- custom methods ------------- */

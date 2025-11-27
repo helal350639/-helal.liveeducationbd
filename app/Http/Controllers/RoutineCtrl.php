@@ -279,8 +279,6 @@ class RoutineCtrl extends Controller
         Session::flash('Success','The routine successfully deleted');
         return redirect()->route('routine.index');
       }
-
-      Session::flash('error', 'Permission restricted!');
-      return back();
+      return back()->with('error', 'Permission Denied');
     }
 }

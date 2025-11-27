@@ -182,23 +182,21 @@ class FilterCtrl extends Controller
      */
     public function destroy($id)
     {
-        if(Auth::user()->AuthorizeRoles('SuperAdmin'))
-        {
-            $filter = Filter::find($id);
-            
-            if (File::exists($filter->image)) {
-                File::delete($filter->image);
-            }
-            $filter->delete();
-
-            $filter->courses()->detach();
-
-            Session::flash('Success','This filter Successfully delete');
-            return redirect()->route('filter.index');
+      if(Auth::user()->AuthorizeRoles('SuperAdmin'))
+      {
+        $filter = Filter::find($id);
+        
+        if (File::exists($filter->image)) {
+            File::delete($filter->image);
         }
+        $filter->delete();
 
-        Session::flash('error', 'Permission restricted!');
-        return back();
+        $filter->courses()->detach();
+
+        Session::flash('Success','This filter Successfully delete');
+        return redirect()->route('filter.index');
+      }
+      return back()->with('error', 'Permission Denied');
     }
 
     /** -------------- custom methods ------------- */

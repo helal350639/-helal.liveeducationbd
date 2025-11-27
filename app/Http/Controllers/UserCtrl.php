@@ -165,6 +165,8 @@ class UserCtrl extends Controller
      */
     public function destroy($id)
     {
+      if(Auth::user()->AuthorizeRoles('SuperAdmin'))
+      {
         $user = User::find($id);
         if (File::exists($user->image)) {
             File::delete($user->image);
@@ -173,6 +175,8 @@ class UserCtrl extends Controller
         $user->delete();
         Session::flash('success', 'User Successfully Removed');
         return redirect()->route('users.index');
+      }
+      return back()->with('error', 'Permission Denied');
     }
 
     // ----------------------- profile route ------------

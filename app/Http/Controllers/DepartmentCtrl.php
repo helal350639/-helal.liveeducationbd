@@ -182,24 +182,22 @@ class DepartmentCtrl extends Controller
     {
         if(Auth::user()->AuthorizeRoles('SuperAdmin'))
         {
-            $department = Department::find($id);
+          $department = Department::find($id);
 
-            // remove relationship
-            $department->courses()->detach();
-            $department->semesters()->detach();
-            $department->subjects()->detach();
-            // $department->chapters()->detach();
-            $department->questions()->detach();
+          // remove relationship
+          $department->courses()->detach();
+          $department->semesters()->detach();
+          $department->subjects()->detach();
+          // $department->chapters()->detach();
+          $department->questions()->detach();
 
-            // delete department table
-            $department->delete();
+          // delete department table
+          $department->delete();
 
-            Session::flash('Success','The department Successfully delete');
-            return redirect()->route('department.index');
+          Session::flash('Success','The department Successfully delete');
+          return redirect()->route('department.index');
         }
-
-        Session::flash('error', 'Permission restricted!');
-        return back();
+        return back()->with('error', 'Permission Denied');
     }
 
     /** -------------- custom methods ------------- */

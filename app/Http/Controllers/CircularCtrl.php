@@ -262,6 +262,8 @@ class CircularCtrl extends Controller
      */
     public function destroy($id)
     {
+      if(Auth::user()->AuthorizeRoles('SuperAdmin'))
+      {
         $file = Circular::find($id);
         $xfile = public_path($file->pdf);
 
@@ -286,6 +288,8 @@ class CircularCtrl extends Controller
 
         Session::flash('success', 'The circular successfully deleted.');        
         return redirect()->route('circular.index');
+      }
+      return back()->with('error', 'Permission Denied');
     }
     
 }

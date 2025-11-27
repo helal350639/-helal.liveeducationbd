@@ -252,22 +252,20 @@ class SyllabusCtrl extends Controller
      */
     public function destroy($id)
     {
-        if(Auth::user()->AuthorizeRoles('SuperAdmin'))
-        {
-            $syllabus = Syllabus::find($id);
+      if(Auth::user()->AuthorizeRoles('SuperAdmin'))
+      {
+        $syllabus = Syllabus::find($id);
 
-            // delete all relationship
-            $syllabus->questions()->detach();
+        // delete all relationship
+        $syllabus->questions()->detach();
 
-            //delete group table
-            $syllabus->delete();
+        //delete group table
+        $syllabus->delete();
 
-            Session::flash('Success','The syllabus successfully deleted');
-            return redirect()->route('syllabus.index');
-        }
-
-        Session::flash('error', 'Permission restricted!');
-        return back();
+        Session::flash('Success','The syllabus successfully deleted');
+        return redirect()->route('syllabus.index');        
+      }
+      return back()->with('error', 'Permission Denied');
     }
 
     //custom routes

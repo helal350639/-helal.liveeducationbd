@@ -739,6 +739,8 @@ class QuestionCtrl extends Controller
      */
     public function destroy($id)
     {
+      if(Auth::user()->AuthorizeRoles('SuperAdmin'))
+      {
         $mcq = Question::find($id);
 
         if($mcq->type == 'MCQ')
@@ -784,6 +786,8 @@ class QuestionCtrl extends Controller
 
         Session::flash('Success','The question successfully deleted');
         return redirect()->route('question.index');
+      }
+      return back()->with('error', 'Permission Denied');
     }
 
     //ajax request methods

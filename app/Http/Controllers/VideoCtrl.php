@@ -190,6 +190,8 @@ class VideoCtrl extends Controller
      */
     public function destroy($id)
     {
+      if(Auth::user()->AuthorizeRoles('SuperAdmin'))
+      {
         $video = Video::find($id);
 
         if($video->image)
@@ -205,6 +207,8 @@ class VideoCtrl extends Controller
 
         Session::flash('success', 'The video successfully deleted.');        
         return redirect()->route('video.index');
+      }
+      return back()->with('error', 'Permission Denied');
     }
     
 }

@@ -102,6 +102,10 @@ class PageCtrl extends Controller
 
   public function destroy($id)
   {
-    //
+    if(Auth::user()->AuthorizeRoles('SuperAdmin'))
+    {
+      //
+    }
+    return back()->with('error', 'Permission Denied');
   }
 }

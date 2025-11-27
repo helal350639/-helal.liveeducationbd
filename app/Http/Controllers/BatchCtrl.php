@@ -213,24 +213,22 @@ class BatchCtrl extends Controller
      */
     public function destroy($id)
     {
-        if(Auth::user()->AuthorizeRoles('SuperAdmin'))
-        {
-          $course = Batch::find($id);
+      if(Auth::user()->AuthorizeRoles('SuperAdmin'))
+      {
+        $course = Batch::find($id);
 
-          // delete all relationship
-          // $course->courses()->detach();
-          // $course->departments()->detach();
-          $course->papers()->detach();
+        // delete all relationship
+        // $course->courses()->detach();
+        // $course->departments()->detach();
+        $course->papers()->detach();
 
-          //delete course table
-          $course->delete();
+        //delete course table
+        $course->delete();
 
-          Session::flash('Success','The batch successfully deleted');
-          return redirect()->route('batch.index');
-        }
-
-        Session::flash('error', 'Permission restricted!');
-        return back();
+        Session::flash('Success','The batch successfully deleted');
+        return redirect()->route('batch.index');
+      }
+      return back()->with('error', 'Permission Denied');
     }
 
     /** -------------- custom methods ------------- */

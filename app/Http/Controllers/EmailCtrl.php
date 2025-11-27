@@ -221,20 +221,18 @@ class EmailCtrl extends Controller
     {
         if(Auth::user()->AuthorizeRoles('SuperAdmin'))
         {
-            $email = Email::find($id);
+          $email = Email::find($id);
 
-            // delete all relationship
-            // $email->papers()->detach();
+          // delete all relationship
+          // $email->papers()->detach();
 
-            //delete group table
-            $email->delete();
+          //delete group table
+          $email->delete();
 
-            Session::flash('Success','The email successfully deleted');
-            return redirect()->route('email.index');
+          Session::flash('Success','The email successfully deleted');
+          return redirect()->route('email.index');
         }
-
-        Session::flash('error', 'Permission restricted!');
-        return back();
+        return back()->with('error', 'Permission Denied');
     }
 
     /** get students according to the batch */

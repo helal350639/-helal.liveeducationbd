@@ -149,12 +149,16 @@ class CircularTypeCtrl extends Controller
      */
     public function destroy($id)
     {
+      if(Auth::user()->AuthorizeRoles('SuperAdmin'))
+      {
         $file = CircularType::find($id);
         $file->delete();
 
         Session::flash('success', 'Circular Type deleted.');
 
         return redirect()->route('circular-type.index');
+      }
+      return back()->with('error', 'Permission Denied');
     }
     
 }

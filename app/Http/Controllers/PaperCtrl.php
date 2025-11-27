@@ -248,6 +248,8 @@ class PaperCtrl extends Controller
      */
     public function destroy($id)
     {
+      if(Auth::user()->AuthorizeRoles('SuperAdmin'))
+      {
         $paper = Paper::find($id);
         $xbanner = public_path($paper->banner);
            
@@ -263,6 +265,8 @@ class PaperCtrl extends Controller
         Session::flash('success', 'The question paper successfully deleted!');
         // return redirect()->route('paper.index');
         return back();
+      }
+      return back()->with('error', 'Permission Denied');
     }
 
     //custom routes

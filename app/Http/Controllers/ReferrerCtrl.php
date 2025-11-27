@@ -82,6 +82,10 @@ class ReferrerCtrl extends Controller
      */
     public function destroy(string $id)
     {
+      if(Auth::user()->AuthorizeRoles('SuperAdmin'))
+      {
         //
+      }
+      return back()->with('error', 'Permission Denied');
     }
 }

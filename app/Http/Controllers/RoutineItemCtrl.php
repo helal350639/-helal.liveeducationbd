@@ -176,29 +176,33 @@ class RoutineItemCtrl extends Controller
   //delete routine item
   public function deleteItem($id)
   {
-    $item_row = RoutineItemRow::find($id);
-    $subject_rows =  RoutineSubjectRow::where('item_id', $id)->get();
-    $department_rows =  RoutineDepartmentRow::where('item_id', $id)->get();
-
-    if($subject_rows)
+    if(Auth::user()->AuthorizeRoles('SuperAdmin'))
     {
-      foreach($subject_rows as $row)
+      $item_row = RoutineItemRow::find($id);
+      $subject_rows =  RoutineSubjectRow::where('item_id', $id)->get();
+      $department_rows =  RoutineDepartmentRow::where('item_id', $id)->get();
+
+      if($subject_rows)
       {
-        $row->delete();
+        foreach($subject_rows as $row)
+        {
+          $row->delete();
+        }
       }
-    }
 
-    if($department_rows)
-    {
-      foreach($department_rows as $row)
+      if($department_rows)
       {
-        $row->delete();
+        foreach($department_rows as $row)
+        {
+          $row->delete();
+        }
       }
+
+      $item_row->delete();
+
+      Session::flash('success', 'The item deleted');
+      return back();
     }
-
-    $item_row->delete();
-
-    Session::flash('success', 'The item deleted');
-    return back();
+    return back()->with('error', 'Permission Denied');
   }
 }

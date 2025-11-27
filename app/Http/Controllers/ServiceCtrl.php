@@ -176,6 +176,8 @@ class ServiceCtrl extends Controller
      */
     public function destroy($id)
     {
+      if(Auth::user()->AuthorizeRoles('SuperAdmin'))
+      {
         $service = Service::find($id);
 
         if($service->image)
@@ -191,6 +193,9 @@ class ServiceCtrl extends Controller
 
         Session::flash('success', 'The service successfully deleted.');        
         return redirect()->route('service.index');
+      
+      }
+      return back()->with('error', 'Permission Denied');
     }
     
 }

@@ -177,27 +177,25 @@ class CourseCtrl extends Controller
      */
     public function destroy($id)
     {
-        if(Auth::user()->AuthorizeRoles('SuperAdmin'))
-        {
-            $course = Course::find($id);
+      if(Auth::user()->AuthorizeRoles('SuperAdmin'))
+      {
+        $course = Course::find($id);
 
-            // delete all relationship
-            $course->departments()->detach();
-            $course->semesters()->detach();
-            $course->subjects()->detach();
-            // $course->chapters()->detach();
-            $course->questions()->detach();
-            $course->filters()->detach();
+        // delete all relationship
+        $course->departments()->detach();
+        $course->semesters()->detach();
+        $course->subjects()->detach();
+        // $course->chapters()->detach();
+        $course->questions()->detach();
+        $course->filters()->detach();
 
-            //delete course table
-            $course->delete();
+        //delete course table
+        $course->delete();
 
-            Session::flash('Success','The course successfully deleted');
-            return redirect()->route('course.index');
-        }
-
-        Session::flash('error', 'Permission restricted!');
-        return back();
+        Session::flash('Success','The course successfully deleted');
+        return redirect()->route('course.index');
+      }
+      return back()->with('error', 'Permission Denied');
     }
     
 }

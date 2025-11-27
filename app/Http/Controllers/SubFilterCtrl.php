@@ -161,6 +161,8 @@ class SubFilterCtrl extends Controller
      */
     public function destroy($id)
     {
+      if(Auth::user()->AuthorizeRoles('SuperAdmin'))
+      {
         $subfilter = SubFilter::find($id);
            
         if (File::exists('img/subfilter/' .$subfilter->image)) {
@@ -170,6 +172,8 @@ class SubFilterCtrl extends Controller
 
         Session::flash('Success','This subfilter Successfully delete');
         return redirect()->route('sub-filter.index');
+      }
+      return back()->with('error', 'Permission Denied');
     }
     
 }

@@ -217,25 +217,23 @@ class SubjectCtrl extends Controller
      */
     public function destroy($id)
     {
-        if(Auth::user()->AuthorizeRoles('SuperAdmin'))
-        {
-            $subject = Subject::find($id);
+      if(Auth::user()->AuthorizeRoles('SuperAdmin'))
+      {
+        $subject = Subject::find($id);
 
-            // remove relationship
-            $subject->courses()->detach();
-            $subject->departments()->detach();
-            $subject->semesters()->detach();
-            $subject->chapters()->detach();
-            $subject->questions()->detach();
+        // remove relationship
+        $subject->courses()->detach();
+        $subject->departments()->detach();
+        $subject->semesters()->detach();
+        $subject->chapters()->detach();
+        $subject->questions()->detach();
 
-            $subject->delete();
+        $subject->delete();
 
-            Session::flash('Success','This subject Successfully delete');
-            return redirect()->route('subject.index');
-        }
-
-        Session::flash('error', 'Permission restricted!');
-        return back();
+        Session::flash('Success','This subject Successfully delete');
+        return redirect()->route('subject.index');        
+      }
+      return back()->with('error', 'Permission Denied');
     }
 
     /** -------------- custom methods ------------- */

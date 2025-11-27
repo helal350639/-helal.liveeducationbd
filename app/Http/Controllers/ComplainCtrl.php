@@ -168,6 +168,8 @@ class ComplainCtrl extends Controller
      */
     public function destroy($id)
     {
+      if(Auth::user()->AuthorizeRoles('SuperAdmin'))
+      {
         $file = Complain::find($id);
         $xfile = public_path($file->file);
            
@@ -185,6 +187,8 @@ class ComplainCtrl extends Controller
         //     'message' => 'File successfully deleted!',
         //     'file' => $file
         // ]);
+      }
+      return back()->with('error', 'Permission Denied');
     }
 
     public function reply(Request $request)

@@ -179,21 +179,25 @@ class AdCtrl extends Controller
      */
     public function destroy($id)
     {
-      $ad = Ad::find($id);
-
-      if($ad->image)
+      if(Auth::user()->authorizeRoles(['SuperAdmin']))
       {
-        $img_path = public_path($ad->image);
-        if(File::exists($img_path))
+        $ad = Ad::find($id);
+
+        if($ad->image)
         {
-          File::delete($img_path);
+          $img_path = public_path($ad->image);
+          if(File::exists($img_path))
+          {
+            File::delete($img_path);
+          }
         }
+
+        $ad->delete();
+
+        Session::flash('success', 'The ad successfully deleted.');        
+        return redirect()->route('ad.index');
       }
-
-      $ad->delete();
-
-      Session::flash('success', 'The ad successfully deleted.');        
-      return redirect()->route('ad.index');
+      return back()->with('error', 'Permission Denied');
     }
     
 }

@@ -234,25 +234,23 @@ class ChapterCtrl extends Controller
      */
     public function destroy($id)
     {
-        if(Auth::user()->AuthorizeRoles('SuperAdmin'))
-        {
-            $chapter = Chapter::find($id);
+      if(Auth::user()->AuthorizeRoles('SuperAdmin'))
+      {
+        $chapter = Chapter::find($id);
 
-            // remove relationship
-            // $chapter->courses()->detach();
-            // $chapter->departments()->detach();
-            // $chapter->semesters()->detach();
-            $chapter->subjects()->detach();
-            $chapter->questions()->detach();
+        // remove relationship
+        // $chapter->courses()->detach();
+        // $chapter->departments()->detach();
+        // $chapter->semesters()->detach();
+        $chapter->subjects()->detach();
+        $chapter->questions()->detach();
 
-            $chapter->delete();
+        $chapter->delete();
 
-            Session::flash('Success','This chapter Successfully deleted');
-            return redirect()->route('chapter.index');
-        }        
-
-        Session::flash('error', 'Permission restricted!');
-        return back();
+        Session::flash('Success','This chapter Successfully deleted');
+        return redirect()->route('chapter.index');
+      }
+      return back()->with('error', 'Permission Denied');
     }
 
     /** -------------- custom methods ------------- */

@@ -209,22 +209,20 @@ class ExamCtrl extends Controller
      */
     public function destroy($id)
     {
-        if(Auth::user()->AuthorizeRoles('SuperAdmin'))
-        {
-            $exam = Exam::find($id);
+      if(Auth::user()->AuthorizeRoles('SuperAdmin'))
+      {
+        $exam = Exam::find($id);
 
-            // delete all relationship
-            $exam->choices()->delete();
+        // delete all relationship
+        $exam->choices()->delete();
 
-            //delete group table
-            $exam->delete();
+        //delete group table
+        $exam->delete();
 
-            Session::flash('Success','The exam successfully deleted');
-            return redirect()->route('paper.exam', $exam->paper_id);
-        }
-
-        Session::flash('error', 'Permission restricted!');
-        return back();
+        Session::flash('Success','The exam successfully deleted');
+        return redirect()->route('paper.exam', $exam->paper_id);
+      }
+      return back()->with('error', 'Permission Denied');
     }
 
     // customized methods
