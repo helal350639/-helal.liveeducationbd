@@ -265,9 +265,10 @@ class CategoryCtrl extends Controller
     if($type == 'Free Results' || $type == 'Premium Results')
     {
       $departments = $departments->leftJoin('papers', 'departments.id', 'papers.department_id')
-      ->leftJoin('exams', 'exams.paper_id', 'papers.id')
-      ->where('papers.batch_id', $batch->id)
-      ->where('exams.status', 'Completed');
+      ->whereRaw('DATE(papers.close) < ?', date('Y-m-d'))
+      // ->leftJoin('exams', 'exams.paper_id', 'papers.id')
+      ->where('papers.batch_id', $batch->id);
+      // ->where('exams.status', 'Completed');
 
       if($type == 'Premium Results')
       {
