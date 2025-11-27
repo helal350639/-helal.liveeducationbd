@@ -51,29 +51,6 @@ class CategoryCtrl extends Controller
     $videos = [];
     $chapter = Chapter::find($id);
     $questions = $chapter->questions()->where('type', 'Video')->get();
-    // if($type == 'Subject')
-    // {
-    //   $subject = Subject::find($id);
-    //   $videos = $subject->questions()->where('Type', 'Video')->get();
-    //   $title = $subject->name; 
-    // }
-    // if($type == 'Semester')
-    // {
-    //   $semester = Semester::find($id);
-    //   $videos = $semester->questions()->where('Type', 'Video')->get();
-    //   $title = $semester->name;
-    // }
-    // if($type == 'Department')
-    // {
-    //   $department = Department::find($id);
-    //   $videos = $department->questions()->where('Type', 'Video')->get();
-    //   $title = $department->name;
-    // }
-
-    // if(empty($videos))
-    // {
-    //   return back();
-    // }
     $title = 'Recorded Videos';
 
     return view('homepage.recorded-courses.video', compact('questions', 'title'));
@@ -107,6 +84,7 @@ class CategoryCtrl extends Controller
     $course = Course::find($course_id);
     $departments = $course->departments()->get();
     $batch = $course;
+
     // return 'under development';
     return view('homepage.department', compact('type', 'batch', 'departments'));
   }
@@ -152,9 +130,8 @@ class CategoryCtrl extends Controller
     if($type == 'Premium Results' || $type == 'Free Results')
     {
       $batches = $batches->leftJoin('papers', 'batches.id', 'papers.batch_id')
-      ->leftJoin('exams', 'exams.paper_id', 'papers.id')
-      ->whereRaw('DATE(batches.end_at) > ?', date('Y-m-d H:i:s'))
-      ->where('exams.status', 'Completed');
+      ->whereRaw('DATE(papers.close) < ?', date('Y-m-d'))
+      ->whereRaw('DATE(batches.end_at) > ?', date('Y-m-d H:i:s'));
 
       if($type == 'Premium Results')
       {
@@ -196,17 +173,12 @@ class CategoryCtrl extends Controller
       $batches = $batches->whereHas('course.questions', function ($q) {
         $q->where('type', 'Video');
       })
-      // ->whereHas('department.questions', function ($q) {
-      //   $q->where('type', 'Video');
-      // })
       ->whereRaw('DATE(end_at) > ?', date('Y-m-d H:i:s'));
     }
     //finally execute the query
     $batches = $batches->get();
-    // dd($batches);
 
     return view('homepage.batch', compact('type', 'batches', 'dashboard'));
-
   }
 
   // department query for polytechnic study and where need directly call to the departments
@@ -226,7 +198,8 @@ class CategoryCtrl extends Controller
 
   public function semesters($type)
   {
-    $semesters = Semester::all();
+    $semesters = Semester::Where('status', 'Active')->get();
+
     return view('homepage.polytechnic-studies.semester', compact('type', 'semesters'));
   }
 
@@ -234,7 +207,6 @@ class CategoryCtrl extends Controller
   public function department($type, $batch_id, $dashboard = null)
   {
     $student = Auth::guard('student')->user();
-    // dd($dashboard);
     $batch = Batch::find($batch_id);
 
     $departments = $batch->departments()
@@ -266,9 +238,7 @@ class CategoryCtrl extends Controller
     {
       $departments = $departments->leftJoin('papers', 'departments.id', 'papers.department_id')
       ->whereRaw('DATE(papers.close) < ?', date('Y-m-d'))
-      // ->leftJoin('exams', 'exams.paper_id', 'papers.id')
       ->where('papers.batch_id', $batch->id);
-      // ->where('exams.status', 'Completed');
 
       if($type == 'Premium Results')
       {
@@ -305,9 +275,6 @@ class CategoryCtrl extends Controller
 
     if($type == 'Recorded Courses')
     {
-      // $departments = $departments->whereHas('departments.questions', function($q){
-      //   return $q->where('type', 'Video');
-      // });
       $departments = $departments->leftJoin('department_question', 'department_question.department_id', 'departments.id')
       ->leftJoin('questions', 'questions.id', 'department_question.question_id')
       ->where('questions.type', 'Video')
@@ -324,8 +291,6 @@ class CategoryCtrl extends Controller
     }
 
     $departments = $departments->get();
-
-    // dd($departments);
     
     return view('homepage.department', compact('type', 'batch', 'departments'));
   }
@@ -382,9 +347,6 @@ class CategoryCtrl extends Controller
   public function syllabus($type, $batch_id, $department_id)
   {
     $now = now();
-    // $past = new DateTime();
-    // $past->modify('+11 minutes');
-    // $now = $past->format('Y-m-d H:i:s');
 
     $scheduled_syllabus = Syllabus::where('status', 'Scheduled')->where('datetime', '<=', $now)->get();
     if($scheduled_syllabus)
@@ -417,7 +379,6 @@ class CategoryCtrl extends Controller
   {
     $batch = Batch::find($batch_id);
     $routine = Routine::where('batch_id', $batch_id)
-    // ->where('department_id', $department_id)
     ->orderBy('id', 'DESC')
     ->where('status', 'Published')
     ->first();
@@ -449,8 +410,6 @@ class CategoryCtrl extends Controller
     ->where('batch_id', $batch_id)
     ->where('department_id', $department_id)
     ->whereIn('status', ['Published', 'Scheduled']);
-    // ->whereRaw('DATE(open) <= ?', date('Y-m-d H:i:s'))
-    // ->whereRaw('DATE(close) >= ?', date('Y-m-d H:i:s'));
 
     if($type == 'Premium Exams')
     {
@@ -472,8 +431,6 @@ class CategoryCtrl extends Controller
     $batch = Batch::find($batch_id);
     $department = Department::find($department_id);
     $results = Paper::whereRaw('DATE(papers.close) < ?', date('Y-m-d'))
-    // ->where('exams.status', 'Completed')
-    // ->leftJoin('exams', 'papers.id', 'exams.paper_id')
     ->where('papers.batch_id', $batch_id)
     ->orderBy('papers.open', 'ASC');
 
@@ -491,14 +448,13 @@ class CategoryCtrl extends Controller
     ->select('papers.id', 'papers.name', 'papers.open');
     $results = $results->get();
 
-    // dd($results);
-
     return view('homepage.result', compact('type', 'batch', 'department', 'results'));
   }
 
   public function subjects($type, $batch_id = null, $department_id)
   {    
       $subjects = Subject::where('status', 'Active')->get();
+
       return view('homepage.recorded-courses.subject', compact('subjects'));
   }
 
@@ -506,6 +462,7 @@ class CategoryCtrl extends Controller
   {
     $subject = Subject::find($subject_id);
     $chapters = $subject->chapters()->get();
+
     return view('homepage.recorded-courses.chapter', compact('chapters'));
   }
 
