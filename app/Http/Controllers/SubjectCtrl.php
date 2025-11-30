@@ -241,7 +241,8 @@ class SubjectCtrl extends Controller
     public function getSubjects($department_id)
     {
         $arr = explode(',', $department_id);
-        $items = Subject::whereHas('departments', function($query) use($arr) {
+        $items = Subject::where('status', 'Active')
+        ->whereHas('departments', function($query) use($arr) {
             $query->whereIn('department_id', $arr);
         })->select('id', 'name')->get();
         return response()->json(['data' => $items]);
@@ -250,7 +251,8 @@ class SubjectCtrl extends Controller
     public function getSemsSubjects($semester_id)
     {
         $arr = explode(',', $semester_id);
-        $items = Subject::whereHas('semesters', function($query) use($arr) {
+        $items = Subject::where('status', 'Active')
+        ->whereHas('semesters', function($query) use($arr) {
             $query->whereIn('semester_id', $arr);
         })->select('id', 'name')->get();
         return response()->json(['data' => $items]);

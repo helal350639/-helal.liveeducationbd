@@ -220,7 +220,8 @@ class SemesterCtrl extends Controller
     public function getSemesters($department_id)
     {
         $arr = explode(',', $department_id);
-        $items = Semester::whereHas('departments', function($query) use($arr)
+        $items = Semester::where('status', 'Active')
+        ->whereHas('departments', function($query) use($arr)
         {
             $query->whereIn('department_id', $arr);
         })->select('id', 'name')->get();

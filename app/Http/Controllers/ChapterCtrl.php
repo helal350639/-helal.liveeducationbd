@@ -258,7 +258,8 @@ class ChapterCtrl extends Controller
     public function getChapters($subject_id)
     {
         $arr = explode(',', $subject_id);
-        $items = Chapter::whereHas('subjects', function($query) use($arr) {
+        $items = Chapter::where('status', 'Active')
+        ->whereHas('subjects', function($query) use($arr) {
             $query->whereIn('subject_id', $arr);
         })->select('id', 'name')->get();
         return response()->json(['data' => $items]);
