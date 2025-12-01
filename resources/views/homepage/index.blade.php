@@ -377,7 +377,7 @@ if($user)
         <div class="row" style="--bs-gutter-x: 0.3rem !important;">
           @foreach($book_categories as $value)
           <div class="col-md-3 col-6 mb-1 dropdown bcs-jobs" id="home-services-area-one">
-            <a href="{{route('home.books', $value->id)}}">
+            <a href="{{route('home.books.department', $value->id)}}">
               <div class="my-home-service premium-course-box">
                 <div class="my-home-service-icon">
                   <img src="/web/img/it-books.png" alt="" loading="lazy">

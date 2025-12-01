@@ -68,8 +68,8 @@ $user = Auth::guard('student')->user();
               @endforeach
               @else
               <div class="panel panel-default">
-                <div class="panel-body">
-                  No Course Available
+                <div class="panel-body text-center">
+                  No Books Available
                 </div>
               </div>
               @endif

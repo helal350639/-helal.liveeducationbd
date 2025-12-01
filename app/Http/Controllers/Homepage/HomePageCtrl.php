@@ -32,6 +32,7 @@ use App\Models\Subject;
 use App\Models\BookCategory;
 use Auth;
 use Session;
+use DB;
 
 class HomePageCtrl extends Controller
 {
@@ -425,18 +426,34 @@ class HomePageCtrl extends Controller
     return ScheduleCtrl::scheduleSms();
   }
 
+  public function booksDepartment($id)
+  {
+    $category = DB::table('book_categories')->find($id);
+    $departments = Department::where('status', 'Active')
+    ->get();
+
+    return view('homepage.books.department', compact('category', 'departments'));
+  }
+
   public function books($id)
   {
-    $books = Subject::where('status', 'Active')->get();
+    $books = Subject::where('status', 'Active')
+    ->whereHas('departments', function($query) use($id)
+    {
+      $query->where('department_id', $id);
+    })
+    ->get();
+
     return view('homepage.books.index', compact('books'));
   }
 
   public function readBook($id)
   {
-    return redirect()->route('home.coming-soon');
+    // return redirect()->route('home.coming-soon');
 
     $subject = Subject::find($id);
-    $questions = $subject->questions()->get();
+    $questions = $subject->questions()->where('type', 'MCQ')
+    ->paginate(25);
     // dd($questions);
     if($questions)
     {
