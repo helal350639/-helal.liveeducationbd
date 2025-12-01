@@ -31,6 +31,7 @@ ul li{list-style: none}
   <div class="pagination-sm no-margin pull-right">
     {!! $questions->links() !!}
   </div>
+  <br>
 
   <h2 class="text-center">{{$subject->name}}</h2>
   
