@@ -37,7 +37,7 @@ $user = Auth::guard('student')->user();
                   <div class="package-exam-content mx-2 mx-lg-3">
                     <div class="package-exam-title pt-3">
                       <h2>
-                        <a href="{{route('home.book.read', $value->id)}}">{{substr($value->name, 0, 20)}}</a>
+                        <a href="{{route('home.book.read', $value->id)}}">{{$value->name}}</a>
                       </h2>
                     </div>
                     <div class="row button-and-price pb-3 pb-lg-4">

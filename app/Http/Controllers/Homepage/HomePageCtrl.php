@@ -449,12 +449,10 @@ class HomePageCtrl extends Controller
 
   public function readBook($id)
   {
-    // return redirect()->route('home.coming-soon');
-
     $subject = Subject::find($id);
     $questions = $subject->questions()->where('type', 'MCQ')
     ->paginate(25);
-    // dd($questions);
+    
     if($questions)
     {
       return view('homepage.books.read', compact('subject', 'questions'));

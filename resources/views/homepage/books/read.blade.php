@@ -31,10 +31,12 @@ ul li{list-style: none}
   <div class="pagination-sm no-margin pull-right">
     {!! $questions->links() !!}
   </div>
+
+  <h2 class="text-center">{{$subject->name}}</h2>
   
-  <h3 class="box-title">
-    Questions ({{$questions->total()}})
-  </h3>
+  <h5 class="box-title">
+    Total Questions ({{$questions->total()}})
+  </h5>
 </div><!-- /.box-header -->
 <div class="box-body">
   @foreach($questions as $key => $value)
