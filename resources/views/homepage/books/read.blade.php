@@ -28,12 +28,13 @@ ul li{list-style: none}
 </style>
 <div class="col-md-8 offset-md-2" style="margin: 50px auto; ">
 <div class="box-header">
+
+  <h2 class="text-center">{{$subject->name}}</h2>
+  
   <div class="pagination-sm no-margin pull-right">
     {!! $questions->links() !!}
   </div>
   <br>
-
-  <h2 class="text-center">{{$subject->name}}</h2>
   
   <h5 class="box-title">
     Total Questions ({{$questions->total()}})
