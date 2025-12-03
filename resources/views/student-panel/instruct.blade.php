@@ -31,7 +31,7 @@ if($user)
             @if($paper->close && $paper->close < date('Y-m-d H:i:s'))
             <div class="card card-warning">
               <div class="card-heading p-3">
-                <b>Exam No. {{$value->name}}</b>
+                <b>{{$value->name}}</b>
               </div>
               <div class="card-body">
                 <p class="text-danger">পরীক্ষার সময় শেষ...</p>
@@ -45,7 +45,7 @@ if($user)
             @elseif($value->status == 'Scheduled')
             <div class="card card-warning">
               <div class="card-heading p-3">
-                <b>Exam No. {{$value->name}}</b>
+                <b>{{$value->name}}</b>
               </div>
               <div class="card-body">
                 <p> পরীক্ষা সময় <b>{{ $source->dtformat($value->open)}}</b></p>
@@ -60,7 +60,7 @@ if($user)
             @elseif($value->status == 'Published')
             <div class="card card-warning">
               <div class="card-heading p-3">
-                <b>Exam No. {{$value->name}}</b>
+                <b>{{$value->name}}</b>
               </div>
               <div class="card-body">
                 <p>{!! $value->details !!}</p>

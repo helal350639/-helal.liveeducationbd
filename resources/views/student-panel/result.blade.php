@@ -4,6 +4,7 @@ $source = New SourceCtrl;
 $user = Auth::guard('student')->user();
 $percentage = $score = 0;
 $exam_index = $exams->count();
+$student = $user;
 
 function position($user_mark, $candidates, $marks)
 {
@@ -174,14 +175,6 @@ function position($user_mark, $candidates, $marks)
         <div class="panel-body" style="text-align: center">
           <p>{{$paper->result_message}}</p>
           <hr>
-          <p>
-            <a href="{{route('students.exam')}}" class="btn btn-warning">
-              <i class="fa fa-arrow-left"></i> Back
-            </a>
-            <a href="{{route('students.complain')}}" class="btn btn-info">
-              আপনার মতামত/অভিযোগ দিন
-            </a>
-          </p>
         </div>
       </div>
       @else
@@ -193,16 +186,54 @@ function position($user_mark, $candidates, $marks)
       </div>
       @endif
 
+      <div class="col-md- offset-md-4">
+        <a href="{{route('students.solution', $paper->id)}}" class="btn btn-sm btn-success"> সল্যুশন</a>
+        @if($student && $paper->exams()->where('student_id', $student->id)->first())
+
+          <a href="{{route('students.exam.paper', $paper->id)}}" class="btn btn-sm btn-primary">এক্সাম পেপার </a>
+
+          {{-- <a href="{{route('students.result', $paper->id)}}" class="btn btn-sm btn-warning"> ফলাফল</a> --}}
+
+          <a href="{{route('students.result', $paper->id)}}" class="btn btn-sm btn-info"> Next Exam PDF</a>
+          @endif
+      </div>
+
       <p class="text-center p-3">
         <a class="btn btn-warning" href="{{route('students.dashboard')}}">Back to the Dashboard</a>
       </p>
         
       </div>
     </section> <!-- /.content -->
+
+    <!-- The Modal -->
+    <div class="modal fade pt-5 mt-5" id="messageModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+
+          <!-- Modal Header -->
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+          <!-- Modal body -->
+          <div class="modal-body p-5 text-center" id="modal-message">
+            {{$paper->message}}
+            <hr>
+            আজকের প্রশ্ন সম্পর্কে আপনার মতামত দিন <a href="{{route('students.complain')}}">Click Here</a>
+            <br>
+            আপনার কোন অভিযোগ না থাকলে সলূশন দেখতে পেজটি close করুন।
+          </div>
+
+        </div>
+      </div>
+    </div>
 @endsection
 
 @section('scripts')
 <script>
-  //
+  window.onload = function()
+  {
+    let modal = document.getElementById('messageModal');
+    const myModal = new bootstrap.Modal(modal);
+    myModal.show();
+  }
 </script>
 @endsection

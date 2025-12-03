@@ -16,33 +16,37 @@ $user = Auth::guard('student')->user();
     <!-- Main content -->
     <section class="our-service p-5">
       <div class="container">
+
         <div class="row">
           
           <div class="title-area text-center">
             <h1> {{$category->name}} </h1>
             <small> ডিপার্টমেন্ট সমূহ </small>
           </div>
-          <div class="home-services-area">
-            <div class="row g-2 g-md-3 g-lg-4" style="--bs-gutter-x: 0.3rem !important;">
+          <div class="all-courses-area pt-5">
+            <div class="row g-2 g-md-3 g-lg-4">
   
-              @if($departments->count())
-                @foreach($departments as $value)
-                <div class="col-md-3 col-6 mb-1 dropdown bcs-jobs" id="home-services-area-one">
-                  <a href="{{route('home.books', $value->id)}}">
-                    <div class="my-home-service premium-course-box">
-                      <div class="my-home-service-icon">
-                        <img src="/web/img/department.png" alt="" loading="lazy">
-                      </div>
-                      <div class="my-home-service-content">
-                        <h3>{{$value->name}}</h3>
-                        @if(isset($value->items_count))
-                        <h3>({{$value->items_count}})</h3>
-                        @endif
-                      </div>
+              @if(count($departments))
+              @foreach($departments as $value)
+              <div class="col-6 col-lg-3 mt-4">
+                <div class="exam-package-area">
+                  <div class="package-exam-image">
+                    <a href="{{route('home.books', $value->id)}}">
+                    <img src="{{ $value->banner? $value->banner : '/img/book-cover.png'}}" alt="" loading="lazy" />
+                    </a>
+                  </div>
+                  <div class="package-exam-content mx-2 mx-lg-3">
+                    <div class="package-exam-title pt-3">
+                      <h2>
+                        <a href="{{route('home.books', $value->id)}}">{{$value->name}}</a>
+                      </h2>
                     </div>
-                  </a>
+                    <div class="row button-and-price pb-3 pb-lg-4">
+                    </div>
+                  </div>
                 </div>
-                @endforeach
+              </div>
+              @endforeach
               @else
               <div class="card card-default">
                 <div class="card-body text-center">
@@ -52,7 +56,7 @@ $user = Auth::guard('student')->user();
               @endif
             </div>
           </div>
-        </div> <!-- /.row -->
+        </div>
         
         @include('partials.back-button')
 

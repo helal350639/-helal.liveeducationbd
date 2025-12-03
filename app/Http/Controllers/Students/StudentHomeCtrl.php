@@ -102,7 +102,11 @@ class StudentHomeCtrl extends Controller
 
     $references = Referrer::where('referrer_id', auth()->id())->orderBy('id', 'DESC')->get();
 
-    return view('student-panel.dashboard', compact('data', 'student', 'orders', 'references'));
+    $paper = Paper::where('open', 'like', date('Y-m-d').'%')
+    ->whereIn('batch_id', $student_batches_ids)
+    ->first();
+
+    return view('student-panel.dashboard', compact('data', 'student', 'orders', 'references', 'paper'));
   }
 
   public function profile()

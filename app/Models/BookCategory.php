@@ -6,5 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class BookCategory extends Model
 {
-  protected $fillable = ['name', 'banner', 'status', 'details', 'web'];
+  protected $fillable = ['name', 'banner', 'status', 'details', 'web', 'department'];
+
+  public function departments()
+  {
+    return $this->belongsToMany(Department::class);
+  }
 }

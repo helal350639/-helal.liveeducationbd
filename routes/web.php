@@ -274,6 +274,7 @@ Route::middleware(['auth'])->group(function()
 	Route::resource('ad', 'AdCtrl');
 	Route::resource('video', 'VideoCtrl');
 	Route::resource('service', 'ServiceCtrl');
+	Route::resource('book-category', 'BookCategoryCtrl');
 
 	/** -------------------- Custom Routes ------------------ */
 	Route::controller(DepartmentCtrl::class)->group(function()

@@ -61,9 +61,17 @@ if($user)
                 @if($papers->count())
 
                   @foreach($papers as $key => $paper)
-
                     <div class="col-lg-8 col-md-10 col-sm-12" title="{{$source->dtformat($paper->close)}}">
-                      <div class="border accordion-body-content d-flex justify-content-between align-items-center flex-wrap p-3 py-2">
+                      <div class="border accordion-body-content d-flex justify-content-between align-items-center flex-wrap p-3 py-2"
+
+                      @if($paper->open > now() && $paper->close > now())
+                       onclick="showMessage(this)"
+                      data-message="আপনার {{$paper->name}} শুরু হবে তারিখঃ {{$source->dformat($paper->open)}} সময় রাত {{$source->tformat($paper->open)}}"
+                      @elseif($paper->close < now())
+                       onclick="showMessage(this)"
+                      data-message="পরীক্ষা হয়ে গেছে...<br> সলুশন পেপার দেখতে <a href='{{route('students.solution', $paper->id)}}'>Click Now</a>"
+                      @endif>
+
                         <div class="text d-flex align-items-center list-content">
                           <div class="course_exam-icon">
                             <div class="circular-progress" title="Provided Answer" data-inner-circle-color="#def3ff" data-percentage="6" data-progress-color="rgb(137 24 26)" data-bg-color="rgb(137 24 26 / 70%)" style="background: #fff; font-size:25px; border:1px solid #ddd; color:#1CAB55">
@@ -76,7 +84,7 @@ if($user)
                           </div>
                           <p class="exam-title ps-1" style="width: 100%">
                             <span>{{ $paper->name }}</span>
-                            <span style="float:right;">{{ $source->dtformat($paper->open) }} </span>
+                            <span style="float:right;"> {{ $source->dformat($paper->open) }} </span>
                             <br>
                             <span style="font-size: 12px; font-weight: 700; color: #1CAB55;"> (প্রশ্ন -{{$paper->questions()->count()}}টি, সময়-{{$paper->time}}মিনিট) </span>
                           </p>
@@ -120,4 +128,34 @@ if($user)
 
       </div> <!-- /.container -->
     </section> <!-- /.our_courses -->
+    <div class="preloader"></div>
+
+<!-- The Modal -->
+<div class="modal fade pt-5 mt-5" id="messageModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+      <!-- Modal body -->
+      <div class="modal-body p-5 text-center" id="modal-message">
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  function showMessage(e)
+  {
+    let modal = document.getElementById('messageModal');
+    const myModal = new bootstrap.Modal(modal);
+
+    let modalMessage = document.getElementById('modal-message');
+    modalMessage.innerHTML = e.dataset.message;
+
+    myModal.show();
+  }
+</script>
 @endsection

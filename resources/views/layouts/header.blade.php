@@ -280,6 +280,23 @@ if($complains)
             <li><a href="{{route('chapter.index')}}"><i class="fa fa-bookmark"></i> View Chapters</a></li>
           </ul>
         </li>
+       
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-book"></i>
+            <span>Books</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li>
+              <a href="{{route('book-category.index')}}">
+                <i class="fa fa-file-text"></i> View Book Categories
+              </a>
+            </li>
+          </ul>
+        </li>
 
         <li class="treeview">
           <a href="#">
