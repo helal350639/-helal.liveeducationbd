@@ -105,7 +105,7 @@ $value = $paper;
                   <td>{{$source->dtformat($value->open)}}</td>
                 </tr>
                 <tr>
-                  <th>Exma Finish At:</th>
+                  <th>Exam Finish At:</th>
                   <td>{{$source->dtformat($value->close)}}</td>
                 </tr>
                 <tr>

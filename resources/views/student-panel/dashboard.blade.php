@@ -195,10 +195,7 @@ font-size: 16px;
 
               @if($paper)
 
-                <div class="all-courses-area">
-                  <div class="row justify-content-center g-3">
-
-                  <div class="col-lg-8 col-md-10 col-sm-12" title="{{$source->dtformat($paper->close)}}">
+                  <div class="col-md-8 offset-md-2" title="{{$source->dtformat($paper->close)}}">
                     <div class="border accordion-body-content d-flex justify-content-between align-items-center flex-wrap p-3 py-2" style="background: #fff">
 
                       <div class="text d-flex align-items-center list-content">
@@ -211,23 +208,33 @@ font-size: 16px;
                             @endif
                           </div>
                         </div>
-                        <p class="exam-title ps-1">
-                          <span>{{ $paper->name }}</span>
-                          <span></span>
+                        <p class="exam-title ps-1" style="width: 100%">
+                          <span style="float:left">{{ $paper->name }}</span>
+                          <span style="float:right;">{{$source->tformat($paper->open)}}</span>
                           <br>
-                          <span style="font-size: 12px; font-weight: 700; color: #1CAB55;"> (প্রশ্ন -{{$paper->questions()->count()}}টি, সময়-{{$paper->time}}মিনিট) </span>
+                          <span style="font-size: 12px; font-weight: 700; color: #1CAB55; float:left"> (প্রশ্ন -{{$paper->questions()->count()}}টি, সময়-{{$paper->time}}মিনিট) </span>
                         </p>
                       </div>
                       <div class="v-button d-flex flex-wrap gap-2">
-                        <a href="{{route('students.instruction', $paper->id)}}">
+                        @php
+                        $type = '';
+                        if($paper->permit == 'Every One')
+                        {
+                          $type = 'Free Exams';
+                        }
+                        else{
+                          $type = 'Premium Exams';
+                        }
+                        @endphp
+                        <a class="btn btn-info btn-sm" href="{{route('category.check-method', [$type, $paper->batch->id, $paper->department->id])}}">
                           Today Your Exam
                         </a>
                       </div>
                     </div>
                   </div>
 
-                </div>
-              </div>
+                {{-- </div>
+              </div> --}}
               @endif
 
          </div>
