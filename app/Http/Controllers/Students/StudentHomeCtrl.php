@@ -104,6 +104,7 @@ class StudentHomeCtrl extends Controller
 
     $paper = Paper::where('open', 'like', date('Y-m-d').'%')
     ->whereIn('batch_id', $student_batches_ids)
+    ->orderBy('id', 'ASC')
     ->first();
 
     return view('student-panel.dashboard', compact('data', 'student', 'orders', 'references', 'paper'));
