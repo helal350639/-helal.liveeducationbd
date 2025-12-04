@@ -193,39 +193,43 @@ font-size: 16px;
                 <a class="blink-text btn btn-info" href="{{route('students.my-course')}}" >Your Reference Link: Click Now</a>
               </p>
 
-            <div class="all-courses-area">
-              <div class="row justify-content-center g-3">
+              @if($paper)
 
-              <div class="col-lg-8 col-md-10 col-sm-12" title="{{$source->dtformat($paper->close)}}">
-                <div class="border accordion-body-content d-flex justify-content-between align-items-center flex-wrap p-3 py-2" style="background: #fff">
+                <div class="all-courses-area">
+                  <div class="row justify-content-center g-3">
 
-                  <div class="text d-flex align-items-center list-content">
-                    <div class="course_exam-icon">
-                      <div class="circular-progress" title="Provided Answer" data-inner-circle-color="#def3ff" data-percentage="6" data-progress-color="rgb(137 24 26)" data-bg-color="rgb(137 24 26 / 70%)" style="background: #fff; font-size:25px; border:1px solid #ddd; color:#1CAB55">
-                        @if($paper->open <= now() && $paper->close > now())
-                        <i class="fa fa-unlock"></i>
-                        @else
-                        <i class="fa fa-lock" style="color:red"></i>
-                        @endif
+                  <div class="col-lg-8 col-md-10 col-sm-12" title="{{$source->dtformat($paper->close)}}">
+                    <div class="border accordion-body-content d-flex justify-content-between align-items-center flex-wrap p-3 py-2" style="background: #fff">
+
+                      <div class="text d-flex align-items-center list-content">
+                        <div class="course_exam-icon">
+                          <div class="circular-progress" title="Provided Answer" data-inner-circle-color="#def3ff" data-percentage="6" data-progress-color="rgb(137 24 26)" data-bg-color="rgb(137 24 26 / 70%)" style="background: #fff; font-size:25px; border:1px solid #ddd; color:#1CAB55">
+                            @if($paper->open <= now() && $paper->close > now())
+                            <i class="fa fa-unlock"></i>
+                            @else
+                            <i class="fa fa-lock" style="color:red"></i>
+                            @endif
+                          </div>
+                        </div>
+                        <p class="exam-title ps-1">
+                          <span>{{ $paper->name }}</span>
+                          <span></span>
+                          <br>
+                          <span style="font-size: 12px; font-weight: 700; color: #1CAB55;"> (প্রশ্ন -{{$paper->questions()->count()}}টি, সময়-{{$paper->time}}মিনিট) </span>
+                        </p>
+                      </div>
+                      <div class="v-button d-flex flex-wrap gap-2">
+                        <a href="{{route('students.instruction', $paper->id)}}">
+                          Today Your Exam
+                        </a>
                       </div>
                     </div>
-                    <p class="exam-title ps-1">
-                      <span>{{ $paper->name }}</span>
-                      <span></span>
-                      <br>
-                      <span style="font-size: 12px; font-weight: 700; color: #1CAB55;"> (প্রশ্ন -{{$paper->questions()->count()}}টি, সময়-{{$paper->time}}মিনিট) </span>
-                    </p>
                   </div>
-                  <div class="v-button d-flex flex-wrap gap-2">
-                    <a href="{{route('students.instruction', $paper->id)}}">
-                      Today Your Exam
-                    </a>
-                  </div>
+
                 </div>
               </div>
-              </div>
+              @endif
 
-            </div>
          </div>
       </div>
       <div class="row g-4">
