@@ -351,10 +351,18 @@ class CategoryCtrl extends Controller
     // ->update(['status' => 'Published']);
 
     $batch_name = '';
-    $department = Department::find($department_id);
-    $batch = $department->batches()->where('batch_id', $batch_id)->first();
+    $department = Department::select('id', 'name')
+    ->find($department_id);
 
-    if($batch){
+    // $batch = $department->batches()
+    // ->where('batch_id', $batch_id)
+    // ->select('id', 'name')
+    // ->first();
+
+    $batch = Batch::select('id', 'name')->find($batch_id);
+
+    if($batch)
+    {
       $batch_name = $batch->name;
     }
 
@@ -363,7 +371,10 @@ class CategoryCtrl extends Controller
     ->whereIn('status', ['Published', 'Scheduled'])
     ->where('batch_id', $batch_id)
     ->where('department_id', $department_id)
+    ->select('id', 'name')
     ->get();
+
+    // dd($department, $batch, $syllabuses);
 
     return view('homepage.exam-pdf', compact('syllabuses', 'department', 'batch_name'));
   }
