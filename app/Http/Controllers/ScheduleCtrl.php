@@ -25,23 +25,13 @@ class ScheduleCtrl extends Controller
 
     $now = now();
     $past = new DateTime();
-    // if(App::environment('production'))
-    // {
-    //   // $past->modify('+6 hours 11 minutes');
-    //   $past->modify('+11 minutes');
-    //   $now = $past->format('Y-m-d H:i:s');
-    // }
-    // else
-    // {
-    //   $now = $past->format('Y-m-d H:i:s');
-    // }
     $now = $past->format('Y-m-d H:i:s');
 
     $smses = Sms::where('status', 'Scheduled')
     ->whereRaw('datetime <= ?', [$now])
     ->get();
 
-    if($smses)
+    if($smses->count() > 0)
     {
       foreach($smses as $sms)
       {
@@ -75,18 +65,7 @@ class ScheduleCtrl extends Controller
     $source = new SourceCtrl;
 
     $now = now();
-    // $now = date('Y-m-d H:i:s');
     $past = new DateTime();
-    // if(App::environment('production'))
-    // {
-    //   // $past->modify('+6 hours 11 minutes');
-    //   $past->modify('+11 minutes');
-    //   $now = $past->format('Y-m-d H:i:s');
-    // }
-    // else
-    // {
-    //   $now = $past->format('Y-m-d H:i:s');
-    // }
     $now = $past->format('Y-m-d H:i:s');
     
     $emails = Email::where('status', 'Scheduled')
@@ -99,7 +78,7 @@ class ScheduleCtrl extends Controller
 
     // dd($now, $emails);
 
-    if($emails)
+    if($emails->count() > 0)
     {
       foreach($emails as $email)
       {

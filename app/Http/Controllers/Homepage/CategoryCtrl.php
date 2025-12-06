@@ -359,20 +359,21 @@ class CategoryCtrl extends Controller
     // ->select('id', 'name')
     // ->first();
 
-    $batch = Batch::select('id', 'name')->find($batch_id);
+    $batch = Batch::select('id', 'name')
+    ->find($batch_id);
 
     if($batch)
     {
       $batch_name = $batch->name;
     }
 
-    $syllabuses = Syllabus::orderBy('id', 'ASC')
-    // ->orderBy('datetime', 'ASC')
+    $syllabuses = Syllabus::select('id', 'name')
     ->whereIn('status', ['Published', 'Scheduled'])
     ->where('batch_id', $batch_id)
     ->where('department_id', $department_id)
-    ->select('id', 'name')
-    ->get();
+    ->orderBy('datetime')
+    ->orderBy('id')
+    ->paginate(50);
 
     // dd($department, $batch, $syllabuses);
 
