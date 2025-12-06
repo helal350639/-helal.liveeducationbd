@@ -20,6 +20,7 @@ use App\Models\Subject;
 use App\Models\Chapter;
 use Auth;
 use DateTime;
+use DB;
 
 class CategoryCtrl extends Controller
 {
@@ -186,7 +187,8 @@ class CategoryCtrl extends Controller
   {
     $title = '';
 
-    if($type == 'Polytechnic'){
+    if($type == 'Polytechnic')
+    {
       $title = 'Polytechnic Study';
     }
 
@@ -346,18 +348,13 @@ class CategoryCtrl extends Controller
   //
   public function syllabus($type, $batch_id, $department_id)
   {
-    // Syllabus::where('status', 'Scheduled')
-    // ->where('datetime', '<=', now())
-    // ->update(['status' => 'Published']);
+    Syllabus::where('status', 'Scheduled')
+    ->where('datetime', '<=', now())
+    ->update(['status' => 'Published']);
 
     $batch_name = '';
     $department = Department::select('id', 'name')
     ->find($department_id);
-
-    // $batch = $department->batches()
-    // ->where('batch_id', $batch_id)
-    // ->select('id', 'name')
-    // ->first();
 
     $batch = Batch::select('id', 'name')
     ->find($batch_id);
@@ -373,9 +370,7 @@ class CategoryCtrl extends Controller
     ->where('department_id', $department_id)
     ->orderBy('datetime')
     ->orderBy('id')
-    ->paginate(50);
-
-    // dd($department, $batch, $syllabuses);
+    ->get();
 
     return view('homepage.exam-pdf', compact('syllabuses', 'department', 'batch_name'));
   }

@@ -9,9 +9,6 @@ if($user)
 }
 
 $now = now();
-// $past = new DateTime();
-// $past->modify('+11 minutes');
-// $now = $past->format('Y-m-d H:i:s');
 @endphp
 
 @extends('homepage')
@@ -84,7 +81,7 @@ $now = now();
                             <span>{{ $syllabus->name }}</span>
                             <span style="float:right;">{{ $source->dformat($syllabus->open) }} </span>
                             <br>
-                            <span style="font-size: 12px; font-weight: 700; color: #1CAB55;"> (প্রশ্ন -{{$syllabus->questions()->count()}}টি) </span>
+                            {{-- <span style="font-size: 12px; font-weight: 700; color: #1CAB55;"> (প্রশ্ন -{{ $syllabus->questions_count }}টি) </span> --}}
                           </p>
                         </div>
                         <div class="v-button d-flex flex-wrap gap-2">
