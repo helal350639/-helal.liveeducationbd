@@ -367,7 +367,7 @@ class CategoryCtrl extends Controller
     }
 
     $syllabuses = Syllabus::orderBy('id', 'ASC')
-    ->orderBy('datetime', 'ASC')
+    // ->orderBy('datetime', 'ASC')
     ->whereIn('status', ['Published', 'Scheduled'])
     ->where('batch_id', $batch_id)
     ->where('department_id', $department_id)
