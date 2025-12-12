@@ -23,7 +23,7 @@ function active($name)
 <html lang="en">
   <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
 <head>
-  <title>Live Education BD</title>
+    <title>Live Education BD</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -87,6 +87,7 @@ function active($name)
 
       gtag('config', 'G-0DK9PN2V96');
     </script>
+    <script src="https://www.wiris.net/demo/plugins/app/WIRISplugins.js?viewer=image"></script>
 
 </head>
 <body>

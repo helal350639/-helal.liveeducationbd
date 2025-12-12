@@ -300,11 +300,11 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
     });
 
     let checkAll = document.getElementById('checkAll');
-    if(maxq.innerHTML && Number(qcount.innerHTML) >= Number(maxq.innerHTML) || checked > unchecked)
+    if(maxq && Number(qcount.innerHTML) >= Number(maxq.innerHTML) || checked > unchecked)
     {
       checkAll.checked = true;
     }
-    else
+    else if(checkAll)
     {
       checkAll.checked = false;
     }
@@ -596,6 +596,9 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
       {
         question_area.innerHTML = data;
         loading.classList.add('hide');
+
+        mathImgConverter();
+
         prevNext();
         checkAllchecked();
       },
@@ -802,18 +805,6 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
       }
     });
   }
-
-    $(function () {
-      $('#example1').DataTable()
-      $('#example2').DataTable({
-        'paging'      : true,
-        'lengthChange': false,
-        'searching'   : false,
-        'ordering'    : true,
-        'info'        : true,
-        'autoWidth'   : false
-      })
-    })
   </script>
 
 <script>
@@ -882,6 +873,15 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
   });
 
     prevNext();
+
+    // math image converter
+    function mathImgConverter()
+    {
+      if (typeof com !== 'undefined' && typeof com.wiris !== 'undefined' && typeof com.wiris.js !== 'undefined' && typeof com.wiris.js.JsPluginViewer !== 'undefined')
+        {
+          com.wiris.js.JsPluginViewer.parseElement(document.body);
+        }
+    }
 
 </script>
 @endsection

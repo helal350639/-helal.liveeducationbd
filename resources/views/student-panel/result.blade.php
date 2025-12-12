@@ -173,7 +173,7 @@ function position($user_mark, $candidates, $marks)
       @elseif(isset($result['message']))
       <div class="col-md-6 offset-md-3 panel panel-default">
         <div class="panel-body" style="text-align: center">
-          <p>{{$paper->result_message}}</p>
+          <p>{{$paper->name}} রেজলাট প্রকাশ করা হবে তারিখ- {{$source->dformat($paper->result_at)}} সময় {{$source->tformat($paper->result_at)}}</p>
           <hr>
         </div>
       </div>

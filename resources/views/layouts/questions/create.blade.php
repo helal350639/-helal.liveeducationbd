@@ -84,7 +84,9 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <label for="title">Question Title (*)</label>
-                        <textarea class="form-control editor" name="title" id="title" rows="3" required></textarea>
+                        {{-- <textarea class="form-control editor" name="title" id="title" rows="3" required></textarea> --}}
+                        <textarea class="ckeditor form-control" name="title" id="title" rows="3" required></textarea>
+
                         {{-- <div class="input-group"> --}}
                             {{-- <span class="input-group-addon">
                                 <img src="" alt="" width="54">
@@ -103,7 +105,7 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <label for="">Explanation</label>
-                        <textarea class="form-control editor" name="explanation" id="explanation"></textarea>
+                        <textarea class="form-control ckeditor" name="explanation" id="explanation"></textarea>
                     </div>
                 </div>
                 <div class="col-md-12">
@@ -673,11 +675,11 @@ function selectType(e)
 
 function formValidation()
 {
-    let title = document.getElementById('title');
+    // let title = document.getElementById('title');
 
-    if(title.value == ''){
-        alert('Question title field is required.');
-    }
+    // if(title.value == ''){
+    //     alert('Question title field is required.');
+    // }
     title.focus();
 }
 
@@ -893,8 +895,8 @@ function resetFields()
     // }
 
     //reset question title and explanation fields
-    $('#title').summernote('reset');
-    $('#explanation').summernote('reset');
+    // $('#title').summernote('reset');
+    // $('#explanation').summernote('reset');
 
     $(function (){ $('.select2').select2() });
 }
@@ -914,6 +916,11 @@ function resetFields()
             height: 150
         });
     });
+</script>
+
+<script src="/ckeditor/ckeditor.js"></script>
+<script>
+  CKEDITOR.replace('ckeditor');
 </script>
 
 @endsection

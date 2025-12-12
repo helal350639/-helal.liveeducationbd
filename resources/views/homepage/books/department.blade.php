@@ -11,6 +11,9 @@ $user = Auth::guard('student')->user();
   .panel ::-webkit-scrollbar{width: 5px;}
   ::-webkit-scrollbar-thumb{background-color: #ddd}
   .course-image{width:100%}
+  .exam-package-area .package-exam-image img{
+    height: 100%;
+  }
 </style>
 
     <!-- Main content -->
@@ -32,7 +35,7 @@ $user = Auth::guard('student')->user();
                 <div class="exam-package-area">
                   <div class="package-exam-image">
                     <a href="{{route('home.books', $value->id)}}">
-                    <img src="{{ $value->banner? $value->banner : '/img/book-cover.png'}}" alt="" loading="lazy" />
+                    <img src="{{ $value->banner? $value->banner : '/img/book-department.jpg'}}" alt="" loading="lazy" />
                     </a>
                   </div>
                   <div class="package-exam-content mx-2 mx-lg-3">

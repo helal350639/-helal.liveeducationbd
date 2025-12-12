@@ -27,7 +27,7 @@ if($exam)
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <meta name="csrf-token" content="{{ csrf_token() }}">
-  <link rel="icon" href="/img/logo.png" />
+  <link rel="icon" href="/img/favicon.png?v=1.1.0" />
   <title>Exam</title>
   <link rel="stylesheet" href="{{'/web/assets/vendors/slick/slick.css'}}" />
   <link rel="stylesheet" href="{{'/web/assets/vendors/slick/slick-theme.css'}}"/>
@@ -60,6 +60,9 @@ if($exam)
     .question-title-text{display: inline;text-align:justify}
     .question-title-main{background-color:none}
   </style>
+
+  <script src="/ckeditor/ckeditor.js"></script>
+  <script src="https://www.wiris.net/demo/plugins/app/WIRISplugins.js?viewer=image"></script>
 </head>
 <body>
 
@@ -123,6 +126,13 @@ if($exam)
 <script src="{{'/web/assets/js/main.js'}}" defer></script>
 
 <script>
+  function mathImgConverter()
+  {
+    if (typeof com !== 'undefined' && typeof com.wiris !== 'undefined' && typeof com.wiris.js !== 'undefined' && typeof com.wiris.js.JsPluginViewer !== 'undefined')
+    {
+      com.wiris.js.JsPluginViewer.parseElement(document.body);
+    }
+  }
   //load all questions
   let questions_area = document.getElementById('questions-area');
   function loadQuestions()
@@ -239,6 +249,9 @@ if($exam)
         document.getElementById('submit-btn').style.display = 'block';
       }
     });
+
+    // math eq to image converter
+    mathImgConverter();
   }
 
   //show next question

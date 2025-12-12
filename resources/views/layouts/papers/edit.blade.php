@@ -370,11 +370,11 @@ function getDepartments(e)
             '<div class="form-group">'+
                 '<label for="result_message">Result Publish Date & Time</label>'+
                 '<input type="datetime-local" class="form-control" name="result_at" id="result_at" required onchange="setTime(this)" value="{{$value->result_at}}">'+
-            '</div>'+
-            '<div class="form-group">'+
-                '<label for="result_message">Write short message instead of result publish</label>'+
-                '<textarea type="text" class="form-control" name="result_message" id="result_message" required rows="3">{{$value->result_message}}</textarea>'+
             '</div>';
+            // '<div class="form-group">'+
+            //     '<label for="result_message">Write short message instead of result publish</label>'+
+            //     '<textarea type="text" class="form-control" name="result_message" id="result_message" required rows="3">{{$value->result_message}}</textarea>'+
+            // '</div>';
             result_message.style.display = 'block';
         }
         else

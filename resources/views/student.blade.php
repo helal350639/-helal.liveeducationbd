@@ -96,6 +96,9 @@ function active($name)
 
       gtag('config', 'G-0DK9PN2V96');
     </script>
+
+  <script src="/ckeditor/ckeditor.js"></script>
+  <script src="https://www.wiris.net/demo/plugins/app/WIRISplugins.js?viewer=image"></script>
 </head>
 <body>
   <header id="Header">

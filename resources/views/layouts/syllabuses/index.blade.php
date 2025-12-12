@@ -133,18 +133,65 @@ $source = New SourceCtrl;
     </section>
     <!-- /.content -->
     @endsection
-{{-- @section('scripts')
-  <script>
-    $(function () {
-      $('#example1').DataTable()
-      $('#example2').DataTable({
-        'paging'      : true,
-        'lengthChange': false,
-        'searching'   : false,
-        'ordering'    : true,
-        'info'        : true,
-        'autoWidth'   : false
-      })
-    })
-  </script>
-@endsection --}}
+    @section('scripts')
+    <script>
+      // on change course get batches
+      function getBatches(e)
+      {
+          let ids = Array.from(e.selectedOptions).map(({value}) => value);
+  
+          $.ajax({
+              type: 'GET', //THIS NEEDS TO BE GET
+              url: '/get_batches/' + ids,
+              success: function (data) {
+  
+                  var obj = JSON.parse(JSON.stringify(data));
+                  var options = '<option value="">Select One</option>';
+  
+                  $.each(obj['data'], function (key, val) {
+                      options += '<option value="'+val.id+'">'+val.name+'</option>';
+                  });
+  
+                  if(options != ""){
+                      $("#batch_id").html(options);
+                      $("#department_id").html('<option value="">Select One</option>');
+                  }else{
+                      $("#batch_id").html('');
+                  }
+              },
+              error: function(data) { 
+                      console.log('data error');
+              }
+          });
+      }
+  
+      // on change batch get departments
+      function getDepartments(e)
+      {
+          let ids = Array.from(e.selectedOptions).map(({value}) => value);
+  
+          $.ajax({
+              type: 'GET', //THIS NEEDS TO BE GET
+              url: '/get_departments_by_batch/' + ids,
+              success: function (data) {
+  
+                  var obj = JSON.parse(JSON.stringify(data));
+                  var options = '<option value="">Select One</option>';
+  
+                  $.each(obj['data'], function (key, val) {
+                      options += '<option value="'+val.id+'">'+val.name+'</option>';
+                  });
+  
+                  if(options != ""){
+                      $("#department_id").html(options)
+                  }else{
+                      $("#department_id").html('')
+                  }
+              },
+              error: function(data) { 
+                console.log('data error');
+              }
+          });
+      }
+    </script>
+  @endsection

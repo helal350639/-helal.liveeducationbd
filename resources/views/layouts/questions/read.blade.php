@@ -79,7 +79,7 @@ $correct_answer = '';
                   <tr>
                   <tr>
                     <th style="width: 200px;">Question Title:</th>
-                    <td><label style="font-size:16px">{{$value->title}}</label> <br><img src="{{$value->image}}" alt="" width="150"></td>
+                    <td><label style="font-size:16px">{!!$value->title!!}</label> <br><img src="{{$value->image}}" alt="" width="150"></td>
                   </tr>
                   @if($mcq->type == 'Written')
                   <tr>
@@ -138,7 +138,7 @@ $correct_answer = '';
                   @endif
                   <tr>
                     <th>Explanation:</th>
-                    <td>{{$value->explanation}}</td>
+                    <td>{!!$value->explanation!!}</td>
                   </tr>
                   <tr>
                     <th>Filters:</th>
@@ -174,5 +174,4 @@ $correct_answer = '';
       </div><!-- /.box -->
     </div><!--/.col (left) -->
   </section><!-- /.content -->
-   
 @endsection

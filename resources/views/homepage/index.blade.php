@@ -16,6 +16,7 @@ if($user)
   .package-exam-title a{
     color: #000
   }
+  .designation p{text-align: center!important}
 </style>
 
 <!-- preloader --> 
@@ -335,9 +336,18 @@ if($user)
               <div class="button-and-price pb-3 pb-lg-4">
                 <div class="package-exam-price">
                   <div class="package-exam-total-price text-muted">
-                    <s class="text-muted">৳ {{number_format($batch->price, 0)}}</s>
+                    {{-- <span class="text-muted">৳ {{number_format($batch->price, 0)}}</span> --}}
+                    <span>
+                      @if($batch->discount > 0)
+                        ফি <del>৳{{number_format($batch->price, 0)}}</del> = 
+                        ৳{{number_format($batch->selling_price, 0)}} 
+                      <span style="background:yellow">(Save-৳{{number_format($batch->discount, 0)}})</span>
+                      @else
+                      ফি ৳{{number_format($batch->price, 0)}}
+                      @endif
+                    </span>
                   </div>
-                  <div class="package-exam-discount-price">৳ {{number_format($batch->price - $batch->discount, 0)}}</div>
+                  <br>
                 </div>
               <div class="text-end">
                 <div class="package-exam-button">
@@ -451,7 +461,7 @@ if($user)
               </div>
               <div class="event-content">
                 <h3 class="text-uppercase text-black teacher_title">{{$teacher->name}}</h3>
-                <p>{!! $teacher->designation !!}</p>
+                <div class="designation">{!! $teacher->designation !!}</div>
               </div>
             </div>
           </a>

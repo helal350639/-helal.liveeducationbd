@@ -125,15 +125,8 @@ class TeacherCtrl extends Controller
      */
     public function edit($id)
     {
-        if(Auth::user()->AuthorizeRoles('SuperAdmin'))
-        {
-            $user = Teacher::find($id);
-            return view('layouts.teachers.edit', compact('user'));
-        }
-
-        Session::flash('error', 'Permission restricted!');
-
-        return back();
+      $user = Teacher::find($id);
+      return view('layouts.teachers.edit', compact('user'));
     }
 
     /**

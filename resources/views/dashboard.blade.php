@@ -15,6 +15,9 @@
     }(window,document,'script'));
   </script>
 
+  <script src="/ckeditor/ckeditor.js"></script>
+  <script src="https://www.wiris.net/demo/plugins/app/WIRISplugins.js?viewer=image"></script>
+
 </head>
 
 <body class="hold-transition skin-blue sidebar-mini">	

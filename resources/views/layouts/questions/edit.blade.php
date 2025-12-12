@@ -129,7 +129,7 @@ foreach($question->filters as $val)
                 <div class="col-md-12">
                     <div class="form-group">
                         <label for="title">Question Title (*)</label>
-                        <textarea class="form-control editor" name="title" id="title" rows="3" required>{{$value->title}}</textarea>
+                        <textarea class="form-control ckeditor" name="title" id="title" rows="3" required>{{$value->title}}</textarea>
                     </div>
                     <p class="text-danger pull-right">Image types must be: .jpeg, .jpg, .png and Max size: 500KB</p>
                 </div>
@@ -206,7 +206,7 @@ foreach($question->filters as $val)
                 <div class="col-md-12">
                     <div class="form-group">
                         <label for="">Explanation</label>
-                        <textarea class="form-control editor" name="explanation" id="explanation">{{$value->explanation}}</textarea>
+                        <textarea class="form-control ckeditor" name="explanation" id="explanation">{{$value->explanation}}</textarea>
                     </div>
                 </div>
                 <div class="col-md-12">
@@ -1047,6 +1047,7 @@ function removeFile(e)
 @endsection
 
 @section('scripts')
+<script src="/ckeditor/ckeditor.js"></script>
 <script src="/assets/summernote/summernote.min.js"></script>
 <script>
     // select 2
@@ -1059,5 +1060,4 @@ function removeFile(e)
         });
     });
 </script>
-
 @endsection

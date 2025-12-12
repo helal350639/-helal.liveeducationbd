@@ -10,6 +10,8 @@
 		}
 		.content-header, .content-header > .breadcrumb > li > a{color:#fff}
 	</style>
+  <script src="https://www.wiris.net/demo/plugins/app/WIRISplugins.js?viewer=image"></script>
+  <script src="/ckeditor/ckeditor.js"></script>
 
 </head>
 
@@ -35,6 +37,20 @@
     		$('.card').removeClass('card-hidden');
     	}, 700)
     });
+  </script>
+
+  
+  
+
+  <script>
+    CKEDITOR.on('instanceReady', function (ev) {
+      if (typeof WirisPlugin !== 'undefined') {
+          WirisPlugin.listeners.fire('onTargetReady', {
+              editor: ev.editor
+          });
+      }
+  });
+
   </script>
 
 </body>

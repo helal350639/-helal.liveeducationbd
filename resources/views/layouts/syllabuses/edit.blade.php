@@ -88,7 +88,7 @@ $value = $syllabus;
                 <div class="col-md-12">
                     <div class="form-group">
                         <label for="details">Details</label>
-                        <textarea class="form-control" name="details" id="details" rows="4">{{$value->details}}</textarea>
+                        <textarea class="form-control ckeditor" name="details" id="details" rows="4">{{$value->details}}</textarea>
                     </div>
                 </div>
                 <div class="col-md-6 no-padding">

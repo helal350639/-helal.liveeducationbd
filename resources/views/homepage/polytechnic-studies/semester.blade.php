@@ -36,7 +36,7 @@ $user = Auth::guard('student')->user();
                   </div>
                   <div class="package-exam-content mx-2 mx-lg-3">
                     <div class="package-exam-title pt-3">
-                      <h2 class="text-center"><a href="{{route('category.departments', ['Polytechnic', $value->id])}}">{{substr($value->name, 0, 20)}}</a></h2>
+                      <h2 class="text-center"><a href="{{route('category.departments', ['Polytechnic', $value->id])}}">{{$value->name}}</a></h2>
                     </div>
                   </div>
                 </div>

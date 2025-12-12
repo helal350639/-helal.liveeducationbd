@@ -62,8 +62,16 @@ if($user)
               <div class="card-heading p-3">
                 <b>{{$value->name}}</b>
               </div>
-              <div class="card-body">
-                <p>{!! $value->details !!}</p>
+              <div class="card-body"><p>
+                @if($value->details)
+                  {!! $value->details !!}
+                @else
+                মোট প্রশ্ন আছেঃ {{$value->questions()->count()}} টি <br>
+                {{-- ( সাবজেক্ট -০১ , সাবজেক্ট -০২ ------ ডিপার্টমেন্ট-০৩ টি ) --}}
+                মোট পরীক্ষার সময়ঃ {{$value->time}} মিনিট <br>
+                আপনি যখন এক্সাম লিংকে প্রবেশ করবেন তখন থেকে {{$value->time}} মিনিট সময় পাবেন। একজন পরীক্ষার্থী একটি এক্সাম লিংকে {{$value->exam_limit ? $value->exam_limit : 'একাধিক'}} বার এক্সাম দিতে পারবেন।
+                @endif
+                </p>
               </div>
               <div class="card-footer">
                 <a class="btn btn-info pull-right" href="{{route('students.exam.show', $value->id)}}">শুরু করুন</a>
