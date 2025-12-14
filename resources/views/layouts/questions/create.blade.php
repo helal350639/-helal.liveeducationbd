@@ -603,7 +603,7 @@ function selectType(e)
                                 '<span class="input-group-addon label-danger" onclick="this.parentNode.parentNode.remove()">'+
                                     '<i class="fa fa-close"></i>'+
                                 '</span>'+
-                                '<textarea class="form-control" name="items[]" id="items" rows="3"></textarea>'+
+                                '<textarea class="form-control ckeditor" name="items[]" id="items" rows="3"></textarea>'+
                                 '<span class="input-group-addon">'+
                                     '<input style="display: none" type="file" name="item_img[]" id="item_2" onchange="showImg(this)"/>'+
                                     '<label for="item_2"><i class="fa fa-image"></i></label>'+

@@ -187,9 +187,12 @@ font-size: 16px;
       <div class="row">
          <div class="col-md-12">
             <div class="section-title text-center mb-4">
-               <h2> স্টুডেন্ট ড্যাশবোর্ড </h2>
-               <p style="font-size: 24px;"> Registration ID: <span style=" font-weight: 700; color: #080;">{{$source->numset($user->id, 6)}}</span></p>
-               <p style="color: white;">
+              <h2> স্টুডেন্ট ড্যাশবোর্ড </h2>
+              <p style="font-size: 24px;"> 
+                Registration ID: 
+                <span style=" font-weight: 700; color: #080;">{{$source->numset($user->id, 6)}}</span>
+              </p>
+              <p style="color: white;">
                 <a class="blink-text btn btn-info" href="{{route('students.my-course')}}" >Your Reference Link: Click Now</a>
               </p>
 
@@ -226,7 +229,7 @@ font-size: 16px;
                           $type = 'Premium Exams';
                         }
                         @endphp
-                        <a class="btn btn-info btn-sm" href="{{route('category.check-method', [$type, $paper->batch->id, $paper->department->id])}}">
+                        <a class="btn btn-info btn-sm" href="{{route('category.check-method', [$type, $paper->batch->id, $paper->department?$paper->department->id:''])}}">
                           Today Your Exam
                         </a>
                       </div>
