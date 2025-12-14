@@ -796,7 +796,10 @@ class QuestionCtrl extends Controller
         $questions = Question::orderBy('id', 'DESC')
         ->where('type', $request->type)
         ->where('title', 'like', '%'.$request->title.'%')
-        ->with(['mcqitems'])->get();
+        ->with(['mcqitems'])
+        // ->select('id', 'title')
+        ->limit(10)
+        ->get();
         
         return response()->json([
             'success' => true,
@@ -806,7 +809,8 @@ class QuestionCtrl extends Controller
 
     public function QuestionSearch(Request $request)
     {
-        $mcqs = Question::where('title', 'like', '%'.$request->search.'%')->paginate(25);
+        $mcqs = Question::where('title', 'like', '%'.$request->search.'%')
+        ->paginate(25);
         return view('layouts.questions.index', compact('mcqs'));
     }
 
