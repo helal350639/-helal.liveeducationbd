@@ -129,7 +129,7 @@ foreach($question->filters as $val)
                 <div class="col-md-12">
                     <div class="form-group">
                         <label for="title">Question Title (*)</label>
-                        <textarea class="form-control ckeditor" name="title" id="title" rows="3" required>{{$value->title}}</textarea>
+                        <textarea class="form-control editor" name="title" id="title" rows="3" required>{{$value->title}}</textarea>
                     </div>
                     <p class="text-danger pull-right">Image types must be: .jpeg, .jpg, .png and Max size: 500KB</p>
                 </div>
@@ -149,7 +149,7 @@ foreach($question->filters as $val)
                             <div class="input-group">
                                 <input type="hidden" name="itemid[]" value="{{$val->id}}">
                                 <span class="input-group-addon label-danger" onclick="this.parentNode.parentNode.remove()"><i class="fa fa-close"></i></span>
-                                <textarea class="form-control" name="items[]" id="items{{$val->id}}" rows="3">{{$val->item}}</textarea>
+                                <textarea class="form-control short_editor" name="items[]" id="items{{$val->id}}" rows="3">{{$val->item}}</textarea>
                                 <span class="input-group-addon">
                                     <img src="{{$val->image}}" alt="" width="54">
                                     <input style="display: none" type="file" name="item_img[]" id="item_{{$val->id}}" onchange="showImg(this)"/>
@@ -206,7 +206,7 @@ foreach($question->filters as $val)
                 <div class="col-md-12">
                     <div class="form-group">
                         <label for="">Explanation</label>
-                        <textarea class="form-control ckeditor" name="explanation" id="explanation">{{$value->explanation}}</textarea>
+                        <textarea class="form-control editor" name="explanation" id="explanation">{{$value->explanation}}</textarea>
                     </div>
                 </div>
                 <div class="col-md-12">
@@ -311,6 +311,17 @@ foreach($question->filters as $val)
 </div>
 
 <script type="text/javascript">
+
+function editor()
+{
+  $('.editor').summernote({
+      height: 150,
+      toolbar: [
+        ['script', ['subscript', 'superscript']]
+    ]
+  });
+}
+
 // add labels
 function addLabel(e)
 {
@@ -692,7 +703,7 @@ function addMulitMcq()
                         '<span class="input-group-addon label-danger" onclick="this.parentNode.parentNode.remove()">'+
                         '<i class="fa fa-close"></i>'+
                         '</span>'+
-                        '<textarea class="form-control" name="items[]" id="items" rows="3" >'+mcqItems[x]+'</textarea>'+
+                        '<textarea class="form-control editor" name="items[]" id="items" rows="3" >'+mcqItems[x]+'</textarea>'+
                         '<span class="input-group-addon">'+
                             '<input style="display: none" type="file" name="item_img[]" id="item_'+x+'"/>'+
                             '<label for="item_'+x+'"><i class="fa fa-image"></i></label>'+
@@ -706,6 +717,8 @@ function addMulitMcq()
 
     multiItems.innerHTML = Items;
 
+    editor();
+
 };
 
 function addOneField()
@@ -718,7 +731,7 @@ function addOneField()
                         '<span class="input-group-addon label-danger" onclick="this.parentNode.parentNode.remove()">'+
                         '<i class="fa fa-close"></i>'+
                         '</span>'+
-                        '<textarea class="form-control" name="items[]" id="items" rows="3" ></textarea>'+
+                        '<textarea class="form-control editor" name="items[]" id="items" rows="3" ></textarea>'+
                         '<span class="input-group-addon">'+
                             '<input style="display: none" type="file" name="item_img[]" id="item_'+x+'"/>'+
                             '<label for="item_'+x+'"><i class="fa fa-image"></i></label>'+
@@ -728,6 +741,8 @@ function addOneField()
                         '</span>'+
                       '</div>';
     multiItems.appendChild(field);
+
+    editor();
 
 }
 
@@ -1056,7 +1071,32 @@ function removeFile(e)
     //this script for text editor
     $(document).ready(function() {
         $('.editor').summernote({
-            height: 150
+            height: 150,
+            toolbar: [
+              // Default groups
+              ['style', ['style']],
+              ['font', ['bold', 'underline', 'clear']],
+              // ['fontname', ['fontname']],
+              ['fontsize', ['fontsize']],
+              // ['color', ['color']],
+              
+              // 👉 Added here
+              ['script', ['subscript', 'superscript']],
+              
+              ['para', ['ul', 'ol', 'paragraph']],
+              ['table', ['table']],
+              ['insert', ['link', 'picture', 'video', 'math']],
+              ['view', ['fullscreen', 'codeview', 'help']]
+          ]
+        });
+    });
+
+    $(document).ready(function() {
+        $('.short_editor').summernote({
+            height: 100,
+            toolbar: [
+              ['script', ['subscript', 'superscript']]
+          ]
         });
     });
 </script>

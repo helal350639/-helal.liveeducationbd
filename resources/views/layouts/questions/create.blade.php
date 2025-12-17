@@ -85,7 +85,7 @@
                     <div class="form-group">
                         <label for="title">Question Title (*)</label>
                         {{-- <textarea class="form-control editor" name="title" id="title" rows="3" required></textarea> --}}
-                        <textarea class="ckeditor form-control" name="title" id="title" rows="3" required></textarea>
+                        <textarea class="editor form-control" name="title" id="title" rows="3" required></textarea>
 
                         {{-- <div class="input-group"> --}}
                             {{-- <span class="input-group-addon">
@@ -105,7 +105,7 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <label for="">Explanation</label>
-                        <textarea class="form-control ckeditor" name="explanation" id="explanation"></textarea>
+                        <textarea class="form-control editor" name="explanation" id="explanation"></textarea>
                     </div>
                 </div>
                 <div class="col-md-12">
@@ -528,7 +528,7 @@ function addMulitMcq()
                         '<span class="input-group-addon label-danger" onclick="this.parentNode.parentNode.remove()">'+
                         '<i class="fa fa-close"></i>'+
                         '</span>'+
-                        '<textarea class="form-control" name="items[]" id="items" rows="3" >'+mcqItems[x]+'</textarea>'+
+                        '<textarea class="form-control editor" name="items[]" id="items" rows="3" >'+mcqItems[x]+'</textarea>'+
                         '<span class="input-group-addon">'+
                             '<input style="display: none" type="file" name="item_img[]" id="item_'+x+'"/>'+
                             '<label for="item_'+x+'"><i class="fa fa-image"></i></label>'+
@@ -541,6 +541,14 @@ function addMulitMcq()
     }
 
     multiItems.innerHTML = Items;
+    $(document).ready(function() {
+      $('.editor').summernote({
+          height: 150,
+          toolbar: [
+            ['script', ['subscript', 'superscript']]
+        ]
+      });
+    });
 
 }
 
@@ -554,7 +562,7 @@ function addOneField()
                             '<span class="input-group-addon label-danger" onclick="this.parentNode.parentNode.remove()">'+
                             '<i class="fa fa-close"></i>'+
                             '</span>'+
-                            '<textarea class="form-control" name="mcq_items[]" id="mcq_items" rows="3" ></textarea>'+
+                            '<textarea class="form-control editor" name="mcq_items[]" id="mcq_items" rows="3" ></textarea>'+
                             '<span class="input-group-addon">'+
                                 '<input style="display: none" type="file" name="item_img[]" id="item_'+x+'"/>'+
                                 '<label for="item_'+x+'"><i class="fa fa-image"></i></label>'+
@@ -564,6 +572,15 @@ function addOneField()
                                 '</span>'+
                         '</div>';
     multiItems.appendChild(field);
+
+    $(document).ready(function() {
+      $('.editor').summernote({
+          height: 150,
+          toolbar: [
+            ['script', ['subscript', 'superscript']]
+        ]
+      });
+    });
 
 }
 
@@ -587,7 +604,7 @@ function selectType(e)
                             '<span class="input-group-addon label-danger" onclick="this.parentNode.parentNode.remove()">'+
                                 '<i class="fa fa-close"></i>'+
                                 '</span>'+
-                                '<textarea class="form-control" name="items[]" id="items" rows="3"></textarea>'+
+                                '<textarea class="form-control editor" name="items[]" id="items" rows="3"></textarea>'+
                                 '<span class="input-group-addon">'+
                                     '<img src="" alt="" width="54">'+
                                     '<input style="display: none" type="file" name="item_img[]" id="item_1" onchange="showImg(this)"/>'+
@@ -603,7 +620,7 @@ function selectType(e)
                                 '<span class="input-group-addon label-danger" onclick="this.parentNode.parentNode.remove()">'+
                                     '<i class="fa fa-close"></i>'+
                                 '</span>'+
-                                '<textarea class="form-control ckeditor" name="items[]" id="items" rows="3"></textarea>'+
+                                '<textarea class="form-control editor" name="items[]" id="items" rows="3"></textarea>'+
                                 '<span class="input-group-addon">'+
                                     '<input style="display: none" type="file" name="item_img[]" id="item_2" onchange="showImg(this)"/>'+
                                     '<label for="item_2"><i class="fa fa-image"></i></label>'+
@@ -618,7 +635,7 @@ function selectType(e)
                                 '<span class="input-group-addon label-danger" onclick="this.parentNode.parentNode.remove()">'+
                                     '<i class="fa fa-close"></i>'+
                                 '</span>'+
-                                '<textarea class="form-control" name="items[]" id="items" rows="3"></textarea>'+
+                                '<textarea class="form-control editor" name="items[]" id="items" rows="3"></textarea>'+
                                 '<span class="input-group-addon">'+
                                     '<input style="display: none" type="file" name="item_img[]" id="item_3" onchange="showImg(this)"/>'+
                                     '<label for="item_3"><i class="fa fa-image"></i></label>'+
@@ -633,7 +650,7 @@ function selectType(e)
                                 '<span class="input-group-addon label-danger" onclick="this.parentNode.parentNode.remove()">'+
                                     '<i class="fa fa-close"></i>'+
                                 '</span>'+
-                                '<textarea class="form-control" name="items[]" id="items" rows="3"></textarea>'+
+                                '<textarea class="form-control editor" name="items[]" id="items" rows="3"></textarea>'+
                                 '<span class="input-group-addon">'+
                                     '<input style="display: none" type="file" name="item_img[]" id="item_4" onchange="showImg(this)"/>'+
                                     '<label for="item_4"><i class="fa fa-image"></i></label>'+
@@ -668,7 +685,10 @@ function selectType(e)
 
     $(document).ready(function() {
         $('.editor').summernote({
-            height: 150
+            height: 150,
+            toolbar: [
+              ['script', ['subscript', 'superscript']]
+          ]
         });
     });
 }
@@ -913,7 +933,23 @@ function resetFields()
     //this script for text editor
     $(document).ready(function() {
         $('.editor').summernote({
-            height: 150
+            height: 150,
+            toolbar: [
+              // Default groups
+              ['style', ['style']],
+              ['font', ['bold', 'underline', 'clear']],
+              // ['fontname', ['fontname']],
+              ['fontsize', ['fontsize']],
+              // ['color', ['color']],
+              
+              // 👉 Added here
+              ['script', ['subscript', 'superscript']],
+              
+              ['para', ['ul', 'ol', 'paragraph']],
+              ['table', ['table']],
+              ['insert', ['link', 'picture', 'video', 'math']],
+              ['view', ['fullscreen', 'codeview', 'help']]
+          ]
         });
     });
 </script>

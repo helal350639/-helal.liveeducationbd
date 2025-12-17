@@ -88,7 +88,7 @@ $value = $syllabus;
                 <div class="col-md-12">
                     <div class="form-group">
                         <label for="details">Details</label>
-                        <textarea class="form-control ckeditor" name="details" id="details" rows="4">{{$value->details}}</textarea>
+                        <textarea class="form-control editor" name="details" id="details" rows="4">{{$value->details}}</textarea>
                     </div>
                 </div>
                 <div class="col-md-6 no-padding">
@@ -331,7 +331,23 @@ function Status(e)
     //this script for text editor
     $(document).ready(function() {
         $('.editor').summernote({
-            height: 150
+            height: 150,
+            toolbar: [
+              // Default groups
+              ['style', ['style']],
+              ['font', ['bold', 'underline', 'clear']],
+              // ['fontname', ['fontname']],
+              ['fontsize', ['fontsize']],
+              // ['color', ['color']],
+              
+              // 👉 Added here
+              ['script', ['subscript', 'superscript']],
+              
+              ['para', ['ul', 'ol', 'paragraph']],
+              ['table', ['table']],
+              ['insert', ['link', 'picture', 'video', 'math']],
+              ['view', ['fullscreen', 'codeview', 'help']]
+          ]
         });
     });
 

@@ -174,7 +174,23 @@
     //this script for text editor
     $(document).ready(function() {
         $('.editor').summernote({
-            height: 150
+            height: 150,
+            toolbar: [
+              // Default groups
+              ['style', ['style']],
+              ['font', ['bold', 'underline', 'clear']],
+              // ['fontname', ['fontname']],
+              ['fontsize', ['fontsize']],
+              // ['color', ['color']],
+              
+              // 👉 Added here
+              ['script', ['subscript', 'superscript']],
+              
+              ['para', ['ul', 'ol', 'paragraph']],
+              ['table', ['table']],
+              ['insert', ['link', 'picture', 'video']],
+              ['view', ['fullscreen', 'codeview', 'help']]
+          ]
         });
     });
 
