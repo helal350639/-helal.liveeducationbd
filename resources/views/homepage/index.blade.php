@@ -340,7 +340,7 @@ if($user)
                     <span>
                       @if($batch->discount > 0)
                         ফি <del>৳{{number_format($batch->price, 0)}}</del> = 
-                        ৳{{number_format($batch->selling_price, 0)}} 
+                        ৳{{number_format(($batch->price - $batch->discount), 0)}} 
                       <span style="background:yellow">(Save-৳{{number_format($batch->discount, 0)}})</span>
                       @else
                       ফি ৳{{number_format($batch->price, 0)}}

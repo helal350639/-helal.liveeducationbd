@@ -126,9 +126,10 @@ $selling_price = $price - $discount;
               <div class="card-heading p-3">
                 <h3>
                   @if($discount) 
-                  <del> &#2547;{{$source->point0($price)}}</del> &nbsp; <span class="label label-warning"> &#2547;{{$source->point0($discount)}} ছাড়</span>
-                  @endif
+                  <del> &#2547;{{$source->point0($price)}}</del> &nbsp; 
                   <b> &nbsp; &#2547;{{$source->point0($selling_price)}}</b>
+                  <span class="btn btn-warning">  Save - &#2547;{{$source->point0($discount)}} </span>
+                  @endif
                   </h3>
                 <p>{{$value->subtitle}}</p>
                 <table class="table table-bordered">
