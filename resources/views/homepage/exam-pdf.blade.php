@@ -94,8 +94,8 @@ $now = now();
                           প্রকাশিত হবেঃ {{$source->dtformat($syllabus->datetime)}}
                           @else
                           <a href="{{route('student.syllabus', $syllabus->id)}}" class="btn btn-sm btn-info text-white"> পড়ুন </a>
-                          <a href="{{route('students.syllabus.pdf', $syllabus->id)}}" class="btn btn-sm btn-warning"> ডাউনলোড </a>
-                          {{-- <a class="btn btn-sm btn-warning"  data-url="{{route('students.syllabus.pdf', $syllabus->id)}}" onclick="pdfGenerate(this)"> ডাউনলোড </a> --}}
+                          {{-- <a href="{{route('students.syllabus.pdf', $syllabus->id)}}" class="btn btn-sm btn-warning"> ডাউনলোড </a> --}}
+                          <a class="btn btn-sm btn-warning"  data-url="{{route('students.syllabus.pdf', $syllabus->id)}}" onclick="pdfGenerate(this)"> ডাউনলোড </a>
                           @endif
                         </div>
                       </div>
