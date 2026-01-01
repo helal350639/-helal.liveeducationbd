@@ -43,6 +43,11 @@ $now = now();
       height: 45px;
   }
 }
+#pdfLoading{
+    position: fixed; top:0; left:0; bottom:0; width: 100%; height: 100%; background: rgba(0,0,0,0.1);
+    text-align: center;
+    padding-top: 20%
+   }
 </style>
 
     <!-- Main content -->
@@ -89,7 +94,8 @@ $now = now();
                           প্রকাশিত হবেঃ {{$source->dtformat($syllabus->datetime)}}
                           @else
                           <a href="{{route('student.syllabus', $syllabus->id)}}" class="btn btn-sm btn-info text-white"> পড়ুন </a>
-                          <a href="{{route('students.syllabus.pdf', $syllabus->id)}}" class="btn btn-sm btn-warning"> ডাউনলোড </a>
+                          {{-- <a href="{{route('students.syllabus.pdf', $syllabus->id)}}" class="btn btn-sm btn-warning"> ডাউনলোড </a> --}}
+                          <a class="btn btn-sm btn-warning"  data-url="{{route('students.syllabus.pdf', $syllabus->id)}}" onclick="pdfGenerate(this)"> ডাউনলোড </a>
                           @endif
                         </div>
                       </div>
@@ -114,4 +120,44 @@ $now = now();
 
       </div> <!-- /.container -->
     </section> <!-- /.our_courses -->
+
+  
+  <div id="pdfLoading" style="display:none;">
+    <img src="/img/loading.gif" alt="">
+  </div>
+
+    <script>
+    
+    function pdfGenerate(e)
+      {
+        let preloader = document.getElementById('pdfLoading');
+        preloader.style.display = 'block';
+        
+        let url = e.dataset.url;
+    
+        fetch(url, {
+            method: "GET",
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+    
+          preloader.style.display = 'none';
+    
+            if (data.status === 'success')
+            {
+                // Redirect to PDF file
+                window.location.href = data.url;
+            } else {
+                alert('Failed to generate PDF');
+            }
+        })
+        .catch(error => {
+            document.getElementById('pdfLoading').style.display = 'none';
+            alert('Something went wrong');
+        });
+      }
+    </script>
 @endsection

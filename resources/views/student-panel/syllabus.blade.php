@@ -30,6 +30,11 @@ $qcount = 0;
   /* @media screen and (min-width:768px){
     .department{width:850px; columns:400px 2; column-gap:30px; column-rule: 1px solid #888; }
   } */
+   #pdfLoading{
+    position: fixed; top:0; left:0; bottom:0; width: 100%; height: 100%; background: rgba(0,0,0,0.1);
+    text-align: center;
+    padding-top: 20%
+   }
 </style>
 
   <!-- Main content -->
@@ -47,7 +52,11 @@ $qcount = 0;
             <div class="box-header with-border">
               <h4 class="box-title" style="display: inline">Questions (<b>{{count($syllabus->questions)}}</b>)</h4>
               <div class="text-right toolbar-icon pull-right" style="display: inline">
-                <a href="{{route('students.syllabus.pdf', $syllabus->id)}}" class="label label-info" title="Download"><i class="fa fa-download"></i> Download PDF </a>
+                {{-- <a href="{{route('students.syllabus.pdf', $syllabus->id)}}" class="label label-info" title="Download"><i class="fa fa-download"></i> Download PDF </a> --}}
+                <a href="javascript:void(0)" id="generatePdfBtn" class="label label-info" title="Download" data-url="{{route('students.syllabus.pdf', $syllabus->id)}}" onclick="pdfGenerate(this)">
+                  <i class="fa fa-download"></i> Download PDF 
+                </a>
+              
               </div>
             </div>
           </div>
@@ -129,11 +138,47 @@ $qcount = 0;
       
     </div>
   </section><!-- /.content -->
+  
+  <div id="pdfLoading" style="display:none;">
+    <img src="/img/loading.gif" alt="">
+  </div>
    
 @endsection
 @section('scripts')
-<script>
   
+<script>
+  function pdfGenerate(e)
+  {
+    let preloader = document.getElementById('pdfLoading');
+    preloader.style.display = 'block';
+    
+    let url = e.dataset.url;
+
+    fetch(url, {
+        method: "GET",
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+
+      preloader.style.display = 'none';
+
+        if (data.status === 'success')
+        {
+            // Redirect to PDF file
+            window.location.href = data.url;
+        } else {
+            alert('Failed to generate PDF');
+        }
+    })
+    .catch(error => {
+        document.getElementById('pdfLoading').style.display = 'none';
+        alert('Something went wrong');
+    });
+  }
+
   function printDiv()
   {
     // document.getElementById('heading').style.display = 'block';

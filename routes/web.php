@@ -179,6 +179,7 @@ Route::middleware('auth:student')->group(function()
       Route::post('student/exam_add', 'examAdd')->name('student.exam.add');
       Route::get('syllabus/{id}', 'syllabus')->name('student.syllabus');
       Route::get('syllabus/{id}/pdf', 'generatePDF')->name('students.syllabus.pdf');
+      Route::get('syllabus/pdf-download/{filename}', 'download')->name('students.syllabus.download');
       Route::get('complain', 'complain')->name('students.complain');
       Route::post('complain', 'complainStore')->name('students.complain.store');
       Route::get('update-paper/{id}', 'updatePaperAjax')->name('paper.update.ajax');

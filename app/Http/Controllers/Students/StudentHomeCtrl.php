@@ -28,6 +28,7 @@ use Mail;
 use DB;
 use \Mpdf\Mpdf;
 use Spatie\Browsershot\Browsershot;
+use Illuminate\Support\Facades\Storage;
 
 class StudentHomeCtrl extends Controller
 {
@@ -782,15 +783,27 @@ class StudentHomeCtrl extends Controller
 
     ob_end_clean();
 
-    // $mpdf->Output(storage_path('app/mpdf/syllabus.pdf'), 'F');
+    //file name creation
+    $syllabus_name = $syllabus->name ? $syllabus->name : '-';
+    $batch_name = $syllabus->batch ? $syllabus->batch->name : '-';
+    $department_name = $syllabus->department ? $syllabus->department->name : '-';
+    $fileName = $syllabus_name.'_'.$batch_name.'_'.$department_name;
 
-    $mpdf->Output($syllabus ? $syllabus->name.'.pdf' : '----Syllabus.pdf', 'D');
+    $path = storage_path('app/mpdf/'.$fileName);
+    if(!Storage::exists('mpdf/'.$fileName))
+    {
+      $mpdf->Output($path, 'F');
+    }
 
-    // $mpdf->stream('document.pdf');
+    return response()->json([
+        'status' => 'success',
+        'url' => route('students.syllabus.download', $fileName)
+    ]);
+  }
 
-    // return $mpdf->download('Syllabus PDF.pdf');
-
-    // return view('student-panel.syllabus-pdf', compact('syllabus', 'groupedData'));
+  public function download($file)
+  {
+    return Storage::download('mpdf/'.$file, $file.'.pdf');
   }
 
   public function complain()
