@@ -723,15 +723,11 @@ class StudentHomeCtrl extends Controller
 
   public function generatePDF($id)
   {
-    // $syllabus = Syllabus::find($id);
-
     // check this syllabus batch request user permission
     $user = Auth::guard('student')->user();
-
-    $data = $this->syllabusQuestions($id);
+    $syllabus = Syllabus::find($id);
     
-    $syllabus = $data['syllabus'];
-
+    // if user not connected to the batch then redirect back
     $user_batch = $user->batches()
     ->where('batch_id', $syllabus->batch_id)
     ->first();
@@ -740,6 +736,26 @@ class StudentHomeCtrl extends Controller
     {
       return redirect()->route('home.course.show', $syllabus->batch_id);
     }
+
+    //file name creation
+    $syllabus_name = $syllabus->name ? $syllabus->name : '-';
+    $batch_name = $syllabus->batch ? $syllabus->batch->name : '-';
+    $department_name = $syllabus->department ? $syllabus->department->name : '-';
+    $fileName = $syllabus_name.'_'.$batch_name.'_'.$department_name;
+
+    //safe file name
+    $fileName = preg_replace('/[\/\\\\:*?"<>|]/u', '-', $fileName);
+
+    //check file already exist?
+    if(Storage::exists('mpdf/'.$fileName))
+    {
+      return response()->json([
+        'status' => 'success',
+        'url' => route('students.syllabus.download', $fileName)
+      ]);
+    }
+
+    $data = $this->syllabusQuestions($id);
 
     $groupedData = $data['questions'];
 
@@ -783,17 +799,9 @@ class StudentHomeCtrl extends Controller
 
     ob_end_clean();
 
-    //file name creation
-    $syllabus_name = $syllabus->name ? $syllabus->name : '-';
-    $batch_name = $syllabus->batch ? $syllabus->batch->name : '-';
-    $department_name = $syllabus->department ? $syllabus->department->name : '-';
-    $fileName = $syllabus_name.'_'.$batch_name.'_'.$department_name;
-
     $path = storage_path('app/mpdf/'.$fileName);
-    if(!Storage::exists('mpdf/'.$fileName))
-    {
-      $mpdf->Output($path, 'F');
-    }
+    $mpdf->Output($path, 'F');
+    // if(!Storage::exists('mpdf/'.$fileName)){}
 
     return response()->json([
         'status' => 'success',
