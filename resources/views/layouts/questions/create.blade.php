@@ -46,10 +46,6 @@
                         </select>
                     </div>
                 </div>
-                {{-- <div class="col-md-12">
-                    <hr>
-                    <label for="">CATEGORIES</label>
-                </div> --}}
                 <div class="col-md-12">
                     <div class="form-group">
                         <label for="name">Course Name (*)</label>
@@ -676,11 +672,19 @@ function selectType(e)
     else
     {
         Answer.innerHTML = '<div class="col-md-12 no-padding">'+
+          '<div class="form-group">'+
+                '<label for="">Video URL Type</label>'+
+                '<select class="form-control" name="url_type" id="url_type" placeholder="Video URL Type" required>'+
+                  '<option value="">Select One</option>'+
+                  '<option value="Youtube">Youtube</option>'+
+                  '<option value="Google Drive">Google Drive</option>'+
+                '</select>'+
+            '</div>'+
             '<div class="form-group">'+
                 '<label for="">Input Video URL</label>'+
-                '<input type="url" class="form-control" name="video" id="video" placeholder="https://www.youtube.com/watch?v=DFDDFE8dDFd" required>'+
-                '</div>'+
-            '</div>';
+                '<input type="url" class="form-control" name="video" id="video" required>'+
+            '</div>'+
+          '</div>';
     }
 
     $(document).ready(function() {

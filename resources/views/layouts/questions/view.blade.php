@@ -9,6 +9,9 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
 {
   $url = route('syllabus.addtopaper');
 }
+else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
+  $url = route('book.addtopaper');
+}
 @endphp
 
 @extends('dashboard')
@@ -211,11 +214,26 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
               <div class="form-group">
                 <div class="input-group">
                   <label class="label-default">{{$paper->name}}</label>
-                  <span class="input-group-addon" style="font-weight: bold"><span id="qcount">{{count($paper->questions)}}</span>/<span id="maxq">{{$paper->max}}</span></span>
+                  <span class="input-group-addon" style="font-weight: bold">
+                    <span id="qcount">{{count($paper->questions)}}</span>/
+                    <span id="maxq">{{$paper->max}}</span>
+                  </span>
                 </div>
               </div>
               <div class="form-group">
-                <a class="btn btn-info pull-right" href="{{$paper->type == 'syllabus'? route('syllabus.view', $paper->id): route('paper.view', $paper->id)}}"><i class="fa fa-check"></i> Done</a>
+                @if($paper->type == 'syllabus')
+                <a class="btn btn-info pull-right" href="{{route('syllabus.view', $paper->id)}}">
+                  <i class="fa fa-check"></i> Done
+                </a>
+                @elseif($paper->type == 'book')
+                <a class="btn btn-info pull-right" href="{{route('book.view', $paper->id)}}">
+                  <i class="fa fa-check"></i> Done
+                </a>
+                @else
+                <a class="btn btn-info pull-right" href="{{route('paper.view', $paper->id)}}">
+                  <i class="fa fa-check"></i> Done
+                </a>
+                @endif
                 {{-- <button type="button" class="btn btn-success btn-sm pull-right" onclick="addToPaper(this)" value="{{$paper->id}}"><i class="fa fa-plus"></i> Add To Paper</button> --}}
               </div>
             </div>
@@ -233,7 +251,9 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
                   <li class="item">
                     <p>
                       <a>{{$filter->name}}</a>
-                      <span class="drop-down" onclick="showHideSubFilter(this)"><i class="fa fa-chevron-down"></i></span>
+                      <span class="drop-down" onclick="showHideSubFilter(this)">
+                        <i class="fa fa-chevron-down"></i>
+                      </span>
                     </p>
                     <ul class="filter-group hide">
                       @foreach($filter->subfilter as $sub)
@@ -300,7 +320,8 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
     });
 
     let checkAll = document.getElementById('checkAll');
-    if(maxq && Number(qcount.innerHTML) >= Number(maxq.innerHTML) || checked > unchecked)
+    // maxq && Number(counter) >= Number(maxq.innerHTML) || 
+    if(checked > unchecked)
     {
       checkAll.checked = true;
     }
@@ -779,7 +800,6 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
 @endsection
 @section('scripts')
   <script>
-
 
   // get syllabuses
   function getSyllabus(e)

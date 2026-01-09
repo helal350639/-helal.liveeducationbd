@@ -42,13 +42,20 @@ if(!is_null(Session::get('_paper')))
       <div class="panel-heading">
         <label style="display: block; font-size:16px">
           <input type="checkbox" class="check" value="{{$value->id}}" onclick="count(this)" {{in_array($value->id, $xqs) ? 'checked':''}}>
-          <span style="float: left; color:#a00"> প্রশ্ন নং- {{$key + $questions->firstItem()}} : &nbsp; </span>{!!$value->title!!}</label>
+          <span style="float: left; color:#a00"> প্রশ্ন নং- {{$key + $questions->firstItem()}} : &nbsp; </span>{!!$value->title!!}
+        </label>
       </div>
       <div class="panel-body">
         <div class="tools">
-          <a href="{{route('question.show', $value->id)}}" class="btn btn-info btn-xs"><i class="fa fa-file"></i></a>
-          <a href="{{route('question.edit', $value->id)}}" class="btn btn-warning btn-xs"><i class="fa fa-pencil"></i></a>
-          <button class="btn btn-danger btn-xs" onclick="del(this)" value="{{$value->id}}"><i class="fa fa-trash"></i></button>
+          <a href="{{route('question.show', $value->id)}}" class="btn btn-info btn-xs">
+            <i class="fa fa-file"></i>
+          </a>
+          <a href="{{route('question.edit', $value->id)}}" class="btn btn-warning btn-xs">
+            <i class="fa fa-pencil"></i>
+          </a>
+          <button class="btn btn-danger btn-xs" onclick="del(this)" value="{{$value->id}}">
+            <i class="fa fa-trash"></i>
+          </button>
         </div>
         @foreach($value->getlabels as $val)
         <label class="label label-default">{{$val->label}}</label>
@@ -86,16 +93,26 @@ if(!is_null(Session::get('_paper')))
         <p style="padding-top:15px;"><b>Answer:</b> {!! $value->answer !!}</p>
         <p>
           @foreach($value->answerfiles as $val)
-          @if(substr($val->file, -3) == 'pdf')
-          <a target="_blank" href="{{$val->file}}"><i class="fa fa-file"></i></a>
-          @else
-          <a target="_blank" href="{{$val->file}}"><img src="{{$val->file}}" alt="" width="100"></a>
+            @if(substr($val->file, -3) == 'pdf')
+            <a target="_blank" href="{{$val->file}}">
+              <i class="fa fa-file"></i>
+            </a>
+            @else
+            <a target="_blank" href="{{$val->file}}">
+              <img src="{{$val->file}}" alt="" width="100">
+            </a>
             &nbsp; 
-          @endif
+            @endif
           @endforeach
         </p>
 
         @elseif($value->type == 'Video')
+          @if($value->url_type == 'Youtube')
+          <iframe width="420" height="315" src="https://www.youtube.com/embed/tgbNymZ7vqY"></iframe>
+
+          @else
+          <iframe src="{{$value->video}}" width="640" height="480" allow="autoplay" allowfullscreen></iframe>
+          @endif
         <p>{!! $value->video !!}</p>
         <div class="col-md-12 no-padding">
           <button class="btn btn-info" onclick="showHideAnswer(this)">Show Explanation: <i class="fa fa-chevron-down"></i></button>

@@ -1,10 +1,10 @@
 @php
 $user = Auth::guard('student')->user();
 @endphp
+
 @extends('student')
 @section('title', 'বই সমূহ')
 @section('content')
-{{-- <script src='https://www.google.com/recaptcha/api.js' async defer></script> --}}
 <style>
   .checkbox{padding-left: 25px}
   .panel ::-webkit-scrollbar{width: 5px;}
@@ -34,7 +34,7 @@ $user = Auth::guard('student')->user();
                 <div class="exam-package-area">
                   <div class="package-exam-image">
                     <a href="{{route('home.book.read', $value->id)}}">
-                    <img src="{{ $value->banner? $value->banner : '/img/book-cover.jpg'}}" alt="" loading="lazy" />
+                    <img src="{{ $value->front_cover? $value->front_cover : '/img/book-cover.jpg'}}" alt="" loading="lazy" />
                     </a>
                   </div>
                   <div class="package-exam-content mx-2 mx-lg-3">

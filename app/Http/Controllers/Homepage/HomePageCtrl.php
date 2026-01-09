@@ -30,6 +30,7 @@ use App\Models\Service;
 use App\Models\Visitor;
 use App\Models\Subject;
 use App\Models\BookCategory;
+use App\Models\Book;
 use Auth;
 use Session;
 use DB;
@@ -437,11 +438,8 @@ class HomePageCtrl extends Controller
 
   public function books($id)
   {
-    $books = Subject::where('status', 'Active')
-    ->whereHas('departments', function($query) use($id)
-    {
-      $query->where('department_id', $id);
-    })
+    $books = Book::where('status', 'Active')
+    ->where('department_id', $id)
     ->get();
 
     return view('homepage.books.index', compact('books'));
@@ -449,13 +447,15 @@ class HomePageCtrl extends Controller
 
   public function readBook($id)
   {
-    $subject = Subject::find($id);
+    $subject = Book::find($id);
     $questions = $subject->questions()->where('type', 'MCQ')
     ->paginate(25);
+
+    $chapters = $subject->chapters()->select('id', 'name')->get();
     
     if($questions)
     {
-      return view('homepage.books.read', compact('subject', 'questions'));
+      return view('homepage.books.read', compact('subject', 'chapters', 'questions'));
     }
     return back();
   }

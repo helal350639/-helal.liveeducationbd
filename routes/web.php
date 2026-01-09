@@ -276,6 +276,7 @@ Route::middleware(['auth'])->group(function()
 	Route::resource('video', 'VideoCtrl');
 	Route::resource('service', 'ServiceCtrl');
 	Route::resource('book-category', 'BookCategoryCtrl');
+	Route::resource('book', 'BookCtrl');
 
 	/** -------------------- Custom Routes ------------------ */
 	Route::controller(DepartmentCtrl::class)->group(function()
@@ -414,6 +415,14 @@ Route::middleware(['auth'])->group(function()
     Route::get('routine/edit-item/{id}', 'editItem')->name('routine.item.edit');    
     Route::put('routine/item/update/{id}', 'update')->name('routine.item-update');
     Route::get('routine/show-item/{id}', 'showItem')->name('routine.item.show'); 
+  });
+
+  Route::controller(BookCtrl::class)->group(function()
+	{
+		Route::get('book-add-question/{book}/{id}', 'addQuestion')->name('book.add.question');
+		Route::post('book/add_to_paper', 'addToPaper')->name('book.addtopaper');
+		Route::get('book/view/{id}', 'view')->name('book.view');
+		Route::get('book/pdf/{id}', 'pdf')->name('book.pdf');
   });
 
   Route::controller(HomePageSettingCtrl::class)->group(function()

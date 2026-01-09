@@ -61,12 +61,24 @@ class QuestionCtrl extends Controller
 
     public function viewQuestion()
     {
-        $courses = Course::where('status', 'Active')->get();
-        $departments = Department::where('status', 'Active')->get();
-        $semesters = Semester::where('status', 'Active')->get();
-        $subjects = Subject::where('status', 'Active')->get();
-        $chapters = Chapter::where('status', 'Active')->get();
-        $users = User::where('status', 'Active')->get();
+        $courses = Course::where('status', 'Active')
+        ->select('id', 'name')
+        ->get();
+        $departments = Department::where('status', 'Active')
+        ->select('id', 'name')
+        ->get();
+        $semesters = Semester::where('status', 'Active')
+        ->select('id', 'name')
+        ->get();
+        $subjects = Subject::where('status', 'Active')
+        ->select('id', 'name')
+        ->get();
+        $chapters = Chapter::where('status', 'Active')
+        ->select('id', 'name')
+        ->get();
+        $users = User::where('status', 'Active')
+        ->select('id', 'name')
+        ->get();
 
         $filters = Filter::with(['SubFilter'])->get();
 
@@ -97,12 +109,24 @@ class QuestionCtrl extends Controller
             $filter_ids = explode(',', $data['filter_ids']);
         }
 
-        $courses = Course::where('status', 'Active')->get();
-        $departments = Department::where('status', 'Active')->get();
-        $semesters = Semester::where('status', 'Active')->get();
-        $subjects = Subject::where('status', 'Active')->get();
-        $chapters = Chapter::where('status', 'Active')->get();
-        $users = User::where('status', 'Active')->get();
+        $courses = Course::where('status', 'Active')
+        ->select('id', 'name')
+        ->get();
+        $departments = Department::where('status', 'Active')
+        ->select('id', 'name')
+        ->get();
+        $semesters = Semester::where('status', 'Active')
+        ->select('id', 'name')
+        ->get();
+        $subjects = Subject::where('status', 'Active')
+        ->select('id', 'name')
+        ->get();
+        $chapters = Chapter::where('status', 'Active')
+        ->select('id', 'name')
+        ->get();
+        $users = User::where('status', 'Active')
+        ->select('id', 'name')
+        ->get();
 
         $filters = Filter::with(['SubFilter'])->get();
 
@@ -197,11 +221,20 @@ class QuestionCtrl extends Controller
      */
     public function create()
     {
-      $courses = Course::where('status', 'Active')->get();
-      $departments = Department::where('status', 'Active')->get();
+      $courses = Course::where('status', 'Active')
+      ->select('id', 'name')
+      ->get();
+      $departments = Department::where('status', 'Active')
+      ->select('id', 'name')
+      ->get();
+      
       $filters = Filter::with(['SubFilter'])
-      ->where('filters.status', 'Active')->orderBy('filters.id', 'ASC')->get();
-      $labels = Filter::with(['SubFilter'])->orderBy('filters.id', 'ASC')
+      ->where('filters.status', 'Active')
+      ->orderBy('filters.id', 'ASC')
+      ->get();
+
+      $labels = Filter::with(['SubFilter'])
+      ->orderBy('filters.id', 'ASC')
       ->where('filters.status', 'Active')
       ->where('filters.label', 'Yes')
       ->get();
@@ -314,7 +347,7 @@ class QuestionCtrl extends Controller
         }
 
         // video url to embed url convert
-        if($data['type'] == 'Video')
+        if($data['type'] == 'Video' && $data['url_type'] == 'Youtube')
         {
           $parts = parse_url($data['video']);
           parse_str($parts['query'], $queryParams);

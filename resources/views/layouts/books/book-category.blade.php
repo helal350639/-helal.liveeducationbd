@@ -140,11 +140,24 @@ $source = New SourceCtrl;
           });
           form.elements.department.innerHTML = departmentOptions;
 
-          // form.elements.status.options.forEach(s => {
-          //   statusOptions += '<option value="'+s+'">'+s+'</option>';
-          // })
-          form.elements.status.append('<option value="'+data.bookCategory.status+'" selected>'+data.bookCategory.status+'</option>');
-          // console.log(form.elements.status.options);
+          //create status options
+          let formStatusOptions = form.elements.status.options; 
+          let selected = '';         
+          for(let o = 0; o < formStatusOptions.length; o++)
+          {
+            if(formStatusOptions[o].value == data.bookCategory.status)
+            {
+              selected = 'selected';
+            }
+            else
+            {
+              selected = '';
+            }
+
+            statusOptions += '<option value="'+formStatusOptions[o].value+'" '+selected+'>'+formStatusOptions[o].value+'</option>';
+
+          };
+          form.elements.status.innerHTML = statusOptions;
         },
         error: function(data){
           console.error(data);

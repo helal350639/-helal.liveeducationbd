@@ -295,6 +295,11 @@ if($complains)
                 <i class="fa fa-file-text"></i> View Book Categories
               </a>
             </li>
+            <li>
+              <a href="{{route('book.index')}}">
+                <i class="fa fa-book"></i> View Books
+              </a>
+            </li>
           </ul>
         </li>
 

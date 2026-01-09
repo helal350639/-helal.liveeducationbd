@@ -6,6 +6,12 @@ $source = New SourceCtrl;
 @extends('dashboard')
 @section('title', 'View All Orders')
 @section('content')
+<style>
+  .not-found{
+    text-align: center;
+    padding:15px;
+  }
+</style>
 <!-- Content Header (Page header) -->
 <section class="content-header">
   <h1>All Orders</h1>
@@ -20,6 +26,72 @@ $source = New SourceCtrl;
   <div class="row">
     <div class="col-xs-12">
       <div class="box">
+        <div class="box-body">
+          <form action="{{route('order.index')}}" method="GET">
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="batch_id">Batch</label>
+                <select name="batch_id" id="batch_id" class="form-control">
+                  <option value="">Select One</option>
+                  @foreach($batches as $batch)
+                  <option value="{{$batch->id}}" {{request('batch_id') == $batch->id ? 'selected': ''}}>{{$batch->name}}</option>
+                  @endforeach
+                </select>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="department_id">Department</label>
+                <select name="department_id" id="department_id" class="form-control">
+                  <option value="">Select One</option>
+                  @foreach($departments as $department)
+                  <option value="{{$department->id}}" {{request('department_id') == $department->id ? 'selected': ''}}>{{$department->name}}</option>
+                  @endforeach
+                </select>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="student_id">Student</label>
+                <select name="student_id" id="student_id" class="form-control">
+                  <option value="">Select One</option>
+                  @foreach($students as $student)
+                  <option value="{{$student->id}}" {{request('student_id') == $student->id ? 'selected': ''}}>{{$student->name}}</option>
+                  @endforeach
+                </select>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="status">Status</label>
+                <select name="status" id="status" class="form-control">
+                  <option value="">Select One</option>
+                  <option value="Processing" {{request('status') == 'Processing'? 'selected': ''}}>Processing</option>
+                  <option value="Pending" {{request('status') == 'Pending'? 'selected': ''}}>Pending</option>
+                  <option value="Failed" {{request('status') == 'Failed'? 'selected': ''}}>Failed</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="start_date">Start Date</label>
+                <input type="date" name="start_date" id="start_date" class="form-control" value="{{request('start_date')}}">
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="end_date">End Date</label>
+                <input type="date" name="end_date" id="end_date" class="form-control" value="{{request('end_date')}}">
+              </div>
+            </div>
+            <div class="col-md-3"><br>
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="box">
         <div class="box-header">
           <h3 class="box-title">List of Orders</h3>
               <div class="box-tools">
@@ -33,6 +105,7 @@ $source = New SourceCtrl;
               </div>
             </div>
             <!-- /.box-header -->
+            @if(count($orders))
             <div class="box-body table-responsive no-padding">
               <table id="example1" class="table table-bordered table-hover">
                 <tr>
@@ -88,7 +161,6 @@ $source = New SourceCtrl;
                   </td>
                   <td>
                     {{-- <a href="{{route('group.show',$value->id)}}" class="label label-info" title="Details"><i class="fa fa-file-text"></i></a> --}}
-                    {{-- <a href="{{route('students.add', [$value->id, 'Group'])}}" class="btn btn-primary btn-sm" title="Add Students"><i class="fa fa-user-plus"></i></a> --}}
                     {{-- <a href="{{route('group.edit', $value->id)}}" class="btn btn-warning btn-sm" title="Edit"><i class="fa fa-edit"></i></a> --}}
                     @if(Auth::user()->authorizeRoles(['SuperAdmin']))
                     <form style="display: inline" action="{{route('order.destroy', $value->id)}}" method="POST">
@@ -108,8 +180,13 @@ $source = New SourceCtrl;
                 {{$orders->links()}}
               </div>
             </div>
-          </div>
-          <!-- /.box -->
+            @else
+            <div class="not-found">
+              <h3>Orders Not Found!</h3>
+              <p>Filter order by query fields</p>
+            </div>
+            @endif
+          </div> <!-- /.box -->
         </div>
       </div>
     </section>

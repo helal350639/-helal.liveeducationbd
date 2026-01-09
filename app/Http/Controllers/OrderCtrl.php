@@ -10,6 +10,8 @@ use App\Models\Role;
 use App\Models\Order;
 use App\Models\Student;
 use App\Models\Referrer;
+use App\Models\Batch;
+use App\Models\Department;
 use Auth;
 use Image;
 use File;
@@ -32,6 +34,13 @@ class OrderCtrl extends Controller
   public function index(Request $request)
   {
     $search = $request->input('search');
+    $batch = $request->input('batch_id');
+    $department = $request->input('department_id');
+    $student = $request->input('student_id');
+    $status = $request->input('status');
+    $start_date = $request->input('start_date');
+    $end_date = $request->input('end_date');
+
     $orders = Order::query()
     ->when($search, function ($query, $search)
     {
@@ -39,10 +48,32 @@ class OrderCtrl extends Controller
       ->orWhere('orders.email', 'like', "%{$search}%")
       ->orWhere('orders.phone', 'like', "%{$search}%");
     })
+    ->when($batch, function($query, $batch)
+    {
+      $query->where('orders.batch_id', $batch);
+    })
+    ->when($department, function($query, $department)
+    {
+      $query->where('orders.department_id', $department);
+    })
+    ->when($student, function($query, $student)
+    {
+      $query->where('orders.student_id', $student);
+    })
+    ->when($status, function($query, $status)
+    {
+      $query->where('orders.status', $status);
+    })
+    ->when($start_date, function($query, $start_date) use ($end_date)
+    {
+      $query->whereRaw('DATE(orders.created_at) >= ?', [$start_date])
+      ->whereRaw('DATE(orders.created_at) <= ?', [$end_date]);
+    })
     ->leftJoin('batches', 'batches.id', 'orders.batch_id')
     ->leftJoin('departments', 'departments.id', 'orders.department_id')
     ->leftJoin('students', 'students.id', 'orders.student_id')
-    ->leftJoin('batch_student', function($join) {
+    ->leftJoin('batch_student', function($join)
+    {
       $join->on('batch_student.student_id', 'students.id');
     })
     ->orderBy('id','desc')
@@ -52,10 +83,32 @@ class OrderCtrl extends Controller
     'students.name as student_name',
     'batch_student.student_id as batch_has_student'
     )
-    ->groupBy('orders.id', 'orders.student_id', 'orders.batch_id', 'orders.department_id', 'orders.name', 'orders.email', 'orders.phone', 'orders.amount', 'orders.address', 'orders.status', 'orders.transaction_id', 'orders.currency', 'orders.created_at', 'batches.name', 'departments.name', 'students.name', 'batch_student.student_id')
-    ->paginate(25)
-    ->appends(['search' => $search]);
-    return view('layouts.orders.index', compact('orders'));
+    ->groupBy('orders.id', 'orders.student_id', 'orders.batch_id', 'orders.department_id', 'orders.name', 'orders.email', 'orders.phone', 'orders.amount', 'orders.address', 'orders.status', 'orders.transaction_id', 'orders.currency', 'orders.created_at', 'batches.name', 'departments.name', 'students.name', 'batch_student.student_id');
+
+    if($search || $batch || $department || $student || $status || $start_date ||$end_date)
+    {
+      $orders = $orders->paginate(25)
+      ->appends(['search' => $search])
+      ->withQueryString();
+    }
+    else
+    {
+      $orders = [];
+    }
+
+    $batches = Batch::where('status', 'Active')
+    ->select('id', 'name')
+    ->get();
+
+    $departments = Department::where('status', 'Active')
+    ->select('id', 'name')
+    ->get();
+
+    $students = Student::where('Status', 'Active')
+    ->select('id', 'name')
+    ->get();
+
+    return view('layouts.orders.index', compact('orders', 'batches', 'departments', 'students'));
   }
 
   public function show($id)

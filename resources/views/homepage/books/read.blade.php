@@ -10,6 +10,7 @@ if(!is_null(Session::get('_paper')))
   $paper = Session::get('_paper');
   $xqs = $paper->questions()->pluck('id')->toArray();
 }
+$book = $subject;
 @endphp
 @extends('student')
 @section('title', 'Read Book')
@@ -25,16 +26,54 @@ if(!is_null(Session::get('_paper')))
 .hide{display: none}
 body{background:#eee}
 ul li{list-style: none}
+.front_cover, .back_cover{
+  width: 100%
+}
+.index-page{
+  width: 100%;
+  max-width: 1240px;
+  max-height: 1754px;
+  background:#fff;
+  margin: 15px 0;
+  text-align: center;
+  padding: 35px 15px;
+}
+.index-list{
+  text-align: left;
+  margin-top: 20px;
+  margin-left: 10%;
+}
+.index-list li{
+  margin: 25px 0;
+  list-style: square;
+}
+.index-footer{
+  /* position: absolute; */
+  margin-bottom:10px;
+  text-align: center
+}
 </style>
 <div class="col-md-8 offset-md-2" style="margin: 50px auto; ">
 <div class="box-header">
 
-  <h2 class="text-center">{{$subject->name}}</h2>
+  <img class="front_cover" src="{{$subject->front_cover}}" alt="">
+  <div class="index-page">
+    <h1>{{$book->name}}</h1>
+    <h3>Index</h3>
+    <ul class="index-list">
+      @foreach($chapters as $chapter)
+      <li>{{$chapter->name}}</li>
+      @endforeach
+    </ul>
+    <div class="index-footer">
+      Publisher: <b>Live Education BD</b>
+    </div>
+  </div>
   
   <div class="pagination-sm no-margin pull-right">
     {!! $questions->links() !!}
   </div>
-  <br>
+  <hr>
   
   <h5 class="box-title">
     Total Questions ({{$questions->total()}})
@@ -122,6 +161,9 @@ ul li{list-style: none}
   <div class="pagination-sm no-margin pull-right">
     {!! $questions->links() !!}
   </div>
+
+
+  <img class="back_cover" src="{{$subject->back_cover}}" alt="">
 </div><!-- /.box-footer -->
 </div>
 <script>
