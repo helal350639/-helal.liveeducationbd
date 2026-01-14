@@ -350,28 +350,8 @@ class QuestionCtrl extends Controller
         if($data['type'] == 'Video')
         {
           $url = $data['video'];
-          // if($data['url_type'] == 'Youtube')
-          // {
-          //   $parts = parse_url($data['video']);
-          //   parse_str($parts['query'], $queryParams);
-          //   $data['video'] = $queryParams['v'] ?? null;
-          // }elseif($data['url_type'] == 'Youtube')
-          // {
-          //   //
-          // }
-
-          if (str_contains($url, 'drive.google.com')) {
-            // return getGoogleDriveVideoId($url);
-            $data['video'] = $source->videoId($url);
-          }
-      
-          if (str_contains($url, 'youtube.com') || str_contains($url, 'youtu.be')) {
-            // return getYouTubeVideoId($url);
-            $data['video'] = $source->videoId($url);
-          }
+          $data['video'] = $source->videoId($url);
         }
-
-        dd($data['video']);
 
         $data['status'] = 'Active';
         $data['created_at'] = date('Y-m-d H:i:s');
