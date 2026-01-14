@@ -42,6 +42,22 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
     .filter-parent{width:100%}
     .sticky{position: relative;}
   }
+
+  .iframe-container {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  padding-top: 56.25%;
+  margin: 15px 0
+}
+
+.iframe-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
 </style>
 <!-- Content Header (Page header) -->
 <section class="content-header">

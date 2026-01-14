@@ -234,4 +234,46 @@ class SourceCtrl extends Controller
   {
     return $time+13;
   }
+
+  function videoId($url)
+  {
+    if (str_contains($url, 'drive.google.com'))
+    {
+      // Match /d/FILE_ID/
+      if (preg_match('~/d/([^/]+)~', $url, $matches))
+      {
+        return $matches[1];
+      }
+
+      // Match ?id=FILE_ID
+      $parts = parse_url($url);
+      if (!empty($parts['query'])) {
+          parse_str($parts['query'], $query);
+          return $query['id'] ?? null;
+      }
+    }
+
+    if (str_contains($url, 'youtube.com') || str_contains($url, 'youtu.be'))
+    {
+      // youtu.be/VIDEO_ID
+      if (preg_match('~youtu\.be/([^?&]+)~', $url, $matches)) {
+        return $matches[1];
+      }
+
+      // youtube.com/embed/VIDEO_ID
+      if (preg_match('~/embed/([^?&]+)~', $url, $matches)) {
+        return $matches[1];
+      }
+
+      // youtube.com/watch?v=VIDEO_ID
+      $parts = parse_url($url);
+      if (!empty($parts['query'])) {
+        parse_str($parts['query'], $query);
+        return $query['v'] ?? null;
+      }
+    }
+
+    return null;
+  }
+
 }

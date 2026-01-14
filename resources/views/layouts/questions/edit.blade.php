@@ -196,9 +196,17 @@ foreach($question->filters as $val)
                     </div>
                     @else
                     <div class="col-md-12 no-padding">
+                      <div class="form-group">
+                        <label for="">Video URL Type</label>
+                        <select class="form-control" name="url_type" id="url_type" placeholder="Video URL Type" required>
+                          <option value="">Select One</option>
+                          <option value="Youtube" {{$value->url_type == 'Youtube' ? 'selected' : ''}}>Youtube</option>
+                          <option value="Google Drive" {{$value->url_type == 'Google Drive' ? 'selected' : ''}}>Google Drive</option>
+                        </select>
+                      </div>
                         <div class="form-group">
                             <label for="">Input Video URL</label>
-                            <input type="url" class="form-control" name="video" id="video" placeholder="https://www.youtube.com/watch?v=DFDDFE8dDFd" required value="https://www.youtube.com/watch?v={{$value->video}}">
+                            <input type="url" class="form-control" name="video" id="video" placeholder="https://" required value="{{$value->url_type == 'Youtube' ? 'https://www.youtube.com/watch?v='.$value->video : 'https://drive.google.com/file/d/'.$value->video.'/preview'}}">
                             </div>
                         </div>
                     @endif
@@ -234,7 +242,7 @@ foreach($question->filters as $val)
                 </div>
                 <div class="col-md-12 no-padding">
                     @foreach($labels as $label)
-                    @if(!is_null($label->subfilter))
+                      @if(!is_null($label->subfilter))
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="">{{$label->name}}</label>
@@ -246,41 +254,53 @@ foreach($question->filters as $val)
                                 </select>
                             </div>
                         </div>
-                    @endif
+                      @endif
                     @endforeach
                 </div>
                 <div class="col-md-12 no-padding" id="label">
-                    <button type="button" class="btn btn-info" onclick="addLabel(this)" style="margin-left:15px; margin-bottom:15px"><i class="fa fa-plus"></i> Add Label</button>
-                    <div class="clearfix"><label style="margin-left: 15px">LABELS</label></div>
-                    @if($value->getlabels)
-                    @foreach($value->getlabels as $val)
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <div class="input-group">
-                                <input type="text" name="label[]" value="{{$val->label}}" class="form-control" placeholder="Label Name">
-                                <span class="input-group-addon" onclick="this.parentNode.parentNode.parentNode.remove()"><i class="fa fa-close text-danger"></i></span>
-                            </div>
-                            <input type="hidden" name="labelid[]" value="{{$val->id}}">
-                        </div>
+                    <button type="button" class="btn btn-info" onclick="addLabel(this)" style="margin-left:15px; margin-bottom:15px">
+                      <i class="fa fa-plus"></i> Add Label
+                    </button>
+                    <div class="clearfix">
+                      <label style="margin-left: 15px">LABELS</label>
                     </div>
-                    @endforeach
+                    @if($value->getlabels)
+                      @foreach($value->getlabels as $val)
+                      <div class="col-md-4">
+                          <div class="form-group">
+                              <div class="input-group">
+                                  <input type="text" name="label[]" value="{{$val->label}}" class="form-control" placeholder="Label Name">
+                                  <span class="input-group-addon" onclick="this.parentNode.parentNode.parentNode.remove()"><i class="fa fa-close text-danger"></i></span>
+                              </div>
+                              <input type="hidden" name="labelid[]" value="{{$val->id}}">
+                          </div>
+                      </div>
+                      @endforeach
                     @endif
                 </div>
-                <div class="col-md-12"><hr>
+                <div class="col-md-12">
+                  <hr>
                     <div class="form-group">
-                        <label for="status">Status</label><br>
-                        <label><input type="radio" name="status" class="form-radio" value="Active" {{$value->status == 'Active'? 'checked':''}}/> Active &nbsp; </label>
-                        <label> <input type="radio" name="status" class="form-radio" value="Inactive" {{$value->status == 'Inactive'? 'checked':''}}/> Inactive</label>
+                        <label for="status">Status</label>
+                        <br>
+                        <label>
+                          <input type="radio" name="status" class="form-radio" value="Active" {{$value->status == 'Active'? 'checked':''}}/> Active &nbsp; 
+                        </label>
+                        <label> 
+                          <input type="radio" name="status" class="form-radio" value="Inactive" {{$value->status == 'Inactive'? 'checked':''}}/> Inactive
+                        </label>
                     </div>
                 </div>
             </div> <!-- /.box body -->
             <div class="box-footer">
-                <button type="submit" class="btn btn-primary pull-right" id="submit"><i class="fa fa-save"></i> Save</button>
+                <button type="submit" class="btn btn-primary pull-right" id="submit">
+                  <i class="fa fa-save"></i> Save
+                </button>
             </div>
         </form>
-    </div> <!-- /.box -->
+      </div> <!-- /.box -->
     </div> <!--/.col (left) -->
-</div> <!-- /.row -->
+  </div> <!-- /.row -->
 </section> <!-- /.content -->
 
 {{-- modal --}}

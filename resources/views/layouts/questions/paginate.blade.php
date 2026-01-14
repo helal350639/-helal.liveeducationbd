@@ -108,12 +108,15 @@ if(!is_null(Session::get('_paper')))
 
         @elseif($value->type == 'Video')
           @if($value->url_type == 'Youtube')
-          <iframe width="420" height="315" src="https://www.youtube.com/embed/tgbNymZ7vqY"></iframe>
+          <div class="iframe-container">
+            <iframe src="https://www.youtube.com/embed/tgbNymZ7vqY"></iframe>
+          </div>
 
-          @else
-          <iframe src="{{$value->video}}" width="640" height="480" allow="autoplay" allowfullscreen></iframe>
+          @elseif($value->url_type == 'Google Drive')
+          <div class="iframe-container">
+            <iframe src="https://drive.google.com/file/d/{{$value->video}}/preview" allow="autoplay" allowfullscreen></iframe>
+          </div>
           @endif
-        <p>{!! $value->video !!}</p>
         <div class="col-md-12 no-padding">
           <button class="btn btn-info" onclick="showHideAnswer(this)">Show Explanation: <i class="fa fa-chevron-down"></i></button>
         </div>

@@ -72,6 +72,7 @@ if($user)
               @foreach($questions as $value)
 
               <div class="col-6 col-lg-3 mt-4">
+                @if($value->url_type == 'Youtube')
                 <div class="exam-package-area" onclick="showVideoModal('https://www.youtube.com/embed/{{$value->video}}?autoplay=1')">
                   <div class="package-exam-image">
                     <img src="https://img.youtube.com/vi/{{$value->video}}/maxresdefault.jpg" alt="" loading="lazy" />
@@ -82,6 +83,18 @@ if($user)
                     </div>
                   </div>
                 </div>
+                @elseif($value->url_type == 'Google Drive')
+                <div class="exam-package-area" onclick="showVideoModal('https://drive.google.com/file/d/{{$value->video}}/preview')">
+                  <div class="package-exam-image">
+                    <img src="{{$value->banner? $value->banner: '/web/img/video-icon.png'}}" alt="" loading="lazy" />
+                  </div>
+                  <div class="package-exam-content mx-lg-3">
+                    <div class="package-exam-title pt-3">
+                      {!! $value->title !!}
+                    </div>
+                  </div>
+                </div>
+                @endif
               </div>
               @endforeach
               @else

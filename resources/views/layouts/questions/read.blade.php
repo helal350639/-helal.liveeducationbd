@@ -132,7 +132,11 @@ $correct_answer = '';
                   <tr>
                     <th>Video:</th>
                     <td>
+                      @if($value->url_type == 'Youtube')
                       <iframe src="https://www.youtube.com/embed/{{$value->video}}" frameborder="0"></iframe>
+                      @elseif($value->url_type == 'Google Drive')
+                      <iframe src="https://drive.google.com/file/d/{{$value->video}}/preview" width="640" height="480" allow="autoplay" allowfullscreen></iframe>
+                      @endif
                     </td>
                   </tr>
                   @endif

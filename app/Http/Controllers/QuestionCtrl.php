@@ -347,12 +347,31 @@ class QuestionCtrl extends Controller
         }
 
         // video url to embed url convert
-        if($data['type'] == 'Video' && $data['url_type'] == 'Youtube')
+        if($data['type'] == 'Video')
         {
-          $parts = parse_url($data['video']);
-          parse_str($parts['query'], $queryParams);
-          $data['video'] = $queryParams['v'] ?? null;
+          $url = $data['video'];
+          // if($data['url_type'] == 'Youtube')
+          // {
+          //   $parts = parse_url($data['video']);
+          //   parse_str($parts['query'], $queryParams);
+          //   $data['video'] = $queryParams['v'] ?? null;
+          // }elseif($data['url_type'] == 'Youtube')
+          // {
+          //   //
+          // }
+
+          if (str_contains($url, 'drive.google.com')) {
+            // return getGoogleDriveVideoId($url);
+            $data['video'] = $source->videoId($url);
+          }
+      
+          if (str_contains($url, 'youtube.com') || str_contains($url, 'youtu.be')) {
+            // return getYouTubeVideoId($url);
+            $data['video'] = $source->videoId($url);
+          }
         }
+
+        dd($data['video']);
 
         $data['status'] = 'Active';
         $data['created_at'] = date('Y-m-d H:i:s');
@@ -601,15 +620,12 @@ class QuestionCtrl extends Controller
         // video url to embed url convert
         if($data['type'] == 'Video')
         {
-          $parts = parse_url($data['video']);
-          parse_str($parts['query'], $queryParams);
-          $data['video'] = $queryParams['v'] ?? null;
+          $url = $data['video'];
+          $data['video'] = $source->videoId($url);
         }
 
         $data['status'] = $request->status;
         $data['updated_by'] = Auth::id();
-
-        // dd($data);
 
         try {
             // update data to database
