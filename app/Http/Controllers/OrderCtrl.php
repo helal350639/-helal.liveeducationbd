@@ -93,7 +93,8 @@ class OrderCtrl extends Controller
     }
     else
     {
-      $orders = [];
+      $orders = $orders->whereRaw('DATE(orders.created_at) >= ?', [date('Y-m-d', strtotime('-7 days'))])
+      ->paginate(25)->withQueryString();
     }
 
     $batches = Batch::where('status', 'Active')
