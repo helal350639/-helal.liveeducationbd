@@ -162,9 +162,9 @@
                 <button type="btnSubmit" class="btn btn-primary pull-right" id="btnSubmit" onclick="formValidation()"><i class="fa fa-save"></i> Save</button>
             </div>
         </form>
-    </div> <!-- /.box -->
+      </div> <!-- /.box -->
     </div> <!--/.col (left) -->
-</div> <!-- /.row -->
+  </div> <!-- /.row -->
 </section> <!-- /.content -->
 
 {{-- modal --}}
@@ -176,7 +176,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-warning" data-dismiss="modal">Cancel</button>
-                <button class="btn btn-success" onclick="addMulitMcq()" data-dismiss="modal">Done</button>
+                <button class="btn btn-success" onclick="addMultiMcq()" data-dismiss="modal">Done</button>
             </div>
         </div>
     </div>
@@ -511,7 +511,7 @@ function getFilters(e)
 }
 
 // add multiple mcq items
-function addMulitMcq()
+function addMultiMcq()
 {
     let = multiLineText = document.getElementById('multiLineText');
     let = multiItems = document.getElementById('multiItems');

@@ -131,9 +131,7 @@ class StudentHomeCtrl extends Controller
 
   public function courseShow($id)
   {
-    // dd(Session::get('_order'));
     $batch = Batch::find($id);
-    // $batches = Batch::where('status', 'Active')->get();
     $departments = $batch->departments()->where('status', 'Active')->get();
     $groups = Group::where('status', 'Active')->get();
     return view('homepage.course-show', compact('batch', 'departments', 'groups'));
@@ -155,7 +153,6 @@ class StudentHomeCtrl extends Controller
     if($batch->price < 1)
     {
       try {
-        // $student = Student::find($data['student_id']);
         $student->batches()->attach($data['batch_id']);
         $student->departments()->attach($data['department_id']);  
         
@@ -235,7 +232,8 @@ class StudentHomeCtrl extends Controller
   {
     $user = Auth::guard('student')->user();
     $student = Student::find($user->id);
-    $batches = $student->batches()->orderBy('id', 'DESC')->where('status', 'Active')->get();
+    $batches = $student->batches()->orderBy('id', 'DESC')
+    ->where('status', 'Active')->get();
     return view('student-panel.my-syllabus', compact('batches'));
   }
 
@@ -264,7 +262,7 @@ class StudentHomeCtrl extends Controller
     ->select('syllabi.id', 'syllabi.name', 'students.name as student_name')
     ->orderBy('syllabi.id', 'DESC')
     ->get();
-    // dd($syllabuses);
+    
     return view('student-panel.my-syllabus', compact('batch_syllabuses', 'department_syllabuses', 'batches', 'batch'));
   }
 

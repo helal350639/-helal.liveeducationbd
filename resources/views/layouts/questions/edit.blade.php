@@ -195,7 +195,7 @@ foreach($question->filters as $val)
                         </div>
                     </div>
                     @else
-                    <div class="col-md-12 no-padding">
+                    <div class="col-md-4 no-padding">
                       <div class="form-group">
                         <label for="">Video URL Type</label>
                         <select class="form-control" name="url_type" id="url_type" placeholder="Video URL Type" required>
@@ -204,11 +204,13 @@ foreach($question->filters as $val)
                           <option value="Google Drive" {{$value->url_type == 'Google Drive' ? 'selected' : ''}}>Google Drive</option>
                         </select>
                       </div>
-                        <div class="form-group">
-                            <label for="">Input Video URL</label>
-                            <input type="url" class="form-control" name="video" id="video" placeholder="https://" required value="{{$value->url_type == 'Youtube' ? 'https://www.youtube.com/watch?v='.$value->video : 'https://drive.google.com/file/d/'.$value->video.'/preview'}}">
-                            </div>
-                        </div>
+                    </div>
+                    <div class="col-md-8 no-padding">
+                      <div class="form-group">
+                          <label for="">Input Video URL</label>
+                          <input type="url" class="form-control" name="video" id="video" placeholder="https://" required value="{{$value->url_type == 'Youtube' ? 'https://www.youtube.com/watch?v='.$value->video : 'https://drive.google.com/file/d/'.$value->video.'/preview'}}">
+                          </div>
+                      </div>
                     @endif
                 </div>
                 <div class="col-md-12">

@@ -11,6 +11,7 @@ use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\Auth\StudentLogin;
 use App\Http\Controllers\Auth\TeacherLoginCtrl;
 use App\Http\Controllers\Students\StudentHomeCtrl;
+use App\Http\Controllers\Students\QuestionReadingController;
 use App\Http\Controllers\Teachers\TeacherHomeCtrl;
 use App\Http\Controllers\Homepage\CategoryCtrl;
 use App\Http\Controllers\Homepage\JobPreparationCtrl;
@@ -193,6 +194,23 @@ Route::middleware('auth:student')->group(function()
 		Route::post('contact-check', 'contactCheck')->name('contact-check');
 		Route::post('otp-check', 'otpCheck')->name('otp-check');
 	});
+
+  //book question
+  Route::controller(QuestionReadingController::class)->group(function()
+  { 
+    //reaction,
+    Route::post('book-question-react', 'reactStore')->name('question.react.store');
+    Route::get('book-question-react/{question_id}', 'reactShow')->name('question.react.show');
+    //comments,
+    Route::post('book-question-comment', 'commentStore')->name('question.comment.store');
+    Route::get('book-question-comment/{question_id}', 'commentShow')->name('question.comment.show');
+    //rating,
+    Route::post('book-question-rate', 'rateStore')->name('question.rate.store');
+    Route::get('book-question-rate/{question_id}', 'rateShow')->name('question.rate.show');
+    //reading marking
+    Route::post('book-question-reading', 'readingStore')->name('question.reading.store');
+    Route::get('book-question-reading/{question_id}', 'readingShow')->name('question.reading.show');
+  });
 });
 
 Route::prefix('teachers')->group(function()

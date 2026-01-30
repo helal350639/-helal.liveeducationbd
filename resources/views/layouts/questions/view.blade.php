@@ -12,6 +12,17 @@ if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
 else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
   $url = route('book.addtopaper');
 }
+
+  $book_chapters = $session = [];
+  if(!is_null(Session::get('_paper')))
+  {
+    $session = Session::get('_paper');
+    $book_chapters = $session->chapters;
+  }
+  else
+  {
+    $book_chapters = $chapters;
+  }
 @endphp
 
 @extends('dashboard')
@@ -129,7 +140,7 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
                 <div class="col-md-2">
                   <div class="form-group">
                     <label for="">Subjects</label>
-                    <select name="subject_id" id="subject_id" class="form-control select2" onchange="getChapters(this)">
+                    <select name="subject_id" id="subject_id" class="form-control select2" onchange="{{$session && $session->type == 'book'? '':'getChapters(this)'}}">
                       <option value="">Select One</option>
                       @foreach($subjects as $value)
                       <option value="{{$value->id}}" {{$cat['subject_id'] == $value->id ? 'selected':''}}>{{$value->name}}</option>
@@ -142,7 +153,7 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
                     <label for="">Chapter</label>
                     <select name="chapter_id" id="chapter_id" class="form-control select2">
                       <option value="">Select One</option>
-                      @foreach($chapters as $value)
+                      @foreach($book_chapters as $value)
                       <option value="{{$value->id}}" {{$cat['chapter_id'] == $value->id ? 'selected':''}}>{{$value->name}}</option>
                       @endforeach
                     </select>
