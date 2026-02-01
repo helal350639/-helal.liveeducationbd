@@ -148,19 +148,19 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
                     </select>
                   </div>
                 </div>
-                @if($book_chapters)
                 <div class="col-md-2">
                   <div class="form-group">
                     <label for="">Chapter</label>
                     <select name="chapter_id" id="chapter_id" class="form-control select2">
                       <option value="">Select One</option>
-                      @foreach($book_chapters as $value)
-                      <option value="{{$value->id}}" {{$cat['chapter_id'] == $value->id ? 'selected':''}}>{{$value->name}}</option>
-                      @endforeach
+                      @if($book_chapters)
+                        @foreach($book_chapters as $value)
+                        <option value="{{$value->id}}" {{$cat['chapter_id'] == $value->id ? 'selected':''}}>{{$value->name}}</option>
+                        @endforeach
+                      @endif
                     </select>
                   </div>
                 </div>
-                @endif
                 <div class="col-md-2">
                   <div class="form-group">
                     <label for="">Type</label>
@@ -174,7 +174,7 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
                 </div>
                 <div class="col-md-2">
                   <div class="form-group">
-                    <label for="">Created By</label>
+                    <label>Created By</label>
                     <select name="created_by" id="created_by" class="form-control select2">
                       <option value="">Select One</option>
                       @foreach($users as $value)
@@ -220,7 +220,7 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
                   </div>
                 </div>
 
-                <div class="col-md-1">
+                <div class="col-md-2">
                   <div class="form-group">
                     <br>
                     <input class="btn btn-primary btn-block" type="submit" value="Submit">
