@@ -336,7 +336,6 @@ if($user)
               <div class="button-and-price pb-3 pb-lg-4">
                 <div class="package-exam-price">
                   <div class="package-exam-total-price text-muted">
-                    {{-- <span class="text-muted">৳ {{number_format($batch->price, 0)}}</span> --}}
                     <span>
                       @if($batch->discount > 0)
                         ফি <del>৳{{number_format($batch->price, 0)}}</del> = 

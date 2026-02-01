@@ -20,7 +20,7 @@ $user = Auth::guard('student')->user();
         <div class="row">
           
           <div class="title-area text-center">
-            <h1>চলমান কোর্স সমূহ </h1>
+            <h1>চলমান কোর্স সমূহ</h1>
           </div>
           <div class="all-courses-area">
             <div class="row g-2 g-md-3 g-lg-4">
@@ -51,9 +51,16 @@ $user = Auth::guard('student')->user();
                         </div>
                         <div class="package-exam-price">
                           <div class="package-exam-total-price text-muted">
-                            <s class="text-muted">৳ {{number_format($value->price)}}</s>
+                            <span>
+                              @if($value->discount > 0)
+                                ফি <del>৳{{number_format($value->price, 0)}}</del> = 
+                                ৳{{number_format(($value->price - $value->discount), 0)}} 
+                              <span style="background:yellow">(Save-৳{{number_format($value->discount, 0)}})</span>
+                              @else
+                              ফি ৳{{number_format($value->price, 0)}}
+                              @endif
+                            </span>
                           </div>
-                          <div class="package-exam-discount-price">৳ {{number_format($value->net_price)}}</div>
                         </div>
                       </div>
                       <div class="col text-end">
@@ -67,7 +74,8 @@ $user = Auth::guard('student')->user();
                             <button class="btn btn-default pull-right" disabled>Applied</button>
                             @else
                             <div class="custom-btn btn-12">
-                              <span>ক্লিক করুন!</span><span>কোর্সটি কিনুন</span>
+                              <span>ক্লিক করুন!</span>
+                              <span>কোর্সটি কিনুন</span>
                             </div>
                             @endif
                           </a>

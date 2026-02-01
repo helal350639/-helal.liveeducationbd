@@ -96,7 +96,8 @@ ul li{list-style: none}
       <div class="panel-heading">
         <label style="display: block; font-size:16px">
           <input type="checkbox" class="check" value="{{$value->id}}" onclick="count(this)" {{in_array($value->id, $xqs) ? 'checked':''}}>
-          <span style="float: left; color:#a00"> প্রশ্ন নং- {{$key + $questions->firstItem()}} : &nbsp; </span>{!!$value->title!!}</label>
+          <span style="float: left; color:#a00"> প্রশ্ন নং- {{$key + $questions->firstItem()}} : &nbsp; </span>{!!$value->title!!}
+        </label>
       </div>
       <div class="panel-body">
         @foreach($value->getlabels as $val)
@@ -187,9 +188,9 @@ ul li{list-style: none}
   </div><!-- /.box-footer -->
 </div>
 
-<div class="filter">
+{{-- <div class="filter">
   <button type="button">Filter</button>
-</div>
+</div> --}}
 
 <!-- Modal React -->
 <div class="modal fade" id="reaction">
