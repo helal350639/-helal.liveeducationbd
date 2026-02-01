@@ -148,6 +148,7 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
                     </select>
                   </div>
                 </div>
+                @if($book_chapters)
                 <div class="col-md-2">
                   <div class="form-group">
                     <label for="">Chapter</label>
@@ -159,6 +160,7 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
                     </select>
                   </div>
                 </div>
+                @endif
                 <div class="col-md-2">
                   <div class="form-group">
                     <label for="">Type</label>
@@ -218,7 +220,7 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
                   </div>
                 </div>
 
-                <div class="col-md-2">
+                <div class="col-md-1">
                   <div class="form-group">
                     <br>
                     <input class="btn btn-primary btn-block" type="submit" value="Submit">

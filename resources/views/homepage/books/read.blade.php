@@ -178,17 +178,18 @@ ul li{list-style: none}
     </div>
   </div>
   @endforeach
-</div><!-- /.box-body -->
-<div class="box-footer clearfix">
-  <div class="pagination-sm no-margin pull-right">
-    {!! $questions->links() !!}
-  </div>
-
-  <img class="back_cover" src="{{$subject->back_cover}}" alt="">
-</div><!-- /.box-footer -->
+  </div><!-- /.box-body -->
+  <div class="box-footer clearfix">
+    <div class="pagination-sm no-margin pull-right">
+      {!! $questions->links() !!}
+    </div>
+    <img class="back_cover" src="{{$subject->back_cover}}" alt="">
+  </div><!-- /.box-footer -->
 </div>
 
-
+<div class="filter">
+  <button type="button">Filter</button>
+</div>
 
 <!-- Modal React -->
 <div class="modal fade" id="reaction">
@@ -421,7 +422,7 @@ ul li{list-style: none}
     let data = await ajaxShow(url);
 
     rateForm.elements.rating.forEach((r) => {
-      if(data.rate != null && r.value == data.rate.rate)
+      if(data.rate != null && r.value == data.rate.rating)
       {
         r.checked = true;
       }
