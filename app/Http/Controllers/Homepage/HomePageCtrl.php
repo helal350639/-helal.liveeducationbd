@@ -31,6 +31,11 @@ use App\Models\Visitor;
 use App\Models\Subject;
 use App\Models\BookCategory;
 use App\Models\Book;
+use App\Models\Filter;
+use App\Models\QuestionComment;
+use App\Models\QuestionReaction;
+use App\Models\QuestionRating;
+use App\Models\QuestionReading;
 use Auth;
 use Session;
 use DB;
@@ -445,17 +450,135 @@ class HomePageCtrl extends Controller
     return view('homepage.books.index', compact('books'));
   }
 
-  public function readBook($id)
+  public function readBook(Request $request, $id)
   {
+    $data = $request->validate(
+      [
+        "question_id" => 'nullable|numeric',
+        "chapter" => 'nullable|numeric',
+        "source" => 'nullable|string',
+        "sub-source" => 'nullable|string',
+        "year" => 'nullable|string',
+        "reaction" => 'nullable|string',
+        "rating" => 'nullable|string',
+        "reading" => 'nullable|string'
+      ]
+    );
+
+    //
+    $chapter = $source = $subsource = $year = $reaction = $rating = $reading = '';
+    if(isset($data['chapter']))
+    {
+      $chapter = $data['chapter'];
+    }
+    if(isset($data['source']))
+    {
+      $source = $data['source'];
+    }
+    if(isset($data['sub-source']))
+    {
+      $subsource = $data['sub-source'];
+    }
+    if(isset($data['year']))
+    {
+      $year = $data['year'];
+    }
+    if(isset($data['reaction']))
+    {
+      $reaction = $data['reaction'];
+    }
+    if(isset($data['rating']))
+    {
+      $rating = $data['rating'];
+    }
+    if(isset($data['reading']))
+    {
+      $reading = $data['reading'];
+    }
+    
     $subject = Book::find($id);
-    $questions = $subject->questions()->where('type', 'MCQ')
+
+    // dd($subject->questions()->toSql());
+    $questions = $subject->questions()
+    ->where('type', 'MCQ')
+    ->when($chapter, function($query, $chapter)
+    {
+      $query->whereHas('chapters', function ($q) use ($chapter)
+      {
+        $q->where('chapter_id', $chapter);
+      });
+    })
+    ->when($source, function($query, $source)
+    {
+      $query->whereHas('filters', function ($q) use ($source)
+      {
+        $q->where('filter_id', $source);
+      });
+    })
+    // ->when($subsource, function($query, $subsource)
+    // {
+    //   return $query->where('filter_id', $subsource);
+    // })
+    // ->when($year, function($query, $year)
+    // {
+    //   return $query->where('year', $year);
+    // })
+    ->when($reaction, function($query, $reaction)
+    {
+      $query->whereHas('reactions', function ($q) use ($reaction)
+      {
+        $q->where('reaction', $reaction);
+      });
+    })
+    ->when($rating, function($query, $rating)
+    {
+      $query->whereHas('ratings', function ($q) use ($rating)
+      {
+        $q->where('rating', $rating);
+      });
+    })
+    ->when($reading, function($query, $reading)
+    {
+      $query->whereHas('readings', function ($q) use ($reading)
+      {
+        $q->where('reading', $reading);
+      });
+    })
     ->paginate(25);
 
-    $chapters = $subject->chapters()->select('id', 'name')->get();
-    
+    $chapters = $subject->chapters()
+    ->select('id', 'name')
+    ->get();
+
+    //question sources
+    $qsource = Filter::where('slug', 'source')
+    ->select('id', 'name', 'slug')
+    ->first();
+    $sources = $qsource->subfilter()
+    ->select('id', 'name')
+    ->get();
+
+    // get sub sources
+    $subsource = Filter::where('slug', 'sub-source')
+    ->select('id', 'name', 'slug')
+    ->first();
+
+    $subsources = $subsource->subfilter()
+    ->select('id', 'name')
+    ->get();
+
+    // get sub sources
+    $year = Filter::where('slug', 'year')
+    ->select('id', 'name', 'slug')
+    ->first();
+
+    $years = $year->subfilter()
+    ->select('id', 'name')
+    ->get();
+
     if($questions)
     {
-      return view('homepage.books.read', compact('subject', 'chapters', 'questions'));
+      return view('homepage.books.read', compact('subject', 'chapters', 'questions', 'sources', 'subsources', 'years'));
     }
     return back();
   }

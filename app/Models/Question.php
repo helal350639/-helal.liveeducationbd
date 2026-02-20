@@ -67,4 +67,24 @@ class Question extends Model
     {
         return $this->hasOne(Choice::class, 'question_id');
     }
+
+    public function reactions()
+    {
+      return $this->hasMany(QuestionReaction::class, 'question_id');
+    }
+
+    public function comments()
+    {
+      return $this->hasMany(QuestionComment::class, 'question_id');
+    }
+
+    public function ratings()
+    {
+      return $this->hasMany(QuestionRating::class, 'question_id');
+    }
+
+    public function readings()
+    {
+      return $this->hasMany(QuestionReading::class, 'question_id');
+    }
 }

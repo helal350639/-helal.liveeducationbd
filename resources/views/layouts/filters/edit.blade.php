@@ -47,6 +47,12 @@ foreach($filter->courses as $val)
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
+                        <label for="slug">Filter Slug</label>
+                        <input type="text" class="form-control" name="slug" id="slug" value="{{$filter->slug}}" {{$filter->slug ? 'readonly':''}}>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
                         <label for="label" class="btn btn-default">
                             <input type="checkbox" class="form-/control" name="label" id="label" value="Yes" {{$filter->label == 'Yes'? 'checked':''}} /> Use as Label</label>
                     </div>

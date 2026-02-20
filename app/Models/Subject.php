@@ -28,13 +28,19 @@ class Subject extends Model
         return $this->belongsToMany(Chapter::class, 'chapter_subject', 'subject_id', 'chapter_id');
     }
 
-    public function questions()
-    {
-        return $this->belongsToMany(Question::class, 'question_subject', 'subject_id', 'question_id');
-    }
+    // public function questions()
+    // {
+    //     return $this->belongsToMany(Question::class, 'question_subject', 'subject_id', 'question_id');
+    // }
 
     public function routines()
     {
         return $this->belongsToMany(Routine::class);
+    }
+
+    //collection
+    public function questions()
+    {
+        return $this->belongsToMany(Question::class, 'subject_question');
     }
 }

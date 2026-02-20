@@ -41,6 +41,7 @@ $source = New SourceCtrl;
                 <tr>
                   <th>Id</th>
                   <th>Name</th>
+                  <th>Slug</th>
                   <th>Course Name</th>
                   <th>Label</th>
                   <th>Details</th>
@@ -52,6 +53,7 @@ $source = New SourceCtrl;
                 <tr>
                   <td>{{$filter->id}}</td>
                   <td>{{$filter->name}}</td>
+                  <td>{{$filter->slug}}</td>
                   <td>
                     @foreach($filter->courses as $course)
                     <label class="label label-primary">{{$course->name}}</label>

@@ -79,7 +79,11 @@ $correct_answer = '';
                   <tr>
                   <tr>
                     <th style="width: 200px;">Question Title:</th>
-                    <td><label style="font-size:16px">{!!$value->title!!}</label> <br><img src="{{$value->image}}" alt="" width="150"></td>
+                    <td>
+                      <label style="font-size:16px">{!!$value->title!!}</label> 
+                      <br>
+                      <img src="{{$value->image}}" alt="" width="150">
+                    </td>
                   </tr>
                   @if($mcq->type == 'Written')
                   <tr>
@@ -151,7 +155,49 @@ $correct_answer = '';
                         <label for="" class="label label-primary">{{$val->name}}</label>
                       @endforeach
                     </td>
-                  </tr>                
+                  </tr>
+                  {{-- {{dd($value->readings)}} --}}
+                  <tr>
+                    <th>Reaction:</th>
+                    <td>
+                      @foreach($value->reactions as $val)
+                        <a target="_blank" class="label label-primary" href="{{route('student.show', $val->student_id)}}">
+                          {{$val->reaction}}
+                        </a>
+                      @endforeach
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Comments:</th>
+                    <td>
+                      @foreach($value->comments as $val)
+                        <a target="_blank" class="label label-default" href="{{route('student.show', $val->student_id)}}">
+                          {{$val->comment}}
+                        </a>
+                        <br>
+                      @endforeach
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Rating:</th>
+                    <td>
+                      @foreach($value->ratings as $val)
+                        <a target="_blank" class="label label-info" href="{{route('student.show', $val->student_id)}}">
+                          {{$val->rating}}
+                        </a>
+                      @endforeach
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Reading:</th>
+                    <td>
+                      @foreach($value->readings as $val)
+                        <a target="_blank" class="label label-info" href="{{route('student.show', $val->student_id)}}">
+                          {{$val->reading}}
+                        </a>
+                      @endforeach
+                    </td>
+                  </tr>
                    <tr>
                     <th>Status:</th>
                     <td>

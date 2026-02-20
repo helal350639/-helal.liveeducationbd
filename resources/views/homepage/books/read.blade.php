@@ -59,6 +59,14 @@ ul li{list-style: none}
 .show{
   padding: 15px;
 }
+.filter{
+  position: fixed;
+  left: 0;
+  bottom:0;
+}
+.form-group{
+  margin-bottom: 15px
+}
 </style>
 <div class="preloader">
 
@@ -188,9 +196,104 @@ ul li{list-style: none}
   </div><!-- /.box-footer -->
 </div>
 
-{{-- <div class="filter">
-  <button type="button">Filter</button>
-</div> --}}
+<div class="filter">
+  <button type="button" class="btn btn-info fixed" data-bs-target="#filter" data-bs-toggle="modal"> 
+    <i class="fa fa-filter"></i> 
+    Filter
+  </button>
+</div>
+
+<!-- Modal React -->
+<div class="modal fade" id="filter">
+  <div class="modal-dialog">
+      <div class="modal-content">
+        <form action="{{route('home.book.read', $book->id)}}" method="GET" id="filterForm">
+          <input type="hidden" name="question_id">
+          <div class="modal-header">
+            <i class="fa fa-filter"> </i> 
+            &nbsp; 
+            <b>Filter Question</b>
+          </div>
+          <div class="modal-body">
+            {{-- <div class="form-group">
+              <label class="btn btn-default"> সাবজেক্ট নাম:</label>
+              <select name="subject" class="form-control">
+                <option value="">Select One</option>
+                <option value=""></option>
+              </select>
+            </div> --}}
+            <div class="form-group">
+              <label class="btn btn-default"> চেপ্টার নাম:</label>
+              <select name="chapter" class="form-control">
+                <option value="">Select One</option>
+                @foreach($chapters as $chapter)
+                <option value="{{$chapter->id}}">{{$chapter->name}}</option>
+                @endforeach
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="btn btn-default"> প্রশ্ন সোর্স:</label>
+              <select name="source" class="form-control">
+                <option value="">Select One</option>
+                @foreach($sources as $source)
+                <option value="{{$source->id}}">{{$source->name}}</option>
+                @endforeach
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="btn btn-default"> সাব সোর্স</label>
+              <select name="sub-source" class="form-control">
+                <option value="">Select One</option>
+                @foreach($subsources as $subsource)
+                <option value="{{$subsource->id}}">{{$subsource->name}}</option>
+                @endforeach
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="btn btn-default"> পরীক্ষার সন</label>
+              <select name="year" class="form-control">
+                <option value="">Select One</option>
+                @foreach($years as $year)
+                <option value="{{$year->id}}">{{$year->name}}</option>
+                @endforeach
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="btn btn-default"> Reaction:</label>
+              <select name="reaction" class="form-control">
+                <option value="">Select One</option>
+                <option value="Good">Good</option>
+                <option value="Very Good">Very Good</option>
+                <option value="Moderate">Moderate</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="btn btn-default"> Rating:</label>
+              <select name="rating" class="form-control">
+                <option value="">Select One</option>
+                <option value="Very Important">Very Important</option>
+                <option value="Medium Important">Medium Important</option>
+                <option value="Low Important">Low Important</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="btn btn-default"> Reading:</label>
+              <select name="reading" class="form-control">
+                <option value="">Select One</option>
+                <option value="Done">Done</option>
+                <option value="Again Reading">Again Reading</option>
+                <option value="So Hard">So Hard</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-success" data-bs-dismiss="modal">Search</button>
+          </div>
+        </form>
+      </div>
+  </div>
+</div>
 
 <!-- Modal React -->
 <div class="modal fade" id="reaction">

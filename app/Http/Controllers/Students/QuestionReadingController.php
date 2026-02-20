@@ -17,6 +17,17 @@ class QuestionReadingController extends Controller
     $this->middleware('auth:student');
   }
 
+  public function index(Request $request)
+  {
+    $data = $request->validate([
+      'chapter_id' => 'nullable|numeric',
+      'source' => 'nullable|string',
+      'sub-source' => 'nullable|string',
+      'year' => 'nullable|numeric',
+      'reaction' => 'nullable'
+    ]);
+  }
+
   public function reactStore(Request $request)
   {
     //validation
