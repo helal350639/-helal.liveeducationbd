@@ -512,17 +512,23 @@ class HomePageCtrl extends Controller
     {
       $query->whereHas('filters', function ($q) use ($source)
       {
-        $q->where('filter_id', $source);
+        $q->where('sub_filter_id', $source);
       });
     })
-    // ->when($subsource, function($query, $subsource)
-    // {
-    //   return $query->where('filter_id', $subsource);
-    // })
-    // ->when($year, function($query, $year)
-    // {
-    //   return $query->where('year', $year);
-    // })
+    ->when($subsource, function($query, $subsource)
+    {
+      $query->whereHas('filters', function ($q) use ($subsource)
+      {
+        $q->where('sub_filter_id', $subsource);
+      });
+    })
+    ->when($year, function($query, $year)
+    {
+      $query->whereHas('filters', function ($q) use ($year)
+      {
+        $q->where('sub_filter_id', $year);
+      });
+    })
     ->when($reaction, function($query, $reaction)
     {
       $query->whereHas('reactions', function ($q) use ($reaction)
