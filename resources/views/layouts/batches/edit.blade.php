@@ -111,6 +111,12 @@ foreach($batch->teachers as $val)
                         <input type="number" class="form-control" name="net_price" id="net_price" value="{{$batch->net_price}}" step="0.01" placeholder="0.00 Tk.">
                     </div>
                 </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="extra_fee_note">Note for Extra Fee</label>
+                        <input type="text" class="form-control" name="extra_fee_note" id="extra_fee_note" value="{{$batch->extra_fee_note}}" placeholder="Write a why added the extra fee.">
+                    </div>
+                </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="start_at">Start Date</label>

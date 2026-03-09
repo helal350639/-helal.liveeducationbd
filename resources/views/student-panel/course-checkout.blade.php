@@ -65,7 +65,6 @@ $selling_price = $price - $discount;
             <div class="card-body">
                 <input type="hidden" name="student_id" value="{{$user ? $user->id : null}}">
                 <input type="hidden" name="batch_id" value="{{$value->id}}">
-                
                 <input type="hidden" name="name" value="{{$student? $student->name:''}}" />
                 <input type="hidden" name="email" value="{{$student? $student->email:''}}" />
                 <input type="hidden" name="phone" value="{{$student? $student->contact:''}}" />
@@ -107,7 +106,10 @@ $selling_price = $price - $discount;
                     </tr>
                     <tr>
                       <td>অন্যান্য ফী (+)</td>
-                      <th>&#2547; {{$source->point0($value->fee)}}</th>
+                      <th>
+                        &#2547; {{$source->point0($value->fee)}}
+                        <div class="btn btn-info" data-bs-toggle="tooltip" data-bs-title="{{$value->extra_fee_note}}">?</div>
+                      </th>
                     </tr>
                     <tr>
                       <td>ডিস্কাউন্ট (-)</td>

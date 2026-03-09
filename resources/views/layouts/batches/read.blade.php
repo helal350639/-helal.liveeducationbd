@@ -36,8 +36,42 @@ $source = new SourceCtrl;
             <table class="table">
               <tbody>
                 <tr>
-                  <th style="width: 200px;">Name:</th>
+                  <th style="width: 200px;">Title:</th>
                   <td>{{$batch->name}}</td>
+                </tr>
+                <tr>
+                  <th>Sub-Title:</th>
+                  <td>{{$batch->subtitle}}</td>
+                </tr>
+                <tr>
+                  <th>Price: Tk.</th>
+                  <td><b>{{$batch->price}}</b></td>
+                </tr>
+                <tr>
+                  <th>Extra Fee: Tk.</th>
+                  <td>{{$batch->fee}}
+                    <p>{{$batch->extra_fee_note}}</p>
+                  </td>
+                </tr>
+                <tr>
+                  <th>Discount: Tk.</th>
+                  <td>{{$batch->discount}}</td>
+                </tr>
+                <tr>
+                  <th>Reference Discount: Tk.</th>
+                  <td>{{$batch->reference_discount}}</td>
+                </tr>
+                <tr>
+                  <th>Selling Price: Tk.</th>
+                  <td>{{$batch->reference_discount}}</td>
+                </tr>
+                <tr>
+                  <th>Referrer Bonus: Tk.</th>
+                  <td>{{$batch->reference_bonus}}</td>
+                </tr>
+                <tr>
+                  <th>Net Price: Tk.</th>
+                  <td>{{$batch->net_price}}</td>
                 </tr>
                 <tr>
                   <th>Course:</th>
