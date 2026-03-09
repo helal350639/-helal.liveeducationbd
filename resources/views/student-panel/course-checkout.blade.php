@@ -108,7 +108,7 @@ $selling_price = $price - $discount;
                       <td>অন্যান্য ফী (+)</td>
                       <th>
                         &#2547; {{$source->point0($value->fee)}}
-                        @if($value->fee)
+                        @if($value->fee > 0)
                         <div class="btn btn-info" data-bs-toggle="tooltip" data-bs-title="{{$value->extra_fee_note}}">?</div>
                         @endif
                       </th>
