@@ -12,6 +12,11 @@ class Filter extends Model
         return $this->hasMany(SubFilter::class, 'filter_id');
     }
 
+    public function parents()
+    {
+        return $this->hasMany(SubFilter::class, 'filter_id');
+    }
+
     public function courses()
     {
         return $this->belongsToMany(Course::class);

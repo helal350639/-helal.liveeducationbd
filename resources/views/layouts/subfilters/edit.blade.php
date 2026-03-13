@@ -2,9 +2,9 @@
 @section('title', 'Edit Filter')
 @section('content')
 <section class="content-header">
-  <h1>Edit Filter</h1>
+  <h1>Edit Sub-Filter</h1>
   <ol class="breadcrumb">
-    <li><a href="#"><i class="fa fa-dashboard"></i> Filters</a></li>
+    <li><a href="#"><i class="fa fa-dashboard"></i> Sub-Filters</a></li>
     <li class="active">Edit Filter</li>
 </ol>
 </section>
@@ -15,19 +15,30 @@
     <div class="col-md-8"> <!-- general form elements -->
       <div class="box box-primary">
         <div class="box-header with-border">
-            <h3 style="color: #800" class="box-title">Filter Details</h3>
+            <h3 style="color: #800" class="box-title">Sub-Filter Details</h3>
         </div>
         <form action="{{route('sub-filter.update', $subfilter)}}" method="POST">
             @csrf
             @method('PUT')
             <div class="box-body">
+              <div class="col-md-12">
+                  <div class="form-group">
+                      <label for="name">Sub-Filter Name</label>
+                      <select class="form-control" name="filter_id" id="filter_id" required>
+                          <option value="">Select One</option>
+                          @foreach($filters as $val)
+                          <option value="{{$val->id}}" {{$val->id == $subfilter->filter_id ? 'selected' : ''}}>{{$val->name}}</option>
+                          @endforeach
+                      </select>
+                  </div>
+              </div>
                 <div class="col-md-12">
                     <div class="form-group">
-                        <label for="name">Filter Name</label>
-                        <select class="form-control" name="filter_id" id="filter_id" required>
+                        <label for="parent_id">Parent(Optional)</label>
+                        <select class="form-control" name="parent_id" id="parent_id" required>
                             <option value="">Select One</option>
-                            @foreach($filters as $val)
-                            <option value="{{$val->id}}" {{$val->id == $subfilter->filter_id ? 'selected' : ''}}>{{$val->name}}</option>
+                            @foreach($parents as $val)
+                            <option value="{{$val->id}}" {{$val->id == $subfilter->parent_id ? 'selected' : ''}}>{{$val->name}}</option>
                             @endforeach
                         </select>
                     </div>

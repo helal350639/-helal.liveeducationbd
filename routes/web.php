@@ -335,6 +335,11 @@ Route::middleware(['auth'])->group(function()
 		Route::get('get_filters/{course_id}', 'getFilters');
 	});
 
+  Route::controller(SubFilterCtrl::class)->group(function()
+	{
+		Route::get('get-sub-filter/{parent_id}', 'getSubSource')->name('subfilter.subsource');
+	});
+
 	Route::controller(PaperCtrl::class)->group(function()
 	{
     Route::prefix('paper')->group(function()

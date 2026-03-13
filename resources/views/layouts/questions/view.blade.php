@@ -263,7 +263,6 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
                   <i class="fa fa-check"></i> Done
                 </a>
                 @endif
-                {{-- <button type="button" class="btn btn-success btn-sm pull-right" onclick="addToPaper(this)" value="{{$paper->id}}"><i class="fa fa-plus"></i> Add To Paper</button> --}}
               </div>
             </div>
           </div>
@@ -284,13 +283,13 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
                         <i class="fa fa-chevron-down"></i>
                       </span>
                     </p>
-                    <ul class="filter-group hide">
+                    <ul class="filter-group hide" id="{{$filter->slug}}">
                       @foreach($filter->subfilter as $sub)
                       <li class="item">
                         <div class="input-group">
                           <a>{{$sub->name}}</a>
                           <span class="input-group-addon">
-                            <input type="checkbox" name="sub_filter" value="{{$sub->id}}" onchange="ajaxFilter()">
+                            <input type="checkbox" name="sub_filter" value="{{$sub->id}}" onchange="ajaxFilter(this)" data-id="{{$sub->id}}">
                           </span>
                         </div>
                       </li>
@@ -619,7 +618,7 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
   //assign sub-filters for every where use
   let filters = document.getElementsByName('sub_filter');
 
-  function ajaxFilter()
+  function ajaxFilter(elm)
   {
     //loading image view
     loading.classList.remove('hide');
@@ -657,6 +656,43 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
         console.log(data);
       }
     });
+
+
+    const subsource = document.getElementById('sub-source');
+    if(elm.dataset.id && elm.checked)
+    {
+      $.ajax({
+      type: 'GET',
+      url: '{{route("subfilter.subsource", "")}}/'+elm.dataset.id,
+      success: function(data){
+        let options = '';
+        data.subsource.forEach(s => 
+        {
+          options += '<li class="item">'+
+                        '<div class="input-group">'+
+                          '<a>'+s.name+'</a>'+
+                          '<span class="input-group-addon">'+
+                            '<input type="checkbox" name="sub_filter" value="'+s.id+'" onchange="ajaxFilter(this)">'+
+                          '</span>'+
+                        '</div>'+
+                      '</li>';
+        });
+
+        if(options)
+        {
+          subsource.innerHTML = options;
+        }
+        else
+        {
+          subsource.innerHTML = 'Sub Source Not Found!';
+        }
+      },
+      error: function(data){
+        console.error(data);
+      }
+    });
+    }
+    
   }
 
   window.onscroll = function(){

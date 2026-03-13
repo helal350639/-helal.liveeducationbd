@@ -111,8 +111,10 @@ class SubFilterCtrl extends Controller
     public function edit($id)
     {
         $filters = Filter::where('status', 'Active')->get();
+        $filter = Filter::where('slug', 'source')->first();
+        $parents = $filter->parents()->get();
         $subfilter = SubFilter::find($id);
-        return view('layouts.subfilters.edit', compact('filters', 'subfilter'));
+        return view('layouts.subfilters.edit', compact('filters', 'parents', 'subfilter'));
     }
 
     /**
@@ -174,6 +176,14 @@ class SubFilterCtrl extends Controller
         return redirect()->route('sub-filter.index');
       }
       return back()->with('error', 'Permission Denied');
+    }
+
+    public function getSubSource($parent_id)
+    {
+      $subsource = SubFilter::where('parent_id', $parent_id)->get();
+      return response()->json([
+        'subsource' => $subsource
+      ], 200);
     }
     
 }
