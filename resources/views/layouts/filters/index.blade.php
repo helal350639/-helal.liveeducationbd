@@ -50,9 +50,9 @@ $source = New SourceCtrl;
                   <th>Status</th>
                   <th width="110">Action</th>
                 </tr>
-                @foreach($filters as $filter)
+                @foreach($filters as $key => $filter)
                 <tr>
-                  <td>{{$filter->id}}</td>
+                  <td>{{$key + 1}}</td>
                   <td>{{$filter->name}}</td>
                   <td>{{$filter->slug}}</td>
                   <td>{{$filter->order_number}}</td>
