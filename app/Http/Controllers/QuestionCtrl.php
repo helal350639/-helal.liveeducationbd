@@ -80,7 +80,9 @@ class QuestionCtrl extends Controller
         ->select('id', 'name')
         ->get();
 
-        $filters = Filter::with(['SubFilter'])->get();
+        $filters = Filter::with(['SubFilter'])
+        ->orderBy('order_number', 'asc')
+        ->get();
 
         $cat = [
             'course_id' => null,

@@ -53,6 +53,12 @@ foreach($filter->courses as $val)
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
+                        <label for="order_number">Order Number</label>
+                        <input type="text" class="form-control" name="order_number" id="order_number" value="{{$filter->order_number}}">
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
                         <label for="label" class="btn btn-default">
                             <input type="checkbox" class="form-/control" name="label" id="label" value="Yes" {{$filter->label == 'Yes'? 'checked':''}} /> Use as Label</label>
                     </div>

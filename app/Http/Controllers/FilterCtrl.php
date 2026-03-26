@@ -34,7 +34,7 @@ class FilterCtrl extends Controller
         $query->where('name', 'like', "%{$search}%");
       })
       ->with(['courses'])
-      ->orderBy('filters.id','desc')
+      ->orderBy('filters.order_number','asc')
       ->paginate(25)
       ->appends(['search' => $search]);
       
