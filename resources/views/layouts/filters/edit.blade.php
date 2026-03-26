@@ -54,7 +54,7 @@ foreach($filter->courses as $val)
                 <div class="col-md-12">
                     <div class="form-group">
                         <label for="order_number">Order Number</label>
-                        <input type="text" class="form-control" name="order_number" id="order_number" value="{{$filter->order_number}}">
+                        <input type="number" class="form-control" name="order_number" id="order_number" value="{{$filter->order_number}}" placeholder="0-9">
                     </div>
                 </div>
                 <div class="col-md-12">
