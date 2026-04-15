@@ -452,6 +452,10 @@ Route::middleware(['auth'])->group(function()
   {
     Route::get('about-us', 'aboutUs')->name('settings.about-us');
     Route::post('about-us/update', 'aboutUsUpdate')->name('about.update');
+
+    //notices
+    Route::get('notice-edit', 'noticeEdit')->name('noitice.edit');
+    Route::put('noitce-update/{id}', 'noticeUpdate')->name('notice.update');
   });
 
   // database backup

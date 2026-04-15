@@ -36,6 +36,7 @@ use App\Models\QuestionComment;
 use App\Models\QuestionReaction;
 use App\Models\QuestionRating;
 use App\Models\QuestionReading;
+use App\Models\Notice;
 use Auth;
 use Session;
 use DB;
@@ -104,8 +105,11 @@ class HomePageCtrl extends Controller
     $book_categories = BookCategory::where('status', 'Active')
     ->select('id', 'name')
     ->get();
+
+    //notice
+    $notice = Notice::latest()->where('status', 'published')->first();
     
-    return view('homepage.index', compact('courses', 'sliders', 'batches', 'teachers', 'complains', 'about', 'circulars', 'ads', 'videos', 'main_video', 'services', 'book_categories'));
+    return view('homepage.index', compact('courses', 'sliders', 'batches', 'teachers', 'complains', 'about', 'circulars', 'ads', 'videos', 'main_video', 'services', 'book_categories','notice'));
   }
 
   public function circular($id)

@@ -600,4 +600,50 @@ style="background-image: url('/web/img/background-bg.jpg')">
   </div>
 </div>
 </section>
+@if($notice)
+<style>
+  .modal{
+    z-index: 9999;
+  }
+  .modal .btn-close{
+    margin-top: 20px;
+    margin-right:5px
+  }
+</style>
+<!-- Notice Modal -->
+<div class="modal fade" id="noticeModal" tabindex="-1" aria-labelledby="noticeLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="noticeLabel">{{$notice->title}}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        {!! $notice->details !!}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        {{-- <button type="button" class="btn btn-primary">Save changes</button> --}}
+      </div>
+    </div>
+  </div>
+</div>
+@endif
+
+@endsection
+@section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  @if($notice)
+    function showNotice()
+    {
+      const modalid = document.getElementById('noticeModal');
+      const myModal = new bootstrap.Modal(modalid);
+      myModal.show();
+    }
+
+    showNotice();
+  @endif
+
+</script>
 @endsection

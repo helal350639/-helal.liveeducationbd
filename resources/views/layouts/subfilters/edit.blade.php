@@ -23,7 +23,7 @@
             <div class="box-body">
               <div class="col-md-12">
                   <div class="form-group">
-                      <label for="name">Sub-Filter Name</label>
+                      <label for="name">Filter Name</label>
                       <select class="form-control" name="filter_id" id="filter_id" required>
                           <option value="">Select One</option>
                           @foreach($filters as $val)

@@ -434,6 +434,9 @@ if($complains)
             <li>
               <a href="/circular"><i class="fa fa-copy"></i> Circulars</a>
             </li>
+            <li>
+              <a href="/notice-edit"><i class="fa fa-edit"></i> Notice</a>
+            </li>
           </ul>
         </li>
 

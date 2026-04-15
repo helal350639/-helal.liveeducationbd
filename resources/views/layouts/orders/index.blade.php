@@ -111,10 +111,12 @@ $source = New SourceCtrl;
                 <tr>
                   <th>Id</th>
                   <th>Name</th>
+                  <th>Student ID</th>
                   <th>Batch</th>
                   <th>Department</th>
                   <th>Email</th>
                   <th>Phone</th>
+                  <th>Price Tk.</th>
                   <th>Order At</th>
                   <th>Status</th>
                   <th>Connected?</th>
@@ -124,6 +126,7 @@ $source = New SourceCtrl;
                 <tr>
                   <td>{{$value->id}}</td>
                   <td>{{$value->student_name}}</td>
+                  <td>{{$value->student_id}}</td>
                   <td>{{$value->batch_name}}</td>
                   <td>
                     {{$value->department_name}}
@@ -133,6 +136,7 @@ $source = New SourceCtrl;
                   </td>
                   <td>{{$value->email}}</td>
                   <td>{{$value->phone}}</td>
+                  <td>{{$value->amount}}</td>
                   <td>{{$source->dtformat($value->created_at)}}</td>
                   <td>
                     @if($value->status == 'Complete')

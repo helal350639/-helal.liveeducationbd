@@ -9,6 +9,7 @@ use App\Models\Filter;
 use App\Models\SubFilter;
 use App\Models\Role;
 use App\Models\AnswerFile;
+use App\Models\Notice;
 use Auth;
 use Image;
 use Toastr;
@@ -51,5 +52,33 @@ class HomepageSettingCtrl extends Controller
     $result = Storage::put('about.json', json_encode($data, JSON_PRETTY_PRINT));
 
     return redirect()->route('settings.about-us');
+  }
+
+  public function noticeEdit()
+  {
+    $notice = Notice::latest()->first();
+    return view('layouts.homepagesettings.notice-edit', compact('notice'));
+  }
+
+  public function noticeUpdate(Request $request, $id)
+  {
+    $data = $request->validate([
+      'title' => 'required|string',
+      'details' => 'nullable|string',
+      'image' => 'nullable|image',
+      'start_at' => 'nullable|date',
+      'end_at' => 'nullable|date',
+      'status' => 'nullable|string',
+    ]);
+
+    try {
+      Notice::where('id', $id)->update($data);
+      Session::flash('success', 'The notice successfully updated.');
+    }
+    catch(\Exception $e)
+    {
+      return $e->getMessage();
+    }
+    return back();
   }
 }
