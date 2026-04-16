@@ -438,6 +438,7 @@ class HomePageCtrl extends Controller
 
   public function booksDepartment($id)
   {
+    return redirect()->route('home.coming-soon');
     $category = DB::table('book_categories')->find($id);
     $departments = Department::where('status', 'Active')
     ->get();

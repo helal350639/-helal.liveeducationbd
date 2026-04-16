@@ -117,6 +117,11 @@ class StudentLogin extends Controller
           ]);
     
         Auth::guard('student')->loginUsingId($user->id);
+      
+        Student::where('id', $user->id)->update([
+          'last_login_at' => now(),
+          'logged_in' => 'Yes'
+        ]);
     
         return redirect()->intended(route('students.dashboard'));
     }
@@ -139,6 +144,11 @@ class StudentLogin extends Controller
           ]);
   
       Auth::guard('student')->loginUsingId($user->id);
+
+      Student::where('id', $user->id)->update([
+        'last_login_at' => now(),
+        'logged_in' => 'Yes'
+      ]);
   
       return redirect()->intended(route('students.dashboard'));
     }
