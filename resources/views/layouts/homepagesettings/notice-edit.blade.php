@@ -46,7 +46,7 @@ $value = $notice;
                       <textarea class="form-control editor" name="details" id="details" rows="10">{{$value->details}}</textarea>
                   </div>
               </div>
-              <div class="col-md-12">
+              {{-- <div class="col-md-12">
                   <div class="form-group">
                       <label for="image">Image</label>
                       <input type="file" class="form-control" name="image" id="image" multiple>
@@ -70,7 +70,7 @@ $value = $notice;
                       <label for="end_at">End Date</label>
                       <input type="datetime-local" class="form-control" name="end_at" id="end_at" value="{{$value->end_at}}">
                   </div>
-              </div>
+              </div> --}}
               <div class="col-md-6">
                   <div class="form-group">
                       <label for="status">Status</label>

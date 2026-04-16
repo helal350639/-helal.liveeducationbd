@@ -12,6 +12,7 @@ use App\Models\Question;
 use App\Models\Filter;
 use App\Models\Order;
 use App\Models\Visitor;
+use App\Models\Student;
 use Carbon\Carbon;
 use Auth;
 use DB;
@@ -52,16 +53,39 @@ class HomeCtrl extends Controller
         'filters' => Filter::count(),
       ];
 
+      //visitors
       $visitors = \DB::table('visitors')
-        ->selectRaw('DATE(visited_at) as date, COUNT(*) as total')
-        ->groupByRaw('DATE(visited_at)')
-        ->orderBy('date', 'ASC')
-        ->get();
+      ->where('visited_at', '>=', now()->subDays(30))
+      ->selectRaw('DATE(visited_at) as date, COUNT(*) as total')
+      ->groupByRaw('DATE(visited_at)')
+      ->orderBy('date', 'ASC')
+      ->get();
 
-      $dates = $visitors->pluck('date');
-      $totals = $visitors->pluck('total');
+      $visitors_dates = $visitors->pluck('date');
+      $visitors_totals = $visitors->pluck('total');
 
-      return view('layouts.index', compact('data', 'dates', 'totals'));
+      //orders/sales
+      $orders = Order::where('created_at', '>=', now()->subDays(30))
+      ->selectRaw('DATE(created_at) as date, COUNT(*) as total')
+      ->groupByRaw('DATE(created_at)')
+      ->orderBy('date', 'ASC');
+
+      $orders_dates = $orders->pluck('date');
+      $orders_totals = $orders->pluck('total');
+
+      // $orders_pending_totals = $orders
+      // ->where('status', 'Pending')
+      // ->pluck('total');
+
+      // $orders_success_totals = $orders
+      // ->where('status', 'Processing')
+      // ->pluck('total');
+
+      //active/inactive students
+      $active_students = Student::where('last_login_at', '>=', now()->subDays(3))->count();
+      $inactive_students = Student::where('last_login_at', '<', now()->subDays(3))->count();
+
+      return view('layouts.index', compact('data', 'visitors_dates', 'visitors_totals', 'orders_dates', 'orders_totals', 'active_students', 'inactive_students'));
     }
 
     public function visitors()

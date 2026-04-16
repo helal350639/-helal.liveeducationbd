@@ -116,14 +116,38 @@ $new = $confirmed = $completed = $cancelled = 0;
           </div> <!-- /.info-box -->
         </div> <!-- /.col -->
         
+        <div class="col-md-3 col-sm-6 col-xs-12">
+          <div class="info-box">
+            <a href="{{route('student.index', 'status=Active')}}">
+              <span class="info-box-icon bg-green"><i class="fa fa-users"></i></span>
+            </a>
+            <div class="info-box-content">
+              <span class="info-box-text">Active Students</span>
+              <span class="info-box-number">{{$active_students}}</span>
+            </div> <!-- /.info-box-content -->
+          </div> <!-- /.info-box -->
+        </div> <!-- /.col --><!-- fix for small devices only -->
+        
+        <div class="col-md-3 col-sm-6 col-xs-12">
+          <div class="info-box">
+            <a href="{{route('student.index', 'status=Inactive')}}">
+              <span class="info-box-icon bg-gray"><i class="fa fa-users"></i></span>
+            </a>
+            <div class="info-box-content">
+              <span class="info-box-text">Inactive Students</span>
+              <span class="info-box-number">{{$inactive_students}}</span>
+            </div> <!-- /.info-box-content -->
+          </div> <!-- /.info-box -->
+        </div> <!-- /.col --><!-- fix for small devices only -->
+        
         <div class="clearfix visible-sm-block"></div>
       </div>
       <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-12">
           <!-- AREA CHART -->
           <div class="box box-primary">
             <div class="box-header with-border">
-              <h3 class="box-title">Area Chart
+              <h3 class="box-title">Visitors
                 {{-- Daily Visitors --}}
               </h3>
 
@@ -140,31 +164,12 @@ $new = $confirmed = $completed = $cancelled = 0;
             </div> <!-- /.box-body -->
           </div> <!-- /.box -->
         </div>
-
-        <div class="col-md-6">
-          <!-- DONUT CHART -->
-          <div class="box box-danger">
-            <div class="box-header with-border">
-              <h3 class="box-title">Donut Chart</h3>
-
-              <div class="box-tools pull-right">
-                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-                </button>
-                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-              </div>
-            </div>
-            <div class="box-body">
-              <canvas id="pieChart" style="height:250px"></canvas>
-            </div> <!-- /.box-body -->
-          </div> <!-- /.box -->
-
-        </div>
         <!-- /.col (LEFT) -->
-        <div class="col-md-6">
+        <div class="col-md-12">
           <!-- LINE CHART -->
           <div class="box box-info">
             <div class="box-header with-border">
-              <h3 class="box-title">Line Chart</h3>
+              <h3 class="box-title">Orders</h3>
 
               <div class="box-tools pull-right">
                 <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
@@ -180,7 +185,7 @@ $new = $confirmed = $completed = $cancelled = 0;
           </div> <!-- /.box -->
 
           <!-- BAR CHART -->
-          <div class="box box-success">
+          {{-- <div class="box box-success">
             <div class="box-header with-border">
               <h3 class="box-title">Bar Chart</h3>
 
@@ -195,9 +200,29 @@ $new = $confirmed = $completed = $cancelled = 0;
                 <canvas id="barChart" style="height:230px"></canvas>
               </div>
             </div> <!-- /.box-body -->
-          </div> <!-- /.box -->
+          </div> <!-- /.box --> --}}
 
         </div> <!-- /.col (RIGHT) -->
+
+
+        <div class="col-md-6">
+          <!-- DONUT CHART -->
+          <div class="box box-danger">
+            <div class="box-header with-border">
+              <h3 class="box-title">Active & Inactive Students</h3>
+
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>
+            <div class="box-body">
+              <canvas id="pieChart" style="height:250px"></canvas>
+            </div> <!-- /.box-body -->
+          </div> <!-- /.box -->
+
+        </div>
       </div> <!-- /.row -->
 
     </section>
@@ -220,8 +245,6 @@ $new = $confirmed = $completed = $cancelled = 0;
     // Get context with jQuery - using jQuery's .get() method.
     var areaChartCanvas = $('#areaChart').get(0).getContext('2d')
     // This will get the first returned node in the jQuery collection.
-    // let label = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
-    // let data = [65, 59, 80, 81, 56, 55, 40];
     var areaChart       = new Chart(areaChartCanvas)
 
     var areaChartData = {
@@ -250,11 +273,11 @@ $new = $confirmed = $completed = $cancelled = 0;
       ]
     }    
     
-    const label = @json($dates);
-    const total = @json($totals);
+    // const label = @json($visitors_dates);
+    // const total = @json($visitors_totals);
 
-    var ChartData = {
-      labels  : @json($dates),
+    var VisitorsChartData = {
+      labels  : @json($visitors_dates),
       datasets: [
         {
           label               : 'Visitors',
@@ -264,7 +287,7 @@ $new = $confirmed = $completed = $cancelled = 0;
           pointStrokeColor    : 'rgba(60,141,188,1)',
           pointHighlightFill  : '#fff',
           pointHighlightStroke: 'rgba(60,141,188,1)',
-          data                : @json($totals)
+          data                : @json($visitors_totals)
         }
       ]
     }
@@ -309,16 +332,32 @@ $new = $confirmed = $completed = $cancelled = 0;
     }
 
     //Create the line chart
-    areaChart.Line(areaChartData, areaChartOptions)
+    areaChart.Line(VisitorsChartData, areaChartOptions)
 
     //-------------
     //- LINE CHART -
     //--------------
+    var OrdersChartData = {
+      labels  : @json($orders_dates),
+      datasets: [
+        {
+          label               : 'Orders',
+          fillColor           : 'rgba(60,141,188,0.9)',
+          strokeColor         : 'rgba(60,141,188,0.8)',
+          pointColor          : '#3b8bba',
+          pointStrokeColor    : 'rgba(60,141,188,1)',
+          pointHighlightFill  : '#fff',
+          pointHighlightStroke: 'rgba(60,141,188,1)',
+          data                : @json($orders_totals)
+        }
+      ]
+    }
+
     var lineChartCanvas          = $('#lineChart').get(0).getContext('2d')
     var lineChart                = new Chart(lineChartCanvas)
     var lineChartOptions         = areaChartOptions
     lineChartOptions.datasetFill = false
-    lineChart.Line(areaChartData, lineChartOptions)
+    lineChart.Line(OrdersChartData, lineChartOptions)
 
     //-------------
     //- PIE CHART -
@@ -364,6 +403,20 @@ $new = $confirmed = $completed = $cancelled = 0;
         label    : 'Navigator'
       }
     ]
+    var PieData        = [
+      {
+        value    : @json($active_students),
+        color    : '#00c0ef',
+        highlight: '#00c0ef',
+        label    : 'Active'
+      },
+      {
+        value    : @json($inactive_students),
+        color    : '#d2d6de',
+        highlight: '#d2d6de',
+        label    : 'Inactive'
+      }
+    ]
     var pieOptions     = {
       //Boolean - Whether we should show a stroke on each segment
       segmentShowStroke    : true,
@@ -395,9 +448,35 @@ $new = $confirmed = $completed = $cancelled = 0;
     //-------------
     //- BAR CHART -
     //-------------
+    var OrdersChartData = {
+      labels  : @json($orders_dates),
+      datasets: [
+        {
+          label               : 'Electronics',
+          fillColor           : 'rgba(210, 214, 222, 1)',
+          strokeColor         : 'rgba(210, 214, 222, 1)',
+          pointColor          : 'rgba(210, 214, 222, 1)',
+          pointStrokeColor    : '#c1c7d1',
+          pointHighlightFill  : '#fff',
+          pointHighlightStroke: 'rgba(220,220,220,1)',
+          data                : @json($orders_totals)
+        },
+        {
+          label               : 'Digital Goods',
+          fillColor           : 'rgba(60,141,188,0.9)',
+          strokeColor         : 'rgba(60,141,188,0.8)',
+          pointColor          : '#3b8bba',
+          pointStrokeColor    : 'rgba(60,141,188,1)',
+          pointHighlightFill  : '#fff',
+          pointHighlightStroke: 'rgba(60,141,188,1)',
+          data                : @json($orders_totals)
+        }
+      ]
+    }
+
     var barChartCanvas                   = $('#barChart').get(0).getContext('2d')
     var barChart                         = new Chart(barChartCanvas)
-    var barChartData                     = areaChartData
+    var barChartData                     = OrdersChartData
     barChartData.datasets[1].fillColor   = '#00a65a'
     barChartData.datasets[1].strokeColor = '#00a65a'
     barChartData.datasets[1].pointColor  = '#00a65a'

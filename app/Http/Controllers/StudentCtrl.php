@@ -29,11 +29,27 @@ class StudentCtrl extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
+      $active = $inactive = '';
+      if($request->status == 'Active')
+      {
+        $active = $request->status;
+      }
+      elseif($request->status == 'Inactive')
+      {
+        $inactive = $request->status;
+      }
+
         $students = Student::leftJoin('users', 'users.id', 'students.created_by')
         ->orderBy('students.id','DESC')
         ->select('students.*', 'users.name as admin_name')
+        ->when($active, function($query, $active){
+          $query->where('students.last_login_at', '>=', now()->subDays(3));
+        })
+        ->when($inactive, function($query){
+          $query->where('students.last_login_at', '<', now()->subDays(3));
+        })
         ->paginate(25);
         return view('layouts.students.index', compact('students'));
     }

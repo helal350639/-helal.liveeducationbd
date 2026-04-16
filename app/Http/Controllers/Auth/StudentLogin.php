@@ -70,7 +70,12 @@ class StudentLogin extends Controller
             // 'status' => 'Active'
         ], $remember = true))
         {
-            return redirect()->intended(route('students.dashboard'));
+          Student::where('email', $email)->update([
+            'last_login_at' => now(),
+            'logged_in' => 'Yes'
+          ]);
+
+          return redirect()->intended(route('students.dashboard'));
         }
         
         return back()->withErrors(['email' => 'Invalid credentials']);
@@ -78,7 +83,13 @@ class StudentLogin extends Controller
 
     public function logout(Request $request): RedirectResponse
     {
-        Auth::guard('student')->logout();
+        $student = Auth::guard('student');
+        
+        Student::where('id', $student->user()->id)->update([
+          'logged_in' => 'No'
+        ]);
+
+        $student->logout();
     
         $request->session()->invalidate();
     
