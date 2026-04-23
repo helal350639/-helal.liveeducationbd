@@ -93,13 +93,13 @@ if($user)
                     
                         <td>{{$source->dtformat($item->exam_at)}}</td>
                         <td>
-                          @if($source->dformat($item->exam_at) > now())
+                          {{-- @if($source->dformat($item->exam_at) > now())
                           <label for="">Up Coming</label>
                           @elseif($source->dformat($item->exam_at) < now())
                           <label for="">Completed</label>
                           @else
                           <label for="">Running</label>
-                          @endif
+                          @endif --}}
                         </td>
                       </tr>
                       @endforeach
