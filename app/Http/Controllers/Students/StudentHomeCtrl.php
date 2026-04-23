@@ -66,9 +66,10 @@ class StudentHomeCtrl extends Controller
     ->count();
 
     // student already completed the exams
-    $result = Exam::where('student_id', $user->id)
-    ->where('status', 'Completed')
-    ->count();
+    $exam = Exam::where('student_id', $user->id)
+    ->where('status', 'Completed');
+    $result = $exam->count();
+    $exams = $exam->get();
 
     // batch routine for the student
     $routine = Routine::whereIn('batch_id', $student_batches_ids)
@@ -90,8 +91,21 @@ class StudentHomeCtrl extends Controller
 
     $circulars = Circular::where('status', 'Published')->count();
 
+    $courses = Batch::where('status', 'Active')
+    ->whereHas('departments', function($query) use ($student_departments_ids) {
+        $query->whereIn('departments.id', $student_departments_ids);
+    })
+    ->count();
+
+    $total_exams = Paper::whereIn('batch_id', $student_batches_ids)
+    ->whereIn('department_id', $student_departments_ids)
+    ->count();
+
     $data = [
+      'courses' => $courses,
       'course' => $mycourses,
+      'total_exams' => $total_exams,
+      'myexams' => $premium_exam,
       'free_exam' => $free_exam,
       'premium_exam' => $premium_exam,
       'result' => $result,

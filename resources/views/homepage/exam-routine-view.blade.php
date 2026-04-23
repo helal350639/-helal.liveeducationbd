@@ -76,6 +76,7 @@ if($user)
                         @endforeach
                     
                         <th>Date & Time</th>
+                        <th>Status</th>
                       </tr>
                     
                       @foreach($routine_rows as $key => $item)
@@ -91,6 +92,15 @@ if($user)
                         @endforeach
                     
                         <td>{{$source->dtformat($item->exam_at)}}</td>
+                        <td>
+                          @if($source->dformat($item->exam_at) > now())
+                          <label for="">Up Coming</label>
+                          @elseif($source->dformat($item->exam_at) < now())
+                          <label for="">Completed</label>
+                          @else
+                          <label for="">Running</label>
+                          @endif
+                        </td>
                       </tr>
                       @endforeach
                     

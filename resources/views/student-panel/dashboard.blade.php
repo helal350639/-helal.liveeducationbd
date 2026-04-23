@@ -343,12 +343,19 @@ font-size: 16px;
             <div class="card card-body shadow-sm">
                <div class="corce_exam_mobile_res">
                   <div>
-                     <span>আপনার কোর্স প্রোগ্রেস &nbsp; 0 OF 0 </span>
+                     <span>আপনার কোর্স প্রোগ্রেস &nbsp;  {{$data['course']}} OF {{$data['courses']}} </span>
                   </div>
                   <div class="course_exam-icon">
                      <div class="circular-progress" data-inner-circle-color="#def3ff" data-percentage="10" data-progress-color="rgb(137 24 26)" data-bg-color="rgb(137 24 26 / 70%)">
                         <div class="inner-circle"></div>
-                        <p class="percentage">0%</p>
+                        <p class="percentage">
+                          @if($data['courses'])
+                          {{number_format(100 / $data['courses'] * $data['course']) }}
+                          @else
+                          0
+                          @endif
+                          %
+                        </p>
                      </div>
                   </div>
                </div>
@@ -358,12 +365,18 @@ font-size: 16px;
             <div class="card card-body shadow-sm">
                <div class="corce_exam_mobile_res">
                   <div>
-                     <span>আপনার এক্সাম প্রোগ্রেস &nbsp; 0 OF 0 </span>
+                     <span>আপনার এক্সাম প্রোগ্রেস &nbsp; {{$data['myexams']}} OF {{$data['total_exams']}} </span>
                   </div>
                   <div class="course_exam-icon">
                      <div class="circular-progress" data-inner-circle-color="#def3ff" data-percentage="0" data-progress-color="rgb(137 24 26)" data-bg-color="rgb(137 24 26 / 70%)">
                         <div class="inner-circle"></div>
-                        <p class="percentage">0%</p>
+                        <p class="percentage">
+                          @if($data['total_exams'] && $data['myexams'])
+                          {{number_format(100 / $data['total_exams'] * $data['myexams']) }}
+                          @else
+                          0
+                          @endif
+                          %</p>
                      </div>
                   </div>
                </div>

@@ -118,7 +118,7 @@ function active($name)
             <a href="javascript:void(0)" class="dropdown-toggle text-warning" id="Bell" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: black;">
               <i class="fa fa-bell"></i>
             </a>
-            {{-- <span class="notification-indicator-number">1</span> --}}
+            <span class="notification-indicator-number">1</span>
             <ul class="dropdown-menu" aria-labelledby="Bell">
               @foreach($notifications as $val)
               <li class="nav-item">
@@ -355,10 +355,10 @@ function active($name)
           @if($notifications)
 
           <div class="dropdown" style="padding-right: 15px">
-            <a href="javascript:void(0)" class="dropdown-toggle text-warning" id="Bell" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: black;">
+            <a href="javascript:void(0)" class="dropdown-/toggle text-warning" id="Bell" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: black;">
               <i class="fa fa-bell"></i>
+              <span class="notification-indicator-number">{{count($notifications)}}</span>
             </a>
-            {{-- <span class="notification-indicator-number">1</span> --}}
             <ul class="dropdown-menu" aria-labelledby="Bell">
               @foreach($notifications as $val)
               <li class="nav-item">
