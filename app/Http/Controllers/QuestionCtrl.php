@@ -137,21 +137,18 @@ class QuestionCtrl extends Controller
         $subjectId = $data['subject_id'];
 
         $questions = Question::orderBy('id', 'DESC')
-        ->where('type', $data['type'])
-        ->when($data['subject_id'], function($query, $subjectId)
+        ->where('type', $data['type']);
+        if(isset($data['course_id']))
         {
-          $query->whereHas('subjects', fn($q) => $q->where('subject_id', $subjectId));
-        })
-        ->when($data['chapter_id'], function($query, $chapterId)
+            $questions = $questions->whereHas('courses', function($query) use($data){
+                $query->where('course_id', $data['course_id']);
+            });
+        }
+        if(isset($data['department_id']))
         {
-          $query->whereHas('chapters', fn($q) => $q->where('chapter_id', $chapterId));
-        });
-        
-        if(isset($data['syllabus']))
-        {
-          $syllabus = Syllabus::find($data['syllabus']);
-          $questionIds = $syllabus->questions()->pluck('id')->toArray();
-          $questions = $questions->whereIn('id', $questionIds);
+            $questions = $questions->whereHas('departments', function($query) use($data){
+                $query->where('department_id', $data['department_id']);
+            });
         }
 
         if(isset($data['semester_id']))
@@ -160,24 +157,20 @@ class QuestionCtrl extends Controller
                 $query->where('semester_id', $data['semester_id']);
             });
         }
-        elseif(isset($data['department_id']))
+        $questions->when($data['subject_id'], function($query, $subjectId)
         {
-            $questions = $questions->whereHas('departments', function($query) use($data){
-                $query->where('department_id', $data['department_id']);
-            });
-        }
-        elseif(isset($data['course_id']))
+          $query->whereHas('subjects', fn($q) => $q->where('subject_id', $subjectId));
+        })
+        ->when($data['chapter_id'], function($query, $chapterId)
         {
-            $questions = $questions->whereHas('courses', function($query) use($data){
-                $query->where('course_id', $data['course_id']);
-            });
-        }
+          $query->whereHas('chapters', fn($q) => $q->where('chapter_id', $chapterId));
+        });
 
         if($filter_ids)
         {
-            $questions->whereHas('filters', function($query) use($filter_ids){
-                $query->whereIn('sub_filter_id', $filter_ids);
-            });
+          $questions->whereHas('filters', function($query) use($filter_ids){
+              $query->whereIn('sub_filter_id', $filter_ids);
+          });
         }
 
         if(isset($data['created_by']))
@@ -194,6 +187,14 @@ class QuestionCtrl extends Controller
         if(isset($data['title']))
         {
             $questions = $questions->where('title', 'like', '%'.$data['title'].'%');
+        }
+
+        //when syllabus exists then search by syllabus
+        if(isset($data['syllabus']))
+        {
+          $syllabus = Syllabus::find($data['syllabus']);
+          $questionIds = $syllabus->questions()->pluck('id')->toArray();
+          $questions = $questions->whereIn('id', $questionIds);
         }
 
         $questions = $questions->paginate(25);
