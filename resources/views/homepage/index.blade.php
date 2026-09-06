@@ -76,7 +76,7 @@ if($user)
 
                   @foreach($sliders as $value)
 
-                    <div class="hero-slide">
+                    <div class="hero-slide slider">
                       <div class="exam-package-area" onclick="window.location.href='{{route('home.course.show', $value->id)}}'">
                           <div class="package-exam-image">
                             <a href="{{route('home.course.show', $value->id)}}">
@@ -644,6 +644,11 @@ style="background-image: url('/web/img/background-bg.jpg')">
 
     showNotice();
   @endif
+
+      $('.slider').slick({
+    swipeToSlide: true,
+    focusOnSelect: false
+  });
 
 </script>
 @endsection
