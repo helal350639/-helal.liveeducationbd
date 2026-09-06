@@ -76,7 +76,7 @@ if($user)
 
                   @foreach($sliders as $value)
 
-                    <div class="hero-slide">
+                    <div class="hero-slide" onclick="window.location.href='{{route('home.course.show', $value->id)}}'">
                       <div class="exam-package-area">
                           <div class="package-exam-image">
                             <a href="{{route('home.course.show', $value->id)}}">
