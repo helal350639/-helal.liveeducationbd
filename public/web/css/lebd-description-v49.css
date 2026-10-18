@@ -1,0 +1,39 @@
+/* LEBD-3 v49: isolated Description styles for Admin builder and Student read view */
+.lebd-v49-builder{border:1px solid #b8d5ff;border-radius:16px;padding:18px;background:linear-gradient(135deg,#eff7ff,#fff);margin:14px 0 22px}
+.lebd-v49-title{display:flex;align-items:center;flex-wrap:wrap;gap:9px;color:#0d3471;font-size:18px;margin-bottom:14px}
+.lebd-v49-title small{display:block;flex:1 1 100%;font-size:12px;color:#61758f;font-weight:400}
+.lebd-v49-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.lebd-v49-fields label{font-size:13px;color:#193f77;font-weight:600}
+.lebd-v49-fields label:nth-child(3),.lebd-v49-fields label:nth-child(4),.lebd-v49-fields label:nth-child(5),.lebd-v49-fields label:last-child{grid-column:1/-1}
+.lebd-v49-fields input,.lebd-v49-fields textarea{margin-top:5px;font-weight:400}
+.lebd-v49-tools{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+.lebd-v49-info{background:#e2f4eb;color:#176b4d;padding:11px 13px;border-radius:10px;margin-top:15px;font-size:12px;line-height:1.6}
+.lebd-v49-preview{padding:15px;background:white;border:1px dashed #b5c8e4;border-radius:15px;margin-top:15px;max-height:650px;overflow-y:auto}
+.lebd-v49-description{color:#1b345d;font-family:inherit;line-height:1.8;font-size:15px;overflow-wrap:anywhere}
+.lebd-v49-description .lebd-v49-banner{background:linear-gradient(120deg,#063875,#0768ce);border-radius:16px;padding:20px 24px;color:white;margin-bottom:15px}
+.lebd-v49-description .lebd-v49-banner span{letter-spacing:.08em;color:#a9d5ff;font-size:11px;font-weight:700}
+.lebd-v49-description .lebd-v49-banner h2{font-size:22px!important;line-height:1.4;margin:8px 0!important;color:white!important;font-weight:750}
+.lebd-v49-description .lebd-v49-banner p{margin:5px 0 0;color:#e9f4ff}
+.lebd-v49-description .lebd-v49-card{border:1px solid #d5e4f7;border-radius:15px;margin:14px 0;background:#fff;box-shadow:0 5px 18px rgba(17,60,110,.055);overflow:hidden;padding:15px 18px}
+.lebd-v49-description .lebd-v49-card h3{font-size:18px!important;margin:0 0 12px!important;color:#063d85!important;display:flex;align-items:center;gap:10px;border-bottom:1px solid #e9f0fb;padding-bottom:12px;font-weight:750}
+.lebd-v49-description .lebd-v49-icon{display:inline-flex;align-items:center;justify-content:center;min-width:33px;height:33px;background:#e8f3ff;border-radius:10px;color:#096dd6}
+.lebd-v49-description p{font-size:15px;line-height:1.85}
+.lebd-v49-description ul{padding:0!important;margin:0!important;list-style:none!important}
+.lebd-v49-description li{list-style:none!important;padding:9px 9px 9px 34px;position:relative;border-bottom:1px solid #f0f4fa;line-height:1.65}
+.lebd-v49-description .lebd-v49-checks li:before{content:'✓';position:absolute;left:4px;top:9px;width:23px;height:23px;display:grid;place-items:center;background:#dff8eb;border-radius:50%;color:#159253;font-weight:800}
+.lebd-v49-description .lebd-v49-departments{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.lebd-v49-description .lebd-v49-departments li{background:#eef6ff;border-radius:9px;padding:8px 12px;border:1px solid #dbebfb}
+.lebd-v49-description .lebd-v49-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.lebd-v49-description .lebd-v49-link{display:flex;align-items:center;gap:8px;text-decoration:none!important;color:#055fbb!important;border:1px solid #d6e8fb;background:#f4faff;padding:11px;border-radius:11px;font-weight:700}
+.lebd-v49-description .lebd-v49-link:hover{background:#e3f1ff}
+.lebd-v49-description .lebd-v49-link span:first-child{font-size:18px}
+.lebd-v49-description .lebd-v49-contact{display:inline-block;background:#eefaf5;color:#075b36;padding:8px 14px;border-radius:9px;margin:4px}
+.lebd-v49-description .lebd-v49-pay-note{padding:17px 20px;background:linear-gradient(125deg,#eff9ff,#eefbf2);border:1px solid #b8e0d0;border-radius:14px;margin-top:15px}
+.lebd-v49-description .lebd-v49-pay-note p{margin:6px 0;font-size:13px;color:#385771}
+/* Style raw existing rich-text description safely without changing any checkout UI */
+#description .lebd-group-copy{font-size:15px;line-height:1.9;color:#284363}
+#description .lebd-group-copy img{max-width:100%;height:auto;border-radius:12px}
+#description .lebd-group-copy a{color:#076bd6;text-decoration:underline;text-underline-offset:3px}
+#description .lebd-group-copy table{width:100%;max-width:100%;border-collapse:collapse}
+#description .lebd-group-copy table td,#description .lebd-group-copy table th{padding:10px;border:1px solid #d8e7f6}
+@media(max-width:700px){.lebd-v49-fields,.lebd-v49-description .lebd-v49-departments,.lebd-v49-description .lebd-v49-links{grid-template-columns:1fr}.lebd-v49-description .lebd-v49-banner h2{font-size:18px!important}.lebd-v49-description .lebd-v49-card{padding:12px}}

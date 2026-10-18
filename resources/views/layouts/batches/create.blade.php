@@ -1,89 +1,15 @@
 @extends('dashboard')
-@section('title', 'Add New Batch')
-@section('content')
-<section class="content-header">
-  <h1>Add a Batch</h1>
-  <ol class="breadcrumb">
-    <li><a href="#"><i class="fa fa-dashboard"></i> Batches</a></li>
-    <li class="active">Add Batch</li>
-</ol>
-</section>
-
-<!-- Main content -->
-<section class="content">
-  <div class="row"> <!-- left column -->
-    <div class="col-md-8"> <!-- general form elements -->
-      <div class="box box-primary">
-        <div class="box-header with-border">
-            <h3 style="color: #800" class="box-title">Batch Details</h3>
-        </div>
-        <form action="{{route('batch.store')}}" method="POST">
-            @csrf
-            <div class="box-body">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label for="name">Batch Title</label>
-                        <input type="text" class="form-control" name="name" id="name" required>
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label for="subtitle">Batch Sub-Title</label>
-                        <input type="text" class="form-control" name="subtitle" id="subtitle" required>
-                    </div>
-                </div>
-                <div class="clearfix"></div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label for="details">Details</label>
-                        <textarea class="form-control" name="details" id="details" rows="5"></textarea>
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label>Status:</label><br>
-                        <label for="status"><input type="checkbox" name="status" id="status"> Active</label>
-                    </div>
-                </div>
-            </div> <!-- /.box body -->
-            <div class="box-footer">
-                <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-save"></i> Save</button>
-            </div>
-        </form>
-    </div> <!-- /.box -->
-    </div> <!--/.col (left) -->
-</div> <!-- /.row -->
-</section> <!-- /.content -->
+@section('title', 'Add নতুন ব্যাচ')
+@section('stylesheets')
+<link rel="stylesheet" href="/assets/summernote/summernote.min.css">
+<link rel="stylesheet" href="{{ asset('web/css/lebd-admin-batch-v42.css') }}">
 @endsection
-
+@section('content')
+<section class="content-header"><h1>Add নতুন ব্যাচ</h1><ol class="breadcrumb"><li><a href="{{ route('batch.index') }}">Batches</a></li><li class="active">Add নতুন ব্যাচ</li></ol></section>
+<section class="content"><div class="lebd-b41"><div class="lebd-b41-hero"><div><span class="lebd-b41-chip">LIVE EDUCATION BD · Batch Management</span><h2>Add নতুন ব্যাচ</h2><p>সাজানো Form — আগের সব Batch ও Payment Field অপরিবর্তিত</p></div><a class="lebd-b41-back" href="{{ route('batch.index') }}"><i class="fa fa-arrow-left"></i> সব ব্যাচ</a></div>
+@if($errors->any())<div class="lebd-b41-alert"><strong>সংশোধন প্রয়োজন:</strong><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
+<form action="{{ route('batch.store') }}" method="POST">@csrf<nav class="lebd-b41-tabs" aria-label="Batch form steps"><button type="button" class="lebd-b41-tab" data-batch-tab="basic"><i class="fa fa-info-circle"></i> প্রাথমিক তথ্য</button><button type="button" class="lebd-b41-tab" data-batch-tab="content"><i class="fa fa-file-text-o"></i> বিবরণ</button></nav><section class="lebd-b41-panel" data-batch-panel="basic" hidden><div class="lebd-b41-panelhead"><i class="fa fa-book"></i><div><h3>নতুন ব্যাচ</h3><p>Create the batch first; then open Edit to attach Course, Teachers, Price and Media.</p></div></div><div class="lebd-b41-body"><div class="lebd-b41-grid"><div class="lebd-b41-field lebd-b41-c12"><label for="name">ব্যাচের নাম</label><input class="form-control" type="text" name="name" id="name" value="{{ old('name') }}" required ><p class="lebd-b41-hint"></p></div><div class="lebd-b41-field lebd-b41-c12"><label for="subtitle">ব্যাচের উপশিরোনাম</label><input class="form-control" type="text" name="subtitle" id="subtitle" value="{{ old('subtitle') }}" required ><p class="lebd-b41-hint"></p></div><div class="lebd-b41-c12 lebd-b41-checks"><label><input type="checkbox" name="status" id="status" value="1" {{ old('status')?'checked':'' }}> Active</label></div></div></div></section><section class="lebd-b41-panel" data-batch-panel="content" hidden><div class="lebd-b41-panelhead"><i class="fa fa-file-text-o"></i><div><h3>প্রাথমিক বিবরণ</h3><p>Detailed course content is available after creating the batch.</p></div></div><div class="lebd-b41-body"><div class="lebd-b41-grid"><div class="lebd-b41-field lebd-b41-c12"><label for="details">বিস্তারিত বিবরণ</label><textarea class="form-control" name="details" id="details" rows="5">{{ old('details') }}</textarea></div></div></div></section><div class="lebd-b41-alert"><i class="fa fa-info-circle"></i> প্রথমে প্রাথমিক তথ্য দিয়ে Batch তৈরি করো। তারপর Edit Page-এ Course, Department, Teacher, Price, Dates এবং Media পূরণ করবে—আগের System-এর একই পদ্ধতি।</div><div class="lebd-b41-actions"><span class="lebd-b41-progress"><i class="fa fa-shield"></i> Existing SSLCommerz payment flow unchanged</span><button type="submit" class="lebd-b41-save"><i class="fa fa-save"></i> ব্যাচ সংরক্ষণ</button></div></form></div></section>@endsection
 @section('scripts')
-<script type="text/javascript">
-    function getsubcats(elm){
-
-        var catid = elm.options[elm.options.selectedIndex].value;
-
-        $.ajax({
-            type: 'GET', //THIS NEEDS TO BE GET
-            url: '/get_sub_cats/'+catid,
-            success: function (data) {
-
-                var obj = JSON.parse(JSON.stringify(data));
-                var sub_cat_html = "";
-
-                $.each(obj['subcats'], function (key, val) {
-                   sub_cat_html += "<option value="+val.id+">"+val.name+"</option>";
-                });
-
-                if(sub_cat_html != ""){
-                    $("#sub_cat").html('<option value="">Select SubCategory</option>'+sub_cat_html)
-                }else{
-                    $("#sub_cat").html('<option value="">No SubCategory</option>')
-                }
-            },
-            error: function(data) { 
-                 console.log('data error');
-            }
-        });
-    }
-</script>
+<script src="/assets/summernote/summernote.min.js"></script>
+<script src="{{ asset('web/js/lebd-admin-batch-v42.js') }}"></script>
 @endsection

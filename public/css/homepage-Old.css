@@ -1,0 +1,279 @@
+/* =========================
+   LIVE EDUCATION BD HEADER
+   Desktop + Mobile Responsive
+========================= */
+
+
+.mobile-header{
+
+    width:100%;
+    background:#ffffff;
+    padding:20px 40px;
+    box-sizing:border-box;
+
+}
+
+
+/* TOP HEADER */
+
+.header-top{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+}
+
+
+.logo-area img{
+
+    width:260px;
+    max-width:100%;
+}
+
+
+
+/* BUTTON AREA */
+
+.header-actions{
+
+    display:flex;
+    align-items:center;
+    gap:20px;
+
+}
+
+
+
+.dashboard-btn,
+.login-btn{
+
+    background:#0868df;
+    color:white;
+
+    height:70px;
+    padding:0 35px;
+
+    border-radius:40px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+
+    text-decoration:none;
+
+    font-size:22px;
+    font-weight:bold;
+
+}
+
+
+.notification-btn{
+
+    background:#edf5ff;
+
+    width:70px;
+    height:70px;
+
+    border-radius:50%;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    color:#12377d;
+
+    position:relative;
+
+}
+
+
+.notification-btn b{
+
+    position:absolute;
+
+    top:-5px;
+    right:-5px;
+
+    background:red;
+    color:white;
+
+    width:28px;
+    height:28px;
+
+    border-radius:50%;
+
+    text-align:center;
+
+    line-height:28px;
+
+}
+
+
+
+
+/* MENU ROW */
+
+.mobile-menu-row{
+
+    display:flex;
+
+    gap:30px;
+
+    margin-top:25px;
+
+}
+
+
+.mobile-menu-row a{
+
+
+    flex:1;
+
+    background:#e8f2ff;
+
+    padding:22px;
+
+    border-radius:40px;
+
+    text-align:center;
+
+    color:#12377d;
+
+    font-size:25px;
+
+    font-weight:bold;
+
+    text-decoration:none;
+
+}
+
+
+
+.mobile-menu-row a.active{
+
+    background:#0868df;
+
+    color:white;
+
+}
+
+
+
+
+
+/* =========================
+        MOBILE VIEW
+========================= */
+
+
+@media(max-width:768px){
+
+
+.mobile-header{
+
+    padding:15px;
+
+}
+
+
+
+.header-top{
+
+    gap:10px;
+
+}
+
+
+
+.logo-area img{
+
+    width:130px;
+
+}
+
+
+
+.header-actions{
+
+    gap:8px;
+
+}
+
+
+
+.dashboard-btn,
+.login-btn{
+
+
+    width:45px;
+
+    height:45px;
+
+    padding:0;
+
+    border-radius:50%;
+
+}
+
+
+
+.dashboard-btn span,
+.login-btn span{
+
+    display:none;
+
+}
+
+
+
+.dashboard-btn i,
+.login-btn i{
+
+    font-size:18px;
+
+}
+
+
+
+.notification-btn{
+
+    width:45px;
+
+    height:45px;
+
+}
+
+
+
+.notification-btn i{
+
+    font-size:18px;
+
+}
+
+
+
+
+.mobile-menu-row{
+
+    gap:8px;
+
+    margin-top:15px;
+
+}
+
+
+
+.mobile-menu-row a{
+
+    padding:12px 5px;
+
+    font-size:13px;
+
+}
+
+
+
+}

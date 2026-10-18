@@ -1,0 +1,21 @@
+/* Category-wide A4 book; each reader/chapter creates its own new page */
+.lebd-complete-book{padding:16px 10px 48px;background:#eaf0f5;min-height:100vh}
+.lebd-complete-toolbar{max-width:930px;margin:0 auto 18px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;background:white;padding:15px 20px;border-radius:10px}
+.lebd-complete-toolbar h2{margin:0;font-size:21px}.lebd-complete-toolbar p{margin:6px 0 0;color:#526777}
+.lebd-complete-buttons{display:flex;gap:8px;flex-wrap:wrap}.lebd-complete-buttons a,.lebd-complete-buttons button{border:0;border-radius:5px;background:#0878b8;color:white;padding:10px 13px;text-decoration:none;cursor:pointer}
+.lebd-chapter-preview-head{max-width:210mm;margin:16px auto 9px;color:#17446c;font-weight:700;display:flex;justify-content:space-between;gap:8px}
+.lebd-chapter-preview-head a{font-weight:normal;font-size:13px}.lebd-book-chapter-section{break-before:page;page-break-before:always}
+.lebd-book-chapter-section.lebd-first-chapter{break-before:auto;page-break-before:auto}
+.lebd-book-empty{max-width:780px;margin:40px auto;background:white;padding:32px;text-align:center}
+/* Chapter question sequence remains chapter-local; physical sheet numbers run through the book */
+@media print{.lebd-complete-book{padding:0;background:white}.lebd-complete-toolbar,.lebd-chapter-preview-head,.main-header,.main-sidebar,.sidebar,.content-header{display:none!important}
+.lebd-book-chapter-section{margin:0;padding:0;break-before:page;page-break-before:always}
+.lebd-book-chapter-section.lebd-first-chapter{break-before:auto;page-break-before:auto}
+.lebd-a4-pages{gap:0!important}.lebd-a4-sheet{break-after:page;page-break-after:always}}
+
+.lebd-book-toc-preview{max-width:210mm;background:white;margin:14px auto 25px;padding:25px 30px;border:1px solid #dbe1e9}
+.lebd-book-toc-preview h3{text-align:center;margin:5px 0 22px;font-weight:700}
+.lebd-toc-auto-line{display:flex;align-items:baseline;gap:8px;margin:8px 0}
+.lebd-toc-auto-dots{flex:1;border-bottom:1px dotted #64748b}
+.lebd-toc-auto-line strong{white-space:nowrap}
+@media print{.lebd-book-toc-preview{break-after:page;page-break-after:always;border:0;min-height:270mm;margin:0;max-width:210mm;box-sizing:border-box}}

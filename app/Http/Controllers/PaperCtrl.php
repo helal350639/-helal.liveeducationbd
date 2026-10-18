@@ -86,77 +86,227 @@ class PaperCtrl extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
+{
+    $source = new SourceCtrl;
+
+    $validator = Validator::make($request->all(), [
+        'header' => 'required',
+        'banner' => 'mimes:jpeg,jpg,png,pdf|max:1000',
+    ]);
+
+    if($validator->fails())
     {
-        $source = new SourceCtrl;
-        $validator = Validator::make($request->all(), [
-            'header' => 'required',
-            'banner' => 'mimes:jpeg,jpg,png,pdf|max:1000',
-        ]);
-        
-        $data = $request->all();
-        // dd($data);
+        return response()->json(
+            [
+                'success' => false,
+                'message' => 'File upload failed',
+                'errors' => $validator->getMessageBag()->toArray()
+            ],
+            201
+        );
+    }
 
-        if(isset($data['_token']))
-        {
-            unset($data['_token']);
-        }
 
-        if(isset($data['banner']))
-        {
-            $data['banner'] = $source->uploadImage($data['banner'], 'papers/');
-        }
+    /*
+    |--------------------------------------------------------------------------
+    | Get Form Data
+    |--------------------------------------------------------------------------
+    */
 
-        if(!isset($data['format']))
-        {
-            $data['format'] = 0;
-        }
+    $data = $request->all();
 
-        $data['created_at'] = date('Y-m-d H:i:s');
 
-        try{
-            Paper::insert($data);
-        }
-        catch(\E $e)
-        {
-            return $e;
-        }
+    /*
+    |--------------------------------------------------------------------------
+    | Multiple Departments
+    |--------------------------------------------------------------------------
+    */
 
+    $departmentIds = $data['department_id'] ?? [];
+
+    // Make sure department_id is always an array
+    if (!is_array($departmentIds))
+    {
+        $departmentIds = [$departmentIds];
+    }
+
+    // Remove department array from main paper data
+    unset($data['department_id']);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Keep First Department as Primary Department
+    |--------------------------------------------------------------------------
+    |
+    | Old system uses papers.department_id as a single value.
+    | So first selected department will be stored there.
+    | All selected departments will also be saved
+    | in paper_departments table.
+    |
+    */
+
+    $data['department_id'] = $departmentIds[0] ?? null;
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Remove Token
+    |--------------------------------------------------------------------------
+    */
+
+    if(isset($data['_token']))
+    {
+        unset($data['_token']);
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Banner Upload
+    |--------------------------------------------------------------------------
+    */
+
+    if(isset($data['banner']))
+    {
+        $data['banner'] = $source->uploadImage(
+            $data['banner'],
+            'papers/'
+        );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Format
+    |--------------------------------------------------------------------------
+    */
+
+    if(!isset($data['format']))
+    {
+        $data['format'] = 0;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Created Date
+    |--------------------------------------------------------------------------
+    */
+
+    $data['created_at'] = date('Y-m-d H:i:s');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Create Question Paper
+    |--------------------------------------------------------------------------
+    */
+
+    try
+    {
+        // Create paper
+        Paper::insert($data);
+
+        // Get newly created paper
         $paper = Paper::orderBy('id', 'DESC')->first();
 
-        // return response()->json(['success' => 'true', 'message' => 'File successfully uploaded!', 'paper' => $paper], 200);
-        Session::flash('success', 'The question paper successfully created.');
-        return redirect()->route('paper.show', $paper->id);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Save Multiple Departments
+        |--------------------------------------------------------------------------
+        */
+
+        if($paper && !empty($departmentIds))
+        {
+            $paper->departments()->sync($departmentIds);
+        }
     }
+    catch(\Exception $e)
+    {
+        return $e;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Success Message
+    |--------------------------------------------------------------------------
+    */
+
+    Session::flash(
+        'success',
+        'The question paper successfully created.'
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Redirect
+    |--------------------------------------------------------------------------
+    */
+
+    return redirect()->route(
+        'paper.show',
+        $paper->id
+    );
+}
 
     /**
-     * Display the specified resource.
-     *
-     * @param  \App\subfilter  $subfilter
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
+ * Display the specified resource.
+ *
+ * @param  \App\subfilter  $subfilter
+ * @return \Illuminate\Http\Response
+ */
+public function show($id)
+{
+    $paper = Paper::with([
+        'course',
+        'batch',
+        'department',
+        'departments',
+        'questions'
+    ])->find($id);
+
+    if($paper)
     {
-      $paper = Paper::find($id);
-      if($paper)
-      {
-        return view('layouts.papers.read', compact('paper'));
-      }
-      else
-      {
-        Session::flash('error', 'The question paper mabybe deleted or not found!');
+        // All active courses
+        $courses = Course::where('status', 'Active')
+            ->orderBy('name', 'asc')
+            ->get();
+
+        return view(
+            'layouts.papers.read',
+            compact('paper', 'courses')
+        );
+    }
+    else
+    {
+        Session::flash(
+            'error',
+            'The question paper maybe deleted or not found!'
+        );
+
         return redirect()->route('paper.index');
-      }
+    }
+}
+
+
+public function view($id)
+{
+    if(!is_null(Session::get('_paper')))
+    {
+        Session::forget('_paper');
     }
 
-    public function view($id)
-    {
-        if(!is_null(Session::get('_paper')))
-        {
-            Session::forget('_paper');
-        }
-        $paper = Paper::find($id);
-        return view('layouts.papers.view', compact('paper'));
-    }
+    $paper = Paper::find($id);
+
+    return view(
+        'layouts.papers.view',
+        compact('paper')
+    );
+}
 
     /**
      * Show the form for editing the specified resource.
@@ -183,62 +333,242 @@ class PaperCtrl extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
+{
+    $source = new SourceCtrl;
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Validation
+    |--------------------------------------------------------------------------
+    */
+
+    $validator = Validator::make($request->all(), [
+
+        'header' => 'required',
+
+        'banner' => 'nullable|image|mimes:jpeg,jpg,png,pdf|max:1000',
+
+    ]);
+
+
+    if($validator->fails())
     {
-        $source = new SourceCtrl;
-        $validator = Validator::make($request->all(), [
-            'header' => 'required',
-            'banner'   => 'nullable|image|mimes:jpeg,jpg,png,pdf|max:1000',
-        ]);
+        return response()->json(
+            [
+                'success' => false,
 
-        if($validator->fails()){
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => 'File upload failed',
-                    'errors' => $validator->getMessageBag()->toArray()
-                ],
-                201
-            );
-        }
+                'message' => 'File upload failed',
 
-        $paper = Paper::find($id);
-        $xbanner = public_path($paper->banner);
-        
-        $data = $request->all();
+                'errors' => $validator->getMessageBag()->toArray()
+            ],
 
-        if(isset($data['_token']))
-        {
-            unset($data['_token']);
-        }
-
-        if(isset($data['_method']))
-        {
-            unset($data['_method']);
-        }
-
-        if(isset($data['banner']))
-        {
-            $data['banner'] = $source->uploadImage($data['banner'], 'papers/');
-        }
-
-        try{
-            Paper::where('id', $id)->update($data);
-
-            if(File::exists($xbanner))
-            {
-                File::delete($xbanner);
-            }
-        }
-        catch(\E $e)
-        {
-            return $e;
-        }
-
-        $paper = Paper::find($id);
-        Session::flash('success', 'The question paper successfully updated!');
-        
-        return redirect()->route('paper.edit', $paper->id);
+            201
+        );
     }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Get Existing Paper
+    |--------------------------------------------------------------------------
+    */
+
+    $paper = Paper::find($id);
+
+
+    if(!$paper)
+    {
+        return back()->with(
+            'error',
+            'Question Paper not found.'
+        );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Old Banner
+    |--------------------------------------------------------------------------
+    */
+
+    $xbanner = public_path($paper->banner);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Get Form Data
+    |--------------------------------------------------------------------------
+    */
+
+    $data = $request->all();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Multiple Departments
+    |--------------------------------------------------------------------------
+    */
+
+    $departmentIds = $data['department_id'] ?? [];
+
+
+    // Make sure department_id is always an array
+
+    if(!is_array($departmentIds))
+    {
+        $departmentIds = [$departmentIds];
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Remove department_id Array From Main Paper Data
+    |--------------------------------------------------------------------------
+    */
+
+    unset($data['department_id']);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Keep First Department as Primary Department
+    |--------------------------------------------------------------------------
+    |
+    | Old system uses papers.department_id as a single value.
+    | Therefore first selected department will remain in
+    | papers.department_id.
+    |
+    | All selected departments will be stored in
+    | paper_departments table.
+    |
+    |--------------------------------------------------------------------------
+    */
+
+    $data['department_id'] = $departmentIds[0] ?? null;
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Remove Token
+    |--------------------------------------------------------------------------
+    */
+
+    if(isset($data['_token']))
+    {
+        unset($data['_token']);
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Remove Method
+    |--------------------------------------------------------------------------
+    */
+
+    if(isset($data['_method']))
+    {
+        unset($data['_method']);
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Banner Upload
+    |--------------------------------------------------------------------------
+    */
+
+    $newBannerUploaded = false;
+
+
+    if(isset($data['banner']) && $data['banner'])
+    {
+        $data['banner'] = $source->uploadImage(
+            $data['banner'],
+            'papers/'
+        );
+
+        $newBannerUploaded = true;
+    }
+    else
+    {
+        // Do not overwrite existing banner
+        unset($data['banner']);
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Update Question Paper
+    |--------------------------------------------------------------------------
+    */
+
+    try
+    {
+        Paper::where(
+            'id',
+            $id
+        )->update($data);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Save Multiple Departments
+        |--------------------------------------------------------------------------
+        */
+
+        $paper = Paper::find($id);
+
+
+        if($paper)
+        {
+            $paper->departments()->sync($departmentIds);
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Delete Old Banner Only When New Banner Uploaded
+        |--------------------------------------------------------------------------
+        */
+
+        if(
+            $newBannerUploaded &&
+            File::exists($xbanner)
+        )
+        {
+            File::delete($xbanner);
+        }
+    }
+    catch(\Exception $e)
+    {
+        return $e;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Success Message
+    |--------------------------------------------------------------------------
+    */
+
+    Session::flash(
+        'success',
+        'The question paper successfully updated!'
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Redirect
+    |--------------------------------------------------------------------------
+    */
+
+    return redirect()->route(
+        'paper.edit',
+        $paper->id
+    );
+}
 
     /**
      * Remove the specified resource from storage.
@@ -529,25 +859,404 @@ class PaperCtrl extends Controller
     }
 
     /** detuch question from question paper */
-    public function detachQuestion($paperId, $qid)
-    {
+public function detachQuestion($paperId, $qid)
+{
+    $paper = Paper::find($paperId);
+
+    $paper->questions()->detach($qid);
+
+    return response()->json([
+        'success' => true
+    ]);
+}
+
+
+/**
+ * Get Routine Exams by Batch
+ */
+public function getRoutineExams($batch_id)
+{
+    try {
+
+        // Get latest published routine for this batch
+        $routine = \App\Models\Routine::where(
+            'batch_id',
+            $batch_id
+        )
+        ->where(
+            'status',
+            'Published'
+        )
+        ->orderBy(
+            'id',
+            'DESC'
+        )
+        ->first();
+
+
+        // No routine found
+        if (!$routine) {
+
+            return response()->json([
+                'success' => false,
+                'exams' => []
+            ]);
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Get Exam Names from Routine
+        |--------------------------------------------------------------------------
+        */
+
+        $exams = $routine->exams()
+            ->orderBy(
+                'sort_order',
+                'ASC'
+            )
+            ->get([
+                'id',
+                'name',
+                'sort_order'
+            ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Attach Start & End Time from Routine Item
+        |--------------------------------------------------------------------------
+        */
+
+        $examData = $exams->map(function ($exam) use ($routine) {
+
+            $item = \App\Models\RoutineItemRow::where(
+                'routine_id',
+                $routine->id
+            )
+            ->where(
+                'paper_name',
+                $exam->name
+            )
+            ->first();
+
+
+            return [
+                'id' => $exam->id,
+
+                'name' => $exam->name,
+
+                'sort_order' => $exam->sort_order,
+
+                'exam_at' => $item
+                    ? $item->exam_at
+                    : null,
+
+                'exam_end_at' => $item
+                    ? $item->exam_end_at
+                    : null,
+            ];
+
+        });
+
+
+        return response()->json([
+
+            'success' => true,
+
+            'exams' => $examData
+
+        ]);
+
+    }
+    catch (\Exception $e) {
+
+        return response()->json([
+
+            'success' => false,
+
+            'exams' => [],
+
+            'message' => $e->getMessage()
+
+        ], 500);
+
+    }
+}
+
+
+
+/**
+ * Auto Add Question Page
+ */
+public function autoAddQuestion($id)
+{
+    $paper = Paper::with([
+        'course',
+        'batch',
+        'department',
+        'departments',
+        'questions'
+    ])->find($id);
+
+    if (!$paper) {
+        return back()->with(
+            'error',
+            'Question Paper not found'
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | All Active Courses
+    |--------------------------------------------------------------------------
+    |
+    | Batch দিয়ে Course filter হবে না।
+    | Question database-এ ব্যবহৃত সব Active Course এখানে দেখাবে।
+    |
+    */
+
+    $courses = Course::where(
+        'status',
+        'Active'
+    )
+    ->orderBy(
+        'name',
+        'asc'
+    )
+    ->get();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Active Departments
+    |--------------------------------------------------------------------------
+    */
+
+   return view(
+    'layouts.papers.auto_add_question',
+    compact(
+        'paper',
+        'courses'
+    )
+);
+}
+
+
+/**
+ * Get Departments by Course
+ */
+public function getDepartmentsByCourse($course_id)
+{
+    $course = Course::find($course_id);
+
+    if (!$course) {
+        return response()->json([
+            'success' => false,
+            'data' => []
+        ], 404);
+    }
+
+    $departments = $course->departments()
+        ->where('departments.status', 'Active')
+        ->orderBy('departments.name', 'asc')
+        ->get([
+            'departments.id',
+            'departments.name'
+        ]);
+
+    return response()->json([
+        'success' => true,
+        'data' => $departments
+    ]);
+}
+
+/**
+ * Get Available Questions Count
+ */
+public function getAvailableQuestions(Request $request)
+{
+    $courseId     = $request->input('course_id');
+    $departmentId = $request->input('department_id');
+    $subjectId    = $request->input('subject_id');
+    $chapterId    = $request->input('chapter_id');
+    $paperId      = $request->input('paper_id');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Course Required
+    |--------------------------------------------------------------------------
+    */
+
+    if (!$courseId) {
+
+        return response()->json([
+            'success' => true,
+            'count'   => 0
+        ]);
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Question Query
+    |--------------------------------------------------------------------------
+    */
+
+    $query = \App\Models\Question::query();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Course Filter
+    |--------------------------------------------------------------------------
+    */
+
+    $query->whereHas(
+        'courses',
+        function ($q) use ($courseId) {
+
+            $q->where(
+                'course_id',
+                $courseId
+            );
+
+        }
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Department Filter
+    |--------------------------------------------------------------------------
+    */
+
+    if ($departmentId) {
+
+        $query->whereHas(
+            'departments',
+            function ($q) use ($departmentId) {
+
+                $q->where(
+                    'department_id',
+                    $departmentId
+                );
+
+            }
+        );
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Subject Filter
+    |--------------------------------------------------------------------------
+    */
+
+    if ($subjectId) {
+
+        $query->whereHas(
+            'subjects',
+            function ($q) use ($subjectId) {
+
+                $q->where(
+                    'subject_id',
+                    $subjectId
+                );
+
+            }
+        );
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Chapter Filter
+    |--------------------------------------------------------------------------
+    */
+
+    if ($chapterId) {
+
+        $query->whereHas(
+            'chapters',
+            function ($q) use ($chapterId) {
+
+                $q->where(
+                    'chapter_id',
+                    $chapterId
+                );
+
+            }
+        );
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Only MCQ Questions
+    |--------------------------------------------------------------------------
+    */
+
+    $query->where(
+        'type',
+        'MCQ'
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Exclude Questions Already Added to This Paper
+    |--------------------------------------------------------------------------
+    */
+
+    if ($paperId) {
+
         $paper = Paper::find($paperId);
 
-        $paper->questions()->detach($qid);
-        return response()->json([
-            'success' => true
-            ]
-        );
-        // return 'I am responding from server with id:'.$qid;
+        if ($paper) {
+
+            $existingQuestionIds =
+                $paper->questions()
+                    ->pluck('questions.id')
+                    ->toArray();
+
+
+            if (!empty($existingQuestionIds)) {
+
+                $query->whereNotIn(
+                    'questions.id',
+                    $existingQuestionIds
+                );
+
+            }
+
+        }
+
     }
 
-    public function getPapers($id)
-    {
-      $papers = Paper::where('department_id', $id)
-      ->select('id', 'name')
-      ->get();
-      return response()->json([
-        'papers' => $papers
-      ], 200);
-    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Count
+    |--------------------------------------------------------------------------
+    */
+
+    $count = $query->count();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Response
+    |--------------------------------------------------------------------------
+    */
+
+    return response()->json([
+        'success' => true,
+        'count'   => $count
+    ]);
+}
+
 }

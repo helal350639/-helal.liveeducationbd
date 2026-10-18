@@ -1,0 +1,35 @@
+/* LEBD-3 A4 book layout v18: physical page proportions, two print columns + chapter intro box */
+.lebd-a4-reader{--page-width:210mm;--page-height:297mm;--page-pad:13mm;--column-gap:9mm; color:#111;font-family:'Noto Serif Bengali','SolaimanLipi','Kalpurush',Georgia,serif;font-size:11pt;line-height:1.55}
+.lebd-a4-pages{display:flex;flex-direction:column;align-items:center;gap:15px}
+.lebd-a4-sheet{box-sizing:border-box;width:var(--page-width);height:var(--page-height);max-width:none;background:#fff;border:1px solid #c9ced4;box-shadow:0 4px 14px #0002;padding:var(--page-pad);overflow:hidden;break-after:page;page-break-after:always}
+.lebd-a4-title{text-align:center;font-weight:bold;font-size:12pt;margin:0 0 7mm}
+.lebd-a4-columns{height:239mm;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--column-gap);position:relative}
+.lebd-a4-columns:before{content:'';position:absolute;left:50%;top:0;bottom:0;border-left:1px solid #444;transform:translateX(-50%);pointer-events:none}
+.lebd-a4-column{min-width:0;overflow:hidden}
+.lebd-a4-answers{height:25mm;border-top:1px solid #bbb;padding-top:2mm;margin-top:3mm;overflow:hidden}
+.lebd-a4-answers strong{font-size:10pt}.lebd-a4-answer-grid{display:flex;flex-wrap:wrap;gap:1mm 4mm;font-size:9pt}
+.lebd-a4-page-no{text-align:center;font-size:9pt;margin-top:2mm}
+.lebd-book-item{box-sizing:border-box;margin:0 0 4mm;break-inside:avoid;overflow-wrap:anywhere;line-height:1.48}
+.lebd-book-question{font-weight:500;margin:0 0 2mm}
+.lebd-book-options{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:3mm;row-gap:1mm;margin:2mm 0}
+.lebd-book-option{min-width:0;display:flex;align-items:flex-start;gap:2mm}.lebd-book-option>span:first-child{white-space:nowrap}
+.lebd-book-correct{font-size:9.3pt;margin-top:1mm}.lebd-book-explanation{font-size:9pt;margin:1mm 0 0;font-style:italic}
+.lebd-book-subtitle{text-align:center;font-size:12pt;margin:0 0 3mm}.lebd-book-prose{white-space:normal;text-align:justify}.lebd-rich-content p{display:inline;margin:0}.lebd-rich-content math{font-style:normal}.lebd-rich-content img,.lebd-book-option img,.lebd-book-question-image{max-width:100%;height:auto}.lebd-book-question-image{max-height:38mm;display:block;margin:2mm auto}.lebd-missing-question{color:#a22}
+.lebd-source-items{position:absolute!important;left:-99999px!important;top:0!important;visibility:hidden!important;width:380px!important;pointer-events:none!important}.lebd-a4-reader[data-rendering="true"] .lebd-a4-pages{visibility:hidden}
+.lebd-a4-edit-controls{display:flex;gap:4px;flex-wrap:wrap;margin:3mm 0}.lebd-a4-edit-controls form{display:inline}.lebd-a4-edit-details{padding:5px;background:#f4f8fd;border:1px solid #cbdbe9;margin:2mm 0}.lebd-a4-edit-details summary{cursor:pointer}
+/* Chapter intro box */
+.lebd-book-chapter-intro{margin-bottom:5mm}
+.lebd-chapter-intro-frame{border:1px solid #555;padding:3mm 3mm 2.5mm;background:#fff}
+.lebd-chapter-intro-hero{display:grid;grid-template-columns:30mm minmax(0,1fr);align-items:stretch;min-height:27mm;border:1px solid #333;background:linear-gradient(180deg,#fbfbfb,#f0f0f0)}
+.lebd-chapter-intro-left{display:grid;grid-template-rows:1fr 1fr;border-right:1px solid #333;background:linear-gradient(180deg,#efefef,#dcdcdc)}
+.lebd-chapter-intro-left-top,.lebd-chapter-intro-left-bottom{display:flex;align-items:center;justify-content:center;text-align:center;padding:2mm 1.5mm;font-weight:700;font-size:11pt;border-bottom:1px solid #333}
+.lebd-chapter-intro-left-bottom{border-bottom:0;font-size:10pt}
+.lebd-chapter-intro-main{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:3mm 4mm}
+.lebd-chapter-intro-main-title{font-size:16pt;font-weight:700;line-height:1.2;margin-bottom:1.2mm}
+.lebd-chapter-intro-main-subtitle{font-size:10pt;color:#333}
+.lebd-chapter-intro-strip{margin-top:3mm;border:1px solid #666;padding:2.2mm 3mm;text-align:center;font-weight:600;font-size:10.5pt;background:#f8f8f8}
+/* Editor controls are available in a separate list, not inside the printed columns. */
+.lebd-editor-items{max-width:790px;margin:15px auto;padding:14px;background:#fff;border:1px solid #d7e2ea}.lebd-editor-items .lebd-book-item{padding:10px 0;border-bottom:1px dashed #ddd}.lebd-editor-items .lebd-book-question,.lebd-editor-items .lebd-book-options,.lebd-editor-items .lebd-book-correct,.lebd-editor-items .lebd-book-explanation,.lebd-editor-items .lebd-book-subtitle,.lebd-editor-items .lebd-book-prose{display:none}
+@media(max-width:850px){.lebd-a4-pages{align-items:flex-start;overflow:auto}.lebd-a4-reader{overflow-x:auto}.lebd-a4-sheet{flex:none}}
+@page{size:A4;margin:0}
+@media print{body{background:#fff!important}.lebd-a4-reader{width:210mm!important}.lebd-a4-pages{gap:0}.lebd-a4-sheet{margin:0;border:none;box-shadow:none}.lebd-a4-sheet:last-child{break-after:auto;page-break-after:auto}.lebd-editor-items,.lebd-a4-edit-controls,.lebd-a4-edit-details,.ebook-top,.ebook-panel,.eb-add-panel,.eb-editor-head,.sidebar,.main-header,.main-sidebar{display:none!important}}

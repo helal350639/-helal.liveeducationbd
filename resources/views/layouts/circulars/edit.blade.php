@@ -89,7 +89,7 @@ function checkIn($id, $arr)
               </div>
               <div class="col-md-12">
                   <div class="form-group">
-                      <label for="url">Link/url</label>
+                      <label for="url">আবেদন লিংক (Application Link)</label>
                       <input type="url" class="form-control" name="url" id="url" value="{{$value->url}}">
                   </div>
               </div>
@@ -103,11 +103,13 @@ function checkIn($id, $arr)
                       @php
                       $img_array = json_decode($value->image);
                       @endphp
+                      @if(is_array($img_array) || $img_array instanceof \Traversable)
                       @foreach($img_array as $image)
                       <a target="_blank" href="{{$image}}">
                         <img src="{{$image}}" alt="" width="100">
                       </a>
                       @endforeach
+                      @endif
                     @endif
                   </p>
               </div>
@@ -124,6 +126,14 @@ function checkIn($id, $arr)
                           @endif
                         </div>
                       </div>
+                  </div>
+              </div>
+              <div class="col-md-12">
+                  <div class="form-group">
+                      <label for="pdf_link">PDF Link</label>
+                      <input type="url" class="form-control" name="pdf_link" id="pdf_link" value="{{ old('pdf_link', $value->pdf_link) }}" placeholder="https://drive.google.com/file/d/.../view">
+                      <small class="help-block">PDF Link দিলে Student Page-এ আগে এই লিংক খুলবে। ফাঁকা থাকলে Uploaded PDF দেখাবে।</small>
+                      @error('pdf_link')<span class="text-danger">{{ $message }}</span>@enderror
                   </div>
               </div>
               <div class="col-md-12">
@@ -185,7 +195,7 @@ function checkIn($id, $arr)
                     $("#sub_cat").html('<option value="">No SubCategory</option>')
                 }
             },
-            error: function(data) { 
+            error: function(data) {
                  console.log('data error');
             }
         });

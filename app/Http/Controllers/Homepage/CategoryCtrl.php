@@ -59,27 +59,44 @@ class CategoryCtrl extends Controller
 
   // batches query according to the course id
   public function batch($type, $course_id)
-  {
+{
+    $dashboard = null;
+
     $course = Course::find($course_id);
+
     $batches = Batch::where('status', 'Active')
-    ->where('course_id', $course_id)
-    ->whereRaw('DATE(reg_end_at) > ?', date('Y-m-d H:i:s'))
-    ->get();
+        ->where('course_id', $course_id)
+        ->whereRaw('DATE(reg_end_at) > ?', date('Y-m-d H:i:s'))
+        ->get();
+
 
     if($type == 'job')
     {
-      return view('homepage.job-batch', compact('type', 'course', 'batches'));
+        return view('homepage.job-batch', compact(
+            'type',
+            'course',
+            'batches'
+        ));
     }
+
 
     if($type == 'Recorded Courses')
     {
-      // return 'This page is under development';
-      return $this->courseDepartment($type, $course_id, $dashboard = null);
+        return $this->courseDepartment(
+            $type,
+            $course_id,
+            $dashboard
+        );
     }
-    
-    return view('homepage.batch', compact('type', 'course', 'batches'));
-  }
 
+
+    return view('homepage.batch', compact(
+        'type',
+        'course',
+        'batches',
+        'dashboard'
+    ));
+}
   public function courseDepartment($type, $course_id, $dashboard = null)
   {
     $course = Course::find($course_id);

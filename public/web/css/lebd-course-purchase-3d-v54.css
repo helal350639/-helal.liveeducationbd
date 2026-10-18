@@ -1,0 +1,45 @@
+/* LEBD-3 v54 | premium straight mobile-style purchase card. Presentation only. */
+.batch-right-area .lebd-purchase-v54{
+  --lebd-blue:#1269e8;--lebd-green:#04865e;
+  width:100%;max-width:100%;margin:0 auto;
+  position:relative;isolation:isolate;
+  border:1px solid rgba(95,158,246,.23)!important;
+  border-radius:23px!important;
+  background:linear-gradient(155deg,#fff 12%,#f4f9ff 62%,#fff 100%)!important;
+  box-shadow:0 16px 40px rgba(20,64,121,.13),0 4px 10px rgba(20,64,121,.06),inset 0 1px 0 #fff!important;
+  transform:none!important;rotate:0deg!important;perspective:none!important;
+  overflow:hidden!important;
+}
+.batch-right-area .lebd-purchase-v54:before{content:'';position:absolute;top:0;left:12%;right:12%;height:3px;border-radius:0 0 9px 9px;background:linear-gradient(90deg,#63d7ff,#1569ea,#13bb8b);z-index:2}
+.batch-right-area .lebd-purchase-v54-media{position:relative;border-radius:0;overflow:hidden;background:#0c2544;min-height:135px}
+.batch-right-area .lebd-purchase-v54-media img{display:block;width:100%;height:auto;max-height:235px;min-height:165px;object-fit:cover}
+.batch-right-area .lebd-purchase-v54-media iframe{display:block}
+.batch-right-area .lebd-v54-video-tag{position:absolute;top:12px;left:12px;z-index:3;display:inline-flex;align-items:center;gap:5px;background:rgba(8,26,52,.82);border:1px solid rgba(255,255,255,.26);border-radius:30px;color:#fff;padding:6px 11px;font-size:11px;font-weight:700;pointer-events:none;box-shadow:0 2px 9px rgba(0,0,0,.16)}
+.batch-right-area .lebd-v54-body{padding:18px 17px 19px!important}
+.batch-right-area .lebd-v54-price{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:0 0 13px!important;padding:13px 12px;border-radius:14px;background:linear-gradient(145deg,#e9f4ff,#fff);border:1px solid #d6eaff;box-shadow:inset 0 1px 1px #fff,0 5px 12px rgba(30,95,180,.06)}
+.batch-right-area .lebd-v54-price del{color:#8493a9;font-weight:650;font-size:17px}
+.batch-right-area .lebd-v54-price strong{font-size:29px!important;line-height:1.15;color:var(--lebd-blue)!important;letter-spacing:-.6px}
+.batch-right-area .lebd-v54-price .batch-save{background:linear-gradient(135deg,#ffe774,#ffb900)!important;color:#3d2900!important;border-radius:30px!important;font-size:11px!important;font-weight:800;padding:7px 9px!important;margin:0!important;box-shadow:0 5px 9px rgba(200,138,0,.18)}
+.batch-right-area .lebd-v54-enrolled{width:100%;border-collapse:separate!important;border-spacing:0!important;border:1px solid #bcebd9;border-radius:12px;overflow:hidden;background:linear-gradient(95deg,#effdf7,#fff);margin:0 0 13px!important;box-shadow:0 4px 10px rgba(8,132,94,.04)}
+.batch-right-area .lebd-v54-enrolled td,.batch-right-area .lebd-v54-enrolled th{padding:12px 9px!important;border:0!important;font-size:13px!important;color:#067d52!important;font-weight:700!important}
+.batch-right-area .lebd-v54-enrolled th{text-align:right!important;white-space:nowrap;font-weight:800!important;border-left:1px solid #d4eadf!important}
+.batch-right-area .lebd-v54-enrolled .fa{color:#0aab71;margin-right:4px}
+.batch-right-area .lebd-v54-offer{color:#c52f48!important;background:linear-gradient(90deg,#fff0f4,#fff9fa);border:1px solid #ffd5df;border-radius:11px;padding:10px 7px;margin:0 0 13px!important;line-height:1.45;font-size:12px!important;text-align:center;font-weight:700;box-shadow:0 3px 7px rgba(180,50,80,.04)}
+.batch-right-area .lebd-v54-offer:before{content:'◷';font-size:17px;margin-right:7px;vertical-align:middle}
+.batch-right-area .lebd-purchase-v54 .batch-buy-button:not(.batch-purchased){width:100%;display:flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:12px 14px!important;background:linear-gradient(135deg,#00b96d,#008751)!important;border:1px solid #008551!important;border-radius:14px!important;box-shadow:0 8px 0 #006944,0 13px 19px rgba(0,127,81,.2)!important;color:#fff!important;font-size:18px!important;font-weight:800!important;line-height:1.2;transform:none!important;transition:filter .15s,box-shadow .15s!important}
+.batch-right-area .lebd-purchase-v54 .batch-buy-button:not(.batch-purchased):hover{filter:brightness(1.06);box-shadow:0 6px 0 #006944,0 10px 14px rgba(0,127,81,.18)!important;transform:translateY(2px)!important}
+.batch-right-area .lebd-purchase-v54 .batch-purchased{border-radius:13px!important;min-height:48px}
+.batch-right-area .lebd-purchase-v54 .batch-registration-ended{background:#fff3f3;border:1px solid #ffd3d3;border-radius:11px;padding:13px!important}
+/* Phone card remains straight and fills the available width, no skew, tilt or off-screen shadow. */
+@media(max-width:1000px){.batch-right-area .lebd-purchase-v54{width:100%;max-width:440px!important}}
+@media(max-width:600px){
+ .batch-right-area .lebd-purchase-v54{max-width:100%!important;border-radius:18px!important;transform:none!important}
+ .batch-right-area .lebd-v54-body{padding:14px!important}
+ .batch-right-area .lebd-v54-price{gap:7px;padding:10px!important;margin-bottom:10px!important}
+ .batch-right-area .lebd-v54-price strong{font-size:25px!important}
+ .batch-right-area .lebd-v54-enrolled{margin-bottom:10px!important}
+ .batch-right-area .lebd-v54-enrolled td,.batch-right-area .lebd-v54-enrolled th{font-size:12px!important;padding:10px 7px!important}
+ .batch-right-area .lebd-v54-offer{margin-bottom:11px!important;font-size:11px!important}
+ .batch-right-area .lebd-purchase-v54 .batch-buy-button:not(.batch-purchased){font-size:16px!important;min-height:48px!important}
+}
+@media(prefers-reduced-motion:reduce){.batch-right-area .lebd-purchase-v54 *{transition:none!important}}

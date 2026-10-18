@@ -1,99 +1,18 @@
 @extends('dashboard')
-@section('title', 'Add New Teacher')
+@section('title', 'শিক্ষক প্রোফাইল')
 @section('stylesheets')
 <link href="/assets/summernote/summernote.min.css" rel="stylesheet">
+<style>
+.lebd-t45{max-width:1200px;margin:0 auto}.lebd-t45 .box{border-radius:15px;overflow:hidden;border:1px solid #dfebf8;box-shadow:0 8px 22px rgba(0,44,92,.05)}.lebd-t45 .box-header{padding:18px 22px;background:#f4f9ff}.lebd-t45 .box-title{font-weight:700;color:#0a3671}.lebd-t45 .box-body{padding:20px 22px}.lebd-t45 .t45-section{margin:0 0 22px;padding:20px;border:1px solid #e1e9f4;border-radius:12px;background:#fff}.lebd-t45 .t45-section h3{margin:0 0 16px;font-weight:700;font-size:18px;color:#103f7c;border-bottom:1px solid #e7edf5;padding-bottom:12px}.lebd-t45 label{font-weight:600;color:#19385e}.lebd-t45 .form-control{border-color:#d4dfed;border-radius:7px}.lebd-t45 textarea.form-control{min-height:86px}.lebd-t45 .t45-hint{font-size:12px;color:#66788c}.lebd-t45 .t45-avatar{width:100px;height:100px;object-fit:cover;border-radius:50%;border:3px solid #edf4ff;margin:12px 0}.lebd-t45 .t45-actions{padding:18px 22px;background:#f6faff;display:flex;align-items:center;justify-content:flex-end;gap:10px}.lebd-t45 .t45-actions .btn{border-radius:8px;padding:10px 24px}.lebd-t45 .t45-switches{display:flex;gap:22px;flex-wrap:wrap}.lebd-t45 .t45-switches label{cursor:pointer}.lebd-t45 .t45-switches input{margin-right:5px}.lebd-t45 .t45-alert{background:#eef7ff;border-radius:8px;padding:11px 13px;color:#24588c;font-size:12px;margin-bottom:18px}@media(max-width:767px){.lebd-t45 .box-body{padding:12px}.lebd-t45 .t45-section{padding:14px}}
+</style>
 @endsection
 @section('content')
-
- <section class="content-header">
-      <h1>Add New Teacher</h1>
-      <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Users</a></li>
-        <li class="active">Add New Teacher</li>
-      </ol>
-    </section>
-
-    <!-- Main content -->
-    <section class="content">
-      <div class="row">
-        <!-- left column -->
-        <div class="col-md-6">
-          <!-- general form elements -->
-          <div class="box box-primary">
-            <div class="box-header with-border">
-              <h3 style="color: #800" class="box-title">Teacher Details</h3>
-            </div>
-    <form action="{{route('teacher.store')}}" method="POST" enctype="multipart/form-data" >
-        @csrf
-        <div class="box-body">
-            <div class="col-md-12">
-                <div class="form-group">
-                    <label for="Name">Name</label>
-                    <input type="text" name="name" class="form-control" required />
-                </div>
-                <div class="form-group">
-                    <label for="designation" >Designation</label>
-                    <textarea name="designation" class="form-control editor" ></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" name="email" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label for="contact" >Contact</label>
-                    <input type="text" name="contact" class="form-control" required />
-                </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <div class="input-group">
-                      <input type="text" name="password" class="form-control" required />
-                      <span class="input-group-addon" onclick="showPassword(this)"><i class="fa fa-eye"></i></span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-12">
-              <div class="form-group">
-                  <label for="image">Photo</label>
-                  <input type="file" name="image" class="form-control" />
-              </div>
-              <p class="text-danger">Image Dimension: 200x200px;<br> Types must be in: .jpeg, .jpg, .png and <br>Max size: 500KB</p>
-          </div>
-
-        </div>
-
-        <div class="box-footer">
-            <button type="submit" class="btn btn-primary pull-right">Save</button>
-        </div>
-        <div class="clearfix"></div>
-    </form>
-          </div> <!-- /.box -->
-        </div> <!--/.col (left) -->
-      </div> <!-- /.row -->
-    </section> <!-- /.content -->
+<section class="content-header"><h1>নতুন শিক্ষক যুক্ত করুন</h1><ol class="breadcrumb"><li><a href="{{ route('teacher.index') }}">শিক্ষক তালিকা</a></li><li class="active">প্রোফাইল</li></ol></section>
+<section class="content"><div class="lebd-t45"><div class="box box-primary"><div class="box-header with-border"><h3 class="box-title"><i class="fa fa-user-circle"></i> শিক্ষক প্রোফাইল তথ্য</h3></div>
+<form action="{{ route('teacher.store') }}" method="POST" enctype="multipart/form-data">@csrf<div class="box-body"><div class="t45-alert"><i class="fa fa-info-circle"></i> শিক্ষকের যোগ্যতা, অভিজ্ঞতা ও পরিচিতি Student Course-এর Teacher Tab-এ দেখানো যাবে। Email, মোবাইল ও Password প্রকাশ করা হবে না।</div>
+@if($errors->any())<div class="alert alert-danger"><strong>তথ্যগুলো যাচাই করুন।</strong><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
+<div class="t45-section"><h3>০১. শিক্ষক ও অ্যাকাউন্টের তথ্য</h3><div class="row"><div class="col-md-6"><div class="form-group"><label for="name">শিক্ষকের নাম *</label><input id="name" name="name" type="text" class="form-control" value="{{ old('name') }}" required maxlength="255"></div></div><div class="col-md-6"><div class="form-group"><label for="email">ইমেইল *</label><input id="email" name="email" type="email" class="form-control" value="{{ old('email') }}" required></div></div><div class="col-md-6"><div class="form-group"><label for="contact">মোবাইল / যোগাযোগ *</label><input id="contact" name="contact" type="text" class="form-control" value="{{ old('contact') }}" required></div></div><div class="col-md-6"><div class="form-group"><label for="password">পাসওয়ার্ড *</label><div class="input-group"><input id="password" name="password" type="password" autocomplete="new-password" class="form-control" required><span class="input-group-btn"><button type="button" class="btn btn-default" onclick="var e=document.getElementById('password');e.type=e.type==='password'?'text':'password'"><i class="fa fa-eye"></i></button></span></div></div></div><div class="col-md-12"><div class="form-group"><label for="designation">পদবি / বিষয়ের পরিচয়</label><textarea id="designation" name="designation" class="form-control" rows="3" >{{ old('designation') }}</textarea></div></div></div><div class="row"><div class="col-md-6"><div class="form-group"><label for="image">শিক্ষকের ছবি (JPEG / PNG)</label><input type="file" name="image" id="image" class="form-control" accept="image/jpeg,image/png,image/gif"><p class="t45-hint">Recommended: 200×200px; সর্বোচ্চ 500 KB</p><img id="t45Preview" class="t45-avatar" style="display:none" alt="ছবির প্রিভিউ"></div></div></div></div><div class="t45-section"><h3>০২. শিক্ষাগত যোগ্যতা ও দক্ষতা</h3><div class="row"><div class="col-md-6"><div class="form-group"><label for="qualification">শিক্ষাগত যোগ্যতা</label><input id="qualification" name="qualification" type="text" class="form-control" value="{{ old('qualification') }}" ></div></div><div class="col-md-6"><div class="form-group"><label for="institution">প্রতিষ্ঠানের নাম</label><input id="institution" name="institution" type="text" class="form-control" value="{{ old('institution') }}" ></div></div><div class="col-md-6"><div class="form-group"><label for="experience_years">অভিজ্ঞতা (বছর)</label><input id="experience_years" name="experience_years" type="number" class="form-control" value="{{ old('experience_years') }}" min="0" max="80"></div></div><div class="col-md-6"><div class="form-group"><label for="specialization">যেসব বিষয় পড়ান / বিশেষ দক্ষতা</label><input id="specialization" name="specialization" type="text" class="form-control" value="{{ old('specialization') }}" ></div></div></div></div><div class="t45-section"><h3>০৩. শিক্ষক প্রোফাইল ও অর্জন</h3><div class="form-group"><label for="bio">সংক্ষিপ্ত পরিচিতি (Student Card)</label><textarea id="bio" name="bio" class="form-control" rows="3" maxlength="2000">{{ old('bio') }}</textarea></div><div class="row"><div class="col-md-6"><div class="form-group"><label for="total_classes">মোট ক্লাসের সংখ্যা (প্রকৃত তথ্য)</label><input id="total_classes" name="total_classes" type="number" class="form-control" value="{{ old('total_classes') }}" min="0"></div></div><div class="col-md-6"><div class="form-group"><label for="total_students">মোট শিক্ষার্থীর সংখ্যা (প্রকৃত তথ্য)</label><input id="total_students" name="total_students" type="number" class="form-control" value="{{ old('total_students') }}" min="0"></div></div></div><div class="form-group"><label for="achievements">উল্লেখযোগ্য অর্জন</label><textarea id="achievements" name="achievements" class="form-control" rows="3" maxlength="3000">{{ old('achievements') }}</textarea></div><div class="form-group"><label for="profile_details">বিস্তারিত শিক্ষক পরিচিতি</label><textarea id="profile_details" name="profile_details" class="form-control" rows="3" maxlength="8000">{{ old('profile_details') }}</textarea></div></div></div><div class="t45-actions"><a href="{{ route('teacher.index') }}" class="btn btn-default">ফিরে যান</a><button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> সংরক্ষণ করুন</button></div></form></div></div></section>
 @endsection
-
 @section('scripts')
-<script src="/assets/summernote/summernote.min.js"></script>
-  <script>
-    function showPassword(e)
-    {
-      if(e.previousElementSibling.getAttribute('type') == 'password')
-      {
-        e.previousElementSibling.setAttribute('type', 'text');
-      }
-      else
-      {
-        e.previousElementSibling.setAttribute('type', 'password');
-      }
-      
-    }
-
-    //this script for text editor
-    $(document).ready(function() {
-      $('.editor').summernote({
-        // height: 150
-        toolbar: []
-      });
-    });
-  </script>
+<script>document.addEventListener('DOMContentLoaded',function(){var input=document.getElementById('image'),preview=document.getElementById('t45Preview');if(input){input.addEventListener('change',function(){if(this.files&&this.files[0]){preview.src=URL.createObjectURL(this.files[0]);preview.style.display='block'}})}});</script>
 @endsection

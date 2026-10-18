@@ -767,3 +767,617 @@
     width: 100%;
   }
 }
+
+
+
+/* ==========================
+   LIVE EDUCATION COURSE CARD
+========================== */
+
+.course-list{
+    display:flex;
+    flex-wrap:wrap;
+    gap:25px;
+    justify-content:center;
+}
+
+
+.course-card{
+
+    width:295px;
+    height:auto !important;
+
+    background:#fff;
+    border:1px solid #ddd;
+    border-radius:15px;
+
+    overflow:hidden;
+
+    box-shadow:0 5px 15px rgba(0,0,0,.12);
+
+    display:flex;
+    flex-direction:column;
+
+}
+
+
+.course-banner{
+
+    width:100%;
+    height:170px;
+
+    background:#f5f5f5;
+
+}
+
+
+.course-banner img{
+
+    width:100%;
+    height:170px;
+
+    object-fit:cover;
+
+}
+
+
+.no-banner{
+
+    width:100%;
+    height:170px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    color:#999;
+
+}
+
+
+
+.course-body{
+
+    padding:15px;
+
+    display:flex;
+    flex-direction:column;
+
+}
+
+
+
+.course-body h5{
+
+    font-size:12px;
+
+    margin:0 0 15px;
+
+}
+
+
+
+.course-price{
+
+    margin-top:10px;
+
+}
+
+
+.old-price{
+
+    color:#999;
+    text-decoration:line-through;
+
+}
+
+
+.new-price{
+
+    color:#18a957;
+    font-size:20px;
+    font-weight:bold;
+
+}
+
+
+.save{
+
+    background:#ffff00;
+    padding:3px 6px;
+
+}
+
+
+
+.course-buy-btn{
+
+    margin-top:15px !important;
+
+    margin-left:auto;
+
+    background:#18a957;
+
+    color:white;
+
+    padding:10px 15px;
+
+    border-radius:8px;
+
+    text-decoration:none;
+
+}
+
+/* =========================
+   Mobile 2 Column Course Card
+========================= */
+
+@media(max-width:768px){
+
+    .course-list{
+
+        display:grid !important;
+
+        grid-template-columns:repeat(2, 1fr);
+
+        gap:10px;
+
+        padding:10px;
+
+    }
+
+
+    .course-card{
+
+        width:100% !important;
+
+        margin:0 !important;
+
+    }
+
+
+    .course-banner{
+
+        height:120px !important;
+
+    }
+
+
+    .course-banner img{
+
+        height:120px !important;
+
+    }
+
+
+    .course-body{
+
+        padding:10px !important;
+
+    }
+
+
+    .course-body h5{
+
+        font-size:14px !important;
+
+        line-height:1.3;
+
+    }
+
+
+    .old-price{
+
+        font-size:12px;
+
+    }
+
+
+    .new-price{
+
+        font-size:16px;
+
+    }
+
+
+    .save{
+
+        font-size:11px;
+
+    }
+
+
+    .course-buy-btn{
+
+        font-size:13px;
+
+        padding:8px 5px;
+
+        width:100%;
+
+    }
+
+}
+
+/* =========================
+   Mobile Full Width Fix
+========================= */
+
+@media(max-width:768px){
+
+    html, body{
+
+        width:100% !important;
+        overflow-x:hidden !important;
+
+    }
+
+
+    .container{
+
+        width:100% !important;
+
+        max-width:100% !important;
+
+        padding-left:10px !important;
+
+        padding-right:10px !important;
+
+    }
+
+
+    .course-list{
+
+        width:100% !important;
+
+        grid-template-columns:repeat(2,1fr) !important;
+
+        gap:10px !important;
+
+    }
+
+
+    .course-card{
+
+        width:100% !important;
+
+        max-width:100% !important;
+
+    }
+
+}
+
+/* =========================
+   Course Header Compact Design
+========================= */
+
+
+.course-header-box{
+
+    margin-bottom:30px;
+
+}
+
+
+/* Back Button */
+
+.back-btn{
+
+    display:inline-block;
+
+    padding:8px 18px;
+
+    border:1px solid #18a957;
+
+    border-radius:25px;
+
+    color:#18a957;
+
+    text-decoration:none;
+
+    font-size:15px;
+
+    margin-bottom:20px;
+
+    background:#f6e7e7;
+
+}
+
+
+
+.back-btn:hover{
+
+    background:#18a957;
+
+    color:#fff;
+
+}
+
+
+
+/* Course Title Box */
+
+
+.course-title-box{
+
+    text-align:center;
+
+    background:#ffffff;
+
+    border-radius:18px;
+
+    padding:15px 20px;
+
+    max-width:500px;
+
+    margin:auto;
+
+    box-shadow:0 5px 20px rgba(0,0,0,.10);
+
+    border:1px solid #e5e5e5;
+
+}
+
+
+
+.course-icon{
+
+    font-size:28px;
+
+}
+
+
+
+.course-title-box h2{
+
+    margin:5px 0;
+
+    font-size:30px;
+
+    font-weight:700;
+
+    color:#123b82;
+
+}
+
+
+
+.course-title-box p{
+
+    margin:0;
+
+    font-size:15px;
+
+    color:#0a0a0a;
+
+}
+
+
+
+@media(max-width:768px){
+
+
+.course-title-box{
+
+    max-width:90%;
+
+    padding:12px;
+
+}
+
+
+.course-title-box h2{
+
+    font-size:24px;
+
+}
+
+
+}
+
+
+/* =========================
+   Batch Details Page Design
+========================= */
+
+.our_courses .card{
+
+    border-radius:15px;
+    border:1px solid #e5e5e5;
+    box-shadow:0 8px 25px rgba(0,0,0,.08);
+
+}
+
+
+.card-info{
+
+    background:linear-gradient(135deg,#123b82,#19a957)!important;
+    color:#fff!important;
+    border-radius:20px;
+
+}
+
+
+.card-info h3{
+
+    font-size:28px;
+    font-weight:700;
+
+}
+
+
+.course-image{
+
+    border-radius:15px;
+
+}
+
+
+.card-heading h3 b{
+
+    color:#19a957;
+    font-size:26px;
+
+}
+
+
+.card-footer .btn-success{
+
+    background:#19a957;
+    border:none;
+    border-radius:10px;
+    font-size:18px;
+    padding:12px;
+
+}
+
+
+@media(max-width:768px){
+
+    .card-info h3{
+
+        font-size:22px;
+
+    }
+
+}
+
+/* Hide Batch Short Description Box */
+
+.card-info{
+    display:none !important;
+}
+
+/* =========================
+   Course Details Tabs Design
+========================= */
+
+.batch-tabs{
+
+    display:flex;
+
+    gap:10px;
+
+    margin:20px 0;
+
+    align-items:center;
+
+    flex-wrap:wrap;
+
+}
+
+
+
+.batch-tabs a{
+
+    display:inline-block;
+
+    padding:8px 28px;
+
+    background:#f8f9fa;
+
+    color:#333;
+
+    border:1px solid #ddd;
+
+    border-radius:8px;
+
+    text-decoration:none;
+
+    font-size:14px;
+
+    font-weight:500;
+
+    transition:all .3s ease;
+
+}
+
+
+
+.batch-tabs a:hover{
+
+    background:#19a957;
+
+    color:#fff;
+
+    border-color:#19a957;
+
+}
+
+
+
+/* Active button */
+
+.batch-tabs a.active{
+
+    background:#19a957;
+
+    color:#fff;
+
+    border-color:#19a957;
+
+}
+
+
+
+/* Mobile View */
+
+@media(max-width:768px){
+
+    .batch-tabs{
+
+        flex-wrap:nowrap;
+
+        overflow-x:auto;
+
+        gap:6px;
+
+        padding-bottom:5px;
+
+    }
+
+
+    .batch-tabs a{
+
+        padding:7px 14px;
+
+        font-size:12px;
+
+        white-space:nowrap;
+
+    }
+
+}
+
+/* Mobile Tabs Center Alignment */
+
+@media(max-width:768px){
+
+    .batch-tabs{
+
+        justify-content:center !important;
+
+        align-items:center;
+
+        width:100%;
+
+        gap:8px;
+
+        flex-wrap:nowrap;
+
+        overflow-x:auto;
+
+    }
+
+
+    .batch-tabs a{
+
+        padding:7px 15px;
+
+        font-size:12px;
+
+        flex-shrink:0;
+
+    }
+
+}

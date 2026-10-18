@@ -1,0 +1,971 @@
+/* ================= HEADER DESIGN ================= */
+
+.mobile-header{
+    width:100%;
+    background:#ffffff;
+    box-shadow:0 2px 15px rgba(0,0,0,0.08);
+    position:relative;
+    z-index:100;
+}
+
+
+/* Top Area */
+
+.header-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:15px 40px;
+}
+
+
+/* Logo */
+
+.logo-area img{
+    width:180px;
+    height:auto;
+}
+
+
+
+/* Action Buttons */
+
+.header-actions{
+    display:flex;
+    align-items:center;
+    gap:18px;
+}
+
+
+.header-btn{
+    text-decoration:none;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:14px 30px;
+    border-radius:35px;
+    font-size:18px;
+    font-weight:600;
+    color:#123b82;
+    background:#eef5ff;
+    transition:.3s;
+}
+
+
+.header-btn i{
+    font-size:20px;
+}
+
+
+.dashboard-btn{
+    background:#1267e8;
+    color:#fff;
+}
+
+
+.login-btn{
+    background:#1267e8;
+    color:#fff;
+}
+
+
+
+.notification-btn{
+    position:relative;
+    background:#eef5ff;
+}
+
+
+.notification-btn b{
+    position:absolute;
+    right:8px;
+    top:-8px;
+
+    width:22px;
+    height:22px;
+
+    background:red;
+    color:white;
+
+    border-radius:50%;
+    font-size:13px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+
+
+/* Menu Row */
+
+.mobile-menu-row{
+
+    display:flex;
+    justify-content:center;
+    gap:30px;
+
+    padding:15px 30px;
+
+    background:#f4f8ff;
+
+}
+
+
+
+.mobile-menu-row a{
+
+    min-width:180px;
+
+    padding:18px;
+
+    border-radius:40px;
+
+    background:#e7f0ff;
+
+    text-decoration:none;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:12px;
+
+    color:#123b82;
+
+    font-size:20px;
+
+    font-weight:600;
+
+}
+
+
+
+.mobile-menu-row a i{
+
+    font-size:25px;
+
+}
+
+
+.mobile-menu-row .active{
+
+    background:#1267e8;
+
+    color:white;
+
+}
+
+
+
+/* Mobile */
+
+.menu-btn{
+    display:none;
+}
+
+
+
+@media(max-width:768px){
+
+
+.header-top{
+
+    padding:10px 15px;
+
+}
+
+
+.logo-area img{
+
+    width:120px;
+
+}
+
+
+.header-btn span{
+
+    display:none;
+
+}
+
+
+.header-btn{
+
+    padding:12px;
+
+    border-radius:50%;
+
+}
+
+
+.notification-btn b{
+
+    right:0;
+    top:-5px;
+
+}
+
+
+.menu-btn{
+
+    display:flex;
+
+    padding:12px;
+
+    font-size:22px;
+
+}
+
+
+.mobile-menu-row{
+
+    overflow-x:auto;
+
+    justify-content:flex-start;
+
+    gap:10px;
+
+    padding:10px;
+
+}
+
+
+
+.mobile-menu-row a{
+
+    min-width:90px;
+
+    font-size:13px;
+
+    flex-direction:column;
+
+    padding:12px;
+
+}
+
+
+.mobile-menu-row a i{
+
+    font-size:20px;
+
+}
+
+
+
+}
+
+
+/* Notice Modal */
+
+.notice-modal{
+
+    border-radius:20px;
+    overflow:hidden;
+    border:none;
+    box-shadow:0 20px 60px rgba(0,0,0,.25);
+
+}
+
+
+
+.notice-header{
+
+    background:linear-gradient(
+        135deg,
+        #0066ff,
+        #20c4ff
+    );
+
+    color:white;
+
+    padding:25px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:20px;
+
+}
+
+
+
+.notice-header h3{
+
+    margin:0;
+    font-size:28px;
+    font-weight:700;
+
+}
+
+
+
+.notice-header p{
+
+    margin:5px 0 0;
+    opacity:.9;
+
+}
+
+
+
+.notice-icon{
+
+    width:70px;
+    height:70px;
+
+    background:white;
+
+    color:#0066ff;
+
+    border-radius:50%;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:35px;
+
+}
+
+
+
+
+.notice-close{
+
+    margin-left:auto;
+
+    border:none;
+
+    width:45px;
+    height:45px;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,.2);
+
+    color:white;
+
+    font-size:22px;
+
+}
+
+
+
+
+.notice-body{
+
+    background:#f5f9ff;
+
+    padding:25px;
+
+    border-radius:15px;
+
+    font-size:18px;
+
+    line-height:1.8;
+
+    color:#24324a;
+
+}
+
+
+
+.notice-footer{
+
+    padding:20px 25px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+}
+
+
+
+.notice-info{
+
+    color:#6c7a90;
+
+    font-size:16px;
+
+}
+
+
+
+.notice-info i{
+
+    color:#0066ff;
+
+    font-size:25px;
+
+    margin-right:10px;
+
+}
+
+
+
+.notice-btn{
+
+    background:#0066ff;
+
+    color:white;
+
+    padding:12px 35px;
+
+    border-radius:12px;
+
+    font-size:18px;
+
+}
+
+
+
+.notice-btn:hover{
+
+    background:#0052cc;
+
+    color:white;
+
+}
+
+/* ================= RUNNING COURSE DESIGN ================= */
+
+
+.running-course-area{
+
+background:#eef7ff;
+padding:35px 25px;
+border-radius:35px;
+margin:20px auto;
+max-width:1400px;
+
+}
+
+
+
+.running-title{
+
+display:flex;
+justify-content:center;
+align-items:center;
+gap:25px;
+margin-bottom:30px;
+
+}
+
+
+.running-title span{
+
+width:100px;
+height:3px;
+background:#7bbcff;
+
+}
+
+
+.title-bg{
+
+background:#1267d9;
+color:white;
+
+padding:18px 55px;
+
+border-radius:50px;
+
+font-size:32px;
+font-weight:700;
+
+}
+
+
+
+.running-course-card{
+
+background:white;
+
+border-radius:20px;
+
+padding:12px 20px;
+
+display:flex;
+
+align-items:center;
+
+gap:25px;
+
+margin-bottom:15px;
+
+}
+
+
+
+.course-image img{
+
+width:220px;
+height:100px;
+
+object-fit:cover;
+
+border-radius:15px;
+
+}
+
+
+
+.course-content{
+
+flex:1;
+
+}
+
+
+.course-content h3{
+
+font-size:28px;
+
+color:#123b82;
+
+margin:0;
+
+}
+
+
+.course-content p{
+
+font-size:20px;
+
+color:#68758a;
+
+}
+
+
+
+.course-view-btn{
+
+background:#1267e8;
+
+color:white;
+
+padding:15px 35px;
+
+border-radius:35px;
+
+text-decoration:none;
+
+font-size:18px;
+
+}
+
+
+
+.course-view-btn:hover{
+
+color:white;
+
+}
+
+
+
+.category-slider{
+
+display:flex;
+
+gap:18px;
+
+margin-top:35px;
+
+overflow:hidden;
+
+justify-content:center;
+
+}
+
+
+
+.category-card{
+
+width:150px;
+
+height:150px;
+
+border-radius:15px;
+
+display:flex;
+
+flex-direction:column;
+
+justify-content:center;
+
+align-items:center;
+
+color:white;
+
+font-size:45px;
+
+font-weight:bold;
+
+}
+
+
+.category-card span{
+
+font-size:18px;
+
+margin-top:15px;
+
+}
+
+
+.blue{background:#4169e1}
+.purple{background:#8e44ad}
+.green{background:#27ae60}
+.red{background:#ff4545}
+.cyan{background:#13a8b8}
+.orange{background:#f39c12}
+.pink{background:#e94b7a}
+
+
+
+.slider-text{
+
+text-align:center;
+
+font-size:20px;
+
+color:#566;
+
+margin-top:25px;
+
+}
+
+/* ================= HOLOGRAM 3D COURSE DESIGN ================= */
+
+
+.running-course-area{
+
+    background:
+    linear-gradient(
+        135deg,
+        #eef8ff,
+        #dcecff,
+        #f8fcff
+    );
+
+    border-radius:40px;
+
+    border:2px solid rgba(37,120,255,.35);
+
+    box-shadow:
+    0 25px 60px rgba(0,80,180,.25),
+    inset 0 0 40px rgba(255,255,255,.8);
+
+}
+
+
+
+
+.running-course-card{
+
+
+    background:
+    linear-gradient(
+        145deg,
+        rgba(255,255,255,.95),
+        rgba(240,248,255,.85)
+    );
+
+
+    border-radius:28px;
+
+
+    border:1px solid rgba(255,255,255,.9);
+
+
+    box-shadow:
+
+    0 15px 35px rgba(0,80,160,.20),
+
+    0 5px 15px rgba(0,0,0,.08),
+
+    inset 0 0 20px rgba(255,255,255,.9);
+
+
+
+    transform:translateZ(0);
+
+    transition:.35s;
+
+}
+
+
+
+.running-course-card:hover{
+
+
+    transform:
+
+    translateY(-8px)
+
+    scale(1.02);
+
+
+    box-shadow:
+
+    0 30px 60px rgba(0,90,220,.35);
+
+
+}
+
+
+
+
+.course-image img{
+
+
+    border-radius:20px;
+
+
+    box-shadow:
+
+    0 15px 30px rgba(0,0,0,.25);
+
+
+}
+
+
+
+
+
+.course-view-btn{
+
+
+    background:
+
+    linear-gradient(
+        135deg,
+        #1680ff,
+        #0047c7
+    );
+
+
+    box-shadow:
+
+    0 10px 25px rgba(0,90,255,.45);
+
+
+    border:
+
+    1px solid rgba(255,255,255,.5);
+
+
+}
+
+
+
+
+.category-card{
+
+
+    border-radius:25px;
+
+
+    box-shadow:
+
+
+    0 20px 35px rgba(0,0,0,.25),
+
+    inset 0 0 25px rgba(255,255,255,.35);
+
+
+    border:
+
+    1px solid rgba(255,255,255,.5);
+
+
+    transition:.35s;
+
+
+}
+
+
+
+.category-card:hover{
+
+
+    transform:
+
+    translateY(-12px)
+
+    rotateX(8deg);
+
+
+    box-shadow:
+
+    0 35px 60px rgba(0,0,0,.35);
+
+
+}
+
+/* ================= COURSE NAME BOX ================= */
+course-name-box{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:10px;
+
+    padding:10px 25px;
+
+    background:linear-gradient(
+        135deg,
+        #1267e8,
+        #003b9c
+    );
+
+    border-radius:35px;
+
+    box-shadow:
+    0 8px 20px rgba(18,103,232,.35);
+
+}
+
+
+
+.course-label{
+
+    color:white;
+
+    font-size:18px;
+
+    font-weight:600;
+
+}
+
+
+
+.course-title{
+
+    color:#ffe600;
+
+    font-size:22px;
+
+    font-weight:700;
+
+}
+
+
+/* Mobile */
+
+@media(max-width:768px){
+
+.course-name-box{
+
+    flex-direction:column;
+
+    padding:12px 20px;
+
+}
+
+
+.course-label{
+
+    font-size:18px;
+
+}
+
+
+.course-title{
+
+    font-size:22px;
+
+}
+
+}
+
+.premium-course-card{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    background:white;
+
+    padding:25px 35px;
+
+    margin:20px;
+
+    border-radius:25px;
+
+    box-shadow:
+    0 15px 35px rgba(0,80,180,.25);
+
+}
+
+
+
+.course-name-box{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+}
+
+
+
+.course-label{
+
+    color:#123b82;
+
+    font-size:18px;
+
+    font-weight:700;
+
+}
+
+
+
+.course-title{
+
+    background:#1267e8;
+
+    color:#ffe600;
+
+    padding:8px 20px;
+
+    border-radius:30px;
+
+    font-size:22px;
+
+    font-weight:700;
+
+}
+
+
+
+.premium-course-btn{
+
+    background:#1267e8;
+
+    color:white;
+
+    padding:12px 30px;
+
+    border-radius:35px;
+
+    text-decoration:none;
+
+}

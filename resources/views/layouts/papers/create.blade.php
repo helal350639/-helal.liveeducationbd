@@ -45,9 +45,10 @@ $source = New SourceCtrl;
                 <div class="col-md-3">
                     <div class="form-group">
                         <label for="">Batch</label>
-                        <select name="batch_id" id="batch_id" class="form-control select2" onchange="getDepartments(this)">
-                            <option value="">Select One</option>
+                        <select name="batch_id" id="batch_id" class="form-control select2" onchange="getDepartments(this); getRoutineExams(this)">
+                        <option value="">Select One</option>
                         </select>
+                    
                     </div>
                 </div>
                 <div class="col-md-3">
@@ -80,7 +81,15 @@ $source = New SourceCtrl;
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="name">Question Paper No.</label>
-                        <input type="text" class="form-control" name="name" id="name" required>
+                        <select
+    class="form-control select2"
+    name="name"
+    id="name"
+    required
+    disabled
+>
+    <option value="">Select Course & Batch First</option>
+</select>
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -198,166 +207,588 @@ $source = New SourceCtrl;
 @endsection
 
 @section('scripts')
+
 <script src="/assets/summernote/summernote.min.js"></script>
+
 <script type="text/javascript">
 
-// on change course get batches
+
+// ============================================================
+// ON CHANGE COURSE → GET BATCHES
+// ============================================================
+
 function getBatches(e)
 {
-    let ids = Array.from(e.selectedOptions).map(({value}) => value);
+    let ids = Array.from(
+        e.selectedOptions
+    ).map(({value}) => value);
+
 
     $.ajax({
-        type: 'GET', //THIS NEEDS TO BE GET
+
+        type: 'GET',
+
         url: '/get_batches/' + ids,
+
         success: function (data) {
 
-            var obj = JSON.parse(JSON.stringify(data));
-            var options = '<option value="">Select One</option>';
+            var obj =
+                JSON.parse(
+                    JSON.stringify(data)
+                );
 
-            $.each(obj['data'], function (key, val) {
-                options += '<option value="'+val.id+'">'+val.name+'</option>';
-            });
 
-            if(options != ""){
-                $("#batch_id").html(options)
-            }else{
-                $("#batch_id").html('')
-                // $("#semester_id").html('')
-                // $("#subject_id").html('')
-                // $("#chapter_id").html('')
+            var options =
+                '<option value="">Select One</option>';
+
+
+            $.each(
+                obj['data'],
+                function (key, val)
+                {
+
+                    options +=
+                        '<option value="' +
+                        val.id +
+                        '">' +
+                        val.name +
+                        '</option>';
+
+                }
+            );
+
+
+            if(options != "")
+            {
+
+                $("#batch_id").html(
+                    options
+                );
+
             }
+            else
+            {
+
+                $("#batch_id").html('');
+
+            }
+
         },
-        error: function(data) { 
-                console.log('data error');
+
+
+        error: function(data)
+        {
+
+            console.log('data error');
+
         }
+
     });
 }
 
-// on change batch get departments
+
+
+// ============================================================
+// GET ROUTINE EXAM NO. BY BATCH
+// ============================================================
+
+function getRoutineExams(e)
+{
+
+    let batch_id = e.value;
+
+
+    // Disable Exam dropdown while loading
+
+    $('#name').prop(
+        'disabled',
+        true
+    );
+
+
+    $('#name').html(
+        '<option value="">Loading Exams...</option>'
+    );
+
+
+    // If Batch is empty
+
+    if(!batch_id)
+    {
+
+        $('#name').html(
+            '<option value="">Select Course & Batch First</option>'
+        );
+
+
+        return;
+
+    }
+
+
+
+    $.ajax({
+
+        type: 'GET',
+
+        url: '/get-routine-exams/' + batch_id,
+
+
+        success: function(data)
+        {
+        console.log('ROUTINE EXAM RESPONSE:', data);
+        console.log('BATCH ID:', batch_id);
+            var options =
+                '<option value="">Select Exam No.</option>';
+                
+
+            // Check whether exams exist
+
+            if(
+                data.exams &&
+                data.exams.length > 0
+            )
+            {
+
+                $.each(
+                    data.exams,
+                    function(key, val)
+                    {
+
+                        options +=
+                            '<option value="' +
+                            val.name +
+                            '">' +
+                            val.name +
+                            '</option>';
+
+                    }
+                );
+
+
+                $('#name').html(
+                    options
+                );
+
+
+                $('#name').prop(
+                    'disabled',
+                    false
+                );
+
+            }
+            else
+            {
+
+                $('#name').html(
+                    '<option value="">No Exam Found in Routine</option>'
+                );
+
+
+                $('#name').prop(
+                    'disabled',
+                    true
+                );
+
+            }
+
+
+            // Refresh Select2
+
+            $('#name').trigger(
+                'change.select2'
+            );
+
+        },
+
+
+        error: function(xhr)
+        {
+
+            console.log(
+                xhr.responseText
+            );
+
+
+            $('#name').html(
+                '<option value="">Unable to Load Exams</option>'
+            );
+
+
+            $('#name').prop(
+                'disabled',
+                true
+            );
+
+
+            $('#name').trigger(
+                'change.select2'
+            );
+
+        }
+
+    });
+
+}
+
+
+
+// ============================================================
+// ON CHANGE BATCH → GET DEPARTMENTS
+// ============================================================
+
 function getDepartments(e)
 {
-    let ids = Array.from(e.selectedOptions).map(({value}) => value);
+
+    let ids = Array.from(
+        e.selectedOptions
+    ).map(({value}) => value);
+
 
     $.ajax({
-        type: 'GET', //THIS NEEDS TO BE GET
+
+        type: 'GET',
+
         url: '/get_departments_by_batch/' + ids,
+
+
         success: function (data) {
 
-            var obj = JSON.parse(JSON.stringify(data));
-            var options = '<option value="">Select One</option>';
+            var obj =
+                JSON.parse(
+                    JSON.stringify(data)
+                );
 
-            $.each(obj['data'], function (key, val) {
-                options += '<option value="'+val.id+'">'+val.name+'</option>';
-            });
 
-            if(options != ""){
-                $("#department_id").html(options)
-            }else{
-                $("#department_id").html('')
-                // $("#semester_id").html('')
-                // $("#subject_id").html('')
-                // $("#chapter_id").html('')
+            var options =
+                '<option value="">Select One</option>';
+
+
+            $.each(
+                obj['data'],
+                function (key, val)
+                {
+
+                    options +=
+                        '<option value="' +
+                        val.id +
+                        '">' +
+                        val.name +
+                        '</option>';
+
+                }
+            );
+
+
+            if(options != "")
+            {
+
+                $("#department_id").html(
+                    options
+                );
+
             }
+            else
+            {
+
+                $("#department_id").html('');
+
+            }
+
         },
-        error: function(data) { 
-                console.log('data error');
+
+
+        error: function(data)
+        {
+
+            console.log('data error');
+
         }
+
     });
+
 }
 
-    // on upload show image
-    function showImg(e)
+
+
+// ============================================================
+// ON UPLOAD → SHOW IMAGE
+// ============================================================
+
+function showImg(e)
+{
+
+    if(
+        e.parentNode
+        .firstElementChild
+        .tagName == 'IMG'
+    )
     {
-        if(e.parentNode.firstElementChild.tagName == 'IMG')
-        {
-            e.parentNode.firstElementChild.src = window.URL.createObjectURL(e.files[0]);
-        }
-        else
-        {
-            let img = document.createElement('img');
-            img.src = window.URL.createObjectURL(e.files[0]);
-            img.setAttribute('style', 'width:100%;max-width:400px; margin-top:15px');
-            img.alt = '';
-            e.parentNode.appendChild(img);
-        }
-        
+
+        e.parentNode
+        .firstElementChild
+        .src =
+            window.URL.createObjectURL(
+                e.files[0]
+            );
+
+    }
+    else
+    {
+
+        let img =
+            document.createElement(
+                'img'
+            );
+
+
+        img.src =
+            window.URL.createObjectURL(
+                e.files[0]
+            );
+
+
+        img.setAttribute(
+            'style',
+            'width:100%;max-width:400px; margin-top:15px'
+        );
+
+
+        img.alt = '';
+
+
+        e.parentNode.appendChild(
+            img
+        );
+
     }
 
-    function getsubcats(elm){
+}
 
-        var catid = elm.options[elm.options.selectedIndex].value;
 
-        $.ajax({
-            type: 'GET', //THIS NEEDS TO BE GET
-            url: '/get_sub_cats/'+catid,
-            success: function (data) {
 
-                var obj = JSON.parse(JSON.stringify(data));
-                var sub_cat_html = "";
+// ============================================================
+// SUB CATEGORY
+// ============================================================
 
-                $.each(obj['subcats'], function (key, val) {
-                   sub_cat_html += "<option value="+val.id+">"+val.name+"</option>";
-                });
+function getsubcats(elm)
+{
 
-                if(sub_cat_html != ""){
-                    $("#sub_cat").html('<option value="">Select SubCategory</option>'+sub_cat_html)
-                }else{
-                    $("#sub_cat").html('<option value="">No SubCategory</option>')
+    var catid =
+        elm.options[
+            elm.options.selectedIndex
+        ].value;
+
+
+    $.ajax({
+
+        type: 'GET',
+
+        url: '/get_sub_cats/' + catid,
+
+
+        success: function (data) {
+
+            var obj =
+                JSON.parse(
+                    JSON.stringify(data)
+                );
+
+
+            var sub_cat_html = "";
+
+
+            $.each(
+                obj['subcats'],
+                function (key, val)
+                {
+
+                    sub_cat_html +=
+                        "<option value=" +
+                        val.id +
+                        ">" +
+                        val.name +
+                        "</option>";
+
                 }
+            );
 
-                // console.log(obj['subcats'].count());
 
-                // $("#sub_cat").append(you_html); //// For Append
-                   //// For replace with previous one
-            },
-            error: function(data) { 
-                 console.log('data error');
+            if(
+                sub_cat_html != ""
+            )
+            {
+
+                $("#sub_cat").html(
+                    '<option value="">Select SubCategory</option>' +
+                    sub_cat_html
+                );
+
             }
-        });
-    }
-    //this script for text editor
-    $(document).ready(function() {
-        $('.editor').summernote({
-            height: 150
-        });
+            else
+            {
+
+                $("#sub_cat").html(
+                    '<option value="">No SubCategory</option>'
+                );
+
+            }
+
+        },
+
+
+        error: function(data)
+        {
+
+            console.log(
+                'data error'
+            );
+
+        }
+
     });
 
-    // form required check
-    function formCheck(e)
+}
+
+
+
+// ============================================================
+// SUMMERNOTE EDITOR
+// ============================================================
+
+$(document).ready(function()
+{
+
+    $('.editor').summernote({
+
+        height: 150
+
+    });
+
+});
+
+
+
+// ============================================================
+// FORM REQUIRED CHECK
+// ============================================================
+
+function formCheck(e)
+{
+
+    if(
+        e.form.header.value == ''
+    )
     {
-        if(e.form.header.value == '')
-        {
-            console.log(e.form.header);
-            alert('Form Header is required');
-        }
+
+        console.log(
+            e.form.header
+        );
+
+
+        alert(
+            'Form Header is required'
+        );
+
     }
 
-    function Status(e){
-        let timer = e.parentNode.parentNode.nextElementSibling;
-        if(e.options[e.selectedIndex].value == 'Scheduled')
-        {
-            timer.classList.remove('hide');
-            timer.innerHTML = '<div class="col-md-6">'+
-                            '<div class="form-group">'+
-                                '<label for="open">Publish Time</label>'+
-                                '<input type="datetime-local" class="form-control" name="open" id="open" >'+
-                            '</div>'+
-                        '</div>'+
-                        '<div class="col-md-6">'+
-                            '<div class="form-group">'+
-                                '<label for="close">Close Time</label>'+
-                                '<input type="datetime-local" class="form-control" name="close" id="close" >'+
-                            '</div>'+
-                        '</div>';
-        }
-        else
-        {
-            timer.innerHTML = '';
-            timer.classList.add('hide');
-        }
+}
+
+
+
+// ============================================================
+// STATUS
+// ============================================================
+
+function Status(e)
+{
+
+    let timer =
+        e.parentNode
+        .parentNode
+        .nextElementSibling;
+
+
+    if(
+        e.options[
+            e.selectedIndex
+        ].value == 'Scheduled'
+    )
+    {
+
+        timer.classList.remove(
+            'hide'
+        );
+
+
+        timer.innerHTML =
+
+            '<div class="col-md-6">' +
+
+                '<div class="form-group">' +
+
+                    '<label for="open">' +
+                        'Publish Time' +
+                    '</label>' +
+
+                    '<input ' +
+                        'type="datetime-local" ' +
+                        'class="form-control" ' +
+                        'name="open" ' +
+                        'id="open">' +
+
+                '</div>' +
+
+            '</div>' +
+
+
+            '<div class="col-md-6">' +
+
+                '<div class="form-group">' +
+
+                    '<label for="close">' +
+                        'Close Time' +
+                    '</label>' +
+
+                    '<input ' +
+                        'type="datetime-local" ' +
+                        'class="form-control" ' +
+                        'name="close" ' +
+                        'id="close">' +
+
+                '</div>' +
+
+            '</div>';
+
+    }
+    else
+    {
+
+        timer.innerHTML = '';
+
+        timer.classList.add(
+            'hide'
+        );
+
     }
 
-    // select 2
-    $(function (){ $('.select2').select2() });
+}
+
+
+
+// ============================================================
+// SELECT2
+// ============================================================
+
+$(function()
+{
+
+    $('.select2').select2();
+
+});
+
+
+
 </script>
+
 @endsection

@@ -1,0 +1,7 @@
+@extends('homepage')
+@section('title','MCQ Job Preparation')
+@section('content')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="{{ asset('web/css/job-preparation-student.css') }}"><main class="jp-st">@include('homepage.job-preparation.partials.buy-package-button')<div class="jp-st-hero {{ $kind==='non-department'?'purple':'' }}"><h1>{{ $kind==='department'?'MCQ Job Preparation — Department':'MCQ Study — Non-Department' }}</h1><p>আপনার ক্যাটাগরি নির্বাচন করুন</p><a class="jp-st-back" href="{{ route('homepage') }}">← হোমপেজ</a></div><div class="jp-st-grid">@forelse($categories as $cat)
+@php $icon=preg_match('/^[a-z0-9-]+$/',(string)($cat->icon??''))?'fa-'.$cat->icon:'fa-book';$fg=preg_match('/^#[a-fA-F0-9]{6}$/',(string)($cat->icon_color??''))?$cat->icon_color:'#1477e8';$bg=preg_match('/^#[a-fA-F0-9]{6}$/',(string)($cat->card_color??''))?$cat->card_color:'#eef5ff';@endphp
+<a class="jp-st-card" style="background:{{$bg}}" href="{{ route('student.jobprep.category',['kind'=>$kind,'category'=>$cat->id]) }}"><i class="fa-solid {{$icon}}" style="color:{{$fg}}"></i><span>{{$cat->name}}</span></a>@empty<div class="jp-st-empty">এই বিভাগে এখনো কোনো ক্যাটাগরি নেই।</div>@endforelse</div><div class="jp-st-pages">{{$categories->links()}}</div></main>@endsection

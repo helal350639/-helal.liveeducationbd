@@ -1,47 +1,115 @@
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>@yield('title') | {{config('app.name')}} </title>
-  <!-- Tell the browser to be responsive to screen width -->
-  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-  {{-- <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"> --}}
-  <link rel="icon" href="/img/favicon.png?v=1.1.0" />
-  <meta name="csrf-token" content="{{ csrf_token() }}">
-  <!-- Bootstrap 3.3.7 -->
-  <link rel="stylesheet" href="{{'/css/bootstrap.min.css'}}">
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="{{'/css/font-awesome.min.css'}}">
-  <!-- Ionicons -->
-  <link rel="stylesheet" href="{{'/css/ionicons.min.css'}}">
-  <!-- Theme style -->
-  <link rel="stylesheet" href="{{'/css/AdminLTE.min.css'}}">
-  <!-- AdminLTE Skins. Choose a skin from the css/skins
-       folder instead of downloading all of them to reduce the load. -->
-  <link rel="stylesheet" href="{{'/css/_all-skins.min.css'}}">
-  <!-- Morris chart -->
-  <link rel="stylesheet" href="{{'/css/morris.css'}}">
-  <!-- jvectormap -->
-  <link rel="stylesheet" href="{{'/css/jquery-jvectormap.css'}}">
-  <!-- Date Picker -->
-  <link rel="stylesheet" href="{{'/css/bootstrap-datepicker.min.css'}}">
-  <link rel="stylesheet" href="{{'/css/bootstrap-timepicker.min.css'}}">
-  <!-- Daterange picker -->
-  <link rel="stylesheet" href="{{'/css/daterangepicker.css'}}">
-  <!-- bootstrap wysihtml5 - text editor -->
-  <link rel="stylesheet" href="{{'/css/bootstrap3-wysihtml5.min.css'}}">
-  <!-- iCheck -->
-  <link rel="stylesheet" href="{{'/css/blue.css'}}">
-  <link rel="stylesheet" href="{{'/css/fullcalendar.min.css'}}">
-  <link rel="stylesheet" href="{{'/css/fullcalendar.print.min.css'}}">
-  <link rel="stylesheet" href="{{'/css/dataTables.bootstrap.min.css'}}">
-  <link rel="stylesheet" href="{{'/css/select2.min.css'}}">
-  <link rel="stylesheet" href="{{'/css/style.css'}}">
+<meta charset="utf-8">
 
-  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-  <!--[if lt IE 9]>
-  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-  <![endif]-->
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-  <!-- Google Font -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+<title>
+@yield('title') | {{ config('app.name') }}
+</title>
+
+
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+
+
+<link rel="icon" href="/img/favicon.png?v=1.1.0">
+
+
+<meta name="csrf-token" content="{{ csrf_token() }}">
+
+
+
+<!-- Bootstrap -->
+
+<link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}">
+
+
+<!-- Font Awesome -->
+
+<link rel="stylesheet" href="{{ asset('css/font-awesome.min.css') }}">
+
+
+<!-- Ionicons -->
+
+<link rel="stylesheet" href="{{ asset('css/ionicons.min.css') }}">
+
+
+<!-- AdminLTE -->
+
+<link rel="stylesheet" href="{{ asset('css/AdminLTE.min.css') }}">
+
+
+<!-- AdminLTE Skin -->
+
+<link rel="stylesheet" href="{{ asset('css/_all-skins.min.css') }}">
+
+
+<!-- Morris Chart -->
+
+<link rel="stylesheet" href="{{ asset('css/morris.css') }}">
+
+
+<!-- jVector Map -->
+
+<link rel="stylesheet" href="{{ asset('css/jquery-jvectormap.css') }}">
+
+
+<!-- Date Picker -->
+
+<link rel="stylesheet" href="{{ asset('css/bootstrap-datepicker.min.css') }}">
+
+
+<!-- Time Picker -->
+
+<link rel="stylesheet" href="{{ asset('css/bootstrap-timepicker.min.css') }}">
+
+
+<!-- Date Range Picker -->
+
+<link rel="stylesheet" href="{{ asset('css/daterangepicker.css') }}">
+
+
+<!-- Wysihtml5 -->
+
+<link rel="stylesheet" href="{{ asset('css/bootstrap3-wysihtml5.min.css') }}">
+
+
+<!-- iCheck -->
+
+<link rel="stylesheet" href="{{ asset('css/blue.css') }}">
+
+
+<!-- Full Calendar -->
+
+<link rel="stylesheet" href="{{ asset('css/fullcalendar.min.css') }}">
+
+<link rel="stylesheet" href="{{ asset('css/fullcalendar.print.min.css') }}">
+
+
+<!-- Data Table -->
+
+<link rel="stylesheet" href="{{ asset('css/dataTables.bootstrap.min.css') }}">
+
+
+<!-- Select2 -->
+
+<link rel="stylesheet" href="{{ asset('css/select2.min.css') }}">
+
+
+<!-- Custom Style -->
+
+<link rel="stylesheet" href="{{ asset('css/style.css') }}">
+
+
+
+<!-- Google Font -->
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+
+
+
+<!--[if lt IE 9]>
+
+<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+
+<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+
+<![endif]-->

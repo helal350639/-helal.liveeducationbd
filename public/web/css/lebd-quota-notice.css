@@ -1,0 +1,7 @@
+/* LEBD-3 quota limit notice: scoped so existing Reading and Quiz styles stay unchanged. */
+.lebd-limit-notice{display:flex;align-items:center;gap:14px;margin:10px 0 16px;padding:16px 18px;border:1px solid #f6d5a0;border-left:4px solid #f59e0b;border-radius:12px;background:#fffaf1;box-shadow:0 5px 15px rgba(16,24,40,.045);color:#172b53}
+.lebd-limit-symbol{flex:0 0 42px;width:42px;height:42px;border-radius:11px;background:#fff0d5;color:#bd6500;display:flex;align-items:center;justify-content:center;font-size:19px}
+.lebd-limit-copy{flex:1;min-width:0}.lebd-limit-copy h3{font-size:17px!important;line-height:1.4;margin:0 0 5px!important;font-weight:800}.lebd-limit-copy p{font-size:13px;line-height:1.6;margin:0 0 5px}.lebd-limit-copy small{font-size:11px;line-height:1.5;color:#6c7686;display:block}
+.lebd-limit-buy{display:inline-flex;align-items:center;justify-content:center;gap:7px;white-space:nowrap;flex-shrink:0;color:#fff!important;text-decoration:none!important;background:linear-gradient(100deg,#ff8c00,#ff4b4b);border-radius:9px;padding:11px 15px;font-size:13px;font-weight:800;box-shadow:0 4px 10px rgba(255,100,54,.15)}
+.lebd-limit-buy:hover{color:#fff;background:linear-gradient(100deg,#ea7600,#ee3434)}
+@media(max-width:670px){.lebd-limit-notice{display:grid;grid-template-columns:38px 1fr;align-items:start;gap:9px;padding:12px}.lebd-limit-symbol{width:36px;height:36px;flex-basis:36px}.lebd-limit-copy h3{font-size:14px!important}.lebd-limit-copy p{font-size:12px}.lebd-limit-buy{grid-column:1/-1;width:100%;padding:10px 12px;font-size:12px}}

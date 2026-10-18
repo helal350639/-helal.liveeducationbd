@@ -12,6 +12,7 @@ use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\Request;
 use App\Models\Student;
 use Session;
+use App\Models\ReferralTransaction;
 
 class RegisterController extends Controller
 {
@@ -95,18 +96,45 @@ class RegisterController extends Controller
         ]);
 
         $data = $request->all();
-        
+        dd($data);
         if(isset($data['_token']))
         {
-            unset($data['_token']);
+         unset($data['_token']);
         }
+        // Referral Check
+        $data['referred_by'] = null;
 
+        if($request->has('ref'))
+        {
+    $referrer = Student::where('referral_id', $request->ref)->first();
+
+    if($referrer)
+    {
+        $data['referred_by'] = $referrer->id;
+    }
+}
+        
+        
         $data['password'] = bcrypt($data['password']);
         $data['remember_token'] = ucwords(md5($data['contact']));
         $data['status'] = NULL;
+        $data['referral_balance'] = 0;
         
         try{
-            Student::insert($data);
+            $student = Student::create($data);
+            
+            // Website Share Referral Bonus
+            if($student->referred_by)
+            {
+             ReferralTransaction::create([
+            'student_id' => $student->referred_by,
+            'referred_student_id' => $student->id,
+            'amount' => 10,
+            'type' => 'website_share',
+            'status' => 'pending',
+            'description' => 'New student registration through referral link'
+        ]);
+    }
 
             $emailData = [
                 'email_to' => $data['email'],

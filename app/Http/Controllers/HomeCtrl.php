@@ -14,6 +14,7 @@ use App\Models\Order;
 use App\Models\Visitor;
 use App\Models\Student;
 use Carbon\Carbon;
+use App\Models\WithdrawRequest;
 use Auth;
 use DB;
 
@@ -41,17 +42,30 @@ class HomeCtrl extends Controller
     public function index()
     {
       Auth::user()->authorizeRoles(['SuperAdmin', 'Admin', 'Editor', 'Sales']);
-      $data = [
-        'success_orders' => Order::whereIn('status', ['Processing', 'Complete'])->count(),
-        'orders' => Order::count(),
-        'courses' => Course::count(),
-        'departments' => Department::count(),
-        'semesters' => Semester::count(),
-        'subjects' => Subject::count(),
-        'chapters' => Chapter::count(),
-        'questions' => Question::count(),
-        'filters' => Filter::count(),
-      ];
+
+$data = [
+
+    'success_orders' => Order::whereIn(
+        'status',
+        ['Processing', 'Complete']
+    )->count(),
+    'orders' => Order::count(),
+    'courses' => Course::count(),
+    'departments' => Department::count(),
+    'semesters' => Semester::count(),
+    'subjects' => Subject::count(),
+    'chapters' => Chapter::count(),
+    'questions' => Question::count(),
+    'filters' => Filter::count(),
+
+    // Pending Withdraw Request Count
+
+    'withdraws' => WithdrawRequest::where(
+        'status',
+        'pending'
+    )->count(),
+
+];
 
       //visitors
       $visitors = \DB::table('visitors')

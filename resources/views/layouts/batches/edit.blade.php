@@ -1,319 +1,50 @@
 @php
-$department_ids = $teacher_ids = [];
-foreach($batch->departments as $val)
-{
-    array_push($department_ids, $val->id);
-}
-foreach($batch->teachers as $val)
-{
-    array_push($teacher_ids, $val->id);
-}
+$department_ids = $batch->departments->pluck('id')->all();
+$teacher_ids = $batch->teachers->pluck('id')->all();
 @endphp
-
 @extends('dashboard')
-@section('title', 'Edit Batch')
+@section('title', 'ব্যাচ সম্পাদনা')
 @section('stylesheets')
-<link href="/assets/summernote/summernote.min.css" rel="stylesheet">
+<link rel="stylesheet" href="/assets/summernote/summernote.min.css">
+<link rel="stylesheet" href="{{ asset('web/css/lebd-admin-batch-v42.css') }}">
+<link rel="stylesheet" href="{{ asset('web/css/lebd-description-v49.css') }}">
 @endsection
 @section('content')
-<section class="content-header">
-  <h1>Edit Batch</h1>
-  <ol class="breadcrumb">
-    <li><a href="#"><i class="fa fa-dashboard"></i> Batches</a></li>
-    <li class="active">Edit Batch</li>
-</ol>
-</section>
-
-<!-- Main content -->
-<section class="content">
-  <div class="row"> <!-- left column -->
-    <div class="col-md-10"> <!-- general form elements -->
-      <div class="box box-primary">
-        <div class="box-header with-border">
-            <h3 style="color: #800" class="box-title">Batch Details</h3>
-        </div>
-        <form action="{{route('batch.update', $batch)}}" method="POST" enctype="multipart/form-data">
-            @csrf
-            @method('PUT')
-            <div class="box-body">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="name">Course Name (*)</label>
-                        <select class="form-control select2" name="course_id" id="course_id" required  onchange="getDepartments(this)">
-                            <option value="">Select One</option>
-                            @foreach($courses as $val)
-                            <option value="{{$val->id}}" {{$batch->course_id == $val->id? 'selected':''}}>{{$val->name}}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label for="name">Batch Title</label>
-                        <input type="text" class="form-control" name="name" id="name" required value="{{$batch->name}}">
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label for="subtitle">Batch Sub-Title</label>
-                        <input type="text" class="form-control" name="subtitle" id="subtitle" required value="{{$batch->subtitle}}">
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label for="name">Department Name (*)</label>
-                        <select class="form-control select2" multiple name="department_id[]" id="department_id" required>
-                            @foreach($departments as $val)
-                            <option value="{{$val->id}}"{{in_array($val->id, $department_ids)? 'selected':''}}>{{$val->name}}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label for="price">Price</label>
-                        <input type="number" class="form-control" name="price" id="price" required value="{{$batch->price}}" step="0.01" placeholder="0.00 Tk." onkeyup="calcPrice()">
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label for="fee">Extra Fee</label>
-                        <input type="number" class="form-control" name="fee" id="fee" required value="{{$batch->fee}}" step="0.01" placeholder="0.00 Tk." onkeyup="calcPrice()">
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label for="discount">Discount</label>
-                        <input type="number" class="form-control" name="discount" id="discount" value="{{$batch->discount}}" step="0.01" placeholder="0.00 Tk." onkeyup="calcPrice()">
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label for="reference_discount">Reference Discount</label>
-                        <input type="number" class="form-control" name="reference_discount" id="reference_discount" value="{{$batch->reference_discount}}" step="0.01" placeholder="0.00 Tk." onkeyup="calcPrice()">
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label for="selling_price">Selling Price</label>
-                        <input type="number" class="form-control" name="selling_price" id="selling_price" value="{{$batch->selling_price}}" step="0.01" placeholder="0.00 Tk.">
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label for="referrer_bonus">Referrer Bonus</label>
-                        <input type="number" class="form-control" name="referrer_bonus" id="referrer_bonus" required value="{{$batch->referrer_bonus}}" step="0.01" placeholder="0.00 Tk." onkeyup="calcPrice()">
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label for="net_price">Net Price</label>
-                        <input type="number" class="form-control" name="net_price" id="net_price" value="{{$batch->net_price}}" step="0.01" placeholder="0.00 Tk.">
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label for="extra_fee_note">Note for Extra Fee</label>
-                        <input type="text" class="form-control" name="extra_fee_note" id="extra_fee_note" value="{{$batch->extra_fee_note}}" placeholder="Write a why added the extra fee.">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="start_at">Start Date</label>
-                        <input type="date" class="form-control" name="start_at" id="start_at" value="{{$batch->start_at}}">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="end_at">End Date</label>
-                        <input type="date" class="form-control" name="end_at" id="end_at" value="{{$batch->end_at}}">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="reg_end_at">Registration Time</label>
-                        <input type="datetime-local" class="form-control" name="reg_end_at" id="reg_end_at" value="{{$batch->reg_end_at}}">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="offer_end_at">Offer Time</label>
-                        <input type="datetime-local" class="form-control" name="offer_end_at" id="offer_end_at" value="{{$batch->offer_end_at}}">
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label for="teacher_id">Teachers (*)</label>
-                        <select class="form-control select2" multiple name="teacher_id[]" id="teacher_id" required>
-                            @foreach($teachers as $val)
-                            <option value="{{$val->id}}"{{in_array($val->id, $teacher_ids)? 'selected':''}}>{{$val->name}}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label for="extra_student">Extra Students (Optional)</label>
-                        <input class="form-control" type="number" name="extra_student" value="{{$batch->extra_student}}">
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                      <label><input type="checkbox" name="status" id="status" value="{{$batch->status}}" style="width: 15px; height:15px" {{$batch->status == 'Active' ?'checked':''}}> <span style="margin-top:-10px">Status</span></label>
-
-                        &nbsp;
-                    
-                      <label>
-                        <input type="checkbox" name="web" id="web" value="{{$batch->web}}" style="width: 15px; height:15px" {{$batch->web == 'Yes' ? 'checked':''}}> <span style="margin-top:-10px">Web</span>
-                      </label>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="subtitle">Youtube Video URL</label>
-                        <input type="url" class="form-control" name="video" id="video" value=""/>
-                    </div>
-                    @if($batch->video)
-                    <p><iframe class="responsive-iframe" style="max-width: 200px; border:5px solid #fff" src="https://www.youtube.com/embed/{{$batch->video}}" allowfullscreen></iframe></p>
-                    @endif
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="banner">Banner</label>
-                        <input type="file" class="form-control" name="banner" id="banner" onchange="showImg(this)" />
-                        <p style="color:red;padding:5px 0">Image size: 4:6 / 400px X 600px</p>
-                    </div>
-                    <a target="_blank" href="{{$batch->banner}}">
-                        <img src="{{$batch->banner}}" alt="" style="max-width:200px">
-                    </a>
-                </div>
-                <div class="clearfix"></div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label for="short">Short Description</label>
-                        <textarea class="form-control editor" name="short" id="short" rows="5">{{$batch->short}}</textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="details">Details</label>
-                        <textarea class="form-control editor" name="details" id="details" rows="5">{{$batch->details}}</textarea>
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label for="what_is">What is in this course</label>
-                        <textarea class="form-control editor" name="what_is" id="what_is" rows="5">{{$batch->what_is}}</textarea>
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label for="learn">What you will learn by doing the course</label>
-                        <textarea class="form-control editor" name="learn" id="learn" rows="5">{{$batch->learn}}</textarea>
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label for="routine">Class routine</label>
-                        <textarea class="form-control editor" name="routine" id="routine" rows="5">{{$batch->routine}}</textarea>
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label for="faq">Frequently Ask Question</label>
-                        <textarea class="form-control editor" name="faq" id="faq" rows="5">{{$batch->faq}}</textarea>
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label for="refund">Re-fund Policy</label>
-                        <textarea class="form-control editor" name="refund" id="refund" rows="5">{{$batch->refund}}</textarea>
-                    </div>
-                </div>
-            </div> <!-- /.box body -->
-            <div class="box-footer">
-                <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-save"></i> Save</button>
-            </div>
-        </form>
-    </div> <!-- /.box -->
-    </div> <!--/.col (left) -->
-</div> <!-- /.row -->
-</section> <!-- /.content -->
-@endsection
-
+<section class="content-header"><h1>ব্যাচ সম্পাদনা</h1><ol class="breadcrumb"><li><a href="{{ route('batch.index') }}">Batches</a></li><li class="active">ব্যাচ সম্পাদনা</li></ol></section>
+<section class="content"><div class="lebd-b41"><div class="lebd-b41-hero"><div><span class="lebd-b41-chip">LIVE EDUCATION BD · Batch Management</span><h2>ব্যাচ সম্পাদনা</h2><p>সাজানো Form — আগের সব Batch ও Payment Field অপরিবর্তিত</p></div><a class="lebd-b41-back" href="{{ route('batch.index') }}"><i class="fa fa-arrow-left"></i> সব ব্যাচ</a></div>
+@if($errors->any())<div class="lebd-b41-alert"><strong>সংশোধন প্রয়োজন:</strong><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
+<form action="{{ route('batch.update', $batch) }}" method="POST" enctype="multipart/form-data">@csrf @method('PUT')<nav class="lebd-b41-tabs" aria-label="Batch form steps"><button type="button" class="lebd-b41-tab" data-batch-tab="basic"><i class="fa fa-info-circle"></i> প্রাথমিক তথ্য</button><button type="button" class="lebd-b41-tab" data-batch-tab="price"><i class="fa fa-money"></i> মূল্য ও অফার</button><button type="button" class="lebd-b41-tab" data-batch-tab="dates"><i class="fa fa-calendar"></i > সময়সীমা</button><button type="button" class="lebd-b41-tab" data-batch-tab="media"><i class="fa fa-picture-o"></i > ছবি ও ভিডিও</button><button type="button" class="lebd-b41-tab" data-batch-tab="content"><i class="fa fa-file-text-o"></i> কোর্সের বিষয়বস্তু</button><button type="button" class="lebd-b41-tab" data-batch-tab="description"><i class="fa fa-pencil-square-o"></i> Description যোগ / এডিট</button></nav><section class="lebd-b41-panel" data-batch-panel="basic" hidden><div class="lebd-b41-panelhead"><i class="fa fa-book"></i><div><h3>ব্যাচের পরিচিতি</h3><p>কোর্স, ব্যাচ, বিভাগ, শিক্ষক ও প্রকাশনার তথ্য</p></div></div><div class="lebd-b41-body"><div class="lebd-b41-grid"><div class="lebd-b41-field lebd-b41-c6"><label for="course_id">কোর্স নির্বাচন (*)</label><select class="form-control select2" name="course_id" id="course_id" required onchange="getDepartments(this)"><option value="">Select Course</option>@foreach($courses as $val)<option value="{{ $val->id }}" {{ (string) old('course_id',$batch->course_id)===(string)$val->id?'selected':'' }}>{{ $val->name }}</option>@endforeach</select></div><div class="lebd-b41-field lebd-b41-c12"><label for="name">ব্যাচের নাম</label><input class="form-control" type="text" name="name" id="name" value="{{ old('name', $batch->name) }}" required ><p class="lebd-b41-hint"></p></div><div class="lebd-b41-field lebd-b41-c12"><label for="subtitle">ব্যাচের উপশিরোনাম</label><input class="form-control" type="text" name="subtitle" id="subtitle" value="{{ old('subtitle', $batch->subtitle) }}" required ><p class="lebd-b41-hint"></p></div><div class="lebd-b41-field lebd-b41-c6"><label for="department_id">বিভাগ নির্বাচন (*)</label><select class="form-control select2" multiple name="department_id[]" id="department_id" required>@foreach($departments as $val)<option value="{{ $val->id }}" {{ in_array($val->id,old('department_id',$department_ids))?'selected':'' }}>{{ $val->name }}</option>@endforeach</select></div><div class="lebd-b41-field lebd-b41-c6"><label for="teacher_id">শিক্ষক নির্বাচন (*)</label><select class="form-control select2" multiple name="teacher_id[]" id="teacher_id" required>@foreach($teachers as $val)<option value="{{ $val->id }}" {{ in_array($val->id,old('teacher_id',$teacher_ids))?'selected':'' }}>{{ $val->name }}</option>@endforeach</select></div><div class="lebd-b41-field lebd-b41-c6"><label for="extra_student">অতিরিক্ত শিক্ষার্থী (ঐচ্ছিক)</label><input class="form-control" type="number" name="extra_student" id="extra_student" value="{{ old('extra_student',$batch->extra_student) }}"  ><p class="lebd-b41-hint"></p></div><div class="lebd-b41-c12 lebd-b41-checks"><label><input type="checkbox" name="status" id="status" value="1" {{ old('status',$batch->status==='Active')?'checked':'' }}> সক্রিয় অবস্থা</label><label><input type="checkbox" name="web" id="web" value="1" {{ old('web',$batch->web==='Yes')?'checked':'' }}> ওয়েবসাইটে দেখাবে</label></div></div></div></section><section class="lebd-b41-panel" data-batch-panel="price" hidden><div class="lebd-b41-panelhead"><i class="fa fa-money"></i><div><h3>মূল্য ও ছাড়</h3><p>বিদ্যমান পেমেন্টের সব মূল্যসংক্রান্ত ফিল্ড অপরিবর্তিত রয়েছে</p></div></div><div class="lebd-b41-body"><div class="lebd-b41-grid"><div class="lebd-b41-field lebd-b41-c3"><label for="price">মূল মূল্য</label><input class="form-control" type="number" name="price" id="price" value="{{ old('price',$batch->price) }}" required step="0.01"><p class="lebd-b41-hint"></p></div><div class="lebd-b41-field lebd-b41-c3"><label for="fee">অতিরিক্ত ফি</label><input class="form-control" type="number" name="fee" id="fee" value="{{ old('fee',$batch->fee) }}" required step="0.01"><p class="lebd-b41-hint"></p></div><div class="lebd-b41-field lebd-b41-c3"><label for="discount">ছাড়</label><input class="form-control" type="number" name="discount" id="discount" value="{{ old('discount',$batch->discount) }}"  step="0.01"><p class="lebd-b41-hint"></p></div><div class="lebd-b41-field lebd-b41-c3"><label for="reference_discount">রেফারেন্স ছাড়</label><input class="form-control" type="number" name="reference_discount" id="reference_discount" value="{{ old('reference_discount',$batch->reference_discount) }}"  step="0.01"><p class="lebd-b41-hint"></p></div><div class="lebd-b41-field lebd-b41-c3"><label for="selling_price">বিক্রয়মূল্য</label><input class="form-control" type="number" name="selling_price" id="selling_price" value="{{ old('selling_price',$batch->selling_price) }}"  step="0.01"><p class="lebd-b41-hint">Existing stored/payment field; review before saving.</p></div><div class="lebd-b41-field lebd-b41-c3"><label for="referrer_bonus">রেফারার বোনাস</label><input class="form-control" type="number" name="referrer_bonus" id="referrer_bonus" value="{{ old('referrer_bonus',$batch->referrer_bonus) }}" required step="0.01"><p class="lebd-b41-hint"></p></div><div class="lebd-b41-field lebd-b41-c3"><label for="net_price">নিট মূল্য</label><input class="form-control" type="number" name="net_price" id="net_price" value="{{ old('net_price',$batch->net_price) }}"  step="0.01"><p class="lebd-b41-hint">Existing stored/payment field; review before saving.</p></div><div class="lebd-b41-field lebd-b41-c12"><label for="extra_fee_note">Reason for অতিরিক্ত ফি</label><input class="form-control" type="text" name="extra_fee_note" id="extra_fee_note" value="{{ old('extra_fee_note',$batch->extra_fee_note) }}"  ><p class="lebd-b41-hint"></p></div><div class="lebd-b41-c12"><div class="lebd-b41-summary"><div><strong>হিসাবের পূর্বরূপ</strong><br><small>Read-only preview; does not overwrite বিক্রয়মূল্য or নিট মূল্য.</small></div><div style="text-align:right">Selling: <strong id="lebd-b41-calculated-selling">—</strong><br>Net: <strong id="lebd-b41-calculated-net">—</strong></div></div></div></div></div></section><section class="lebd-b41-panel" data-batch-panel="dates" hidden><div class="lebd-b41-panelhead"><i class="fa fa-calendar"></i><div><h3>তারিখ ও ভর্তি</h3><p>ব্যাচের মেয়াদ, রেজিস্ট্রেশন ও অফারের শেষ সময়</p></div></div><div class="lebd-b41-body"><div class="lebd-b41-grid"><div class="lebd-b41-field lebd-b41-c6"><label for="start_at">শুরুর তারিখ</label><input class="form-control" type="date" name="start_at" id="start_at" value="{{ old('start_at', $batch->start_at ? \Carbon\Carbon::parse($batch->start_at)->format('Y-m-d') : '') }}"  ><p class="lebd-b41-hint"></p></div><div class="lebd-b41-field lebd-b41-c6"><label for="end_at">শেষ তারিখ</label><input class="form-control" type="date" name="end_at" id="end_at" value="{{ old('end_at', $batch->end_at ? \Carbon\Carbon::parse($batch->end_at)->format('Y-m-d') : '') }}"  ><p class="lebd-b41-hint"></p></div><div class="lebd-b41-field lebd-b41-c6"><label for="reg_end_at">রেজিস্ট্রেশনের শেষ সময়</label><input class="form-control" type="datetime-local" name="reg_end_at" id="reg_end_at" value="{{ old('reg_end_at', $batch->reg_end_at ? \Carbon\Carbon::parse($batch->reg_end_at)->format('Y-m-d\TH:i') : '') }}"  ><p class="lebd-b41-hint"></p></div><div class="lebd-b41-field lebd-b41-c6"><label for="offer_end_at">অফারের শেষ সময়</label><input class="form-control" type="datetime-local" name="offer_end_at" id="offer_end_at" value="{{ old('offer_end_at', $batch->offer_end_at ? \Carbon\Carbon::parse($batch->offer_end_at)->format('Y-m-d\TH:i') : '') }}"  ><p class="lebd-b41-hint"></p></div></div></div></section><section class="lebd-b41-panel" data-batch-panel="media" hidden><div class="lebd-b41-panelhead"><i class="fa fa-picture-o"></i><div><h3>ব্যানার ও ভিডিও</h3><p>বর্তমান ছবি ও ভিডিও দেখুন, প্রয়োজন হলে পরিবর্তন করুন</p></div></div><div class="lebd-b41-body"><div class="lebd-b41-grid"><div class="lebd-b41-field lebd-b41-c6"><label for="video">ইউটিউব ভিডিও লিংক (ঐচ্ছিক)</label><input class="form-control" type="url" name="video" id="video" value=""  ><p class="lebd-b41-hint">Paste a new full URL only if replacing the video. Existing video stays unchanged when blank.</p></div><div class="lebd-b41-field lebd-b41-c6"><label for="banner">ব্যানার আপলোড / পরিবর্তন</label><input class="form-control" type="file" name="banner" id="banner" accept="image/*"><p class="lebd-b41-hint">Existing suggested image: 400 × 600px. Your existing image stays if no file selected.</p></div><div class="lebd-b41-c6"><div class="lebd-b41-preview"><strong>বর্তমান / নতুন ব্যানার</strong>@if($batch->banner)<img id="lebd-b41-banner-img" src="{{ $batch->banner }}" alt="Batch banner">@else<img id="lebd-b41-banner-img" style="display:none" alt="New batch banner">@endif</div></div><div class="lebd-b41-c6"><div class="lebd-b41-preview"><strong>ইউটিউব ভিডিওর পূর্বরূপ</strong><div>@if($batch->video)<iframe id="lebd-b41-video-frame" src="https://www.youtube-nocookie.com/embed/{{ $batch->video }}" allowfullscreen title="Current batch video"></iframe>@else<iframe id="lebd-b41-video-frame" hidden title="YouTube preview"></iframe>@endif</div></div></div></div></div></section><section class="lebd-b41-panel" data-batch-panel="content" hidden><div class="lebd-b41-panelhead"><i class="fa fa-file-text-o"></i><div><h3>কোর্সের বিষয়বস্তু</h3><p>বিষয়ভিত্তিক তথ্য লিখুন; ক্লাস রুটিন আলাদা মডিউল থেকে প্রদর্শিত হবে</p></div></div><div class="lebd-b41-body"><div class="lebd-b41-grid"><div class="lebd-b42-grouphead lebd-b41-c12"><strong>০১ · কোর্স পরিচিতি</strong><small>কোর্সের সারসংক্ষেপ ও বিস্তারিত তথ্য</small></div><div class="lebd-b41-field lebd-b41-c12"><label for="short">সংক্ষিপ্ত পরিচিতি</label><textarea class="form-control editor" name="short" id="short" rows="4">{{ old('short',$batch->short) }}</textarea><p class="lebd-b41-hint"></p></div><div class="lebd-b41-field lebd-b41-c12"><button type="button" class="btn btn-primary" onclick="document.querySelector('[data-batch-tab=description]').click()"><i class="fa fa-edit"></i> Description যোগ / সম্পাদনা করুন</button><p class="lebd-b41-hint">এই বোতামে ক্লিক করে আলাদা Description Form খুলুন।</p></div><div class="lebd-b42-grouphead lebd-b41-c12"><strong>০২ · শেখার বিষয় ও সুবিধা</strong><small>শিক্ষার্থী কী পাবে এবং কী শিখবে</small></div><div class="lebd-b41-field lebd-b41-c12"><label for="what_is">কোর্সে যা যা থাকছে</label><textarea class="form-control editor" name="what_is" id="what_is" rows="4">{{ old('what_is',$batch->what_is) }}</textarea><p class="lebd-b41-hint"></p></div><div class="lebd-b41-field lebd-b41-c12"><label for="learn">যা যা শিখতে পারবে</label><textarea class="form-control editor" name="learn" id="learn" rows="4">{{ old('learn',$batch->learn) }}</textarea><p class="lebd-b41-hint"></p></div><div class="lebd-b42-routine-note lebd-b41-c12"><i class="fa fa-calendar"></i> <strong>ক্লাস রুটিন:</strong> এখানে আলাদা করে লিখতে হবে না। বিদ্যমান Routine মডিউলে রুটিন পরিচালনা করুন। স্টুডেন্ট পেজে স্বয়ংক্রিয়ভাবে দেখানোর সংযোগ পরবর্তী ধাপে যাচাই করতে হবে।</div><div class="lebd-b42-grouphead lebd-b41-c12"><strong>০৩ · সাধারণ প্রশ্ন ও উত্তর</strong><small>ভর্তি, ক্লাস ও কোর্স সম্পর্কে গুরুত্বপূর্ণ প্রশ্ন</small></div><div class="lebd-b41-field lebd-b41-c12 lebd-v48-admin-faq">
+<label>প্রশ্ন–উত্তর টেবিল</label><p class="lebd-b41-hint">প্রতিটি সারিতে একটি প্রশ্ন ও তার উত্তর লিখুন। নতুন সারি যোগ করুন বা মুছে দিন। Save করলে পুরোনো <code>faq</code> Field-এই তথ্য থাকবে—নতুন Database Column দরকার নেই।</p>
+<textarea name="faq" id="faq" class="lebd-v48-hidden-faq" hidden>{{ old('faq',$batch->faq) }}</textarea>
+<div class="table-responsive"><table class="table table-bordered lebd-v48-admin-table"><thead><tr><th style="width:6%">#</th><th style="width:37%">প্রশ্ন</th><th>উত্তর</th><th style="width:8%">অ্যাকশন</th></tr></thead><tbody id="lebd-v48-faq-rows"></tbody></table></div>
+<button type="button" id="lebd-v48-faq-add" class="btn btn-info"><i class="fa fa-plus"></i> নতুন প্রশ্ন যোগ করুন</button>
+<div id="lebd-v48-faq-legacy" class="lebd-v48-legacy" hidden><p><strong>পুরোনো FAQ তথ্য:</strong> এটি নিজে থেকে মুছে যাবে না। পুরোনো লেখা রাখতে চাইলে নিচের Editor-এও সম্পাদনা করতে পারবেন। নতুন প্রশ্ন–উত্তর টেবিল Save করলে পুরোনো লেখার পরিবর্তে নতুন টেবিল সংরক্ষিত হবে।</p><textarea id="lebd-v48-legacy-editor" class="form-control" rows="5">{{ old('faq',$batch->faq) }}</textarea><button type="button" id="lebd-v48-faq-keep-legacy" class="btn btn-default">পুরোনো লেখা বহাল রাখুন</button></div>
+</div><div class="lebd-b42-grouphead lebd-b41-c12"><strong>০৪ · নীতিমালা ও শর্তাবলি</strong><small>পেমেন্ট ও রিফান্ডের শর্ত স্পষ্টভাবে লিখুন</small></div><div class="lebd-b41-field lebd-b41-c12"><label for="refund">রিফান্ড নীতিমালা</label><textarea class="form-control editor" name="refund" id="refund" rows="4">{{ old('refund',$batch->refund) }}</textarea><p class="lebd-b41-hint"></p></div></div></div></section><section class="lebd-b41-panel" data-batch-panel="description" hidden><div class="lebd-b41-panelhead"><i class="fa fa-pencil-square-o"></i><div><h3>কোর্স Description যোগ ও সম্পাদনা</h3><p>সাজানো তথ্য লিখুন, তারপর নিচের ব্যাচ সংরক্ষণ বোতাম চাপুন।</p></div></div><div class="lebd-b41-body"><div class="lebd-b41-grid"><div class="lebd-b41-c12 lebd-v49-builder" id="lebd-v49-builder">
+  <div class="lebd-v49-title"><i class="fa fa-magic"></i> <strong>সাজানো কোর্স Description তৈরি করুন</strong><small>এই Form শুধুমাত্র Description-এর ডিজাইন তৈরির সহায়ক। পরিবর্তন করে ব্যাচ সংরক্ষণ করলে বিবরণ আপডেট হবে।</small></div>
+  <div class="lebd-v49-fields">
+    <label>কোর্সের শিরোনাম<input class="form-control" type="text" data-desc="title" placeholder="১৫০ দিনের নন + ডিপার্টমেন্ট বেসিক প্রস্তুতি কোর্স"></label>
+    <label>পরীক্ষার সময় ও মেয়াদ<input class="form-control" type="text" data-desc="exam" placeholder="প্রকাশিত Routine অনুযায়ী পরীক্ষা হবে"></label>
+    <label>কোর্স পরিচিতি<textarea class="form-control" rows="2" data-desc="intro" placeholder="কারা অংশ নিতে পারবে, প্রস্তুতির লক্ষ্য"></textarea></label>
+    <label>কোর্সের বৈশিষ্ট্য (প্রতি লাইনে একটি)<textarea class="form-control" rows="8" data-desc="features" placeholder="২৬টি টপিকভিত্তিক প্রস্তুতি পরীক্ষা&#10;৯টি রিভিশন পরীক্ষা&#10;৮টি মডেল পরীক্ষা&#10;প্রতিটি পরীক্ষার সাজেশন PDF"></textarea></label>
+    <label>ডিপার্টমেন্টসমূহ (প্রতি লাইনে একটি)<textarea class="form-control" rows="4" data-desc="departments" placeholder="সিভিল + নন পার্ট&#10;ইলেকট্রিক্যাল + নন পার্ট"></textarea></label>
+    <label>কোর্স কিনবেন কীভাবে — ভিডিও URL<input class="form-control" type="url" data-desc="buyVideo" placeholder="https://www.facebook.com/share/v/..."></label>
+    <label>ডেমো এক্সাম URL<input class="form-control" type="url" data-desc="demo" placeholder="https://liveeducationbd.com/students/instruction/..."></label>
+    <label>এক্সাম দেওয়ার ভিডিও URL<input class="form-control" type="url" data-desc="examVideo" placeholder="https://www.facebook.com/share/v/..."></label>
+    <label>PDF ডাউনলোড ভিডিও URL<input class="form-control" type="url" data-desc="pdfVideo" placeholder="https://www.facebook.com/share/v/..."></label>
+    <label>ওয়েবসাইট URL<input class="form-control" type="url" data-desc="website" value="https://liveeducationbd.com"></label>
+    <label>ফেসবুক পেজ URL<input class="form-control" type="url" data-desc="facebook" placeholder="https://www.facebook.com/..."></label>
+    <label>ফেসবুক গ্রুপ URL<input class="form-control" type="url" data-desc="group" placeholder="https://www.facebook.com/groups/..."></label>
+    <label>WhatsApp নম্বর<input class="form-control" type="text" data-desc="whatsapp" placeholder="০১৭১৮-৭৭৮১৮৪"></label>
+    <label>কল করার নম্বর<input class="form-control" type="text" data-desc="phone" placeholder="০১৬১০-৫৫৪৫১৫"></label>
+    <label>অতিরিক্ত ঘোষণা / শর্ত<textarea class="form-control" rows="3" data-desc="notice" placeholder="যাচাইকৃত ও বাস্তব তথ্য লিখুন; পরীক্ষায় প্রশ্ন কমন পড়ার নিশ্চয়তা দেবেন না"></textarea></label>
+  </div>
+  <div class="lebd-v49-info"><i class="fa fa-shield"></i> কোর্সের মূল্য, SMS Fee, Registration ও Discount স্বয়ংক্রিয়ভাবে আগের Payment/Batch Field থেকে দেখানো হবে। Description Builder-এ কোনো মূল্য পরিবর্তন হয় না।</div>
+  <div class="lebd-v49-tools"><button class="btn btn-primary" type="button" id="lebd-v49-preview"><i class="fa fa-eye"></i> ডিজাইন দেখুন</button><button class="btn btn-success" type="button" id="lebd-v49-insert"><i class="fa fa-paste"></i> Description Editor-এ বসান</button></div>
+  <p id="lebd-v51-status" style="color:#0c6fb5;font-size:13px;padding:7px 0">যে তথ্য লিখবেন সেটি Save-এর পর আবার এখানে পাওয়া যাবে। ধূসর Placeholder লেখা Save হয় না।</p>
+  <div id="lebd-v49-preview-box" class="lebd-v49-preview" hidden></div>
+</div><div class="lebd-b41-field lebd-b41-c12"><label for="details">বিস্তারিত বিবরণ</label><textarea class="form-control editor" name="details" id="details" rows="4">{{ old('details',$batch->details) }}</textarea><p class="lebd-b41-hint"></p></div></div></div></section><script>function getDepartments(e){var selected=e.value;var $=window.jQuery;if(!$||!selected)return;var keep=Array.from(document.querySelectorAll('#department_id option:checked')).map(function(o){return o.value});$.get('/get_departments/'+encodeURIComponent(selected)).done(function(data){var list=data&&data.data?data.data:[];var box=document.getElementById('department_id');if(!box)return;box.innerHTML='';list.forEach(function(row){var opt=new Option(row.name,row.id,false,keep.indexOf(String(row.id))!==-1);box.add(opt)});$(box).trigger('change')})}</script><div class="lebd-b41-actions"><span class="lebd-b41-progress"><i class="fa fa-shield"></i> Existing SSLCommerz payment flow unchanged</span><button type="submit" class="lebd-b41-save"><i class="fa fa-save"></i> ব্যাচ সংরক্ষণ</button></div></form></div></section>@endsection
 @section('scripts')
 <script src="/assets/summernote/summernote.min.js"></script>
-<script type="text/javascript">
-//this script for text editor
-    $(document).ready(function() {
-        $('.editor').summernote({
-            height: 150
-        });
-    });
-</script>
-<script type="text/javascript">
-    // on upload show image
-    function showImg(e)
-     {
-         if(e.parentNode.firstElementChild.tagName == 'IMG')
-         {
-             e.parentNode.firstElementChild.src = window.URL.createObjectURL(e.files[0]);
-         }
-         else
-         {
-             let img = document.createElement('img');
-             img.src = window.URL.createObjectURL(e.files[0]);
-             img.setAttribute('style', 'width:100%;max-width:400px; margin-top:15px');
-             img.alt = '';
-             e.parentNode.appendChild(img);
-         }
-         
-     }
-function calcPrice()
-{
-    let price = document.getElementById('price');
-    let fee = document.getElementById('fee');
-    let discount = document.getElementById('discount');
-    let referrer_bonus = document.getElementById('referrer_bonus');
-    let reference_discount = document.getElementById('reference_discount');
-    let selling_price = document.getElementById('selling_price');
-    let net_price = document.getElementById('net_price');
-
-    selling_price.value = (Number(price.value) + Number(fee.value)) - (Number(discount.value) + Number(reference_discount.value)).toFixed(2);
-
-    net_price.value = Number(selling_price.value) - Number(referrer_bonus.value);
-}
-
-    // get department on select the course
-    function getDepartments(e)
-{
-    let ids = Array.from(e.selectedOptions).map(({value}) => value);
-
-    $.ajax({
-        type: 'GET', //THIS NEEDS TO BE GET
-        url: '/get_departments/' + ids,
-        success: function (data) {
-
-            var obj = JSON.parse(JSON.stringify(data));
-            var options = '';
-
-            $.each(obj['data'], function (key, val) {
-                options += '<option value="'+val.id+'">'+val.name+'</option>';
-            });
-
-            if(options != ""){
-                $("#department_id").html(options)
-            }else{
-                $("#department_id").html('')
-                $("#semester_id").html('')
-                $("#subject_id").html('')
-                $("#chapter_id").html('')
-            }
-        },
-        error: function(data) { 
-                console.log('data error');
-        }
-    });
-}
-
-$(function(){$('.select2').select2()});
-</script>
+<script src="{{ asset('web/js/lebd-admin-batch-v42.js') }}"></script>
+<script src="{{ asset('web/js/lebd-course-description-v51.js') }}"></script>
 @endsection

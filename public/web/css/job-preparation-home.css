@@ -1,0 +1,759 @@
+/* LEBD-3 Student MCQ homepage: preserved original approved card layout. */
+.lebd-homepage-canvas .lebd-jp-dynamic-card h3{font-size:clamp(13px,1.4vw,21px);overflow-wrap:anywhere;text-align:center;padding:0 7px}
+.lebd-homepage-canvas .lebd-jp-dynamic-card .mcq-card-icon,.lebd-homepage-canvas .lebd-jp-dynamic-card .study-card-icon{font-size:clamp(28px,3vw,55px)}
+.lebd-homepage-canvas .lebd-jp-empty{grid-column:1/-1;text-align:center;padding:22px;color:#657992;background:rgba(255,255,255,.75);border-radius:14px}
+/* =========================================================
+   MAIN WRAPPER
+========================================================= */
+
+.mcq-main-wrapper{
+    width:100%;
+    max-width:1500px;
+    margin:30px auto;
+    padding:0 24px;
+    box-sizing:border-box;
+}
+
+
+/* =========================================================
+   COMMON SECTION
+========================================================= */
+
+.mcq-section{
+    position:relative;
+    width:100%;
+    border-radius:22px;
+    overflow:hidden;
+    padding:18px 18px 28px;
+    box-sizing:border-box;
+    margin-bottom:28px;
+}
+
+
+/* =========================================================
+   JOB SECTION BACKGROUND
+========================================================= */
+
+.mcq-job-section{
+    background:
+        linear-gradient(
+            135deg,
+            #fff7f2 0%,
+            #fff0eb 50%,
+            #fff8f3 100%
+        );
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.06);
+}
+
+
+/* =========================================================
+   STUDY SECTION BACKGROUND
+========================================================= */
+
+.mcq-study-section{
+    background:
+        linear-gradient(
+            135deg,
+            #f1f3ff 0%,
+            #edf0ff 50%,
+            #f6f5ff 100%
+        );
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.06);
+}
+
+
+/* =========================================================
+   MAIN HEADING
+========================================================= */
+
+.mcq-heading{
+    width:540px;
+    max-width:70%;
+
+    min-height:120px;
+
+    margin:0 auto 34px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    gap:20px;
+
+    color:#fff;
+
+    border-radius:70px;
+
+    padding:15px 35px;
+
+    box-sizing:border-box;
+
+    position:relative;
+
+    z-index:3;
+
+    box-shadow:
+        0 10px 25px rgba(0,0,0,.14);
+}
+
+
+/* JOB HEADING */
+
+.job-heading{
+    background:
+        linear-gradient(
+            100deg,
+            #ff9800,
+            #ff463e
+        );
+}
+
+
+/* STUDY HEADING */
+
+.study-heading{
+    background:
+        linear-gradient(
+            100deg,
+            #3677ff,
+            #2467d9
+        );
+}
+
+
+.mcq-heading-icon{
+    font-size:48px;
+    width:70px;
+    height:70px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    flex-shrink:0;
+}
+
+
+.mcq-heading h2{
+    margin:0;
+
+    font-family:Arial, sans-serif;
+
+    font-size:40px;
+    font-weight:800;
+
+    line-height:1.1;
+}
+
+
+.mcq-heading p{
+    margin:8px 0 0;
+
+    font-family:Arial, sans-serif;
+
+    font-size:18px;
+
+    font-weight:400;
+}
+
+
+/* =========================================================
+   DECORATIVE TEXT
+========================================================= */
+
+.mcq-decoration{
+    position:absolute;
+    z-index:1;
+
+    display:flex;
+    flex-direction:column;
+
+    font-family:cursive;
+
+    font-size:25px;
+    font-weight:700;
+
+    line-height:1.15;
+
+    opacity:.65;
+}
+
+
+.mcq-left-decoration{
+    left:65px;
+    top:30px;
+
+    color:#efb49d;
+}
+
+
+.mcq-right-decoration{
+    right:55px;
+    top:35px;
+
+    color:#555;
+}
+
+
+.study-left-decoration{
+    left:70px;
+    top:35px;
+
+    color:#80a4ee;
+}
+
+
+.study-books-decoration{
+    position:absolute;
+    right:65px;
+    top:45px;
+
+    font-size:80px;
+
+    display:flex;
+    flex-direction:column;
+
+    line-height:.35;
+
+    color:#9ab0ef;
+
+    opacity:.18;
+
+    transform:rotate(-7deg);
+}
+
+
+/* =========================================================
+   JOB CATEGORY GRID
+========================================================= */
+
+.mcq-category-grid{
+    position:relative;
+    z-index:3;
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(5, minmax(0, 1fr));
+
+    gap:16px;
+
+    width:100%;
+}
+
+
+/* =========================================================
+   JOB CATEGORY CARD
+========================================================= */
+
+.mcq-category-card{
+
+    min-height:165px;
+
+    border-radius:18px;
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+
+    text-decoration:none !important;
+
+    border:1px solid rgba(0,0,0,.06);
+
+    box-shadow:
+        0 5px 15px rgba(0,0,0,.07);
+
+    transition:
+        transform .25s ease,
+        box-shadow .25s ease;
+
+    box-sizing:border-box;
+}
+
+
+.mcq-category-card:hover{
+    transform:translateY(-7px);
+
+    box-shadow:
+        0 14px 25px rgba(0,0,0,.13);
+}
+
+
+.mcq-card-icon{
+
+    width:90px;
+    height:75px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:60px;
+
+    margin-bottom:8px;
+}
+
+
+.mcq-category-card h3{
+
+    margin:0;
+
+    font-family:Arial, sans-serif;
+
+    font-size:25px;
+
+    font-weight:800;
+
+    color:#102957;
+}
+
+
+/* =========================================================
+   JOB CARD COLORS
+========================================================= */
+
+.card-civil{
+    background:#fff8ef;
+}
+
+.card-civil .mcq-card-icon{
+    color:#f59e0b;
+}
+
+
+.card-electrical{
+    background:#fff0f5;
+}
+
+.card-electrical .mcq-card-icon{
+    color:#f01835;
+}
+
+
+.card-mechanical{
+    background:#f6efff;
+}
+
+.card-mechanical .mcq-card-icon{
+    color:#5523c9;
+}
+
+
+.card-computer{
+    background:#eaf9f6;
+}
+
+.card-computer .mcq-card-icon{
+    color:#099d8b;
+}
+
+
+.card-electronic{
+    background:#fff0f5;
+}
+
+.card-electronic .mcq-card-icon{
+    color:#d41472;
+}
+
+
+.card-power{
+    background:#eaf8fa;
+}
+
+.card-power .mcq-card-icon{
+    color:#07506c;
+}
+
+
+.card-rac{
+    background:#fff0f5;
+}
+
+.card-rac .mcq-card-icon{
+    color:#ef1530;
+}
+
+
+.card-architecture{
+    background:#edf5ff;
+}
+
+.card-architecture .mcq-card-icon{
+    color:#126de5;
+}
+
+
+.card-textile{
+    background:#fff5ea;
+}
+
+.card-textile .mcq-card-icon{
+    color:#f37b00;
+}
+
+
+.card-agriculture{
+    background:#eff9e6;
+}
+
+.card-agriculture .mcq-card-icon{
+    color:#299c20;
+}
+
+
+/* =========================================================
+   STUDY GRID
+========================================================= */
+
+.mcq-study-grid{
+
+    position:relative;
+    z-index:3;
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(5, minmax(0, 1fr));
+
+    gap:16px;
+
+    width:100%;
+}
+
+
+/* =========================================================
+   STUDY CARD
+========================================================= */
+
+.mcq-study-card{
+
+    min-height:180px;
+
+    border-radius:18px;
+
+    display:flex;
+    flex-direction:column;
+
+    align-items:center;
+    justify-content:center;
+
+    text-decoration:none !important;
+
+    border:1px solid rgba(0,0,0,.06);
+
+    box-shadow:
+        0 5px 15px rgba(0,0,0,.07);
+
+    transition:
+        transform .25s ease,
+        box-shadow .25s ease;
+
+    box-sizing:border-box;
+}
+
+
+.mcq-study-card:hover{
+
+    transform:translateY(-7px);
+
+    box-shadow:
+        0 14px 25px rgba(0,0,0,.13);
+}
+
+
+.study-card-icon{
+
+    width:90px;
+    height:80px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:55px;
+
+    margin-bottom:10px;
+}
+
+
+.mcq-study-card h3{
+
+    margin:0;
+
+    font-family:Arial, sans-serif;
+
+    font-size:25px;
+
+    font-weight:800;
+
+    color:#102957;
+}
+
+
+/* =========================================================
+   STUDY COLORS
+========================================================= */
+
+.study-bangla{
+    background:#fff0f4;
+}
+
+.study-bangla .study-card-icon{
+    color:#e31b3b;
+}
+
+
+.study-general{
+    background:#eef7ff;
+}
+
+.study-general .study-card-icon{
+    color:#1874df;
+}
+
+
+.study-english{
+    background:#edfaf5;
+}
+
+.study-english .study-card-icon{
+    color:#079879;
+}
+
+
+.study-math{
+    background:#fff6ea;
+}
+
+.study-math .study-card-icon{
+    color:#ff8500;
+}
+
+
+.study-others{
+    background:#f5efff;
+}
+
+.study-others .study-card-icon{
+    color:#4a19c2;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media(max-width:1100px){
+
+    .mcq-category-grid{
+        grid-template-columns:repeat(4,1fr);
+    }
+
+    .mcq-study-grid{
+        grid-template-columns:repeat(3,1fr);
+    }
+
+    .mcq-heading{
+        max-width:80%;
+    }
+
+    .mcq-decoration{
+        display:none;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width:768px){
+
+    .mcq-main-wrapper{
+        padding:0 10px;
+        margin:18px auto;
+    }
+
+
+    .mcq-section{
+        padding:14px 10px 20px;
+
+        border-radius:16px;
+
+        margin-bottom:18px;
+    }
+
+
+    .mcq-heading{
+
+        width:100%;
+        max-width:100%;
+
+        min-height:75px;
+
+        padding:10px 15px;
+
+        border-radius:45px;
+
+        gap:10px;
+
+        margin-bottom:18px;
+    }
+
+
+    .mcq-heading-icon{
+        width:45px;
+        height:45px;
+
+        font-size:30px;
+    }
+
+
+    .mcq-heading h2{
+        font-size:22px;
+    }
+
+
+    .mcq-heading p{
+        font-size:11px;
+        margin-top:4px;
+    }
+
+
+    /* JOB CARDS */
+
+    .mcq-category-grid{
+
+        grid-template-columns:
+            repeat(2, minmax(0,1fr));
+
+        gap:10px;
+    }
+
+
+    .mcq-category-card{
+
+        min-height:125px;
+
+        border-radius:14px;
+    }
+
+
+    .mcq-card-icon{
+
+        width:60px;
+        height:55px;
+
+        font-size:42px;
+
+        margin-bottom:3px;
+    }
+
+
+    .mcq-category-card h3{
+
+        font-size:18px;
+    }
+
+
+    /* STUDY */
+
+    .mcq-study-grid{
+
+        grid-template-columns:
+            repeat(2, minmax(0,1fr));
+
+        gap:10px;
+    }
+
+
+    .mcq-study-card{
+
+        min-height:135px;
+
+        border-radius:14px;
+    }
+
+
+    .study-card-icon{
+
+        width:60px;
+        height:55px;
+
+        font-size:40px;
+
+        margin-bottom:5px;
+    }
+
+
+    .mcq-study-card h3{
+
+        font-size:18px;
+    }
+
+
+    .study-books-decoration{
+        display:none;
+    }
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media(max-width:400px){
+
+    .mcq-heading h2{
+        font-size:18px;
+    }
+
+
+    .mcq-heading p{
+        font-size:9px;
+    }
+
+
+    .mcq-heading-icon{
+        font-size:25px;
+    }
+
+
+    .mcq-category-card{
+        min-height:115px;
+    }
+
+
+    .mcq-card-icon{
+        font-size:36px;
+    }
+
+
+    .mcq-category-card h3{
+        font-size:16px;
+    }
+
+
+    .mcq-study-card{
+        min-height:120px;
+    }
+
+
+    .study-card-icon{
+        font-size:35px;
+    }
+
+
+    .mcq-study-card h3{
+        font-size:16px;
+    }
+
+}

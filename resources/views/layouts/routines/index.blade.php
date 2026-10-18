@@ -70,20 +70,54 @@ $source = New SourceCtrl;
                   <span class="label label-danger">{{$value->status}}</span>
                   @endif
                 </td>
-                <td>
-                  {{-- <a href="{{route('routine.show', $value->id)}}" class="btn btn-info" title="Details"><i class="fa fa-file-text"></i></a> --}}
 
-                  <a href="{{route('routine.item.show', $value->id)}}" class="btn btn-info" title="Add Item"><i class="fa fa-list"></i></a>
 
-                  <a href="{{route('routine.edit', $value->id)}}" class="btn btn-warning btn-sm" title="Edit this value"><i class="fa fa-edit"></i></a>
+                <td style="white-space: nowrap;">
 
-                  <form style="display: inline" action="{{route('routine.destroy', $value->id)}}" method="POST">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this one?')"><i class="fa fa-trash"></i></button>
-                  </form>
-                </td>
-              </tr>
+  {{-- View Routine Items --}}
+  <a href="{{route('routine.item.show', $value->id)}}"
+   class="btn btn-info btn-sm"
+   title="View Routine">
+    <i class="fa fa-list"></i>
+</a>
+
+  {{-- Copy Routine --}}
+  <a href="{{route('routine.copy', $value->id)}}"
+     class="btn btn-success btn-sm"
+     title="Copy Routine"
+     onclick="return confirm('এই Routine-এর একটি সম্পূর্ণ Copy তৈরি করতে চান?')">
+    <i class="fa fa-copy"></i>
+  </a>
+
+  {{-- Edit Routine --}}
+  <a href="{{route('routine.edit', $value->id)}}"
+     class="btn btn-warning btn-sm"
+     title="Edit Routine">
+    <i class="fa fa-edit"></i>
+  </a>
+
+  {{-- Delete Routine --}}
+  <form style="display: inline"
+        action="{{route('routine.destroy', $value->id)}}"
+        method="POST">
+
+    @csrf
+    @method('DELETE')
+
+    <button type="submit"
+            class="btn btn-danger btn-sm"
+            title="Delete Routine"
+            onclick="return confirm('Are you sure you want to delete this one?')">
+
+      <i class="fa fa-trash"></i>
+
+    </button>
+
+  </form>
+
+</td>
+
+
               @endforeach
             </table>
             </div>

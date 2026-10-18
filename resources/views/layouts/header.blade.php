@@ -25,7 +25,6 @@ if($complains)
       <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
         <span class="sr-only">Toggle navigation</span>
       </a>
-
       <div class="navbar-custom-menu">
         <ul class="nav navbar-nav">
           <!-- Messages: style can be found in dropdown.less-->
@@ -34,7 +33,6 @@ if($complains)
               <i class="fa fa-envelope-o"></i>
               <span class="label label-success">{{-- 4 --}}</span>
             </a>
-            
           </li>
           @if($notifications->count())
           <!-- Notifications: style can be found in dropdown.less -->
@@ -63,7 +61,6 @@ if($complains)
           </li>
           <!-- Tasks: style can be found in dropdown.less -->
           @endif
-         
           <!-- User Account: style can be found in dropdown.less -->
           <li class="dropdown user user-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -75,7 +72,6 @@ if($complains)
               <li class="user-header">
                 <img src="{{$user->image ? $user->image:'avatar.png'}}" class="img-circle" alt="User Image">
               </li>
-              
               <!-- Menu Footer-->
               <li class="user-footer">
                 <div class="pull-left">
@@ -91,12 +87,10 @@ if($complains)
               </li>
             </ul>
           </li>
-          
         </ul>
       </div>
     </nav>
   </header>
-
   <!-- Left side column. contains the logo and sidebar -->
   <aside class="main-sidebar">
     <!-- sidebar: style can be found in sidebar.less -->
@@ -109,25 +103,96 @@ if($complains)
         <div class="pull-left info" style="text-align:right">
           <p>{{ $user->name }}</p>
           <a href="#"><i class="fa fa-circle text-success"></i>
-            
             {{ Auth::user()->authRole()->name }}
-
           </a><br>
         </div>
       </div>
       <!-- search form -->
-      
       <!-- /.search form -->
       <!-- sidebar menu: : style can be found in sidebar.less -->
       <br>
       <ul class="sidebar-menu" data-widget="tree">
         {{-- <li class="header">MAIN NAVIGATION</li> --}}
-        <li class="">
-          <a href="/home">
-            <i class="fa fa-dashboard"></i> <span>Dashboard</span>
-          </a>
+        {{-- LEBD - Admin Dashboard submenu --}}
+        @php
+            $dashboardMenuActive = request()->routeIs('home', 'admin.exam.activity', 'admin.dashboard.old', 'admin.recent.activity*')
+                || request()->is('home', 'home/old', 'exam-activity-dashboard', 'admin/recent-activity*');
+        @endphp
+        <li class="treeview {{ $dashboardMenuActive ? 'active menu-open' : '' }}">
+            <a href="#">
+                <i class="fa fa-dashboard"></i>
+                <span>Dashboard</span>
+                <span class="pull-right-container">
+                    <i class="fa fa-angle-left pull-right"></i>
+                </span>
+            </a>
+            <ul class="treeview-menu" style="{{ $dashboardMenuActive ? 'display: block;' : 'display: none;' }}">
+                <li class="{{ request()->routeIs('admin.exam.activity') || request()->is('exam-activity-dashboard') ? 'active' : '' }}">
+                    <a href="{{ route('admin.exam.activity') }}">
+                        <i class="fa fa-line-chart"></i> Exam Activity Dashboard
+                    </a>
+                </li>
+                <li class="{{ request()->routeIs('admin.dashboard.old') || request()->is('home/old') ? 'active' : '' }}">
+                    <a href="{{ route('admin.dashboard.old') }}">
+                        <i class="fa fa-desktop"></i> Old Dashboard
+                    </a>
+                </li>
+                {{-- Recent Activity Dashboard --}}
+                <li class="{{ request()->routeIs('admin.recent.activity*') || request()->is('admin/recent-activity*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.recent.activity') }}">
+                        <i class="fa fa-history"></i> Recent Activity
+                    </a>
+                </li>
+            </ul>
         </li>
-
+        {{-- LEBD-3 MCQ Job Preparation --}}
+        @php $jpActive = request()->routeIs('admin.job-preparation.*', 'admin.mcq-subscription.*') || request()->is('admin/mcq-subscription*'); @endphp
+        <li class="treeview {{ $jpActive ? 'active menu-open' : '' }}">
+          <a href="#"><i class="fa fa-book"></i> <span>MCQ Job Preparation</span>
+            <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+          </a>
+          <ul class="treeview-menu" style="{{ $jpActive ? 'display:block;' : '' }}">
+            <li class="{{ request()->routeIs('admin.job-preparation.categories') && request('kind') === 'department' ? 'active' : '' }}">
+              <a href="{{ route('admin.job-preparation.categories', ['kind' => 'department']) }}"><i class="fa fa-building"></i> Department</a>
+            </li>
+            <li class="{{ request()->routeIs('admin.job-preparation.categories') && request('kind') === 'non-department' ? 'active' : '' }}">
+              <a href="{{ route('admin.job-preparation.categories', ['kind' => 'non-department']) }}"><i class="fa fa-folder-open"></i> Non-Department</a>
+            </li>
+            {{-- MCQ Subscription Package Management --}}
+            @if(\Illuminate\Support\Facades\Route::has('admin.mcq-subscription.index'))
+            <li class="{{ request()->routeIs('admin.mcq-subscription.index', 'admin.mcq-subscription.create', 'admin.mcq-subscription.edit') ? 'active' : '' }}">
+              <a href="{{ route('admin.mcq-subscription.index') }}"><i class="fa fa-cubes"></i> Subscription Packages</a>
+            </li>
+            @endif
+          </ul>
+        </li>
+        {{-- LEBD-3 E-Book: Department / Non-Department --}}
+        @php
+          $ebookMenuActive = request()->routeIs('admin.ebook.*') || request()->is('admin/e-book/*');
+          $ebookDepartmentActive = $ebookMenuActive && request()->segment(3) === 'department';
+          $ebookNonDepartmentActive = $ebookMenuActive && request()->segment(3) === 'non-department';
+        @endphp
+        @if(\Illuminate\Support\Facades\Route::has('admin.ebook.categories'))
+        <li class="treeview {{ $ebookMenuActive ? 'active menu-open' : '' }}">
+          <a href="#"><i class="fa fa-book"></i> <span>E-Book</span>
+            <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+          </a>
+          <ul class="treeview-menu" style="{{ $ebookMenuActive ? 'display:block;' : '' }}">
+            <li class="{{ $ebookDepartmentActive ? 'active' : '' }}">
+              <a href="{{ route('admin.ebook.categories', ['kind' => 'department']) }}"><i class="fa fa-building"></i> Department</a>
+            </li>
+            <li class="{{ $ebookNonDepartmentActive ? 'active' : '' }}">
+              <a href="{{ route('admin.ebook.categories', ['kind' => 'non-department']) }}"><i class="fa fa-folder-open"></i> Non-Department</a>
+            </li>
+            {{-- E-Book Premium Package Management (v25) --}}
+            @if(\Illuminate\Support\Facades\Route::has('admin.ebook-packages.index'))
+            <li class="{{ request()->routeIs('admin.ebook-packages.*') ? 'active' : '' }}">
+              <a href="{{ route('admin.ebook-packages.index') }}"><i class="fa fa-cubes"></i> Subscription Packages</a>
+            </li>
+            @endif
+          </ul>
+        </li>
+        @endif
         <li class="treeview">
           <a href="#">
             <i class="fa fa-at"></i>
@@ -141,7 +206,6 @@ if($complains)
             <li><a href="{{route('email.index')}}"><i class="fa fa-list"></i> View Emails</a></li>
           </ul>
         </li>
-
         <li class="treeview">
           <a href="#">
             <i class="fa fa-envelope"></i>
@@ -155,8 +219,6 @@ if($complains)
             <li><a href="{{route('sms.index')}}"><i class="fa fa-list"></i> View SMS</a></li>
           </ul>
         </li>
-
-
         <li class="treeview">
           <a href="#">
             <i class="fa fa-pencil"></i>
@@ -174,7 +236,6 @@ if($complains)
             <li><a href="#"><i class="fa fa-play"></i> Video</a></li> --}}
           </ul>
         </li>
-
         <li class="treeview">
           <a href="#">
             <i class="fa fa-question"></i>
@@ -192,7 +253,6 @@ if($complains)
             <li><a href="#"><i class="fa fa-play"></i> Video</a></li> --}}
           </ul>
         </li>
-
         <li class="treeview">
           <a href="#">
             <i class="fa fa-file-o"></i>
@@ -204,9 +264,8 @@ if($complains)
           <ul class="treeview-menu">
             <li><a href="{{route('paper.create')}}"><i class="fa fa-pencil"></i> Create Question Paper</a></li>
             <li><a href="{{route('paper.index')}}"><i class="fa fa-list"></i> View Question Papers</a></li>
-          </ul>
+</ul>
         </li>
-
         <li class="treeview">
           <a href="#">
             <i class="fa fa-files-o"></i>
@@ -218,9 +277,45 @@ if($complains)
           <ul class="treeview-menu">
             <li><a href="{{route('syllabus.create')}}"><i class="fa fa-pencil"></i> Create Syllabus</a></li>
             <li><a href="{{route('syllabus.index')}}"><i class="fa fa-file-text"></i> View Syllabus</a></li>
+</ul>
+        </li>
+        <li>
+<a href="{{ route('admin.daily-exam.index') }}">
+        <i class="fa fa-file-text"></i>
+        <span>Daily Exam</span>
+    </a>
+</li>
+        {{-- LEBD — Daily Update Admin Management --}}
+        @php
+            $dailyUpdateMenuActive = request()->routeIs('admin.daily-update.*')
+                || request()->is('admin/daily-update*');
+        @endphp
+        <li class="treeview {{ $dailyUpdateMenuActive ? 'active menu-open' : '' }}">
+          <a href="#">
+            <i class="fa fa-newspaper-o"></i>
+            <span>Daily Update</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu" style="{{ $dailyUpdateMenuActive ? 'display: block;' : 'display: none;' }}">
+            <li class="{{ request()->routeIs('admin.daily-update.index') ? 'active' : '' }}">
+              <a href="{{ route('admin.daily-update.index') }}"><i class="fa fa-dashboard"></i> Dashboard</a>
+            </li>
+            <li class="{{ request()->routeIs('admin.daily-update.all') ? 'active' : '' }}">
+              <a href="{{ route('admin.daily-update.all') }}"><i class="fa fa-list"></i> All Updates</a>
+            </li>
+            <li class="{{ request()->routeIs('admin.daily-update.create') ? 'active' : '' }}">
+              <a href="{{ route('admin.daily-update.create') }}"><i class="fa fa-plus-square"></i> Add New Update</a>
+            </li>
+            <li class="{{ request()->routeIs('admin.daily-update.categories') ? 'active' : '' }}">
+              <a href="{{ route('admin.daily-update.categories') }}"><i class="fa fa-folder-open"></i> Categories</a>
+            </li>
+            <li class="{{ request()->routeIs('admin.daily-update.comments') ? 'active' : '' }}">
+              <a href="{{ route('admin.daily-update.comments') }}"><i class="fa fa-comments"></i> Comments</a>
+            </li>
           </ul>
         </li>
-
         <li class="treeview">
           <a href="#">
             <i class="fa fa-table"></i>
@@ -234,7 +329,6 @@ if($complains)
             <li><a href="{{route('routine.index')}}"><i class="fa fa-file-text"></i> View Routines</a></li>
           </ul>
         </li>
-
         <li class="treeview">
           <a href="#">
             <i class="fa fa-th"></i>
@@ -245,11 +339,9 @@ if($complains)
           </a>
           <ul class="treeview-menu">
             <li><a href="{{route('batch.create')}}"><i class="fa fa-pencil"></i> Create Batch</a></li>
-            
             <li><a href="{{route('batch.index')}}"><i class="fa fa-th"></i> View Batches</a></li>
           </ul>
         </li>
-
         {{-- <li class="treeview">
           <a href="#">
             <i class="fa fa-object-group"></i>
@@ -263,7 +355,6 @@ if($complains)
             <li><a href="{{route('group.index')}}"><i class="fa fa-object-group"></i> View Groups</a></li>
           </ul>
         </li> --}}
-       
         <li class="treeview">
           <a href="#">
             <i class="fa fa-object-ungroup"></i>
@@ -274,13 +365,12 @@ if($complains)
           </a>
           <ul class="treeview-menu">
             <li><a href="{{route('course.index')}}"><i class="fa fa-file-text"></i> View Courses</a></li>
-            <li><a href="{{route('department.index')}}"><i class="fa fa-sitemap"></i> View Departments</a></li>
+<li><a href="{{route('department.index')}}"><i class="fa fa-sitemap"></i> View Departments</a></li>
             <li><a href="{{route('semester.index')}}"><i class="fa fa-tree"></i> View Semesters</a></li>
             <li><a href="{{route('subject.index')}}"><i class="fa fa-book"></i> View Subjects</a></li>
             <li><a href="{{route('chapter.index')}}"><i class="fa fa-bookmark"></i> View Chapters</a></li>
           </ul>
         </li>
-       
         <li class="treeview">
           <a href="#">
             <i class="fa fa-book"></i>
@@ -302,7 +392,6 @@ if($complains)
             </li>
           </ul>
         </li>
-
         <li class="treeview">
           <a href="#">
             <i class="fa fa-users"></i>
@@ -316,7 +405,6 @@ if($complains)
             <li><a href="{{route('student.index')}}"><i class="fa fa-circle-o"></i> View Students</a></li>
           </ul>
         </li>
-
         <li class="treeview">
           <a href="#">
             <i class="fa fa-graduation-cap"></i>
@@ -330,7 +418,6 @@ if($complains)
             <li><a href="{{route('teacher.index')}}"><i class="fa fa-circle-o"></i> View Teachers</a></li>
           </ul>
         </li>
-
         <li class="treeview">
           <a href="#">
             <i class="fa fa-sliders"></i> <span>Filters</span>
@@ -343,7 +430,6 @@ if($complains)
             <li><a href="{{ route('sub-filter.index') }}"><i class="fa fa-sliders"></i> View Sub-Filters</a></li>
           </ul>
         </li>
-
         <li class="treeview">
           <a href="#">
             <i class="fa fa-commenting"></i> <span>Complains</span>
@@ -355,7 +441,6 @@ if($complains)
             <li><a href="{{ route('complain.index') }}"><i class="fa fa-circle-o"></i> View Complains</a></li>
           </ul>
         </li>
-
         <li class="treeview">
           <a href="#">
             <i class="fa fa-shopping-cart"></i> <span>Orders</span>
@@ -368,7 +453,6 @@ if($complains)
             <li><a href="{{ route('order.referrer-order') }}"><i class="fa fa-circle-o"></i> View Referrers</a></li>
           </ul>
         </li>
-
         {{-- @if(Auth::user()->authorizeRoles(['Teacher']))
         <li class="treeview">
           <a href="#">
@@ -382,9 +466,7 @@ if($complains)
           </ul>
         </li>
         @endif --}}
-
         @if(Auth::user()->authorizeRoles(['SuperAdmin']))
-
         <li class="treeview">
           <a href="#">
             <i class="fa fa-user-secret"></i> <span>Admins</span>
@@ -397,22 +479,39 @@ if($complains)
             <li><a href="{{ route('user.index') }}"><i class="fa fa-users"></i> View Users</a></li>
           </ul>
         </li>
-
         {{-- <li>
           <a href="{{ route('database.download') }}" class="btn btn-primary">
           Download Database Backup </a>
         </li> --}}
-
         @endif
-
-        <li class="treeview">
+      <!-- Withdraw -->
+<li class="treeview">
+    <a href="#">
+        <i class="fa fa-money"></i>
+        <span>Withdraw</span>
+        <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+        </span>
+    </a>
+    <ul class="treeview-menu">
+        <li>
+            <a href="{{ route('admin.withdraw.index') }}">
+                <i class="fa fa-list"></i>
+                Withdraw Requests
+            </a>
+        </li>
+    </ul>
+</li>
+<!-- Homepage Settings -->
+        @php $homeSettingsActive = request()->routeIs('admin.home-success.*'); @endphp
+        <li class="treeview {{ $homeSettingsActive ? 'active menu-open' : '' }}">
           <a href="#">
             <i class="fa fa-gear"></i> <span>Homepage Settings</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>
           </a>
-          <ul class="treeview-menu">
+          <ul class="treeview-menu" style="{{ $homeSettingsActive ? 'display:block;' : '' }}">
             <li>
               <a href="{{route('ad.index')}}"><i class="fa fa-copy"></i> Ads</a>
             </li>
@@ -437,9 +536,14 @@ if($complains)
             <li>
               <a href="/notice-edit"><i class="fa fa-edit"></i> Notice</a>
             </li>
+            {{-- LEBD-3 Our Success Management: only visible when v35 routes are registered --}}
+            @if(\Illuminate\Support\Facades\Route::has('admin.home-success.index'))
+            <li class="{{ request()->routeIs('admin.home-success.*') ? 'active' : '' }}">
+              <a href="{{ route('admin.home-success.index') }}"><i class="fa fa-trophy"></i> Our Success / আমাদের সাফল্য</a>
+            </li>
+            @endif
           </ul>
         </li>
-
         <li class="treeview">
           <a href="#">
             <i class="fa fa-gear"></i> <span>Settings</span>
@@ -458,14 +562,11 @@ if($complains)
             </li>
           </ul>
         </li>
-        
-      </ul>
+</ul>
     </section> <!-- /.sidebar -->
   </aside>
-
   <div class="alert-section" style="">
     <div class="clearfix"></div>
     @include('partials.messages')
-   
     <div class="clearfix"></div>
   </div>

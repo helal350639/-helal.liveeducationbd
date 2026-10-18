@@ -21,6 +21,17 @@ class Paper extends Model
         return $this->belongsTo(Department::class);
     }
 
+    // Multiple Departments
+    public function departments()
+    {
+        return $this->belongsToMany(
+            Department::class,
+            'paper_departments',
+            'paper_id',
+            'department_id'
+        );
+    }
+
     public function batch()
     {
         return $this->belongsTo(Batch::class);

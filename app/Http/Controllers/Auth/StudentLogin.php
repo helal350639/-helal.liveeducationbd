@@ -93,9 +93,9 @@ class StudentLogin extends Controller
     
         $request->session()->invalidate();
     
-        $request->session()->regenerateToken();
+        $request->session()->regenerateToken(); 
     
-        return redirect()->route('students.login');
+        return redirect()->route('homepage');
     }
 
     /** --------------------- O Auth logins -------------------- */

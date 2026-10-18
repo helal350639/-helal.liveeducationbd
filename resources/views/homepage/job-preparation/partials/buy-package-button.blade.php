@@ -1,0 +1,4 @@
+<div class="jp-buy-top"><a href="{{url('/packages/mcq')}}" class="jp-buy-sticky">🛒 প্যাকেজ কিনুন</a></div>
+<style>
+.jp-buy-top{display:flex;justify-content:flex-end;position:sticky;top:8px;z-index:20;pointer-events:none;margin-bottom:6px}.jp-buy-sticky{pointer-events:auto;background:linear-gradient(110deg,#f97316,#ff463b);color:white!important;text-decoration:none!important;border-radius:999px;padding:8px 14px;box-shadow:0 3px 10px #0002;font-weight:700;font-size:13px;white-space:nowrap}.jp-access-notice{background:#fff7e9;border:1px solid #f5dbac;border-radius:9px;padding:10px 12px;margin:10px 0;font-size:13px;color:#774514}.jp-access-notice a{font-weight:700}
+</style>

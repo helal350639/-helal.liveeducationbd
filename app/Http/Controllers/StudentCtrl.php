@@ -144,18 +144,21 @@ class StudentCtrl extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
+{
+    if(
+        Auth::user()->AuthorizeRoles('SuperAdmin') ||
+        Auth::user()->AuthorizeRoles('Admin')
+    )
     {
-        if(Auth::user()->AuthorizeRoles('SuperAdmin'))
-        {
-            $user = Student::find($id);
-            return view('layouts.students.edit', compact('user'));
-        }
+        $user = Student::find($id);
 
-        Session::flash('error', 'Permission restricted!');
-
-        return back();
+        return view('layouts.students.edit', compact('user'));
     }
 
+    Session::flash('error', 'Permission restricted!');
+
+    return back();
+}
     /**
      * Update the specified resource in storage.
      *

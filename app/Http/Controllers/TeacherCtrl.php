@@ -82,8 +82,17 @@ class TeacherCtrl extends Controller
             'designation' => 'nullable|max:255',
             'email'     => 'required|unique:teachers',
             'contact'   => 'required|unique:teachers',
-            'image'     => 'nullable|image|mimes:jpeg,jpg,png,gif|max:500'
-        ]);
+            'image'     => 'nullable|image|mimes:jpeg,jpg,png,gif|max:500',
+            'bio' => 'nullable|string|max:2000',
+            'qualification' => 'nullable|string|max:500',
+            'institution' => 'nullable|string|max:255',
+            'experience_years' => 'nullable|integer|min:0|max:80',
+            'specialization' => 'nullable|string|max:500',
+            'total_classes' => 'nullable|integer|min:0',
+            'total_students' => 'nullable|integer|min:0',
+            'achievements' => 'nullable|string|max:3000',
+            'profile_details' => 'nullable|string|max:8000',
+]);
 
        $user = new Teacher;
        $user->name       = $request->name;
@@ -93,6 +102,12 @@ class TeacherCtrl extends Controller
        $user->password   = bcrypt($request->password);
        $user->status     = $request->status ?? 'Inactive';
        $user->created_by = Auth::id();
+
+        // LEBD-3: public teacher profile only (not authentication/payment fields).
+        foreach (['bio','qualification','institution','experience_years','specialization','total_classes','total_students','achievements','profile_details'] as $profileField) {
+            $user->{$profileField} = $request->input($profileField) !== '' ? $request->input($profileField) : null;
+        }
+
        
        if($request->hasFile('image'))
        {
@@ -146,8 +161,17 @@ class TeacherCtrl extends Controller
             'email'     => 'required',
             'status'    => 'nullable|max:30',
             'web'       => 'nullable|max:30',
-            'image'     => 'nullable|image|mimes:jpeg,jpg,png,gif|max:1000'
-        ]);
+            'image'     => 'nullable|image|mimes:jpeg,jpg,png,gif|max:1000',
+            'bio' => 'nullable|string|max:2000',
+            'qualification' => 'nullable|string|max:500',
+            'institution' => 'nullable|string|max:255',
+            'experience_years' => 'nullable|integer|min:0|max:80',
+            'specialization' => 'nullable|string|max:500',
+            'total_classes' => 'nullable|integer|min:0',
+            'total_students' => 'nullable|integer|min:0',
+            'achievements' => 'nullable|string|max:3000',
+            'profile_details' => 'nullable|string|max:8000',
+]);
         
         $data = $request->all();
 
@@ -159,6 +183,17 @@ class TeacherCtrl extends Controller
         $obj->status     = isset($data['status']) ? 'Active' : 'Inactive';
         $obj->web        = isset($data['web']) ? 'Yes' : '';
         $obj->updated_by = Auth::id();
+
+        // LEBD-3 v47: persist edited public profile attributes.
+        // These fields never touch teacher login, payments, or enrollment.
+        foreach (['bio', 'qualification', 'institution', 'experience_years',
+                  'specialization', 'total_classes', 'total_students',
+                  'achievements', 'profile_details'] as $profileField) {
+            $fieldValue = $request->input($profileField);
+            $obj->{$profileField} = ($fieldValue === '' || $fieldValue === null)
+                ? null
+                : $fieldValue;
+        }
 
         if($request->hasFile('image'))
         {

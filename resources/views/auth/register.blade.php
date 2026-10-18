@@ -33,6 +33,7 @@
 
           <form id="form" style="display: none" action="{{ route('register.post') }}" method="POST" style="margin-bottom:15px">
             @csrf
+                   <input type="hidden" name="ref" value="{{ request('ref') }}">
             <div class="form-group">
               <label for="name">Full Name</label>
               <div class="input-group">

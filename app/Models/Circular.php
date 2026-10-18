@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Circular extends Model
 {
   protected $fillable = [
-    'type', 
-    'title', 
+    'type',
+    'title',
     'published_at',
     'start_at',
     'end_at',
@@ -19,9 +19,10 @@ class Circular extends Model
     'details',
     'status',
     'image',
-    'pdf'
-  ];  
-  
+    'pdf',
+    'pdf_link',
+  ];
+
   public function circularType()
   {
     return $this->belongsToMany(CircularType::class);

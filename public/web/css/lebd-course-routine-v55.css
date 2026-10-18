@@ -1,0 +1,31 @@
+/* LEBD-3 v55 — Department buttons and exam cards; isolated to Routine tab */
+#routine .lebd-routine-v55{padding:22px;border:1px solid #d9e8fb;border-radius:18px;background:#fff}
+#routine .lebd-r55-header{display:flex;align-items:center;gap:12px;border-bottom:1px solid #e3edfa;padding-bottom:15px;margin-bottom:18px}
+#routine .lebd-r55-symbol{width:45px;height:45px;display:flex;align-items:center;justify-content:center;border-radius:13px;color:#fff;background:linear-gradient(145deg,#0b79f4,#084bb3);box-shadow:0 6px 15px rgba(12,97,215,.18);font-size:20px}
+#routine .lebd-r55-header h4{font-size:23px;font-weight:750;color:#073976;margin:0 0 4px}
+#routine .lebd-r55-header p{color:#72849a;font-size:13px;margin:0}
+#routine .lebd-r55-label{font-weight:700;font-size:14px;color:#184a83;margin-bottom:10px}
+#routine .lebd-r55-departments{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:18px}
+#routine .lebd-r55-dept-btn{cursor:pointer;display:inline-flex;gap:8px;align-items:center;border:1px solid #cddffa;background:#f4f9ff;color:#0755a4;border-radius:12px;padding:10px 15px;font-size:14px;font-weight:700;transition:background .15s,transform .15s,box-shadow .15s}
+#routine .lebd-r55-dept-btn:hover{background:#e7f3ff;transform:translateY(-1px)}
+#routine .lebd-r55-dept-btn.active{background:linear-gradient(140deg,#1179ed,#0957be);color:#fff;border-color:#0f68d9;box-shadow:0 5px 12px rgba(17,105,215,.24)}
+#routine .lebd-r55-status{padding:15px;border:1px dashed #bcd4f0;border-radius:12px;background:#f6faff;color:#4a6280;text-align:center}
+#routine .lebd-r55-actions{display:flex;justify-content:flex-end;margin:0 0 12px}
+#routine .lebd-r55-actions[hidden],#routine .lebd-r55-status[hidden]{display:none!important}
+#routine .lebd-r55-action{background:#fff;color:#1466bd;border:1px solid #bdd8f6;border-radius:9px;padding:8px 12px;cursor:pointer;font-weight:700}
+#routine .lebd-r55-results{display:grid;gap:12px}
+#routine .lebd-r55-exam{border:1px solid #d8e6f7;border-radius:15px;background:#fff;padding:17px;box-shadow:0 4px 15px rgba(8,58,125,.045)}
+#routine .lebd-r55-exam-top{display:flex;justify-content:space-between;gap:10px;align-items:center;color:#2871c8;font-size:11px;font-weight:750;letter-spacing:.3px}
+#routine .lebd-r55-chip{background:#eaf6ff;color:#135caa;border-radius:20px;padding:5px 10px}
+#routine .lebd-r55-exam h5{font-size:18px;font-weight:750;color:#092d68;margin:10px 0 13px}
+#routine .lebd-r55-datetime{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:9px;margin-bottom:14px}
+#routine .lebd-r55-datetime>div{background:#f1f6fc;border-radius:9px;padding:10px 12px;display:grid;gap:3px;min-width:0}
+#routine .lebd-r55-datetime small{font-size:11px;color:#647a92}
+#routine .lebd-r55-datetime strong{font-size:13px;color:#172e4e;overflow-wrap:anywhere}
+#routine .lebd-r55-table-wrap{overflow-x:auto;border:1px solid #d8e5f5;border-radius:9px}
+#routine .lebd-r55-table-wrap table{border-collapse:collapse;width:100%;min-width:0}
+#routine .lebd-r55-table-wrap th,#routine .lebd-r55-table-wrap td{padding:10px;text-align:left;border-bottom:1px solid #e5ecf5;font-size:13px;vertical-align:top;overflow-wrap:anywhere}
+#routine .lebd-r55-table-wrap th{background:#ebf4ff;color:#144775}
+#routine .lebd-r55-empty{font-size:13px;color:#7a8798;margin:0}
+@media(max-width:600px){#routine .lebd-routine-v55{padding:14px!important}#routine .lebd-r55-header h4{font-size:19px}#routine .lebd-r55-dept-btn{font-size:12px;padding:9px 11px}#routine .lebd-r55-exam{padding:12px}#routine .lebd-r55-exam h5{font-size:16px}}
+@media print{#routine .lebd-r55-departments,#routine .lebd-r55-actions{display:none!important}}

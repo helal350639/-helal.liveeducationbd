@@ -1,0 +1,62 @@
+
+.jp-reading{max-width:1450px;margin:20px auto 50px;padding:0 16px;font-family:inherit;color:#17304e}.jp-reading *{box-sizing:border-box}.jp-read-head{background:linear-gradient(110deg,#174896,#267fda);color:white;padding:17px 20px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.jp-read-head h1{color:white;font-size:22px;margin:0 0 6px;font-weight:800}.jp-read-head p{margin:0;color:#e8efff;font-size:13px}.jp-read-head a{color:white!important}.jp-btn-quiz{background:#0eaf75!important;color:white!important;border:0;border-radius:8px;padding:11px 17px;font-weight:800;text-decoration:none!important;display:inline-flex;align-items:center;gap:7px}.jp-filterbar{display:flex;align-items:center;gap:11px;flex-wrap:wrap;background:#f5f9ff;border:1px solid #dce6f4;border-radius:11px;padding:13px;margin:14px 0}.jp-filterbar label{margin:0;font-size:14px;font-weight:800;white-space:nowrap}.jp-filterbar select{height:40px;min-width:175px;border:1px solid #c8d8eb;border-radius:7px;background:white;padding:0 10px;font-size:14px;color:#173454}.jp-filterbar button{border:0;background:#146bd0;color:white;padding:10px 16px;border-radius:7px;font-weight:800}.jp-filterbar a{font-size:13px;color:#1464c8}.jp-question-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;align-items:start}.jp-mcq{border:1px solid #cbd9e9;background:white;border-radius:11px;box-shadow:0 4px 14px #142f4c0c;overflow:hidden;min-width:0;scroll-margin-top:90px}.jp-mcq-head{display:grid;grid-template-columns:auto 1fr;gap:10px;padding:13px 14px 9px;border-bottom:1px solid #e4ebf2}.jp-mcq-num{white-space:nowrap;color:#ba1232;font-weight:800;font-size:14px}.jp-mcq-title{font-weight:750;color:#102a4e;line-height:1.5;font-size:15px;min-width:0;overflow-wrap:anywhere}.jp-mcq-title p{margin:0}.jp-mcq-src{display:flex;gap:4px;align-items:center;flex-wrap:wrap;margin-top:5px}.jp-mcq-src>span{font-size:10px;color:#53677a}.jp-mcq-src small{font-size:10px;padding:2px 6px;border:1px solid #d8e2ef;border-radius:3px;background:#eff3f9;color:#29445e}.jp-mcq-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-flow:column;grid-template-rows:repeat(2,auto);gap:7px;padding:12px;align-items:stretch}.jp-mcq-option{border:1px solid #d9e5f1;border-radius:6px;background:#f8fbff;padding:10px;line-height:1.5;min-width:0;overflow-wrap:anywhere;font-size:13px}.jp-mcq-option strong{display:inline-block;margin-right:5px;color:#0c58a5}.jp-mcq-option img,.jp-mcq img{max-width:100%;height:auto}.jp-mcq-more{border-top:1px solid #e5ebf3;padding:10px 13px;font-size:13px}.jp-mcq-more details summary{cursor:pointer;color:#1766ba;font-weight:750}.jp-mcq-answer{margin:9px 0 0;color:#103b68;line-height:1.65;overflow-wrap:anywhere}.jp-mcq-actions{border-top:1px solid #dfe7ee;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));background:#f9fbfe}.jp-mcq-actions button,.jp-mcq-actions a,.jp-mcq-actions label{min-width:0;display:flex;align-items:center;justify-content:center;gap:5px;background:transparent;color:#24405d!important;border:0;border-right:1px solid #dfe7ee;text-align:center;padding:10px 4px;font-size:11px;font-weight:750;cursor:pointer;text-decoration:none!important}.jp-mcq-actions>*:last-child{border-right:0}.jp-read-control{padding:11px 13px;display:flex;align-items:center;justify-content:space-between;gap:9px;flex-wrap:wrap;border-top:1px solid #e9edf4;font-size:12px}.jp-read-control label{margin:0}.jp-read-control select{max-width:160px;width:100%;padding:7px;border:1px solid #becde0;border-radius:6px;background:#fff;color:#153457}.jp-comment-panel{padding:13px;background:#f7faff;border-top:1px solid #e1ebf3}.jp-comment-panel textarea{width:100%;border:1px solid #cbdcee;border-radius:7px;padding:8px;min-height:65px}.jp-comment-panel button{background:#166dda;color:white;border:0;border-radius:6px;padding:7px 13px;margin-top:7px}.jp-comment-item{padding:8px 0;border-bottom:1px solid #e2eaf3;font-size:12px}.jp-muted{color:#64778b;font-size:12px}.jp-read-pages{margin:20px auto;overflow:auto;text-align:center}.jp-read-empty{padding:22px;text-align:center}.jp-rating-stars{display:flex;gap:5px;margin-top:8px}.jp-rating-stars button{border:1px solid #dde3ef;background:white;border-radius:6px;padding:6px 9px;font-size:16px;cursor:pointer}.jp-inline-panel{padding:10px 13px;background:#f9fbff;border-top:1px solid #e2e9f1;font-size:12px}.jp-hide{display:none!important}@media(max-width:860px){.jp-question-grid{grid-template-columns:1fr}.jp-reading{padding:0 10px;margin-top:12px}.jp-mcq-head{padding:11px}.jp-mcq-options{padding:9px;gap:6px}.jp-mcq-option{padding:8px;font-size:12px}.jp-mcq-actions button,.jp-mcq-actions a,.jp-mcq-actions label{font-size:10px;flex-direction:column;gap:4px}.jp-filterbar select{min-width:0;flex:1}.jp-read-head h1{font-size:19px}}
+
+/* LEBD-3 v3: Compact mobile reading. One card per row, two consecutive cards
+   can be visible in a typical phone viewport when questions are short.
+   Longer questions/options naturally expand; no content is truncated. */
+@media (max-width: 860px) {
+  .jp-question-grid { grid-template-columns:minmax(0,1fr); gap:7px; }
+  .jp-mcq { border-radius:7px; box-shadow:0 2px 5px rgba(20,47,76,.05); }
+  .jp-mcq-head { gap:6px; padding:6px 8px 5px; }
+  .jp-mcq-num { font-size:11px; }
+  .jp-mcq-title { font-size:12px; line-height:1.32; }
+  .jp-mcq-src { margin-top:2px; gap:3px; }
+  .jp-mcq-src > span, .jp-mcq-src small { font-size:9px; }
+  .jp-mcq-src small { padding:0 3px; }
+  .jp-mcq-options { padding:5px 7px; gap:4px; }
+  .jp-mcq-option { padding:5px 6px; font-size:11px; line-height:1.3; border-radius:4px; }
+  .jp-mcq-option strong { margin-right:3px; }
+  .jp-mcq-more { padding:5px 8px; font-size:11px; }
+  .jp-mcq-answer { margin-top:5px; line-height:1.35; }
+  .jp-mcq-actions button, .jp-mcq-actions a, .jp-mcq-actions label {
+    padding:5px 2px; font-size:9px; line-height:1.2; gap:2px;
+  }
+  .jp-mcq-actions i { font-size:12px; }
+  .jp-read-control { padding:5px 8px; gap:5px; font-size:10px; flex-wrap:nowrap; }
+  .jp-read-control select { padding:4px; font-size:10px; max-width:124px; }
+  .jp-read-head { padding:9px 11px; gap:6px; }
+  .jp-read-head h1 { font-size:15px; margin-bottom:2px; }
+  .jp-read-head p { font-size:10px; }
+  .jp-btn-quiz { padding:7px 10px; font-size:11px; }
+  .jp-filterbar { padding:7px; gap:6px; margin:8px 0; }
+  .jp-filterbar label { font-size:11px; }
+  .jp-filterbar select { height:32px; font-size:11px; }
+  .jp-filterbar button { padding:7px 10px; font-size:11px; }
+  .jp-reading { padding:0 7px; margin:7px auto 18px; }
+}
+@media (max-width: 380px) {
+  .jp-mcq-actions button, .jp-mcq-actions a { font-size:8px; }
+  .jp-mcq-option { font-size:10px; padding:4px; }
+  .jp-mcq-title { font-size:11px; }
+}
+
+/* LEBD-3 v4: Phone-only compact refinements. Desktop and tablet rules above stay untouched.
+   Short MCQs can show two cards in one viewport; long MCQs expand naturally. */
+@media screen and (max-width: 680px) {
+  .jp-question-grid { grid-template-columns: minmax(0, 1fr); gap: 7px; }
+  .jp-mcq { margin: 0; }
+  .jp-mcq-head { padding: 6px 8px 4px; gap: 6px; }
+  .jp-mcq-title, .jp-mcq-title p { margin: 0; line-height: 1.35; }
+  .jp-mcq-src { margin-top: 2px; }
+  .jp-mcq-options { padding: 6px; gap: 4px; grid-template-columns: repeat(2,minmax(0,1fr)); grid-auto-flow: column; grid-template-rows: repeat(2,auto); }
+  .jp-mcq-option { padding: 5px 6px; line-height: 1.3; }
+  .jp-mcq-more { padding: 5px 8px; }
+  .jp-mcq-actions button, .jp-mcq-actions a, .jp-mcq-actions label { min-height: 30px; padding: 4px 2px; line-height: 1.2; overflow-wrap: anywhere; }
+  .jp-read-control { padding: 5px 8px; min-height: 32px; }
+  .jp-read-control select { min-height: 28px; }
+  .jp-filterbar { padding: 7px; margin: 7px 0; }
+  .jp-read-head { padding: 9px 11px; }
+  .jp-comment-panel, .jp-inline-panel { padding: 8px; }
+  .jp-comment-panel textarea { min-height: 56px; }
+  .jp-reading { margin-bottom: 15px; }
+}

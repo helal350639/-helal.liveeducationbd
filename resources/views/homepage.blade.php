@@ -31,6 +31,7 @@ function active($name)
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="robots" content="index" />
     @yield('stylesheets')
+    <link rel="stylesheet" href="{{ asset('web/css/lebd-support-chat-v58.css') }}?v=58">
     <!-- Preconnect & Preload Resources -->
     <link href="{{'/web/assets/fonts.googleapis.com/css24d2f.css?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap" rel="stylesheet'}}">
     <link href="{{'/web/assets/fonts.googleapis.com/css26dcd.css?family=Noto+Sans+Bengali:wght@100..900&amp;display=swap" rel="stylesheet'}}" />
@@ -47,7 +48,7 @@ function active($name)
     <!-- Custom CSS (With Cache Busting) -->
     <link rel="stylesheet" href="{{'/web/assets/css/style2b24.css?v=3.8.40'}}" />
     <link rel="stylesheet" href="{{'/web/assets/css/responsive2b24.css?v=3523'}}" />
-    <link rel="stylesheet" href="{{'/web/css/style.css?v=1.3.3'}}" />
+    <link rel="stylesheet" href="{{'/web/css/style.css?v=1.3.4'}}" />
     <style>
       .user-image{
         max-width: 40px;
@@ -107,8 +108,7 @@ function active($name)
   /></noscript>
   <!-- End Meta Pixel Code -->
 
-</head>
-<body>
+
   <header id="Header">
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
       <div class="container">
@@ -163,7 +163,7 @@ function active($name)
                     <a href="{{route('students.profile')}}" class="dropdown-item ">প্রোফাইল</a>
                   </li>
                   <li>
-                    <form action="{{route('students.logout')}}" method="post" class="btn">
+                    <form action="{{route('students.logout')}}" method="post" class="onclick">
                       @csrf
                       <button type="submit" class="dropdown-item btn btn-warning btn-fluid" onclick="return confirm('Are you sure you want to logout?')">লগআউট</button>
                     </form>
@@ -552,16 +552,8 @@ function active($name)
     </div>
   </footer>
   
-  <div class="objection btn">
-    <a href="https://wa.me/8801718778184" target="blank">
-      <i class="fa-brands fa-whatsapp"></i> WhatsApp
-    </a>
-    |
-    <a href="https://m.me/saeonlineexamgroup" target="blank">
-      <i class="fab fa-facebook-messenger"></i> Messenger
-    </a>
-    
-  </div>
+  {{-- LEBD v58: one common support widget (replaces old WhatsApp/Messenger footer bar) --}}
+  @include('homepage.partials.support-chat')
   
   <!-- JavaScript Libraries (footer) -->
   <script src="{{'/web/assets/js/jquery-3.6.0.min.js'}}"></script>
@@ -637,6 +629,7 @@ function active($name)
 </script>
 
 @yield('scripts')
+   <script src="{{ asset('web/js/lebd-support-chat-v60.js') }}?v=60" defer></script>
 
 </body>
 </html>

@@ -1,163 +1,540 @@
 @extends('dashboard')
+
 @section('title', 'Edit Routine Item')
+
 @section('stylesheets')
+
 <link href="/assets/summernote/summernote.min.css" rel="stylesheet">
+
 <style>
-  .text-right{text-align: right}
+    .text-right {
+        text-align: right;
+    }
+
+    .exam-select-box {
+        width: 100%;
+    }
+
+    .exam-select-box select {
+        width: 100%;
+    }
 </style>
+
 @endsection
+
+
 @section('content')
+
 <section class="content-header">
-  <h1>Edit a Routine Item</h1>
-  <ol class="breadcrumb">
-    <li><a href="#"><i class="fa fa-dashboard"></i> Routines</a></li>
-    <li class="active">Edit Routine</li>
-</ol>
+
+    <h1>Edit a Routine Item</h1>
+
+    <ol class="breadcrumb">
+
+        <li>
+            <a href="#">
+                <i class="fa fa-dashboard"></i>
+                Routines
+            </a>
+        </li>
+
+        <li class="active">
+            Edit Routine
+        </li>
+
+    </ol>
+
 </section>
 
-<!-- Main content -->
+
 <section class="content">
 
-  <div class="row"> <!-- left column -->
-    <div class="col-md-12"> <!-- general form elements -->
-      <div class="box box-primary">
-        <div class="box-header with-border">
-            <h3 style="color: #800" class="box-title">{{$routine->name}}</h3>
-            <div class="toolbar-icon pull-right text-right">
-              <a href="{{route('routine.index')}}" title="View" class="label label-success"><i class="fa fa-list"></i></a>
-            </div>
-        </div>
-        <form action="{{route('routine.item-update', $routine_row)}}" method="POST" enctype="multipart/form-data">
-            @csrf
-            @method('PUT')
-            <input type="hidden" name="routine_id" value="{{$routine->id}}">
+    <div class="row">
 
-            <div class="box-body">
-                <div class="row">
+        <div class="col-md-12">
 
-                  <div class="col-md-6">
-                    <div class="form-group row">
-                      <label class="col-md-4 text-right" for="">Exam No</label>
-                      <div class="col-md-8">
-                        <input class="form-control" name="paper_name" id="paper_name" required value="{{$routine_row->paper_name}}">
-                      </div>
+            <div class="box box-primary">
+
+
+                {{-- =====================================================
+                     HEADER
+                ====================================================== --}}
+
+                <div class="box-header with-border">
+
+                    <h3
+                        style="color:#800"
+                        class="box-title">
+
+                        {{ $routine->name }}
+
+                    </h3>
+
+
+                    <div class="toolbar-icon pull-right text-right">
+
+                        <a
+                            href="{{ route('routine.index') }}"
+                            title="View"
+                            class="label label-success">
+
+                            <i class="fa fa-list"></i>
+
+                        </a>
+
                     </div>
 
-                  @foreach($subject_rows as $subject)
-                    <div class="form-group row">
-                      <label class="col-md-4 text-right" for="">{{$subject->name}}</label>
-                      <div class="col-md-8">
-                        <input type="hidden" name="subject_id[]" value="{{$subject->subject_id}}" required>
-                        <textarea class="form-control editor" name="subject_item[]" rows="5">{{$subject->chapter}}</textarea>
-                      </div>
-                    </div>
-
-                  @endforeach
-                  </div>
-                  
-                  <div class="col-md-6">
-
-                  @foreach($department_rows as $department)
-                    <div class="form-group row">
-                      <label class="col-md-4 text-right" for="">{{$department->name}}</label>
-                      <div class="col-md-8">
-                        <input type="hidden" name="department_id[]" value="{{$department->department_id}}" required>
-                        <textarea class="form-control editor" name="department_item[]" rows="5">{{$department->details}}</textarea>
-                      </div>
-                    </div>
-
-                  @endforeach
-                  
-                    <div class="form-group row">
-                      <label class="col-md-4 text-right" for="">Date & Time</label>
-                      <div class="col-md-8">
-                        <input type="datetime-local" class="form-control" name="exam_at" id="exam_at" required value="{{$routine_row->exam_at}}">
-                      </div>
-                    </div>
-                  </div>
-                
                 </div>
-            </div> <!-- /.box body -->
-            <div class="box-footer">
-                <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-refresh"></i> update</button>
+
+
+                {{-- =====================================================
+                     FORM
+                ====================================================== --}}
+
+                <form
+                    action="{{ route('routine.item-update', $routine_row) }}"
+                    method="POST"
+                    enctype="multipart/form-data">
+
+                    @csrf
+
+                    @method('PUT')
+
+
+                    <input
+                        type="hidden"
+                        name="routine_id"
+                        value="{{ $routine->id }}">
+
+
+                    <div class="box-body">
+
+                        <div class="row">
+
+
+                            {{-- =================================================
+                                 LEFT SIDE
+                            ================================================== --}}
+
+                            <div class="col-md-6">
+
+
+                                {{-- =================================================
+                                     EXAM NAME DROPDOWN
+                                ================================================== --}}
+
+                                <div class="form-group row">
+
+                                    <label
+                                        class="col-md-4 text-right"
+                                        for="paper_name">
+
+                                        Exam No
+
+                                    </label>
+
+
+                                    <div class="col-md-8 exam-select-box">
+
+                                        <select
+                                            class="form-control"
+                                            name="paper_name"
+                                            id="paper_name"
+                                            required>
+
+                                            <option value="">
+                                                Select Exam
+                                            </option>
+
+
+                                            @if(isset($exams) && $exams->count() > 0)
+
+                                                @foreach($exams as $exam)
+
+                                                    <option
+                                                        value="{{ $exam->name }}"
+                                                        {{ $routine_row->paper_name == $exam->name ? 'selected' : '' }}>
+
+                                                        {{ $exam->name }}
+
+                                                    </option>
+
+                                                @endforeach
+
+                                            @else
+
+                                                <option
+                                                    value=""
+                                                    disabled>
+
+                                                    No Exam Name Added
+
+                                                </option>
+
+                                            @endif
+
+                                        </select>
+
+                                    </div>
+
+                                </div>
+
+
+                                {{-- =================================================
+                                     SUBJECTS
+                                ================================================== --}}
+
+                                @foreach($subjects as $subject)
+
+<div class="form-group row">
+
+<label class="col-md-4 text-right">
+
+{{ $subject->name }}
+
+</label>
+
+
+<div class="col-md-8">
+
+
+<input
+type="hidden"
+name="subject_id[]"
+value="{{ $subject->id }}">
+
+
+@php
+
+$subjectData = $subject_rows
+->where('subject_id',$subject->id)
+->first();
+
+@endphp
+
+
+<textarea
+class="form-control editor"
+name="subject_item[]"
+rows="5">@if($subjectData){{ $subjectData->chapter }}@endif</textarea>
+
+
+</div>
+
+</div>
+
+@endforeach
+
+
+                            </div>
+
+
+                            {{-- =================================================
+                                 RIGHT SIDE
+                            ================================================== --}}
+
+                            <div class="col-md-6">
+
+
+                                {{-- =================================================
+                                     DEPARTMENTS
+                                ================================================== --}}
+
+                                @foreach($departments as $department)
+
+<div class="form-group row">
+
+<label class="col-md-4 text-right">
+
+{{ $department->name }}
+
+</label>
+
+
+<div class="col-md-8">
+
+
+<input
+type="hidden"
+name="department_id[]"
+value="{{ $department->id }}">
+
+
+@php
+
+$departmentData = $department_rows
+->where('department_id',$department->id)
+->first();
+
+@endphp
+
+
+<textarea
+class="form-control editor"
+name="department_item[]"
+rows="5">@if($departmentData){{ $departmentData->details }}@endif</textarea>
+
+
+</div>
+
+</div>
+
+@endforeach
+
+
+                                {{-- =================================================
+                                     DATE & TIME
+                                ================================================== --}}
+
+                                <div class="form-group row">
+
+    <label
+        class="col-md-4 text-right"
+        for="exam_at">
+
+        Date & Time
+
+    </label>
+
+
+    <div class="col-md-8">
+
+        <input
+            type="datetime-local"
+            class="form-control"
+            name="exam_at"
+            id="exam_at"
+            required
+            value="{{ $routine_row->exam_at ? \Carbon\Carbon::parse($routine_row->exam_at)->format('Y-m-d\TH:i') : '' }}">
+
+    </div>
+
+</div>
+
+
+<!-- Exam End Date & Time -->
+
+<div class="form-group row">
+
+    <label
+        class="col-md-4 text-right"
+        for="exam_end_at">
+
+        Exam End Date & Time
+
+    </label>
+
+
+    <div class="col-md-8">
+
+        <input
+            type="datetime-local"
+            class="form-control"
+            name="exam_end_at"
+            id="exam_end_at"
+            value="{{ $routine_row->exam_end_at ? \Carbon\Carbon::parse($routine_row->exam_end_at)->format('Y-m-d\TH:i') : '' }}">
+
+    </div>
+
+</div>
+
+                    {{-- =====================================================
+                         FOOTER
+                    ====================================================== --}}
+
+                    <div class="box-footer">
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary pull-right">
+
+                            <i class="fa fa-refresh"></i>
+
+                            Update
+
+                        </button>
+
+                    </div>
+
+
+                </form>
+
+
             </div>
-        </form>
-      </div> <!-- /.box -->
-    </div> <!--/.col (left) -->
-  </div> <!-- /.row -->
-</section> <!-- /.content -->
+
+        </div>
+
+    </div>
+
+</section>
+
 @endsection
+
+
+
 @section('scripts')
+
 <script src="/assets/summernote/summernote.min.js"></script>
+
+
 <script>
 
-    // on change course get batches
-    function getBatches(e)
-    {
-        let ids = Array.from(e.selectedOptions).map(({value}) => value);
-    
-        $.ajax({
-            type: 'GET', //THIS NEEDS TO BE GET
-            url: '/get_batches/' + ids,
-            success: function (data) {
-    
-                var obj = JSON.parse(JSON.stringify(data));
-                var options = '<option value="">Select One</option>';
-    
-                $.each(obj['data'], function (key, val) {
-                    options += '<option value="'+val.id+'">'+val.name+'</option>';
-                });
-    
-                if(options != ""){
-                    $("#batch_id").html(options)
-                }else{
-                    $("#batch_id").html('')
-                }
-            },
-            error: function(data) { 
-                    console.log('data error');
-            }
-        });
-    }
-    
-    // on change batch get departments
-    function getDepartments(e)
-    {
-        let ids = Array.from(e.selectedOptions).map(({value}) => value);
-    
-        $.ajax({
-            type: 'GET', //THIS NEEDS TO BE GET
-            url: '/get_departments_by_batch/' + ids,
-            success: function (data) {
-    
-                var obj = JSON.parse(JSON.stringify(data));
-                var options = '<option value="">Select One</option>';
-    
-                $.each(obj['data'], function (key, val) {
-                    options += '<option value="'+val.id+'">'+val.name+'</option>';
-                });
-    
-                if(options != ""){
-                    $("#department_id").html(options)
-                }else{
-                    $("#department_id").html('')
-                }
-            },
-            error: function(data) { 
-                    console.log('data error');
-            }
-        });
-    }
-    
-    //this script for text editor
-    $(document).ready(function() {
-        $('.editor').summernote({
-          toolbar: [['view', ['fullscreen', 'codeview']]],
-            height: 100
-        });
+$(document).ready(function () {
+
+
+    /* =====================================================
+       SUMMERNOTE
+    ===================================================== */
+
+    $('.editor').summernote({
+
+        toolbar: [
+            [
+                'view',
+                [
+                    'fullscreen',
+                    'codeview'
+                ]
+            ]
+        ],
+
+        height: 100
+
     });
 
-    //select 2
-    $(function(){$('.select2').select2();});
+
+    /* =====================================================
+       SELECT2
+    ===================================================== */
+
+    if ($.fn.select2) {
+
+        $('.select2').select2();
+
+    }
+
+});
+
+
+
+/* =====================================================
+   COURSE → BATCH
+===================================================== */
+
+function getBatches(e)
+{
+
+    let ids = Array.from(
+        e.selectedOptions
+    ).map(
+        ({ value }) => value
+    );
+
+
+    $.ajax({
+
+        type: 'GET',
+
+        url: '/get_batches/' + ids,
+
+        success: function (data)
+        {
+
+            var options =
+                '<option value="">Select One</option>';
+
+
+            $.each(
+                data.data,
+                function (key, val)
+                {
+
+                    options +=
+                        '<option value="' +
+                        val.id +
+                        '">' +
+                        val.name +
+                        '</option>';
+
+                }
+            );
+
+
+            $('#batch_id').html(options);
+
+        },
+
+        error: function (data)
+        {
+
+            console.log(data);
+
+        }
+
+    });
+
+}
+
+
+
+/* =====================================================
+   BATCH → DEPARTMENT
+===================================================== */
+
+function getDepartments(e)
+{
+
+    let ids = Array.from(
+        e.selectedOptions
+    ).map(
+        ({ value }) => value
+    );
+
+
+    $.ajax({
+
+        type: 'GET',
+
+        url: '/get_departments_by_batch/' + ids,
+
+        success: function (data)
+        {
+
+            var options =
+                '<option value="">Select One</option>';
+
+
+            $.each(
+                data.data,
+                function (key, val)
+                {
+
+                    options +=
+                        '<option value="' +
+                        val.id +
+                        '">' +
+                        val.name +
+                        '</option>';
+
+                }
+            );
+
+
+            $('#department_id').html(options);
+
+        },
+
+        error: function (data)
+        {
+
+            console.log(data);
+
+        }
+
+    });
+
+}
+
 </script>
+
 @endsection

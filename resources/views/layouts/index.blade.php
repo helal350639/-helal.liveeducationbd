@@ -139,6 +139,38 @@ $new = $confirmed = $completed = $cancelled = 0;
             </div> <!-- /.info-box-content -->
           </div> <!-- /.info-box -->
         </div> <!-- /.col --><!-- fix for small devices only -->
+         <!-- এখানে Withdraw Card বসাবেন -->
+
+
+    <div class="col-md-3 col-sm-6 col-xs-12">
+
+        <div class="info-box">
+
+            <a href="{{ route('admin.withdraw.index') }}">
+
+                <span class="info-box-icon bg-red">
+                    <i class="fa fa-money"></i>
+                </span>
+
+            </a>
+
+
+            <div class="info-box-content">
+
+                <span class="info-box-text">
+                    Withdraw Requests
+                </span>
+
+
+                <span class="info-box-number">
+                    {{ $data['withdraws'] }}
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
         
         <div class="clearfix visible-sm-block"></div>
       </div>

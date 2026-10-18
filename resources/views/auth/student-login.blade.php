@@ -1,114 +1,301 @@
 @extends('student')
+
 @section('title', 'Login')
+
 @section('content')
-{{-- <script src='https://www.google.com/recaptcha/api.js' async defer></script> --}}
+
 <style>
-  .checkbox{padding-left: 25px}
+
+.login-card{
+    max-width:420px;
+    margin:50px auto;
+    border-radius:20px;
+    box-shadow:0 10px 40px rgba(0,0,0,.12);
+    padding:30px;
+    background:#fff;
+}
+
+.login-logo img{
+    width:100px;
+}
+
+.login-title{
+    font-size:28px;
+    font-weight:700;
+    color:#123b82;
+}
+
+.login-subtitle{
+    font-size:18px;
+    margin-top:15px;
+    color:#444;
+}
+
+
+.form-control{
+    height:48px;
+    border-radius:10px;
+}
+
+
+.input-group-text{
+    cursor:pointer;
+}
+
+
+
+.login-btn{
+
+    width:100%;
+    height:50px;
+    border-radius:12px;
+    font-size:18px;
+    font-weight:600;
+
+}
+
+
+.google-btn img{
+
+    width:80%;
+    max-width:280px;
+
+}
+
+
 </style>
 
+
 <section class="our_courses">
-  <div class="container">
-    <div class="row">
-      <div class="col-md-4 offset-md-4">
-        <div class="card p-3">
-          <div class="login-box text-center" style="margin-top:10px">
-            <div class="login-logo">
-              <h2>{{config('app.name', 'App Name')}}</h2>
-            </div>
-            <!-- /.login-logo -->
-            <div class="login-box-body m-3">
-              <p class="login-box-msg">
-                <img src="/img/logo.png?v=3008" alt="" width="100">
-                <br>
-                <br>
-                Student Login
-              </p>
-    
-              <div style="text-align:center">
-                <a class="btn-block" href="/auth/google">
-                  <img style="max-width: 80%" src="/img/sign-with-google.jpg" alt="">
-                </a>
-    
-                {{-- <hr> --}}
-      
-                <h3 style="text-align: center">or</h3>
-    
-                <button class="btn btn-primary btn-block" onclick="showLoginForm()">Continue with Email Address</button>
-                <br>
-              </div>
-    
-              <form id="form" style="display: none" action="{{ route('students.login.post') }}" method="POST" style="margin-bottom:15px" class="py-3">
-                @csrf
-                <div class="form-group pd-3">
-                  <label for="email" style="text-align: left; width:100%">Email Address</label>
-                  <div class="input-group">
-                    <input type='email' name="email" class='form-control' required placeholder="" />
-                    <span class="input-group-text"><i class="fa fa-envelope"></i></span>
-                  </div>
-                </div>
-                <div class="form-group my-3">
-                  <label for="password" style="text-align: left; width:100%">Password</label>
-                  <div class="input-group">
-                    <input type="password" name="password" class="form-control" required>
-                    <span class="input-group-text" onclick="showPassword(this)"><i class="fa fa-eye-slash"></i></span>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-xs-12">
-                    {{-- @include('/partials.google_recaptcha') --}}
-                    {{-- <br> --}}
-                  </div>
-                  {{-- <div class="col-xs-8">
-                    <div class="checkbox icheck">
-                      <label class="">
-                        <input type="checkbox" class="checkbox"> Remember Me
-                      </label>
-                      <div class="clearfix"></div>
-                    </div>
-                  </div> --}}
-                  <!-- /.col -->
-                  <div class="col-xs-12 d-grid">
-                    <button type="submit" class="btn btn-info btn-submit btn-large">Login</button>
-                  </div>
-                  <!-- /.col -->
-                </div>
-                <br>
-                <p><a href="{{route('password.request')}}" class="text-primary">I forgot my password</a></p>
-              </form>
-              <!-- /.social-auth-links -->
-              <br>
-              <p>
-                <a href="{{route('register')}}" class="text-success">Create New Account</a>
-              </p>
-            </div><!-- /.login-box-body -->
-          </div><!-- /.login-box -->
+
+
+<div class="container">
+
+
+<div class="login-card text-center">
+
+
+    <div class="login-logo">
+
+        <h2 class="login-title">
+            {{ config('app.name','Live Education BD') }}
+        </h2>
+
+
+        <img src="/img/logo.png?v=3008">
+
+
+        <div class="login-subtitle">
+            Student Login
         </div>
-        
-      </div>
+
+
     </div>
-  </div>
+
+
+
+
+    <br>
+
+
+
+    @if($errors->any())
+
+        <div class="alert alert-danger">
+
+            {{ $errors->first() }}
+
+        </div>
+
+    @endif
+
+
+
+
+
+    <!-- Google Login -->
+
+    <a href="/auth/google" class="google-btn">
+
+        <img src="/img/sign-with-google.jpg">
+
+    </a>
+
+
+
+
+    <h3>
+        OR
+    </h3>
+
+
+
+
+<form action="{{ route('students.login.post') }}" 
+      method="POST">
+
+@csrf
+
+
+
+<div class="form-group text-start mb-3">
+
+<label>
+Email Address
+</label>
+
+
+<div class="input-group">
+
+
+<input type="email"
+       name="email"
+       class="form-control"
+       placeholder="Enter your email"
+       required>
+
+
+<span class="input-group-text">
+
+<i class="fa fa-envelope"></i>
+
+</span>
+
+
+</div>
+
+</div>
+
+
+
+
+
+<div class="form-group text-start mb-3">
+
+
+<label>
+Password
+</label>
+
+
+<div class="input-group">
+
+
+<input type="password"
+       name="password"
+       id="password"
+       class="form-control"
+       placeholder="Enter password"
+       required>
+
+
+<span class="input-group-text"
+      onclick="showPassword()">
+
+<i class="fa fa-eye-slash"
+   id="eye"></i>
+
+</span>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+<button type="submit"
+        class="btn btn-primary login-btn">
+
+
+Login
+
+
+</button>
+
+
+
+<br><br>
+
+
+
+<a href="{{ route('password.request') }}"
+   class="text-primary">
+
+Forgot Password?
+
+</a>
+
+
+
+<br><br>
+
+
+
+<a href="{{ route('register') }}"
+   class="text-success">
+
+Create New Account
+
+</a>
+
+
+
+</form>
+
+
+
+</div>
+
+
+</div>
+
+
 </section>
 
+
+
+
+
 <script>
-  function showLoginForm()
-  {
-    document.getElementById('form').style.display = 'block';
-  }
-  function showPassword(e)
-  {
-    let elm = e.previousElementSibling;
-    if(elm.type == 'password')
-    {
-      elm.setAttribute('type', 'text');
-      e.firstChild.classList.add('fa-eye');
-      e.firstChild.classList.remove('fa-eye-slash');
+
+
+function showPassword(){
+
+    let password = document.getElementById('password');
+
+    let eye = document.getElementById('eye');
+
+
+    if(password.type === "password"){
+
+        password.type="text";
+
+        eye.classList.remove('fa-eye-slash');
+
+        eye.classList.add('fa-eye');
+
+
+    }else{
+
+
+        password.type="password";
+
+        eye.classList.remove('fa-eye');
+
+        eye.classList.add('fa-eye-slash');
+
+
     }
-    else 
-    {
-      elm.setAttribute('type', 'password');
-      e.firstChild.classList.add('fa-eye-slash');
-      e.firstChild.classList.remove('fa-eye');
-    }
-  }
+
+}
+
+
 </script>
+
+
+
 @endsection

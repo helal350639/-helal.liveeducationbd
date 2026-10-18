@@ -29,6 +29,8 @@ $value = $paper;
             <button id="text" title="Copy URL" class="btn btn-default btn-sm" onclick="handleClick();" href="{{route('students.instruction', $paper->id)}}"><i class="fa fa-copy"></i> Copy URL </button>
 
             <a href="{{route('paper.add.question', $paper->id)}}" title="Add Questions" class="label label-info"><i class="fa fa-plus"></i> Add Questions</a>
+            
+           <a href="{{route('paper.auto.add.question', $paper->id)}}"title="Auto Add Questions"class="label label-success"><i class="fa fa-magic"></i>Auto Add Questions</a>
 
             <a href="{{route('paper.create')}}" title="Add" class="label label-primary"><i class="fa fa-pencil"></i> Create</a>
 

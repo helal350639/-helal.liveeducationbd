@@ -96,7 +96,6 @@ class QuestionCtrl extends Controller
 
         $questions = Question::orderBy('id', 'DESC')
         ->where('type', 'MCQ')
-        ->where('created_at', 'like', '%'.date('Y-m-d').'%')
         ->paginate(25);
 
         return view('layouts.questions.view', compact('courses', 'departments', 'semesters', 'subjects', 'chapters', 'cat', 'questions', 'filters', 'users'));
@@ -104,113 +103,86 @@ class QuestionCtrl extends Controller
 
     public function viewQuestionPost(Request $request)
     {
-        $data = $request->all();
-        $filter_ids = [];
+        // LEBD-3: Empty HTML select/date inputs must NOT become database filters.
+        // Preserve the original relationships, subfilters and 25-per-page AJAX view.
+        $request->validate([
+            'type' => 'nullable|in:MCQ,Written,Video',
+            'course_id' => 'nullable|integer|min:1',
+            'department_id' => 'nullable|integer|min:1',
+            'semester_id' => 'nullable|integer|min:1',
+            'subject_id' => 'nullable|integer|min:1',
+            'chapter_id' => 'nullable|integer|min:1',
+            'created_by' => 'nullable|integer|min:1',
+            'start' => 'nullable|date_format:Y-m-d',
+            'end' => 'nullable|date_format:Y-m-d',
+            'title' => 'nullable|string|max:1000',
+            'syllabus' => 'nullable|integer|min:1',
+            'filter_ids' => 'nullable|string',
+        ]);
 
-        if(isset($data['filter_ids'])){
-            $filter_ids = explode(',', $data['filter_ids']);
+        $questions = Question::query()->orderByDesc('id')
+            ->where('type', $request->input('type', 'MCQ'));
+
+        foreach (['course_id' => 'courses', 'department_id' => 'departments',
+                  'semester_id' => 'semesters', 'subject_id' => 'subjects',
+                  'chapter_id' => 'chapters'] as $field => $relation) {
+            if ($request->filled($field)) {
+                $id = (int) $request->input($field);
+                $questions->whereHas($relation, function ($q) use ($field, $id) {
+                    $q->where($field, $id);
+                });
+            }
         }
-
-        $courses = Course::where('status', 'Active')
-        ->select('id', 'name')
-        ->get();
-        $departments = Department::where('status', 'Active')
-        ->select('id', 'name')
-        ->get();
-        $semesters = Semester::where('status', 'Active')
-        ->select('id', 'name')
-        ->get();
-        $subjects = Subject::where('status', 'Active')
-        ->select('id', 'name')
-        ->get();
-        $chapters = Chapter::where('status', 'Active')
-        ->select('id', 'name')
-        ->get();
-        $users = User::where('status', 'Active')
-        ->select('id', 'name')
-        ->get();
-
-        $filters = Filter::with(['SubFilter'])->get();
-
-        //make some variables
-        $courseId = $data['course_id'];
-        $departmentId = $data['department_id'];
-        $semesterId = $data['semester_id'];
-        $subjectId = $data['subject_id'];
-        $chapterId = $data['chapter_id'];
-
-        $questions = Question::orderBy('id', 'DESC')
-        ->where('type', $data['type'])
-        ->when($data['course_id'], function($query, $courseId)
-        {
-          $query->whereHas('courses', fn($q) => $q->where('course_id', $courseId));
-        })
-        ->when($data['department_id'], function($query, $departmentId)
-        {
-          $query->whereHas('departments', fn($q) => $q->where('department_id', $departmentId));
-        })
-        ->when($data['semester_id'], function($query, $semesterId)
-        {
-          $query->whereHas('semesters', fn($q) => $q->where('semester_id', $semesterId));
-        })
-        ->when($data['subject_id'], function($query, $subjectId)
-        {
-          $query->whereHas('subjects', fn($q) => $q->where('subject_id', $subjectId));
-        })
-        ->when($data['chapter_id'], function($query, $chapterId)
-        {
-          $query->whereHas('chapters', fn($q) => $q->where('chapter_id', $chapterId));
-        });
-
-        if(isset($data['created_by']))
-        {
-            $questions = $questions->where('created_by', $data['created_by']);
+        if ($request->filled('created_by')) {
+            $questions->where('created_by', (int) $request->input('created_by'));
         }
-
-        if(isset($data['start']))
-        {
-            $questions = $questions->whereRaw('DATE(created_at) >= ?', [$data['start']])
-            ->whereRaw('DATE(created_at) <= ?', [$data['end']]);
+        if ($request->filled('start')) {
+            $questions->whereDate('created_at', '>=', $request->input('start'));
         }
-
-        if(isset($data['title']))
-        {
-            $questions = $questions->where('title', 'like', '%'.$data['title'].'%');
+        if ($request->filled('end')) {
+            $questions->whereDate('created_at', '<=', $request->input('end'));
         }
-
-        //when syllabus exists then search by syllabus
-        if(isset($data['syllabus']))
-        {
-          $syllabus = Syllabus::find($data['syllabus']);
-          $questionIds = $syllabus->questions()->pluck('id')->toArray();
-          $questions = $questions->whereIn('id', $questionIds);
+        if ($request->filled('title')) {
+            $questions->where('title', 'like', '%' . trim($request->input('title')) . '%');
         }
-
-        if($filter_ids)
-        {
-          $questions->whereHas('filters', function($query) use($filter_ids){
-              $query->whereIn('sub_filter_id', $filter_ids);
-          });
+        if ($request->filled('syllabus')) {
+            $syllabusId = (int) $request->input('syllabus');
+            $syllabus = Syllabus::find($syllabusId);
+            $questions->whereIn('id', $syllabus ? $syllabus->questions()->pluck('questions.id') : []);
         }
-
+        $filterIds = array_values(array_unique(array_filter(array_map('intval',
+            explode(',', (string) $request->input('filter_ids', ''))
+        ), fn ($n) => $n > 0)));
+        if ($filterIds) {
+            $questions->whereHas('filters', function ($q) use ($filterIds) {
+                $q->whereIn('sub_filter_id', $filterIds);
+            });
+        }
         $questions = $questions->paginate(25);
 
-        $cat = [
-            'course_id' => isset($data['course_id']) ? $data['course_id'] : null,
-            'department_id' => isset($data['department_id']) ? $data['department_id'] : null,
-            'semester_id' => isset($data['semester_id']) ? $data['semester_id'] : null,
-            'subject_id' => isset($data['subject_id']) ? $data['subject_id'] : null,
-            'chapter_id' => isset($data['chapter_id']) ? $data['chapter_id'] : null,
-            'type' => isset($data['type']) ? $data['type'] : null,
-            'created_by' => isset($data['created_by']) ? $data['created_by'] : null,
-        ];
-
-        if($request->ajax())
-        {
+        if ($request->ajax()) {
             return view('layouts.questions.paginate', compact('questions'))->render();
         }
-
-        return view('layouts.questions.view', compact('courses', 'departments', 'semesters', 'subjects', 'chapters', 'questions', 'cat', 'filters', 'users'));
+        $courses = Course::where('status', 'Active')->select('id', 'name')->get();
+        $departments = Department::where('status', 'Active')->select('id', 'name')->get();
+        $semesters = Semester::where('status', 'Active')->select('id', 'name')->get();
+        $subjects = Subject::where('status', 'Active')->select('id', 'name')->get();
+        $chapters = Chapter::where('status', 'Active')->select('id', 'name')->get();
+        $users = User::where('status', 'Active')->select('id', 'name')->get();
+        $filters = Filter::with(['SubFilter'])->orderBy('order_number')->get();
+        $cat = [
+            'course_id' => $request->input('course_id'),
+            'department_id' => $request->input('department_id'),
+            'semester_id' => $request->input('semester_id'),
+            'subject_id' => $request->input('subject_id'),
+            'chapter_id' => $request->input('chapter_id'),
+            'type' => $request->input('type', 'MCQ'),
+            'created_by' => $request->input('created_by'),
+        ];
+        return view('layouts.questions.view', compact(
+            'courses', 'departments', 'semesters', 'subjects', 'chapters',
+            'questions', 'cat', 'filters', 'users'
+        ));
     }
 
     /**

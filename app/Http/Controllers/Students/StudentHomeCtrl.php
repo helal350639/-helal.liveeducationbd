@@ -22,6 +22,7 @@ use App\Models\Order;
 use App\Models\Routine;
 use App\Models\Circular;
 use App\Models\Referrer;
+use App\Models\ReferralTransaction;
 use Auth;
 use Session;
 use Mail;
@@ -29,6 +30,9 @@ use DB;
 use \Mpdf\Mpdf;
 use Spatie\Browsershot\Browsershot;
 use Illuminate\Support\Facades\Storage;
+use App\Models\DailyExam;
+use Carbon\Carbon;
+
 
 class StudentHomeCtrl extends Controller
 {
@@ -40,6 +44,23 @@ class StudentHomeCtrl extends Controller
   public function dashboard()
   {
     $user = Auth::guard('student')->user();
+
+    // today exam
+$todayExam = DailyExam::where('status','Active')
+    ->first();
+
+    /*
+|--------------------------------------------------------------------------
+| Dynamic Exam Section Courses
+|--------------------------------------------------------------------------
+| Only courses checked by Admin will appear
+| in the Student Dashboard Exam Section.
+*/
+
+$examSectionCourses = Course::where('status', 'Active')
+    ->where('show_in_exam_section', 1)
+    ->orderBy('name', 'ASC')
+    ->get();
 
     // autheticates user courses
     $student = Student::find($user->id);
@@ -100,8 +121,17 @@ class StudentHomeCtrl extends Controller
     $total_exams = Paper::whereIn('batch_id', $student_batches_ids)
     ->whereIn('department_id', $student_departments_ids)
     ->count();
+    // Referral Earn Balance
+
+    $referralEarn = ReferralTransaction::where(
+    'student_id',
+    $student->id
+)
+->where('status','approved')
+->sum('amount');
 
     $data = [
+      'referralEarn' => $referralEarn,
       'courses' => $courses,
       'course' => $mycourses,
       'total_exams' => $total_exams,
@@ -128,7 +158,15 @@ class StudentHomeCtrl extends Controller
 
     // dd($student_batches_ids);
 
-    return view('student-panel.dashboard', compact('data', 'student', 'orders', 'references', 'paper'));
+   return view('student-panel.dashboard', compact(
+    'data',
+    'student',
+    'orders',
+    'references',
+    'paper',
+    'todayExam',
+    'examSectionCourses'
+));
   }
 
   public function profile()
@@ -235,12 +273,34 @@ class StudentHomeCtrl extends Controller
   }
 
   public function myCourse()
-  {
+{
     $user = Auth::guard('student')->user();
+
     $student = Student::find($user->id);
-    $courses = $student->batches()->orderBy('id', 'DESC')->where('status', 'Active')->get();
-    return view('student-panel.my-course', compact('courses'));
-  }
+
+
+    // Student purchased batches
+    $purchasedCourses = $student->batches()
+        ->orderBy('id','DESC')
+        ->where('status','Active')
+        ->get();
+
+
+
+    // Running batches
+    $runningBatches = Batch::orderBy('id','DESC')
+        ->where('status','Active')
+        ->whereDate('start_at','<=',Carbon::today())
+        ->whereDate('reg_end_at','>=',Carbon::now())
+        ->get();
+
+
+
+    return view('student-panel.my-course', compact(
+        'purchasedCourses',
+        'runningBatches'
+    ));
+}
 
   public function mySyllabus()
   {
@@ -358,6 +418,204 @@ class StudentHomeCtrl extends Controller
       return redirect()->route('home.course.show', $paper->batch_id);
     }
   }
+  /*
+|--------------------------------------------------------------------------
+| START ROUTINE EXAM DIRECTLY
+|--------------------------------------------------------------------------
+| Routine Time + Student Permission + Existing Attempt
+|--------------------------------------------------------------------------
+*/
+
+public function startRoutineExam($id)
+{
+    $student = Auth::guard('student')->user();
+
+    abort_unless($student, 403);
+
+    $paper = Paper::findOrFail($id);
+
+    $now = Carbon::now('Asia/Dhaka');
+
+    // Check Question Paper status
+    abort_unless(
+        in_array($paper->status, ['Published', 'Scheduled'], true),
+        403,
+        'Question Paper is not available.'
+    );
+
+    // Check Routine start and end time
+    $routine = DB::table('routines as r')
+        ->join(
+            'routine_item_rows as ri',
+            'ri.routine_id',
+            '=',
+            'r.id'
+        )
+        ->where('r.course_id', $paper->course_id)
+        ->where('r.status', 'Published')
+        ->where('ri.paper_name', $paper->name)
+        ->where('ri.exam_at', '<=', $now->toDateTimeString())
+        ->where('ri.exam_end_at', '>', $now->toDateTimeString());
+
+    if ($paper->batch_id !== null) {
+        $routine->where('r.batch_id', $paper->batch_id);
+    } else {
+        $routine->whereNull('r.batch_id');
+    }
+
+    if ($paper->department_id !== null) {
+        $departmentId = (int) $paper->department_id;
+
+        $routine->where(function ($query) use ($departmentId) {
+            $query->whereNull('r.department_id')
+                ->orWhere('r.department_id', $departmentId)
+                ->orWhereExists(function ($sub) use ($departmentId) {
+                    $sub->selectRaw('1')
+                        ->from('routine_department_columns as dc')
+                        ->whereColumn('dc.routine_id', 'r.id')
+                        ->where('dc.department_id', $departmentId);
+                });
+        });
+    }
+
+    /*
+|--------------------------------------------------------------------------
+| ROUTINE WINDOW + INDIVIDUAL EXAM DURATION
+|--------------------------------------------------------------------------
+| New attempt: Routine must be live.
+| Running attempt: Student can finish their own duration.
+|--------------------------------------------------------------------------
+*/
+
+$existingRunningExam = Exam::where('student_id', $student->id)
+    ->where('paper_id', $paper->id)
+    ->where('status', 'Live')
+    ->orderByDesc('id')
+    ->first();
+
+$hasRemainingTime = false;
+
+if ($existingRunningExam && $existingRunningExam->start_at) {
+
+    $individualEndTime = Carbon::parse(
+        $existingRunningExam->start_at,
+        'Asia/Dhaka'
+    )->addMinutes((int) $paper->time);
+
+    $hasRemainingTime = $now->lessThan(
+        $individualEndTime
+    );
+}
+
+// New attempts require Live Routine.
+// Existing attempts may continue within their own duration.
+
+abort_unless(
+    $routine->exists() || $hasRemainingTime,
+    403,
+    'Routine has ended and no active exam time remains.'
+);
+
+    // Check Student permission
+    $allowed = match ($paper->permit) {
+        'Every One' => true,
+
+        'Batch' => $paper->batch_id !== null
+            && $student->batches()
+                ->where('batches.id', $paper->batch_id)
+                ->exists(),
+
+        'Department' => $paper->department_id !== null
+            && $student->departments()
+                ->where('departments.id', $paper->department_id)
+                ->exists(),
+
+        'Group' => $paper->group_id !== null
+            && $student->groups()
+                ->where('groups.id', $paper->group_id)
+                ->exists(),
+
+        default => false,
+    };
+
+    abort_unless(
+        $allowed,
+        403,
+        'You do not have permission for this exam.'
+    );
+
+    /*
+|--------------------------------------------------------------------------
+| EXISTING LIVE ATTEMPT
+|--------------------------------------------------------------------------
+*/
+
+$runningExam = Exam::where('student_id', $student->id)
+    ->where('paper_id', $paper->id)
+    ->where('status', 'Live')
+    ->orderByDesc('id')
+    ->first();
+
+if ($runningExam) {
+
+    $attemptEnd = Carbon::parse(
+        $runningExam->start_at,
+        'Asia/Dhaka'
+    )->addMinutes((int) $paper->time);
+
+    // Previous attempt still has time: resume it
+    if ($now->lessThan($attemptEnd)) {
+
+        return view('student-panel.exam-show', [
+            'paper' => $paper,
+            'exam' => $runningExam,
+        ]);
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| EXAM LIMIT FROM QUESTION PAPER
+|--------------------------------------------------------------------------
+| Count all started attempts, including expired ones.
+|--------------------------------------------------------------------------
+*/
+
+$usedAttempts = Exam::where('student_id', $student->id)
+    ->where('paper_id', $paper->id)
+    ->count();
+
+$examLimit = (int) ($paper->exam_limit ?? 0);
+
+// 0 means unlimited
+if ($examLimit > 0 && $usedAttempts >= $examLimit) {
+
+    abort(
+        403,
+        'Your exam attempt limit has been reached.'
+    );
+}
+
+/*
+|--------------------------------------------------------------------------
+| CREATE NEW EXAM ATTEMPT
+|--------------------------------------------------------------------------
+| Each new attempt gets its own duration.
+|--------------------------------------------------------------------------
+*/
+
+$newExam = Exam::create([
+    'student_id' => $student->id,
+    'paper_id' => $paper->id,
+    'start_at' => $now->toDateTimeString(),
+    'status' => 'Live',
+]);
+
+return view('student-panel.exam-show', [
+    'paper' => $paper,
+    'exam' => $newExam,
+]);
+}
 
   public function examShow($id)
   {
@@ -372,6 +630,35 @@ class StudentHomeCtrl extends Controller
 
     // find the paper details
     $paper = Paper::find($id);
+
+    /*
+|--------------------------------------------------------------------------
+| RESUME EXISTING LIVE EXAM
+|--------------------------------------------------------------------------
+| Same student + same paper
+| Do not create another exam attempt
+|--------------------------------------------------------------------------
+*/
+
+if (!$paper) {
+    abort(404);
+}
+
+$runningExam = Exam::where('student_id', $user->id)
+    ->where('paper_id', $paper->id)
+    ->where('status', 'Live')
+    ->orderByDesc('id')
+    ->first();
+
+if ($runningExam) {
+
+    $exam = $runningExam;
+
+    return view(
+        'student-panel.exam-show',
+        compact('paper', 'exam')
+    );
+}
 
     // if on the paper settings has exam limitation and exam limitation number is less than already examed count on this paper. So it will redirect to the result page. Otherwise it will redirect to the exam start page.
     if($paper->exam_limit && intval($paper->exam_limit) <= $exams)
@@ -439,11 +726,131 @@ class StudentHomeCtrl extends Controller
     );
   }
 
-  public function batchResult()
-  {
-    $batches = Batch::all();
-    return view('student-panel.batch-result', compact('batches'));
-  }
+  public function batchResult(Request $request)
+{
+    /*
+    |--------------------------------------------------------------------------
+    | Old Results Page: Preserve Existing Behavior
+    |--------------------------------------------------------------------------
+    */
+
+    $filtered = $request->filled('course_id')
+        || $request->filled('batch_id')
+        || $request->filled('department_id');
+
+    if (!$filtered) {
+        $batches = Batch::all();
+
+        return view('student-panel.batch-result', ['batches' => $batches,'filtered' => false,
+        ]);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Selected Course / Batch / Department Validation
+    |--------------------------------------------------------------------------
+    */
+
+    $data = $request->validate([
+        'course_id' => 'required|integer|exists:courses,id',
+        'batch_id' => 'nullable|integer|exists:batches,id',
+        'department_id' => 'nullable|integer|exists:departments,id',
+    ]);
+
+    $course = Course::findOrFail($data['course_id']);
+
+    abort_unless(
+        $course->status === 'Active'
+        && (int) $course->show_in_exam_section === 1,
+        404
+    );
+
+    $batch = null;
+    $department = null;
+
+    if (!empty($data['batch_id'])) {
+        $batch = Batch::where('course_id', $course->id)
+            ->findOrFail($data['batch_id']);
+    }
+
+    if (!empty($data['department_id'])) {
+        abort_unless($batch, 404);
+
+        $department = $batch->departments()
+            ->where('departments.id', $data['department_id'])
+            ->firstOrFail();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Only Current Student's Completed Exam Results
+    |--------------------------------------------------------------------------
+    */
+
+    $studentId = Auth::guard('student')->id();
+
+    $batchIds = $batch
+        ? collect([$batch->id])
+        : Batch::where('course_id', $course->id)
+            ->pluck('id');
+
+    $hasPaperCourseId = \Illuminate\Support\Facades\Schema::hasColumn(
+        'papers',
+        'course_id'
+    );
+
+    $results = Exam::query()
+        ->with('paper')
+        ->where('student_id', $studentId)
+        ->where('status', 'Completed')
+        ->whereHas('paper', function ($query) use (
+            $course,
+            $batch,
+            $department,
+            $batchIds,
+            $hasPaperCourseId
+        ) {
+
+            if ($department) {
+                $query->where('batch_id', $batch->id)
+                      ->where('department_id', $department->id);
+
+            } elseif ($batch) {
+                $query->where('batch_id', $batch->id);
+
+            } else {
+                $query->where(function ($paperQuery) use (
+                    $course,
+                    $batchIds,
+                    $hasPaperCourseId
+                ) {
+                    $paperQuery->whereIn('batch_id', $batchIds);
+
+                    if ($hasPaperCourseId) {
+                        $paperQuery->orWhere(
+                            'course_id',
+                            $course->id
+                        );
+                    }
+                });
+            }
+        })
+        ->orderBy('id', 'DESC')
+        ->get()
+        ->unique('paper_id')
+        ->values();
+
+    return view('student-panel.batch-result', [
+        'filtered' => true,
+        'batches' => collect(),
+        'results' => $results,
+        'course' => $course,
+        'batch' => $batch,
+        'department' => $department,
+    ]);
+}
+
+
 
   public function result($id, $value = null)
   {
@@ -524,6 +931,10 @@ class StudentHomeCtrl extends Controller
     //find paper
     $paper = Paper::find($request->paper_id);
 
+    // Default result when student answers zero questions
+$questions = $paper->questions()->count();
+$no_answered = $questions;
+
     // if choice any question the do this action
     if($request->exam_id && $request->mcq_id)
     {
@@ -546,7 +957,7 @@ class StudentHomeCtrl extends Controller
 
     try {
 
-      if($request->exam_id && $mcq_ids)
+      if($request->exam_id)
       {
         for($x = 0; $x < count($question_ids); $x++)
         {

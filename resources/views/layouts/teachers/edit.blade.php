@@ -1,98 +1,18 @@
 @extends('dashboard')
-@section('title', 'Edit Teacher')
+@section('title', 'শিক্ষক প্রোফাইল')
 @section('stylesheets')
 <link href="/assets/summernote/summernote.min.css" rel="stylesheet">
+<style>
+.lebd-t45{max-width:1200px;margin:0 auto}.lebd-t45 .box{border-radius:15px;overflow:hidden;border:1px solid #dfebf8;box-shadow:0 8px 22px rgba(0,44,92,.05)}.lebd-t45 .box-header{padding:18px 22px;background:#f4f9ff}.lebd-t45 .box-title{font-weight:700;color:#0a3671}.lebd-t45 .box-body{padding:20px 22px}.lebd-t45 .t45-section{margin:0 0 22px;padding:20px;border:1px solid #e1e9f4;border-radius:12px;background:#fff}.lebd-t45 .t45-section h3{margin:0 0 16px;font-weight:700;font-size:18px;color:#103f7c;border-bottom:1px solid #e7edf5;padding-bottom:12px}.lebd-t45 label{font-weight:600;color:#19385e}.lebd-t45 .form-control{border-color:#d4dfed;border-radius:7px}.lebd-t45 textarea.form-control{min-height:86px}.lebd-t45 .t45-hint{font-size:12px;color:#66788c}.lebd-t45 .t45-avatar{width:100px;height:100px;object-fit:cover;border-radius:50%;border:3px solid #edf4ff;margin:12px 0}.lebd-t45 .t45-actions{padding:18px 22px;background:#f6faff;display:flex;align-items:center;justify-content:flex-end;gap:10px}.lebd-t45 .t45-actions .btn{border-radius:8px;padding:10px 24px}.lebd-t45 .t45-switches{display:flex;gap:22px;flex-wrap:wrap}.lebd-t45 .t45-switches label{cursor:pointer}.lebd-t45 .t45-switches input{margin-right:5px}.lebd-t45 .t45-alert{background:#eef7ff;border-radius:8px;padding:11px 13px;color:#24588c;font-size:12px;margin-bottom:18px}@media(max-width:767px){.lebd-t45 .box-body{padding:12px}.lebd-t45 .t45-section{padding:14px}}
+</style>
 @endsection
 @section('content')
-
-    <!-- Content Header (Page header) -->
-    <section class="content-header">
-      <h1>Teacher</h1>
-      <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Users</a></li>
-        <li class="active">Edit Teacher</li>
-      </ol>
-    </section>
-
-    <!-- Main content -->
-    <section class="content">
-      <div class="row">
-        <!-- left column -->
-        <div class="col-md-6">
-          <!-- general form elements -->
-          <div class="box box-primary">
-            <div class="box-header with-border">
-              <h3 class="box-title">Edit Teacher</h3>
-            </div>
-            <div class="col-md-12 text-right toolbar-icon">
-              <a href="{{route('teacher.show', $user->id)}}" class="label label-info" title="Show"><i class="fa fa-file-text"></i></a>
-              <a href="{{route('teacher.index')}}" title="View" class="label label-success"><i class="fa fa-list"></i></a>
-            </div>
-            <!-- /.box-header -->
-            <!-- form start -->
-            <form action="{{route('teacher.update', $user)}}" method="POST" enctype="multipart/form-data">
-              @csrf
-              @method('PUT')
-              <div class="box-body">
-                <div class="form-group">
-                    <label for="">Name</label>
-                    <input type="text" name="name" class="form-control" required value="{{$user->name}}" />
-                </div>
-                <div class="form-group">
-                    <label for="designation" >Designation</label>
-                    <textarea type="text" name="designation" class="form-control editor" >{{$user->designation}}</textarea>
-                </div>
-                <div class="form-group">
-                    <label for="">Email Address</label>
-                    <input type="email" name="email" class="form-control" required value="{{$user->email}}" />
-                </div>
-                <div class="form-group">
-                    <label for="" >Contact</label>
-                    <input type="text" name="contact" class="form-control" required value="{{$user->contact}}" />
-                </div>
-                <div class="form-group">
-                  <label for="image">Profile Image</label>
-                  <input class="form-control" type="file" id="image" name="image" />
-                  <p class="text-danger">Image Dimension: 200 x 200px;<br> Types must be in: .jpeg, .jpg, .png and <br>Max size: 500KB</p>
-                
-                  <p class="text-center"><img src="{{$user->image}}" alt=""  style="max-width:150px" /></p>
-                </div>
-                <div class="form-group">
-                  <label>
-                    <input type="checkbox" name="status" id="status" style="width: 15px; height:15px" {{$user->status == 'Active' ?'checked':''}}>
-                    <span style="margin-top:-10px">Status</span>
-                  </label>
-
-                    &nbsp;
-                
-                  <label>
-                    <input type="checkbox" name="web" id="web" style="width: 15px; height:15px" {{$user->web == 'Yes' ? 'checked':''}}> 
-                    <span style="margin-top:-10px">Web</span>
-                  </label>
-                </div>
-
-              </div> <!-- /.box-body -->
-
-              <div class="box-footer">
-                <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-save"></i> Save</button>
-              </div>
-            </form>
-          </div> <!-- /.box -->
-
-        </div> <!--/.col (left) -->
-      </div> <!-- /.row -->
-    </section> <!-- /.content -->
+<section class="content-header"><h1>শিক্ষক সম্পাদনা</h1><ol class="breadcrumb"><li><a href="{{ route('teacher.index') }}">শিক্ষক তালিকা</a></li><li class="active">প্রোফাইল</li></ol></section>
+<section class="content"><div class="lebd-t45"><div class="box box-primary"><div class="box-header with-border"><h3 class="box-title"><i class="fa fa-user-circle"></i> শিক্ষক প্রোফাইল তথ্য</h3></div>
+<form action="{{ route('teacher.update', $user) }}" method="POST" enctype="multipart/form-data">@csrf @method('PUT')<div class="box-body"><div class="t45-alert"><i class="fa fa-info-circle"></i> শিক্ষকের যোগ্যতা, অভিজ্ঞতা ও পরিচিতি Student Course-এর Teacher Tab-এ দেখানো যাবে। Email, মোবাইল ও Password প্রকাশ করা হবে না।</div>
+@if($errors->any())<div class="alert alert-danger"><strong>তথ্যগুলো যাচাই করুন।</strong><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
+<div class="t45-section"><h3>০১. শিক্ষক ও অ্যাকাউন্টের তথ্য</h3><div class="row"><div class="col-md-6"><div class="form-group"><label for="name">শিক্ষকের নাম *</label><input id="name" name="name" type="text" class="form-control" value="{{ old('name', $user->name ?? '') }}" required maxlength="255"></div></div><div class="col-md-6"><div class="form-group"><label for="email">ইমেইল *</label><input id="email" name="email" type="email" class="form-control" value="{{ old('email', $user->email ?? '') }}" required></div></div><div class="col-md-6"><div class="form-group"><label for="contact">মোবাইল / যোগাযোগ *</label><input id="contact" name="contact" type="text" class="form-control" value="{{ old('contact', $user->contact ?? '') }}" required></div></div><div class="col-md-12"><div class="form-group"><label for="designation">পদবি / বিষয়ের পরিচয়</label><textarea id="designation" name="designation" class="form-control" rows="3" >{{ old('designation', $user->designation ?? '') }}</textarea></div></div></div><div class="row"><div class="col-md-6"><div class="form-group"><label for="image">শিক্ষকের ছবি (JPEG / PNG)</label><input type="file" name="image" id="image" class="form-control" accept="image/jpeg,image/png,image/gif"><p class="t45-hint">Recommended: 200×200px; সর্বোচ্চ 1 MB</p>@if($user->image)<img src="{{ $user->image }}" class="t45-avatar" alt="শিক্ষকের ছবি">@endif<img id="t45Preview" class="t45-avatar" style="display:none" alt="ছবির প্রিভিউ"></div></div></div><div class="t45-switches"><label><input type="checkbox" name="status" value="Active" {{ old('status', $user->status)==='Active'?'checked':'' }}> Active</label><label><input type="checkbox" name="web" value="Yes" {{ old('web', $user->web)==='Yes'?'checked':'' }}> ওয়েবসাইটে প্রদর্শন</label></div></div><div class="t45-section"><h3>০২. শিক্ষাগত যোগ্যতা ও দক্ষতা</h3><div class="row"><div class="col-md-6"><div class="form-group"><label for="qualification">শিক্ষাগত যোগ্যতা</label><input id="qualification" name="qualification" type="text" class="form-control" value="{{ old('qualification', $user->qualification ?? '') }}" ></div></div><div class="col-md-6"><div class="form-group"><label for="institution">প্রতিষ্ঠানের নাম</label><input id="institution" name="institution" type="text" class="form-control" value="{{ old('institution', $user->institution ?? '') }}" ></div></div><div class="col-md-6"><div class="form-group"><label for="experience_years">অভিজ্ঞতা (বছর)</label><input id="experience_years" name="experience_years" type="number" class="form-control" value="{{ old('experience_years', $user->experience_years ?? '') }}" min="0" max="80"></div></div><div class="col-md-6"><div class="form-group"><label for="specialization">যেসব বিষয় পড়ান / বিশেষ দক্ষতা</label><input id="specialization" name="specialization" type="text" class="form-control" value="{{ old('specialization', $user->specialization ?? '') }}" ></div></div></div></div><div class="t45-section"><h3>০৩. শিক্ষক প্রোফাইল ও অর্জন</h3><div class="form-group"><label for="bio">সংক্ষিপ্ত পরিচিতি (Student Card)</label><textarea id="bio" name="bio" class="form-control" rows="3" maxlength="2000">{{ old('bio', $user->bio ?? '') }}</textarea></div><div class="row"><div class="col-md-6"><div class="form-group"><label for="total_classes">মোট ক্লাসের সংখ্যা (প্রকৃত তথ্য)</label><input id="total_classes" name="total_classes" type="number" class="form-control" value="{{ old('total_classes', $user->total_classes ?? '') }}" min="0"></div></div><div class="col-md-6"><div class="form-group"><label for="total_students">মোট শিক্ষার্থীর সংখ্যা (প্রকৃত তথ্য)</label><input id="total_students" name="total_students" type="number" class="form-control" value="{{ old('total_students', $user->total_students ?? '') }}" min="0"></div></div></div><div class="form-group"><label for="achievements">উল্লেখযোগ্য অর্জন</label><textarea id="achievements" name="achievements" class="form-control" rows="3" maxlength="3000">{{ old('achievements', $user->achievements ?? '') }}</textarea></div><div class="form-group"><label for="profile_details">বিস্তারিত শিক্ষক পরিচিতি</label><textarea id="profile_details" name="profile_details" class="form-control" rows="3" maxlength="8000">{{ old('profile_details', $user->profile_details ?? '') }}</textarea></div></div></div><div class="t45-actions"><a href="{{ route('teacher.index') }}" class="btn btn-default">ফিরে যান</a><button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> সংরক্ষণ করুন</button></div></form></div></div></section>
 @endsection
-
 @section('scripts')
-<script src="/assets/summernote/summernote.min.js"></script>
-<script>
-//this script for text editor
-$(document).ready(function() {
-  $('.editor').summernote({
-    // height: 150,
-    toolbar: []
-  });
-});
-</script>
+<script>document.addEventListener('DOMContentLoaded',function(){var input=document.getElementById('image'),preview=document.getElementById('t45Preview');if(input){input.addEventListener('change',function(){if(this.files&&this.files[0]){preview.src=URL.createObjectURL(this.files[0]);preview.style.display='block'}})}});</script>
 @endsection

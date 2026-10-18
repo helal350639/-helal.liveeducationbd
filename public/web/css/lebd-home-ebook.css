@@ -1,0 +1,78 @@
+/* LEBD-3: isolated homepage E-Book card styles, v27 */
+.lebd-ebook-home{width:100%;display:grid;gap:14px;margin:16px 0;font-family:inherit}
+.lebd-ebook-group{border:1px solid #d8e2f7;border-radius:12px;background:#fff;overflow:hidden;box-shadow:0 3px 14px rgba(21,54,120,.08)}
+.lebd-ebook-header{min-height:51px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 14px;color:#fff}
+.lebd-ebook-header-department{background:linear-gradient(95deg,#19449e,#346ade)}
+.lebd-ebook-header-general{background:linear-gradient(95deg,#5431a6,#7850d2)}
+.lebd-ebook-heading{display:flex;align-items:center;gap:10px;min-width:0}
+.lebd-ebook-heading-icon{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.16);font-size:15px;flex-shrink:0}
+.lebd-ebook-heading h2{font-size:15px;font-weight:800;line-height:1.2;margin:0;color:#fff}
+.lebd-ebook-heading p{margin:2px 0 0;font-size:10px;color:#e5eaff}
+.lebd-ebook-see-all{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;min-width:82px;color:#fff!important;text-decoration:none!important;border:1px solid rgba(255,255,255,.84);border-radius:25px;padding:5px 10px;font-weight:700;font-size:11px}
+.lebd-ebook-see-all:hover{background:rgba(255,255,255,.18)}
+.lebd-ebook-grid{padding:12px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.lebd-ebook-card{background:var(--lebd-book-bg,#edf5ff);border:1px solid rgba(31,88,150,.07);border-radius:9px;min-width:0;min-height:99px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;padding:12px 6px;text-align:center;text-decoration:none!important;color:#12244d!important;box-shadow:0 3px 9px rgba(28,56,97,.045);transition:transform .18s,box-shadow .18s}
+.lebd-ebook-card:hover,.lebd-ebook-card:focus-visible{transform:translateY(-3px);box-shadow:0 6px 15px rgba(26,68,129,.15);outline:1px solid var(--lebd-book-icon,#1877e8)}
+.lebd-ebook-icon-circle{display:grid;place-items:center;width:40px;height:40px;background:rgba(255,255,255,.55);border-radius:50%;color:var(--lebd-book-icon,#1877e8);font-size:21px}
+.lebd-ebook-card-name{font-size:12px;font-weight:800;line-height:1.25;overflow-wrap:anywhere}
+.lebd-ebook-empty{grid-column:1/-1;margin:8px 2px;color:#65778d;font-size:13px;text-align:center}
+@media(max-width:720px){.lebd-ebook-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:9px}.lebd-ebook-card{min-height:89px}.lebd-ebook-heading h2{font-size:13px}.lebd-ebook-header{padding:8px 10px}}
+@media(max-width:420px){.lebd-ebook-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.lebd-ebook-see-all{min-width:0;font-size:10px}}
+
+/* v30: centered compact layout, isolated to the E-Book homepage partial */
+.lebd-ebook-home{
+  width:calc(100% - 32px);
+  max-width:1100px;
+  margin:18px auto 24px;
+  gap:13px;
+}
+.lebd-ebook-home .lebd-ebook-header{min-height:43px;padding:7px 12px}
+.lebd-ebook-home .lebd-ebook-heading h2{font-size:14px}
+.lebd-ebook-home .lebd-ebook-heading-icon{width:27px;height:27px;font-size:13px}
+.lebd-ebook-home .lebd-ebook-grid{
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:9px;
+  padding:10px;
+}
+.lebd-ebook-home .lebd-ebook-card{
+  min-height:86px;
+  padding:8px 6px;
+  gap:6px;
+}
+.lebd-ebook-home .lebd-ebook-icon-circle{width:34px;height:34px;font-size:18px}
+.lebd-ebook-home .lebd-ebook-card-name{font-size:11px}
+@media(max-width:720px){
+  .lebd-ebook-home{width:calc(100% - 20px);margin:13px auto 18px}
+  .lebd-ebook-home .lebd-ebook-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;padding:8px}
+  .lebd-ebook-home .lebd-ebook-card{min-height:79px}
+}
+@media(max-width:440px){
+  .lebd-ebook-home .lebd-ebook-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .lebd-ebook-home .lebd-ebook-heading h2{font-size:12px}
+  .lebd-ebook-home .lebd-ebook-see-all{font-size:10px;padding:5px 7px}
+}
+
+/* v31 — align E-Book with the same overall width and card scale as the MCQ homepage sections. */
+.lebd-ebook-home{width:calc(100% - 40px);max-width:1450px;margin:20px auto 22px;gap:14px}
+.lebd-ebook-home .lebd-ebook-header{min-height:57px;padding:10px 18px}
+.lebd-ebook-home .lebd-ebook-heading-icon{width:35px;height:35px;font-size:17px}
+.lebd-ebook-home .lebd-ebook-heading h2{font-size:17px}
+.lebd-ebook-home .lebd-ebook-heading p{font-size:11px}
+.lebd-ebook-home .lebd-ebook-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;padding:13px}
+.lebd-ebook-home .lebd-ebook-card{min-height:120px;padding:13px 8px;gap:9px;border-radius:12px}
+.lebd-ebook-home .lebd-ebook-icon-circle{width:47px;height:47px;font-size:25px}
+.lebd-ebook-home .lebd-ebook-card-name{font-size:13px}
+@media(max-width:720px){
+ .lebd-ebook-home{width:calc(100% - 20px);margin:14px auto 17px;gap:11px}
+ .lebd-ebook-home .lebd-ebook-header{min-height:47px;padding:8px 11px}
+ .lebd-ebook-home .lebd-ebook-heading h2{font-size:14px}
+ .lebd-ebook-home .lebd-ebook-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:9px}
+ .lebd-ebook-home .lebd-ebook-card{min-height:95px;padding:9px 5px;gap:6px}
+ .lebd-ebook-home .lebd-ebook-icon-circle{width:37px;height:37px;font-size:20px}
+ .lebd-ebook-home .lebd-ebook-card-name{font-size:11px}
+}
+@media(max-width:440px){
+ .lebd-ebook-home .lebd-ebook-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .lebd-ebook-home .lebd-ebook-card{min-height:90px}
+ .lebd-ebook-home .lebd-ebook-heading h2{font-size:12px}
+}
