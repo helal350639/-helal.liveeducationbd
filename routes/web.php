@@ -944,3 +944,25 @@ require_once __DIR__ . '/student_advice.php';
 
 // LEBD Fix139 - Independent Examination Section
 require_once __DIR__ . "/exam_section.php";
+
+/*
+ | LEBD-06 temporary local-only result schema inspection.
+ | No student records, grades, or credentials are returned.
+ | REMOVE this block after database mapping is completed.
+ */
+if (app()->environment('local')) {
+    Route::get('/lebd-check-result-schema', function () {
+        $db = \Illuminate\Support\Facades\DB::class;
+        $schema = \Illuminate\Support\Facades\Schema::class;
+        $found = [];
+        foreach ($db::select('SHOW TABLES') as $row) {
+            $table = (string) array_values((array) $row)[0];
+            if (!preg_match('/exam|result|attempt|answer|submit|routine|student/i', $table)) {
+                continue;
+            }
+            $found[$table] = $schema::getColumnListing($table);
+        }
+        ksort($found);
+        return response()->json($found, 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+    })->middleware('auth')->name('lebd.local.result-schema-check');
+}
