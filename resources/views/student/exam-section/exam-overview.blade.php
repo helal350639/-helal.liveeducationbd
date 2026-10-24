@@ -35,7 +35,7 @@
     <div style="font-size:13px;font-weight:800;margin-bottom:8px;color:#10284b">▣ Subject &amp; Syllabus</div>
     <table class="routine-table"><thead><tr><th>Subject</th><th>Syllabus / Topic</th></tr></thead><tbody>
     @forelse($topicList as $topic)<tr><td>{{ $topic->subject }}</td><td>{{ $topic->syllabus }} @if($topic->range_from || $topic->range_to)<small>({{ $topic->range_from ?? '—' }}–{{ $topic->range_to ?? '—' }})</small>@endif</td></tr>
-    @empty<tr><td colspan="2" class="routine-quiet">এই Exam-এর Routine Topic এখনো যুক্ত হয়নি।</td></tr>@endforelse
+    @empty<tr><td colspan="2" class="routine-quiet">এই Exam-এর Routine Topic এখনো যুক্ত হয়নি.।</td></tr>@endforelse
     </tbody></table>
     <details class="routine-details"><summary>ⓘ See More / Instructions</summary><p><strong>Routine:</strong> {{ $e->routine_name }}</p><p><strong>শুরু:</strong> {{ $e->exam_start_at ?? '—' }}<br><strong>শেষ:</strong> {{ $e->exam_end_at ?? '—' }}</p>@if($e->notes)<p>{{ $e->notes }}</p>@endif @if($e->pdf_path)<p><a href="{{ asset('storage/'.$e->pdf_path) }}" target="_blank" rel="noopener">Routine PDF দেখুন</a></p>@endif</details>
   </article>
