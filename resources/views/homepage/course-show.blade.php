@@ -3239,5 +3239,78 @@ function dateCheck(date){
 #overview .lebd-v48-faq p{margin:0 0 8px;line-height:1.85}
 #overview .lebd-v48-faq td p:last-child{margin-bottom:0}
 @media(max-width:600px){#overview .lebd-content-group{padding:14px!important}#overview .lebd-group-head h4{font-size:18px}#overview .lebd-v48-faq th,#overview .lebd-v48-faq td{font-size:12px;padding:9px 8px}#overview .lebd-group-copy{font-size:14px}}
+
+/* Fix232: Instructor mobile card: centralized avatar / clean two-column stats.
+   Explicitly scoped to Teacher tab to avoid other page changes. */
+@media screen and (max-width: 767.98px) {
+  #teacher .lebd-instructor-section { padding: 12px !important; overflow: visible !important; }
+  #teacher .lebd-instructor-card.lebd-instructor-card-v46 {
+    display: flex !important; flex-direction: column !important;
+    align-items: stretch !important; width: 100% !important;
+    grid-template-columns: none !important; gap: 0 !important;
+    padding: 14px 12px !important; margin: 10px 0 !important;
+    box-sizing: border-box !important; overflow: hidden !important;
+  }
+  #teacher .lebd-instructor-card-v46 > .lebd-instructor-primary-v46 {
+    display: flex !important; flex-direction: column !important;
+    align-items: center !important; justify-content: flex-start !important;
+    gap: 7px !important; width: 100% !important; min-width: 0 !important;
+  }
+  #teacher .lebd-instructor-primary-v46 > .lebd-instructor-avatar {
+    display: flex !important; position: relative !important;
+    width: 76px !important; height: 76px !important;
+    min-width: 76px !important; min-height: 76px !important;
+    max-width: 76px !important; max-height: 76px !important;
+    flex: none !important; margin: 0 auto 2px !important;
+    align-items: center !important; justify-content: center !important;
+    border-radius: 50% !important; overflow: hidden !important;
+    border: 3px solid #e8f2ff !important;
+  }
+  #teacher .lebd-instructor-avatar > img {
+    width:100% !important; height:100% !important;
+    object-fit: cover !important; object-position: center !important;
+  }
+  #teacher .lebd-instructor-primary-v46 > .lebd-instructor-details {
+    flex: none !important; width:100% !important; max-width:100% !important;
+    text-align:center !important; margin:0 !important; min-width:0 !important;
+    overflow-wrap:anywhere !important;
+  }
+  #teacher .lebd-instructor-details > h5 {
+    font-size: 15px !important; line-height: 1.35 !important;
+    text-align:center !important; margin:2px 0 4px !important;
+  }
+  #teacher .lebd-instructor-designation {
+    font-size: 11px !important; line-height:1.4 !important;
+    text-align:center !important; overflow-wrap:anywhere !important;
+  }
+  #teacher .lebd-instructor-note {
+    font-size: 10px !important; margin:6px auto !important;
+    padding: 4px 9px !important; max-width:100% !important;
+  }
+  #teacher .t45-teacher-bio, #teacher .t45-teacher-meta {
+    font-size: 10px !important; line-height:1.55 !important;
+    overflow-wrap:anywhere !important; margin: 5px 0 !important;
+  }
+  #teacher .lebd-instructor-aside-v46 {
+    display: grid !important; grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    align-items: start !important; justify-items:stretch !important;
+    border-left:0 !important; border-top:1px solid #e5edf7 !important;
+    padding: 11px 0 0 !important; margin-top:10px !important;
+    width:100% !important; gap: 7px !important;
+  }
+  #teacher .lebd-instructor-stat-v46 {
+    display:flex !important; align-items:center !important; width:100% !important;
+    gap:5px !important; min-width:0 !important; margin:0 !important;
+    font-size:10px !important; line-height:1.35 !important;
+    padding:6px !important; border-radius:8px !important;
+    background:#f1f7ff !important; box-sizing:border-box !important;
+    overflow-wrap:anywhere !important;
+  }
+  #teacher .lebd-instructor-stat-v46 i { flex:0 0 13px !important; font-size:11px !important; }
+  #teacher .lebd-instructor-stat-v46 span { min-width:0 !important; }
+  #teacher .lebd-instructor-aside-v46 > .lebd-instructor-more-hint-v46 { grid-column:1/-1 !important; }
+  #teacher .lebd-instructor-heading { gap:7px!important; flex-wrap:wrap!important; }
+  #teacher .lebd-instructor-heading h4 { font-size:17px!important; }
+}
 </style>
 @endsection

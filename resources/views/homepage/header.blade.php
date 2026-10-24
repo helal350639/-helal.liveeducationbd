@@ -76,6 +76,32 @@ function active($name)
         }
         #Home_add{margin-top: 15px}
       }
+
+      /* LEBD Fix227 - global sticky header, independent of homepage Blade */
+      #Header {
+        position: fixed !important;
+        inset: 0 0 auto 0 !important;
+        width: 100% !important;
+        z-index: 1055 !important;
+        background: #ffffff !important;
+        box-shadow: 0 3px 14px rgba(12,35,65,.10);
+        transform: none !important;
+      }
+      #Header > br { display: none !important; }
+      #Header > .navbar {
+        margin: 0 !important;
+        background-color: #fff !important;
+      }
+      #lebd-header-spacer {
+        height: 94px;
+        width: 100%;
+        flex-shrink: 0;
+        pointer-events: none;
+      }
+      @media (max-width: 991.98px) {
+        #lebd-header-spacer { height: 105px; }
+        #Header #extra-mobile-nav { z-index: 1; }
+      }
     </style>
 
     <!-- Google tag (gtag.js) -->
@@ -386,9 +412,32 @@ function active($name)
     </nav>
     <br><br>
   </header>
+  <div id="lebd-header-spacer" aria-hidden="true"></div>
 
     
-    <!-- Preloader -->
+    <script>
+    /* LEBD Fix227: match content offset to real desktop/mobile header height. */
+    (function () {
+      function syncHeaderHeight() {
+        var header = document.getElementById('Header');
+        var spacer = document.getElementById('lebd-header-spacer');
+        if (!header || !spacer) return;
+        var height = Math.ceil(header.getBoundingClientRect().height);
+        if (height > 0) spacer.style.height = height + 'px';
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncHeaderHeight);
+      } else { syncHeaderHeight(); }
+      window.addEventListener('load', syncHeaderHeight);
+      window.addEventListener('resize', syncHeaderHeight, {passive:true});
+      if ('ResizeObserver' in window) {
+        var target = document.getElementById('Header');
+        if (target) new ResizeObserver(syncHeaderHeight).observe(target);
+      }
+    })();
+  </script>
+
+  <!-- Preloader -->
 
     <main>
       @yield('content')
