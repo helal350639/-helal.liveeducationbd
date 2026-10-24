@@ -8,31 +8,22 @@ class RoutineItemRow extends Model
 {
     protected $table = 'routine_item_rows';
 
-
     protected $fillable = [
-    'routine_id',
-    'paper_name',
-    'exam_at',
-    'exam_end_at'
-];
-
+        'routine_id',
+        'paper_name',
+        'exam_at',
+        'exam_end_at',
+        'create_pdf_at',
+        'question_create_at',
+    ];
 
     public function subjects()
     {
-        return $this->hasMany(
-            RoutineSubjectRow::class,
-            'item_id',
-            'id'
-        );
+        return $this->hasMany(RoutineSubjectRow::class, 'item_id', 'id');
     }
-
 
     public function departments()
     {
-        return $this->hasMany(
-            RoutineDepartmentRow::class,
-            'item_id',
-            'id'
-        );
+        return $this->hasMany(RoutineDepartmentRow::class, 'item_id', 'id');
     }
 }

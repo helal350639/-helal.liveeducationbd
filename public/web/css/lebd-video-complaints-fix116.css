@@ -1,0 +1,19 @@
+/* Scoped exclusively to premium recorded student video complaint controls */
+.lebd-student-complaint-card{display:flex!important;flex-direction:column;overflow:hidden;min-width:0}
+.lebd-student-rec-open{display:block;color:inherit!important;text-decoration:none!important;flex:1;min-width:0}
+.lebd-student-complain-button{background:#fff;border:0;border-top:1px solid #e6edf8;color:#577397;font-size:10px;text-align:right;padding:4px 9px 5px;cursor:pointer;min-height:24px;width:100%}
+.lebd-student-complain-button:hover,.lebd-student-complain-button:focus-visible{color:#dc4d41;text-decoration:underline;background:#f8fbff}
+.lebd-complain-modal[hidden],#lebdComplaintCommentWrap[hidden]{display:none!important}
+.lebd-complain-modal{position:fixed;z-index:99999;inset:0;display:flex;align-items:center;justify-content:center;padding:15px}
+.lebd-complain-backdrop{position:absolute;inset:0;background:rgba(9,27,55,.64)}
+.lebd-complain-dialog{position:relative;max-width:510px;width:100%;max-height:90vh;overflow:auto;border-radius:14px;background:#fff;box-shadow:0 20px 60px rgba(0,0,0,.24);padding:19px;color:#152b50}
+.lebd-complain-dialog-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.lebd-complain-dialog-heading h3{font-size:18px;margin:0 0 9px;font-weight:700}
+.lebd-complain-dialog-heading button{font-size:24px;border:0;background:transparent;cursor:pointer;color:#55647a}
+.lebd-complain-selected{padding:9px;background:#f3f7fc;color:#304866;font-size:12px;border-radius:8px}
+.lebd-complain-dialog label{font-size:13px;font-weight:700;display:block;margin:13px 0 6px}.lebd-complain-dialog label span{color:#b91c1c}
+.lebd-complain-dialog select,.lebd-complain-dialog textarea{width:100%;border:1px solid #cbd6e8;border-radius:7px;padding:10px;font-size:13px;background:#fff;color:#122b50}
+.lebd-complain-footnote{font-size:11px;color:#657e98;margin:11px 0}
+.lebd-complain-actions{display:flex;justify-content:flex-end;gap:8px}.lebd-complain-actions button{border:1px solid #cad4e2;border-radius:7px;background:#f4f7fb;padding:9px 14px;cursor:pointer}.lebd-complain-actions button[type=submit]{border-color:#0677d3;background:#0677d3;color:#fff;font-weight:700}
+.lebd-complaint-flash{padding:10px 14px;border:1px solid #a4dec4;background:#edfff3;color:#146139;border-radius:8px;margin:10px 0}.lebd-complaint-error{background:#fff1f2;color:#9b1825;border-color:#f5b8c1}
+@media(max-width:480px){.lebd-complain-dialog{padding:14px}.lebd-complain-dialog-heading h3{font-size:15px}.lebd-student-complain-button{font-size:9px}}

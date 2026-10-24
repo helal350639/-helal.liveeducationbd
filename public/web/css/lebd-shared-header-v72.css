@@ -1,0 +1,135 @@
+/* LEBD-3 v72 | scoped homepage/student shared navigation visual refresh */
+#Header{background:#fff!important;position:relative;z-index:1040;box-shadow:0 5px 24px rgba(24,51,92,.075);font-family:'Noto Sans Bengali',system-ui,Arial,sans-serif}
+#Header>.navbar{background:#fff!important;padding:8px 0!important;min-height:78px}
+#Header>.navbar>.container{max-width:1480px!important;width:96%!important;margin:auto;gap:12px}
+#Header .logo-img{width:auto;max-width:178px!important;max-height:57px;object-fit:contain}
+#Header #navbarSupportedContent{align-items:center;gap:13px;min-width:0}
+#Header #navbarSupportedContent>ul.navbar-nav{align-items:center;gap:2px;margin-left:auto!important;margin-bottom:0!important;flex-wrap:nowrap}
+#Header #navbarSupportedContent>ul.navbar-nav>li.nav-item>.nav-link{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:12px 9px!important;margin:0 1px;color:#24334a!important;font-size:12.5px!important;font-weight:700;white-space:nowrap;border-radius:12px;min-height:43px;transition:color .16s,background-color .16s}
+#Header #navbarSupportedContent>ul.navbar-nav>li.nav-item>.nav-link>i{color:#314760;font-size:15px}
+#Header #navbarSupportedContent>ul.navbar-nav>li.nav-item>.nav-link:hover,#Header #navbarSupportedContent>ul.navbar-nav>li.nav-item>.nav-link.active{background:#eef6ff!important;color:#066cca!important}
+#Header #navbarSupportedContent>ul.navbar-nav>li.nav-item>.nav-link:hover>i,#Header #navbarSupportedContent>ul.navbar-nav>li.nav-item>.nav-link.active>i{color:#066cca}
+#Header .desk-top-search{margin:0 0 0 12px!important;min-width:190px;max-width:225px}
+#Header .desk-top-search .input-group{min-height:43px;display:flex;flex-wrap:nowrap;background:#f2f5f9;border-radius:40px;overflow:hidden;border:1px solid #e8edf5}
+#Header .desk-top-search .input-group-text,#Header .desk-top-search .form-control{background:transparent!important;color:#364c68!important}
+#Header .desk-top-search .input-group-text{padding:0 11px 0 14px!important}
+#Header .desk-top-search .form-control{font-size:13px!important;min-width:0;box-shadow:none!important}
+#Header .desk-top-search button{border:0;background:transparent;color:#1c314d;cursor:pointer}
+#Header .lebd-nav-bell{width:40px;height:40px;flex:0 0 40px;display:inline-flex;justify-content:center;align-items:center;color:#17365d;text-decoration:none;font-size:19px;border-left:1px solid #edf0f5;margin-left:3px}
+#Header .lebd-nav-bell:hover{color:#0769d4}
+#Header .user-menu>.dropdown-toggle{cursor:pointer;display:flex;align-items:center;gap:8px;white-space:nowrap;border-radius:22px;padding:4px 2px}
+#Header .user-menu .user-image{height:38px;width:38px;max-width:none;object-fit:cover;border:2px solid #e3edff;border-radius:50%}
+#Header .user-menu .hidden-xs{font-size:13px;font-weight:650;color:#253550}
+#Header .dropdown-menu{z-index:1080;box-shadow:0 12px 35px rgba(0,30,75,.13);border:1px solid #e0e9f4;border-radius:12px}
+#Header .mobile-menu,#Header #extra-mobile-nav{display:none!important}
+/* Preserve responsive hamburger and legacy mobile menus. */
+@media(max-width:1250px) and (min-width:992px){
+ #Header #navbarSupportedContent>ul.navbar-nav>li.nav-item>.nav-link{padding:9px 5px!important;font-size:11px!important;gap:4px}
+ #Header #navbarSupportedContent>ul.navbar-nav>li.nav-item>.nav-link>i{font-size:12px}
+ #Header .logo-img{max-width:135px!important}
+ #Header .desk-top-search{min-width:145px;max-width:165px;margin-left:5px!important}
+}
+@media(max-width:991.98px){
+ #Header>.navbar{min-height:65px;padding:5px 0!important}
+ #Header>.navbar>.container{display:block;width:100%!important;max-width:100%!important;padding:0 14px}
+ #Header .mobile-menu{display:flex!important;width:100%}
+ #Header #extra-mobile-nav{display:block!important}
+ #Header .logo-img{max-width:145px!important;max-height:46px}
+ #Header #navbarSupportedContent{padding:10px 0 14px;border-top:1px solid #eff2f5;margin-top:8px}
+ #Header #navbarSupportedContent>ul.navbar-nav{align-items:stretch;flex-wrap:wrap;gap:4px}
+ #Header #navbarSupportedContent>ul.navbar-nav>li.nav-item>.nav-link{justify-content:flex-start!important;font-size:14px!important;padding:10px 13px!important}
+ #Header .desk-top-search{display:none!important}
+ #Header .lebd-nav-bell{display:none!important}
+}
+@media(max-width:600px){#Header>.navbar>.container{padding:0 10px}#Header .logo-img{max-width:122px!important}}
+/* Night preference must not accidentally render navy on navy text in header. */
+html[data-lebd-theme="dark"] #Header{background:#fff!important}
+html[data-lebd-theme="dark"] #Header .navbar{background:#fff!important}
+html[data-lebd-theme="dark"] #Header #navbarSupportedContent>ul.navbar-nav>li.nav-item>.nav-link{color:#24334a!important}
+
+/* v73: restore actual desktop brand; keep mobile brand visible only on mobile */
+#Header .lebd-desktop-brand{display:flex;align-items:center;flex:0 0 auto;margin-right:10px}
+#Header .lebd-desktop-brand .logo-img{display:block;width:175px!important;max-height:57px}
+#Header #navbarSupportedContent>ul.navbar-nav>li.nav-item>.nav-link.active{background:#eaf4ff!important;color:#0069d3!important;box-shadow:inset 0 -2px #1487ee}
+#Header #navbarSupportedContent>ul.navbar-nav>li.nav-item>.nav-link.active i{color:#0873e9!important}
+@media(min-width:992px){#Header .mobile-menu{display:none!important}#Header .lebd-desktop-brand{display:flex!important}}
+@media(max-width:991.98px){
+  #Header .lebd-desktop-brand{display:none!important}
+  #Header .mobile-menu{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px}
+  #Header .mobile-menu .main-logo{flex:0 0 auto}
+  #Header .mobile-menu .main-logo .logo-img{display:block;max-width:145px!important;width:auto!important;max-height:48px!important}
+  #Header .moblie-icon{display:flex!important;gap:10px;align-items:center!important;margin-left:auto}
+  #Header #extra-mobile-nav{display:none!important}
+  #Header #navbarSupportedContent{background:white;border:1px solid #e2e9f3;border-radius:14px;padding:10px;box-shadow:0 14px 28px #0b2e5b16}
+  #Header #navbarSupportedContent:not(.show){display:none!important}
+  #Header #navbarSupportedContent.show{display:block!important}
+  #Header #navbarSupportedContent>ul.navbar-nav{display:flex!important;flex-direction:column!important;align-items:stretch!important;width:100%!important}
+  #Header #navbarSupportedContent>ul.navbar-nav>li.nav-item{width:100%!important}
+  #Header #navbarSupportedContent>ul.navbar-nav>li.nav-item>.nav-link{display:flex!important;width:100%!important;justify-content:flex-start!important;font-size:14px!important;padding:11px 13px!important}
+  #Header #navbarSupportedContent>ul.navbar-nav>.search_button{display:none!important}
+  #Header #navbarSupportedContent .dropdown-menu{position:static!important;float:none;box-shadow:none!important;width:100%}
+}
+@media(max-width:600px){#Header .mobile-menu .main-logo .logo-img{max-width:126px!important}#Header .moblie-icon{gap:8px}}
+
+/* LEBD v75 — mobile menu / profile: desktop visuals and other pages untouched. */
+@media (max-width:991.98px){
+ #Header{overflow:visible!important;isolation:isolate;}
+ #Header>.navbar,#Header>.navbar>.container,#Header .mobile-menu,#Header .moblie-icon{overflow:visible!important;}
+ #Header>.navbar>.container{position:relative!important;}
+ #Header .mobile-menu{min-height:58px!important;flex-wrap:nowrap!important;}
+ #Header .mobile-menu .main-logo{min-width:0;}
+ #Header .moblie-icon{gap:9px!important;flex-shrink:0;}
+ #Header .navbar-toggler.lebd-mobile-nav-toggle{display:inline-flex!important;align-items:center;justify-content:center!important;flex:0 0 39px;width:39px;height:39px;padding:6px!important;border:1px solid #dce6f2!important;border-radius:9px;background:#f7fbff!important;box-shadow:none!important;visibility:visible!important;}
+ #Header .navbar-toggler.lebd-mobile-nav-toggle .navbar-toggler-icon{display:block!important;width:21px;height:21px;opacity:1!important;filter:none!important;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%230b4c9b' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M4 7h16M4 12h16M4 17h16'/%3E%3C/svg%3E")!important;}
+ #Header #navbarSupportedContent{position:relative!important;z-index:1100!important;width:100%!important;margin:6px 0 0!important;clear:both!important;overflow:visible!important;}
+ #Header #navbarSupportedContent:not(.show){display:none!important;}
+ #Header #navbarSupportedContent.show{display:block!important;visibility:visible!important;height:auto!important;opacity:1!important;}
+ #Header #navbarSupportedContent>ul.navbar-nav{margin:0!important;padding:0!important;display:flex!important;flex-direction:column!important;gap:3px!important;align-items:stretch!important;}
+ #Header #navbarSupportedContent>ul.navbar-nav>li.nav-item{display:block!important;width:100%!important;}
+ #Header #navbarSupportedContent>ul.navbar-nav>li.nav-item>.nav-link{display:flex!important;min-height:42px!important;width:100%!important;}
+ #Header .lebd-mobile-profile{position:relative!important;display:block!important;z-index:1150!important;}
+ #Header .lebd-mobile-profile-toggle{display:inline-flex!important;align-items:center;justify-content:center;background:transparent!important;border:0!important;padding:0!important;width:37px;height:39px;cursor:pointer;}
+ #Header .lebd-mobile-profile-toggle::after{display:none!important;}
+ #Header .lebd-mobile-profile-toggle .mobile-user-image{display:block!important;object-fit:cover!important;width:34px!important;height:34px!important;max-width:34px!important;max-height:34px!important;border-radius:50%!important;border:2px solid #dce8f8;}
+ #Header .lebd-mobile-profile-menu{position:absolute!important;top:calc(100% + 8px)!important;right:0!important;left:auto!important;transform:none!important;margin:0!important;width:min(300px,calc(100vw - 28px))!important;min-width:0!important;max-width:calc(100vw - 28px)!important;max-height:calc(100dvh - 100px)!important;overflow-y:auto!important;overflow-x:hidden!important;padding:10px!important;background:#fff!important;color:#173152!important;border:1px solid #dce8f5!important;border-radius:12px!important;box-shadow:0 14px 35px rgba(0,35,90,.22)!important;z-index:1200!important;}
+ #Header .lebd-mobile-profile-menu:not(.show){display:none!important;}
+ #Header .lebd-mobile-profile-menu.show{display:block!important;}
+ #Header .lebd-mobile-profile-menu .user-header{display:block!important;overflow-wrap:anywhere!important;white-space:normal!important;text-align:center!important;padding:8px!important;}
+ #Header .lebd-mobile-profile-menu .user-header img{width:66px!important;height:66px!important;max-width:100%!important;object-fit:cover!important;border-radius:50%!important;}
+ #Header .lebd-mobile-profile-menu .user-header h4{line-height:1.55!important;margin:7px 0!important;overflow-wrap:anywhere!important;}
+ #Header .lebd-mobile-profile-menu .dropdown-item{display:block!important;white-space:normal!important;overflow-wrap:anywhere!important;font-size:13px!important;padding:9px 11px!important;}
+}
+@media(max-width:380px){#Header .moblie-icon{gap:5px!important}#Header .mobile-menu .main-logo .logo-img{max-width:105px!important}}
+
+
+/* LEBD-3 v76 — Mobile four-item persistent nav, no desktop design changes. */
+#Header .lebd-mobile-quicknav{display:none!important;}
+@media(max-width:991.98px){
+  #Header .lebd-mobile-quicknav{
+    display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    width:100%!important;gap:5px!important;margin:5px 0 0!important;
+    padding:5px 2px 7px!important;background:#fff!important;
+    border-top:1px solid #edf1f7!important;
+    border-bottom:1px solid #edf1f7!important;
+    position:relative!important;z-index:1090!important;
+  }
+  #Header .lebd-mobile-quicknav-item{
+    display:flex!important;align-items:center!important;justify-content:center!important;
+    flex-direction:column!important;gap:4px!important;min-width:0!important;
+    min-height:50px!important;padding:7px 2px!important;text-decoration:none!important;
+    color:#294365!important;background:#fff!important;border:1px solid transparent!important;
+    border-radius:10px!important;font-size:11px!important;font-weight:750!important;
+    text-align:center!important;line-height:1.2!important;white-space:nowrap!important;
+  }
+  #Header .lebd-mobile-quicknav-item i{font-size:17px!important;color:#1d4b7c!important;}
+  #Header .lebd-mobile-quicknav-item.active,
+  #Header .lebd-mobile-quicknav-item[aria-current="page"]{
+    color:#066acc!important;background:#eaf4ff!important;
+    border-color:#d3e6ff!important;box-shadow:inset 0 -2px #0c7ef0!important;
+  }
+  #Header .lebd-mobile-quicknav-item.active i,
+  #Header .lebd-mobile-quicknav-item[aria-current="page"] i{color:#0c73df!important;}
+  #Header .lebd-mobile-quicknav-item:focus-visible{outline:2px solid #0875df!important;outline-offset:1px!important;}
+  #Header #extra-mobile-nav{display:none!important;}
+}
+@media(max-width:360px){#Header .lebd-mobile-quicknav-item{font-size:10px!important;gap:3px!important;}.lebd-mobile-quicknav-item i{font-size:15px!important;}}

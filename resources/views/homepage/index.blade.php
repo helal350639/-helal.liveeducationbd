@@ -15,6 +15,22 @@
 --}}
 
 <link rel="stylesheet" href="{{ asset('web/css/lebd-home-course-logo-v32.css') }}">
+{{-- Fix93: dedicated Premium Class pages through the existing homepage route.
+     Future versions may move these into a separately registered route file. --}}
+@php
+    $premiumGroup = request()->query('premium_group');
+    $premiumTopic = request()->query('premium_topic');
+    $premiumView = request()->query('premium_view');
+    $premiumOptions = [
+       'department' => ['civil','electrical','mechanical','computer','electronic','power','rac','architecture','textile','agriculture'],
+       'non-department' => ['bangla-grammar','bangla-literature','bangladesh','international','english','math','science','others'],
+    ];
+    $premiumAllowed = is_string($premiumGroup) && is_string($premiumTopic)
+        && isset($premiumOptions[$premiumGroup]) && in_array($premiumTopic, $premiumOptions[$premiumGroup], true);
+@endphp
+@if($premiumAllowed && in_array($premiumView, ['choose','recorded','live'], true))
+    @include('premium-class.page')
+@else
 <div class="lebd-homepage-canvas">
 
 @php
@@ -136,56 +152,8 @@
   </div>
 </section>
 
-{{-- TWO-COLUMN PROGRAMS CATALOGUE: display-only, links to be connected later. --}}
-<section class="lebd-program-section" id="lebd-programs" aria-label="লাইভ ক্লাস এবং রেকর্ড ক্লাস">
-  <div class="lebd-program-wrap">
-    <article class="lebd-program-panel lebd-program-panel-live">
-      <div class="lebd-program-heading">
-        <span class="lebd-program-pill"><i class="fa-solid fa-chalkboard-user"></i> লাইভ ক্লাস</span>
-        <h2>অনলাইন ব্যাচ ২০২৬ এর সকল সেমিস্টারে ভর্তি চলছে</h2>
-        <p>আপনার পছন্দের লাইভ ক্লাস ও সেমিস্টার বেছে নিন</p>
-      </div>
-      <div class="lebd-program-options" aria-label="লাইভ ক্লাসের বিভাগ">
-        <span class="lebd-program-option"><i class="fa-solid fa-video"></i> লাইভ কোর্স</span>
-        <span class="lebd-program-option"><i class="fa-solid fa-user-graduate"></i> ডিপ্লোমা অ্যাডমিশন</span>
-        <span class="lebd-program-option"><i class="fa-solid fa-lightbulb"></i> সুপার সাজেশন</span>
-        <span class="lebd-program-option"><i class="fa-solid fa-book-open"></i> ১ম সেমিস্টার</span>
-        <span class="lebd-program-option"><i class="fa-solid fa-book-open"></i> ২য় সেমিস্টার</span>
-        <span class="lebd-program-option"><i class="fa-solid fa-book-open"></i> ৩য় সেমিস্টার</span>
-        <span class="lebd-program-option"><i class="fa-solid fa-book-open"></i> ৪র্থ সেমিস্টার</span>
-        <span class="lebd-program-option"><i class="fa-solid fa-book-open"></i> ৫ম সেমিস্টার</span>
-        <span class="lebd-program-option"><i class="fa-solid fa-book-open"></i> ৬ষ্ঠ সেমিস্টার</span>
-        <span class="lebd-program-option"><i class="fa-solid fa-book-open"></i> ৭ম সেমিস্টার</span>
-      </div>
-      <p class="lebd-program-footnote"><i class="fa-solid fa-circle-info"></i> কোর্স লিংক শীঘ্রই যুক্ত করা হবে</p>
-    </article>
-
-    <article class="lebd-program-panel lebd-program-panel-recorded">
-      <div class="lebd-program-heading">
-        <span class="lebd-program-pill"><i class="fa-solid fa-play-circle"></i> রেকর্ড ক্লাস এবং সাজেশন বুক</span>
-        <h2>রেকর্ড ক্লাস ও ডিপ্লোমা ব্যাচের ক্যাটাগরিগুলোর সমন্বিত তালিকা</h2>
-        <p>নিজের সুবিধামতো পড়ুন, বারবার অনুশীলন করুন</p>
-      </div>
-      <div class="lebd-program-group">
-        <h3><i class="fa-solid fa-circle-play"></i> রেকর্ড ক্লাস</h3>
-        <div class="lebd-program-options">
-          <span class="lebd-program-option"><i class="fa-solid fa-laptop"></i> নন ডিপার্টমেন্ট ক্লাস</span>
-          <span class="lebd-program-option"><i class="fa-solid fa-video"></i> নন ডিপার্টমেন্ট রেকর্ড কোর্স</span>
-          <span class="lebd-program-option"><i class="fa-solid fa-play"></i> ডিপার্টমেন্ট ক্লাস</span>
-          <span class="lebd-program-option"><i class="fa-solid fa-photo-film"></i> ডিপার্টমেন্ট রেকর্ড কোর্স</span>
-        </div>
-      </div>
-      <div class="lebd-program-group">
-        <h3><i class="fa-solid fa-book-open"></i> সাজেশন বুক</h3>
-        <div class="lebd-program-options">
-          <span class="lebd-program-option"><i class="fa-solid fa-book"></i> 2nd Semester</span>
-          <span class="lebd-program-option"><i class="fa-solid fa-book"></i> 3rd Semester</span>
-        </div>
-      </div>
-      <p class="lebd-program-footnote"><i class="fa-solid fa-circle-info"></i> বই ও রেকর্ড ক্লাসের লিংক পরে যুক্ত হবে</p>
-    </article>
-  </div>
-</section>
+{{-- Fix93: independently maintained Premium Class homepage panel. --}}
+@include('homepage.partials.premium-class.section')
 
 <style>
 /* Premium presentation is restricted to the new home showcase and free course area. */
@@ -289,12 +257,14 @@
 .lebd-home-hero{display:block;min-height:auto;border-radius:18px;padding:23px 17px 19px}.lebd-home-hero h1{font-size:29px;line-height:1.45;margin:15px 0 9px}.lebd-home-hero p{font-size:13px}.lebd-home-eyebrow{font-size:10px}.lebd-home-eyebrow span{font-size:10px}
 .lebd-home-feature-checks{gap:7px 11px;font-size:10px}.lebd-home-hero-actions{margin-top:16px}.lebd-home-primary-link,.lebd-home-outline-link{font-size:12px;min-height:39px;padding:8px 13px}
 .lebd-home-hero-art{display:none}
-.lebd-home-quick-features{width:95%;margin:-8px auto 0;border-radius:12px}.lebd-home-quick-features>div{padding:10px;gap:8px}.lebd-home-quick-icon{width:33px;height:33px;flex-basis:33px;border-radius:9px;font-size:15px}.lebd-home-quick-features strong{font-size:11px}.lebd-home-quick-features small{font-size:9px}
+.lebd-home-quick-features{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;width:95%;margin:-8px auto 0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;overflow:visible}
+.lebd-home-quick-features>div{padding:12px 11px;gap:9px;min-height:72px;border:1px solid #d8e7f8;border-radius:14px;background:linear-gradient(180deg,#ffffff 0%,#f7fbff 100%);box-shadow:0 10px 22px rgba(13,56,110,.12), inset 0 1px 0 rgba(255,255,255,.92);border-right:1px solid #d8e7f8 !important;border-bottom:1px solid #d8e7f8 !important}
+.lebd-home-quick-icon{width:34px;height:34px;flex-basis:34px;border-radius:10px;font-size:15px;box-shadow:0 6px 14px rgba(0,0,0,.12)}.lebd-home-quick-features strong{font-size:11px;line-height:1.35}.lebd-home-quick-features small{display:none}
 .lebd-home-section-title{gap:9px;margin:23px 0 13px}.lebd-home-section-title h2{font-size:19px}.lebd-home-section-title p{font-size:10px}.lebd-home-section-icon{width:40px;height:40px;flex-basis:40px;font-size:18px}
 .lebd-home-see-all{font-size:10px;padding:7px 9px}.lebd-home-course-grid{grid-template-columns:1fr;gap:10px}
 .lebd-home-course-card{min-height:111px;border-radius:12px}.lebd-home-course-image{flex-basis:34%}.lebd-home-course-badge{font-size:8px;padding:4px 5px}.lebd-home-card-kicker{font-size:8px}
 .lebd-home-course-body{padding:10px}.lebd-home-course-body h3{font-size:15px;margin:5px 0 7px}.lebd-home-course-button{font-size:11px;padding:8px}
-.lebd-home-batch-card{flex:0 0 85%}.lebd-home-batch-cover{height:165px}.lebd-home-batch-body{min-height:126px}.lebd-home-batch-body h3{font-size:16px}
+.lebd-home-batch-card{flex:0 0 85%;border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 12px 26px rgba(13,56,110,.14)}.lebd-home-batch-cover{height:132px;background:#eef6ff}.lebd-home-batch-cover img{width:100%;height:100%;object-fit:contain;display:block;background:#eef6ff}.lebd-home-batch-badge,.lebd-home-batch-body{display:none}
 .lebd-home-arrow{width:32px;height:32px}.lebd-home-prev{left:-6px}.lebd-home-next{right:-6px}
 .lebd-free-shell{padding:16px 11px;border-radius:15px}.lebd-free-header h2{font-size:19px}.lebd-free-header p{font-size:10px}.lebd-free-header-icon{width:38px;height:38px;flex-basis:38px;font-size:17px}.lebd-free-flag{font-size:9px;padding:6px 8px}
 .lebd-free-feature-grid{grid-template-columns:1fr;gap:10px}.lebd-free-feature-card{min-height:110px}.lebd-free-feature-content{padding:11px}.lebd-free-feature-content h3{font-size:14px}.lebd-free-feature-link{font-size:11px}.lebd-free-feature-image{width:34%}
@@ -2467,260 +2437,7 @@ document.addEventListener('DOMContentLoaded', function () {
     সফল শিক্ষার্থীদের পরামর্শ
 ========================= --}}
 
-<section class="success-students-section">
-
-    <div class="success-container">
-
-        {{-- Section Header --}}
-        <div class="success-heading">
-
-            <div class="heading-cap">
-                <i class="fas fa-graduation-cap"></i>
-            </div>
-
-            <h2>
-                সফল শিক্ষার্থীদের <span>পরামর্শ</span>
-            </h2>
-
-            <p>
-                আপনার সাফল্য আমাদের গর্ব — সফলদের অভিজ্ঞতা থেকে শিখুন
-            </p>
-
-        </div>
-
-
-        {{-- Students Cards --}}
-        <div class="success-grid">
-
-
-            {{-- Student 01 --}}
-            <div class="success-card">
-
-                <div class="student-top">
-
-                    <div class="student-image">
-                        <img src="/img/student-1.jpg"
-                             alt="নিউটন মজুমদার">
-                    </div>
-
-                    <div class="student-info">
-
-                        <h3>নিউটন মজুমদার</h3>
-
-                        <p>
-                            <i class="fas fa-user"></i>
-                            BB ID: 547 446
-                        </p>
-
-                        <p>
-                            <i class="fas fa-graduation-cap"></i>
-                            গোপালগঞ্জ বিজ্ঞান ও প্রযুক্তি বিশ্ববিদ্যালয়
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <div class="student-content">
-
-                    <div class="student-position">
-
-                        <div class="position-icon">
-                            <i class="fas fa-building"></i>
-                        </div>
-
-                        <div>
-                            <h4>
-                                প্রভাষক, সমাজবিজ্ঞান বিভাগ
-                            </h4>
-
-                            <p>
-                                গাজীপুর চাঁদ উদ্যান মহিলা কলেজ, সাভার
-                            </p>
-                        </div>
-
-                    </div>
-
-
-                    <div class="advice-title">
-                        <span></span>
-                        <strong>পরামর্শ</strong>
-                        <span></span>
-                    </div>
-
-
-                    <p class="advice-text">
-                        সঠিক গাইডলাইন থেকে শুরু করে ধৈর্য ধরে পড়াশোনা করতে হবে।
-                        কারণ NT​RCA-এর পরীক্ষার প্রস্তুতি বিষয়ভিত্তিক ব্যাপক পড়াশোনা
-                        থাকে। প্রতিটি পরীক্ষার প্রস্তুতি সঠিকভাবে নিতে হবে।
-                    </p>
-
-                </div>
-
-            </div>
-
-
-
-            {{-- Student 02 --}}
-            <div class="success-card">
-
-                <div class="student-top">
-
-                    <div class="student-image">
-                        <img src="/img/student-2.jpg"
-                             alt="সঞ্জিত মন্ডল">
-                    </div>
-
-                    <div class="student-info">
-
-                        <h3>সঞ্জিত মন্ডল</h3>
-
-                        <p>
-                            <i class="fas fa-user"></i>
-                            BB ID: 443 856
-                        </p>
-
-                        <p>
-                            <i class="fas fa-graduation-cap"></i>
-                            জাতীয় বিশ্ববিদ্যালয়
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <div class="student-content">
-
-                    <div class="student-position">
-
-                        <div class="position-icon blue">
-                            <i class="fas fa-train"></i>
-                        </div>
-
-                        <div>
-
-                            <h4>
-                                টি.সি. (গ্রেড-২)
-                            </h4>
-
-                            <p>
-                                বাংলাদেশ রেলওয়ে
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="advice-title">
-                        <span></span>
-                        <strong>পরামর্শ</strong>
-                        <span></span>
-                    </div>
-
-
-                    <p class="advice-text">
-                        বিগত বছরের প্রশ্ন সমাধান, বেসিক মজবুত করা, নিয়মিত
-                        কারেন্ট অ্যাফেয়ার্স পড়া, নিয়মিত মডেল টেস্ট দেওয়া এবং
-                        নিয়োগ সংক্রান্ত আপডেট অনুসরণ করা — এই পাঁচ অভ্যাসই
-                        চাকরি পরীক্ষায় সফলতার মূল চাবিকাঠি।
-                    </p>
-
-                </div>
-
-            </div>
-
-
-
-            {{-- Student 03 --}}
-            <div class="success-card">
-
-                <div class="student-top">
-
-                    <div class="student-image">
-                        <img src="/img/student-3.jpg"
-                             alt="আসিফ আহমেদ">
-                    </div>
-
-                    <div class="student-info">
-
-                        <h3>আসিফ আহমেদ</h3>
-
-                        <p>
-                            <i class="fas fa-user"></i>
-                            BB ID: 200 533
-                        </p>
-
-                        <p>
-                            <i class="fas fa-graduation-cap"></i>
-                            ঢাকা বিশ্ববিদ্যালয়
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <div class="student-content">
-
-                    <div class="student-position">
-
-                        <div class="position-icon green">
-                            <i class="fas fa-book-open"></i>
-                        </div>
-
-                        <div>
-
-                            <h4>
-                                প্রাইমারি প্রধান শিক্ষক
-                                ৪০তম (বিসিএস)
-                            </h4>
-
-                            <p>
-                                প্রাথমিক ও গণশিক্ষা মন্ত্রণালয়
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="advice-title">
-                        <span></span>
-                        <strong>পরামর্শ</strong>
-                        <span></span>
-                    </div>
-
-
-                    <p class="advice-text">
-                        আমি কখনো হাল ছাড়িনি। যত কঠিনই লাগুক চেষ্টা চালিয়ে
-                        গেছি। প্রতিদিন নিজেকে একটু করে উন্নত করেছি। নিয়মিত
-                        ক্লাস, নোট ও টেস্ট করেছি। এতে প্রস্তুতি সম্পূর্ণ হয়েছে
-                        এবং সফলতা এসেছে।
-                    </p>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        {{-- More Button --}}
-        <div class="success-more">
-
-            <a href="#">
-                আরও দেখুন
-                <i class="fas fa-arrow-right"></i>
-            </a>
-
-        </div>
-
-    </div>
-
-</section>
+@include('homepage.partials.student-advice.section')
 
 
 {{-- =========================
@@ -3241,8 +2958,153 @@ document.addEventListener('DOMContentLoaded', function () {
 @media (prefers-reduced-motion:reduce) {
  .lebd-homepage-canvas .new-ebook-card, .lebd-homepage-canvas .lebd-home-course-card {transition:none;}
 }
+
+/* LEBD-3 v81: Homepage running COURSE cards only, mobile only.
+   Desktop styling and all course URLs remain unchanged. */
+@media screen and (max-width: 680px) {
+  .lebd-homepage-canvas .lebd-home-course-grid { gap: 9px; }
+  .lebd-homepage-canvas .lebd-home-course-card {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    height: 98px;
+    min-height: 98px;
+    max-height: 98px;
+    border-radius: 13px;
+    overflow: hidden;
+  }
+  .lebd-homepage-canvas .lebd-home-course-image {
+    width: 34%;
+    height: 98px;
+    min-height: 0;
+    max-height: 98px;
+    flex: 0 0 34%;
+  }
+  .lebd-homepage-canvas .lebd-home-course-image > img {
+    display:block;
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+    object-position: center;
+    max-height: none;
+  }
+  .lebd-homepage-canvas .lebd-home-course-image .lebd-home-gov-logo {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    padding: 4px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+  .lebd-homepage-canvas .lebd-home-course-image .lebd-home-gov-logo img {
+    width: 100%;
+    max-width: 100%;
+    max-height: 68px;
+    height: auto;
+    object-fit: contain;
+  }
+  .lebd-homepage-canvas .lebd-home-course-image .lebd-home-gov-logo strong {
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 9px;
+  }
+  .lebd-homepage-canvas .lebd-home-course-badge {
+    top: 4px;
+    left: 4px;
+    font-size: 8px;
+    padding: 2px 5px;
+    border-radius: 5px;
+  }
+  .lebd-homepage-canvas .lebd-home-course-body {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 0;
+    max-height: 98px;
+    padding: 7px 9px;
+    overflow: hidden;
+  }
+  .lebd-homepage-canvas .lebd-home-card-kicker {
+    font-size: 7px;
+    line-height: 1.1;
+    letter-spacing: .025em;
+    margin: 0;
+  }
+  .lebd-homepage-canvas .lebd-home-course-body h3 {
+    font-size: 13px;
+    line-height: 1.2;
+    margin: 1px 0;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+  }
+  .lebd-homepage-canvas .lebd-home-course-button {
+    min-height: 25px;
+    padding: 4px 7px;
+    margin-top: 3px;
+    border-radius: 6px;
+    font-size: 10px;
+    line-height: 1.2;
+    flex-shrink: 0;
+    gap: 5px;
+  }
+}
+
 </style>
+
+@include('homepage.partials.social.section')
 
 </div> {{-- /.lebd-homepage-canvas ; master-layout footer stays untouched --}}
 
+
+{{-- LEBD-3 v82: only the homepage running-batch carousel cards are compact on mobile. --}}
+<style>
+@media screen and (max-width:680px) {
+  .lebd-homepage-canvas #manualCourseSlider .lebd-home-batch-card {
+    flex:0 0 85%; min-height:0!important; height:auto!important;
+    border-radius:12px; overflow:hidden;
+  }
+  .lebd-homepage-canvas #manualCourseSlider .lebd-home-batch-cover {
+    height:118px!important; min-height:0!important; overflow:hidden;
+  }
+  .lebd-homepage-canvas #manualCourseSlider .lebd-home-batch-cover > img {
+    display:block; width:100%; height:118px!important; object-fit:cover;
+  }
+  .lebd-homepage-canvas #manualCourseSlider .lebd-home-batch-badge {
+    top:6px; left:7px; font-size:9px; padding:4px 6px; gap:4px;
+  }
+  .lebd-homepage-canvas #manualCourseSlider .lebd-home-batch-body {
+    box-sizing:border-box; height:104px!important; min-height:104px!important;
+    padding:8px 10px 9px!important; display:flex; flex-direction:column;
+    gap:0; overflow:hidden;
+  }
+  .lebd-homepage-canvas #manualCourseSlider .lebd-home-batch-body h3 {
+    display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2;
+    line-clamp:2; overflow:hidden; font-size:12px!important;
+    line-height:1.28!important; min-height:0!important;
+    margin:0 0 3px!important; overflow-wrap:anywhere;
+  }
+  .lebd-homepage-canvas #manualCourseSlider .lebd-home-batch-body p {
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    font-size:9px!important; line-height:1.2!important;
+    margin:0 0 4px!important;
+  }
+  .lebd-homepage-canvas #manualCourseSlider .lebd-home-batch-button {
+    min-height:28px; padding:5px 7px!important; margin-top:auto;
+    font-size:10px!important; line-height:1.2!important; border-radius:7px;
+    flex-shrink:0; gap:5px;
+  }
+}
+</style>
+
+@endif
 @endsection

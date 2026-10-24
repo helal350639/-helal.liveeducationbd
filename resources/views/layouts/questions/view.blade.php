@@ -10,8 +10,6 @@ $format = ['a)', 'b)', 'c)', 'd)', 'e)'];
 
 $url = route('paper.addtopaper');
 
-
-
 if(Session::get('_paper') && Session::get('_paper')->type == 'syllabus')
 
 {
@@ -25,8 +23,6 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
   $url = route('book.addtopaper');
 
 }
-
-
 
   $book_chapters = $session = [];
 
@@ -49,8 +45,6 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
   }
 
 @endphp
-
-
 
 @extends('dashboard')
 
@@ -108,8 +102,6 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
   }
 
-
-
   .iframe-container {
 
   position: relative;
@@ -123,8 +115,6 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
   margin: 15px 0
 
 }
-
-
 
 .iframe-container iframe {
 
@@ -140,6 +130,24 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
 }
 
+  /* Fix48: show the complete 11-stage sidebar without clipping. */
+  #filter-parent.filter-parent { max-height:none !important; overflow:visible !important; width:100%; }
+  #filter-parent.filter-parent.sticky { position:relative !important; top:auto !important; }
+  #filter-parent .panel-body { overflow:visible; }
+  .lebd-view-fresh-filters { padding-bottom:10px; }
+  .lebd-view-fresh-filters .lebd-option-search { padding:7px 4px 9px; }
+  .lebd-view-fresh-filters .lebd-option-search input { width:100%; height:33px; font-size:12px; }
+  .lebd-view-fresh-filters .lebd-option-search-hint { color:#777;font-size:11px;margin-top:3px;display:block; }
+  /* Fix47: compact searchable filters; keep the existing view/AJAX/exports. */
+  .lebd-view-fresh-filters .lebd-stage{padding-bottom:5px;border-bottom:1px solid #eee;}
+  .lebd-view-fresh-filters .lebd-stage>p{position:relative;margin:0;padding:10px 27px 10px 3px;}
+  .lebd-view-fresh-filters .lebd-stage>p>a{font-size:13px;font-weight:600;cursor:pointer;}
+  .lebd-view-fresh-filters .lebd-stage>p>.drop-down{right:8px;top:11px;cursor:pointer;}
+  .lebd-view-fresh-filters .filter-group{padding:0 4px 7px 4px;margin:0;list-style:none;}
+  .lebd-view-fresh-filters .filter-group .item{padding:2px 0;}
+  .lebd-view-fresh-filters .lebd-view-option{display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:400;font-size:13px;margin:0;padding:7px;border:1px solid #eee;border-radius:3px;cursor:pointer;}
+  .lebd-view-fresh-filters .lebd-view-option input{margin:0;flex-shrink:0;}
+  .lebd-view-fresh-filters .lebd-view-option:has(input:checked){background:#e6f6fd;border-color:#3c8dbc;}
 </style>
 
 <!-- Content Header (Page header) -->
@@ -185,8 +193,6 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
             {{-- <div class="input-group input-group-sm" style="float:right; width: 150px;margin-left:15px">
 
               <input type="text" name="table_search" class="form-control pull-right" placeholder="Search">
-
-
 
               <div class="input-group-btn">
 
@@ -334,11 +340,11 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
                       {{-- <option value="">Select One</option> --}}
 
-                      <option value="MCQ" {{($cat['type'] ?? null) == 'MCQ' ? 'selected':''}}>MCQ</option>
+                      <option value="MCQ" {{($cat['type'] ?? null) == 'MCQ' ? 'selected' : '' }}>MCQ</option>
 
-                      <option value="Written" {{($cat['type'] ?? null) == 'Written' ? 'selected':''}}>Written</option>
+                      <option value="Written" {{($cat['type'] ?? null) == 'Written' ? 'selected' : '' }}>Written</option>
 
-                      <option value="Video" {{($cat['type'] ?? null) == 'Video' ? 'selected':''}}>Video</option>
+                      <option value="Video" {{($cat['type'] ?? null) == 'Video' ? 'selected' : '' }}>Video</option>
 
                     </select>
 
@@ -414,8 +420,6 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
                       <option value="">Select One</option>
 
-
-
                     </select>
 
                   </div>
@@ -432,15 +436,11 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
                       <option value="">Select One</option>
 
-
-
                     </select>
 
                   </div>
 
                 </div>
-
-
 
                 <div class="col-md-2">
 
@@ -463,8 +463,6 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
         </div>
 
       </div>
-
-
 
       <div class="col-md-4 scroll" style="padding-left: 0">
 
@@ -548,56 +546,71 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
               <div class="panel-body">
 
-                <ul class="filter">
-
-                  @foreach($filters as $filter)
-
-                  @if(count($filter->subfilter) > 0)
-
-                  <li class="item">
-
-                    <p>
-
-                      <a>{{$filter->name}}</a>
-
-                      <span class="drop-down" onclick="showHideSubFilter(this)">
-
-                        <i class="fa fa-chevron-down"></i>
-
-                      </span>
-
-                    </p>
-
-                    <ul class="filter-group hide" id="{{$filter->slug}}">
-
-                      @foreach($filter->subfilter as $sub)
-
-                      <li class="item">
-
-                        <div class="input-group">
-
-                          <a>{{$sub->name}}</a>
-
-                          <span class="input-group-addon">
-
-                            <input type="checkbox" name="sub_filter" value="{{$sub->id}}" onchange="ajaxFilter(this)" data-id="{{$sub->id}}">
-
-                          </span>
-
-                        </div>
-
-                      </li>
-
-                      @endforeach
-
-                    </ul>
-
-                  </li>
-
-                  @endif
-
+                {{-- LEBD-04 Fix47: match the 11 fresh filter stages on Add Question. --}}
+                @php
+                  $lebdStageNames = [
+                    'প্রশ্ন টাইপ', 'কোর্সের নাম', 'প্রশ্ন টপিক', 'ডিপার্টমেন্ট নাম',
+                    'বুক প্রকাশনির নাম', 'সাবজেক্ট নাম', 'চ্যাপ্টার নাম',
+                    'প্রশ্ন সোর্স', 'সাব-সোর্স', 'পরীক্ষার সন', 'Question Quality filter'
+                  ];
+                  $lebdMainStages = \App\Models\Filter::query()
+                    ->where('status', 'Active')->orderBy('order_number')->orderBy('id')
+                    ->limit(11)->get(['id', 'name']);
+                  $lebdBaselineCutoff = \Illuminate\Support\Facades\Schema::hasTable('lebd_filter_visibility_baselines')
+                    ? (int) (\Illuminate\Support\Facades\DB::table('lebd_filter_visibility_baselines')
+                        ->where('id', 1)->value('legacy_max_sub_filter_id') ?? 18)
+                    : 18;
+                  $lebdStageOptions = \App\Models\SubFilter::query()
+                    ->where('status', 'Active')->where('id', '>', $lebdBaselineCutoff)
+                    ->whereIn('filter_id', $lebdMainStages->pluck('id')->all())
+                    ->orderBy('id')->get(['id', 'filter_id', 'name', 'parent_id'])->groupBy('filter_id');
+                  $lebdConnectionMap = [];
+                  if (\Illuminate\Support\Facades\Schema::hasTable('sub_filter_connections')) {
+                    foreach (\Illuminate\Support\Facades\DB::table('sub_filter_connections')->whereIn('child_sub_filter_id', $lebdStageOptions->flatten()->pluck('id')->all())->get(['child_sub_filter_id', 'parent_sub_filter_id']) as $lebdLink) {
+                      $lebdConnectionMap[(int)$lebdLink->child_sub_filter_id][] = (int)$lebdLink->parent_sub_filter_id;
+                    }
+                  }
+                @endphp
+                <div class="lebd-fresh-search" style="margin-bottom:12px;">
+                  <input id="lebd_sidebar_search" type="search" class="form-control" placeholder="Filter / Option খুঁজুন..." aria-label="Search filters" oninput="lebdSearchViewFilters(this.value)">
+                  <small class="text-muted">Add Question-এর ১১টি নতুন Filter</small>
+                </div>
+                <ul class="filter lebd-view-fresh-filters" id="lebd_view_filter_list">
+                  @foreach($lebdStageNames as $lebdIndex => $lebdStageLabel)
+                    @php
+                      $lebdStage = $lebdMainStages->get($lebdIndex);
+                      $lebdStageItems = $lebdStage ? $lebdStageOptions->get($lebdStage->id, collect()) : collect();
+                    @endphp
+                    <li class="item lebd-stage" data-stage-index="{{ $lebdIndex }}" data-stage="{{ $lebdStageLabel }}">
+                      <p>
+                        <a role="button" tabindex="0" onclick="showHideSubFilter(this.nextElementSibling)" onkeydown="if(event.key==='Enter'){showHideSubFilter(this.nextElementSibling)}">{{ $lebdStageLabel }} <small class="text-muted">({{ $lebdStageItems->count() }})</small></a>
+                        <span class="drop-down" role="button" tabindex="0" aria-label="Toggle {{ $lebdStageLabel }}" onclick="showHideSubFilter(this)" onkeydown="if(event.key==='Enter'){showHideSubFilter(this)}">
+                          <i class="fa fa-chevron-down"></i>
+                        </span>
+                      </p>
+                      <ul class="filter-group hide" id="lebd-stage-{{ $lebdIndex }}">
+                        @if(in_array($lebdIndex, [7, 8, 9], true))
+                          <li class="lebd-option-search">
+                            <input type="search" class="form-control lebd-stage-search-input" placeholder="{{ $lebdStageLabel }} খুঁজুন..." aria-label="{{ $lebdStageLabel }} Search" oninput="lebdSearchStageOptions(this)" onclick="event.stopPropagation()">
+                            <small class="lebd-option-search-hint">নাম লিখে Option খুঁজুন; Tick করলে Filter হবে।</small>
+                          </li>
+                        @endif
+                        @forelse($lebdStageItems as $lebdOption)
+                          @php
+                            $lebdParents = $lebdConnectionMap[(int)$lebdOption->id] ?? [];
+                            if ($lebdOption->parent_id && !in_array((int)$lebdOption->parent_id, $lebdParents, true)) $lebdParents[] = (int)$lebdOption->parent_id;
+                          @endphp
+                          <li class="item lebd-stage-option" data-option="{{ $lebdOption->name }}" data-parents="{{ implode(',', $lebdParents) }}">
+                            <label class="lebd-view-option"><span>{{ $lebdOption->name }}</span>
+                              <input type="checkbox" name="sub_filter" value="{{ $lebdOption->id }}" onchange="lebdCascadeChange(this)" data-id="{{ $lebdOption->id }}">
+                            </label>
+                          </li>
+                        @empty
+                          <li class="text-muted" style="padding:8px;">এখন কোনো নতুন Option নেই</li>
+                        @endforelse
+                      </ul>
+                    </li>
                   @endforeach
-
                 </ul>
 
               </div>
@@ -612,6 +625,23 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
       <div class="col-md-8 no-padding">
 
+        {{-- LEBD-04 Fix45: Export current matching questions, independent from pagination. --}}
+        <div class="box" style="margin-bottom:12px;border-top:3px solid #3c8dbc;">
+          <div class="box-body">
+            <div class="row" style="display:flex;flex-wrap:wrap;align-items:end;gap:8px;">
+              <div style="min-width:175px;flex:1;max-width:260px;">
+                <label for="lebd_export_limit" style="display:block;">Download how many?</label>
+                <select id="lebd_export_limit" class="form-control">
+                  <option value="25">25 Questions</option>
+                  <option value="all">All Results (all filtered questions)</option>
+                </select>
+              </div>
+              <button type="button" id="lebd_download_csv" class="btn btn-success"><i class="fa fa-file-excel-o"></i> Download CSV</button>
+              <button type="button" id="lebd_download_word" class="btn btn-primary"><i class="fa fa-file-word-o"></i> Download Word</button>
+            </div>
+            <small class="text-muted" style="display:block;margin-top:7px;">Exports use the selected filters, not just the visible pagination page. Word includes questions, options, correct answers and explanations.</small>
+          </div>
+        </div>
         <div class="box" id="question_area">
 
             @include('layouts.questions.paginate')
@@ -620,19 +650,13 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
       </div>
 
-
-
       <div id="loading" class="loading hide">
 
         <img src="/img/loading.gif" alt="">
 
       </div>
 
-
-
       {{-- <div class="alert hi/de" style="background:#fff;right:0">///</div> --}}
-
-
 
 <script>
 
@@ -640,15 +664,11 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
   const loading = document.getElementById('loading');
 
-
-
   let maxq = document.getElementById('maxq');
 
   let qcount = document.getElementById('qcount');
 
   let counter = 0;
-
-
 
   //checked all if max item is checked
 
@@ -660,8 +680,6 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
     let unchecked = 0;
 
-
-
     if(qcount)
 
     {
@@ -669,8 +687,6 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
       counter = Number(qcount.innerHTML);
 
     }
-
-
 
     let allQ = document.querySelectorAll('.check');
 
@@ -694,39 +710,22 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
     });
 
-
-
     let checkAll = document.getElementById('checkAll');
 
-    // maxq && Number(counter) >= Number(maxq.innerHTML) ||&#x20;
+    // maxq && Number(counter) >= Number(maxq.innerHTML) || 
 
-    if(checked > unchecked)
-
-    {
-
-      checkAll.checked = true;
-
-    }
-
-    else if(checkAll)
-
-    {
-
-      checkAll.checked = false;
-
+    if(checkAll) {
+      checkAll.checked = allQ.length > 0 && unchecked === 0;
+      checkAll.indeterminate = checked > 0 && unchecked > 0;
     }
 
   }
-
-
 
   function getBatch(e)
 
   {
 
     const batch = document.getElementById('batch');
-
-
 
     $.ajax({
 
@@ -762,8 +761,6 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
   }
 
-
-
   function getDepartments(e)
 
   {
@@ -774,11 +771,7 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
       loading.classList.remove('hide');
 
-
-
       let ids = Array.from(e.selectedOptions).map(({value}) => value);
-
-
 
       $.ajax({
 
@@ -788,21 +781,15 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
           success: function (data) {
 
-
-
             var obj = JSON.parse(JSON.stringify(data));
 
             var options = '<option value="">Select One</option>';
-
-
 
             $.each(obj['data'], function (key, val) {
 
               options += '<option value="'+val.id+'">'+val.name+'</option>';
 
             });
-
-
 
             if(options != ""){
 
@@ -830,6 +817,8 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
             console.log('data error');
 
+          loading.classList.add('hide');
+
           }
 
       });
@@ -837,8 +826,6 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
     }
 
   }
-
-
 
   function getSemesters(e)
 
@@ -850,15 +837,11 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
       loading.classList.remove('hide');
 
-
-
       let ids = Array.from(e.selectedOptions).map(({value}) => value);
 
       let department = document.getElementById('department_id');
 
       let preElm = department.parentNode.parentNode;
-
-
 
       $.ajax({
 
@@ -868,21 +851,15 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
           success: function (data) {
 
-
-
               var obj = JSON.parse(JSON.stringify(data));
 
               var options = '<option value="">Select One</option>';
-
-
 
               $.each(obj['data'], function (key, val) {
 
                   options += '<option value="'+val.id+'">'+val.name+'</option>';
 
               });
-
-
 
               if(options != "")
 
@@ -920,13 +897,9 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
                   }
 
-
-
                   // select2 execution
 
                   $(function(){ $('.select2').select2(); });
-
-
 
               }else{
 
@@ -935,8 +908,6 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
                   $("#subject_id").html('')
 
                   $("#chapter_id").html('')
-
-
 
                   if(preElm.nextElementSibling.id == 'semester')
 
@@ -954,9 +925,11 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
           },
 
-          error: function(data) {&#x20;
+          error: function(data) { 
 
                   console.log('data error');
+
+          loading.classList.add('hide');
 
           }
 
@@ -965,8 +938,6 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
     }
 
   }
-
-
 
   function getSubjects(e)
 
@@ -980,11 +951,7 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
       loading.classList.remove('hide');
 
-
-
       let ids = Array.from(e.selectedOptions).map(({value}) => value);
-
-
 
       $.ajax({
 
@@ -994,21 +961,15 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
           success: function (data) {
 
-
-
               var obj = JSON.parse(JSON.stringify(data));
 
               var options = '<option value="">Select One</option>';
-
-
 
               $.each(obj['data'], function (key, val) {
 
                   options += '<option value="'+val.id+'">'+val.name+'</option>';
 
               });
-
-
 
               if(options != ""){
 
@@ -1028,23 +989,19 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
           },
 
-          error: function(data) {&#x20;
+          error: function(data) { 
 
                   console.log('data error');
+
+          loading.classList.add('hide');
 
           }
 
       });
 
-
-
     }
 
-
-
   }
-
-
 
   function getSemsSubjects(e)
 
@@ -1054,11 +1011,7 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
     loading.classList.remove('hide');
 
-
-
       let ids = Array.from(e.selectedOptions).map(({value}) => value);
-
-
 
       $.ajax({
 
@@ -1068,21 +1021,15 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
           success: function (data) {
 
-
-
               var obj = JSON.parse(JSON.stringify(data));
 
               var options = '<option value="">Select One</option>';
-
-
 
               $.each(obj['data'], function (key, val) {
 
                   options += '<option value="'+val.id+'">'+val.name+'</option>';
 
               });
-
-
 
               if(options != ""){
 
@@ -1102,17 +1049,17 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
           },
 
-          error: function(data) {&#x20;
+          error: function(data) { 
 
                   console.log('data error');
+
+          loading.classList.add('hide');
 
           }
 
       });
 
   }
-
-
 
   function getChapters(e)
 
@@ -1126,11 +1073,7 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
     loading.classList.remove('hide');
 
-
-
       let ids = Array.from(e.selectedOptions).map(({value}) => value);
-
-
 
       $.ajax({
 
@@ -1140,21 +1083,15 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
           success: function (data) {
 
-
-
               var obj = JSON.parse(JSON.stringify(data));
 
               var options = '<option value="">Select One</option>';
-
-
 
               $.each(obj['data'], function (key, val) {
 
                   options += '<option value="'+val.id+'">'+val.name+'</option>';
 
               });
-
-
 
               if(options != ""){
 
@@ -1172,9 +1109,11 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
           },
 
-          error: function(data) {&#x20;
+          error: function(data) { 
 
             console.log('data error');
+
+          loading.classList.add('hide');
 
           }
 
@@ -1183,8 +1122,6 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
     }
 
   }
-
-
 
   function showHideAnswer(e)
 
@@ -1196,7 +1133,87 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
   }
 
+  // Fix49: the exact parent links used by Add Question (including connection table)
+  // determine whether a later-stage option belongs to the selected hierarchy.
+  // Question Quality (last stage) is independent of this hierarchy.
+  function lebdCascadeRefresh() {
+    const stages = Array.from(document.querySelectorAll('#lebd_view_filter_list .lebd-stage'));
+    const selectedAncestors = [];
+    let previousStageHasSelection = true; // Stage 1 is always available.
 
+    stages.forEach(function(stage, index) {
+      const quality = index === 10; // Independent difficulty/quality stage.
+      const eligible = index === 0 || previousStageHasSelection;
+      const options = Array.from(stage.querySelectorAll('.lebd-stage-option'));
+      const currentSelected = [];
+
+      options.forEach(function(option) {
+        const cb = option.querySelector('input[type="checkbox"]');
+        const parents = (option.getAttribute('data-parents') || '').split(',').filter(Boolean);
+        // Every step requires a checked option in the preceding step.
+        // Every earlier chosen ancestor must also belong to the option's saved connections.
+        const allowed = quality || (eligible && (index === 0 ||
+          selectedAncestors.every(function(id) { return parents.includes(id); })));
+        option.dataset.allowed = allowed ? '1' : '0';
+        if (!allowed && cb.checked) cb.checked = false;
+        if (allowed && cb.checked && !quality) currentSelected.push(String(cb.value));
+      });
+
+      if (!quality) {
+        previousStageHasSelection = currentSelected.length > 0;
+        currentSelected.forEach(function(id) { selectedAncestors.push(id); });
+      }
+    });
+
+    lebdSearchViewFilters(document.getElementById('lebd_sidebar_search')?.value || '');
+  }
+
+  // Fix51: a chosen option closes only its own stage; search inputs remain intact.
+  // Source, Sub-source and Exam Year retain their dedicated search fields.
+  function lebdCascadeChange(input) {
+    lebdCascadeRefresh();
+    if (input && input.checked) {
+      const stage = input.closest('.lebd-stage');
+      if (stage) {
+        const group = stage.querySelector('.filter-group');
+        if (group) group.classList.add('hide');
+        const arrow = stage.querySelector('p .drop-down i');
+        if (arrow) {
+          arrow.classList.remove('fa-chevron-up');
+          arrow.classList.add('fa-chevron-down');
+        }
+      }
+    }
+    ajaxFilter(input);
+  }
+
+  function lebdSearchStageOptions(input) {
+    lebdSearchViewFilters(document.getElementById('lebd_sidebar_search')?.value || '');
+  }
+
+  function lebdSearchViewFilters(value) {
+    const query = String(value || '').trim().toLocaleLowerCase();
+    document.querySelectorAll('#lebd_view_filter_list .lebd-stage').forEach(function(stage) {
+      const nameMatches = (stage.getAttribute('data-stage') || '').toLocaleLowerCase().includes(query);
+      const localInput = stage.querySelector('.lebd-stage-search-input');
+      const localQuery = localInput ? localInput.value.trim().toLocaleLowerCase() : '';
+      let anyMatch = false;
+      stage.querySelectorAll('.lebd-stage-option').forEach(function(option) {
+        const name = (option.getAttribute('data-option') || '').toLocaleLowerCase();
+        const matches = option.dataset.allowed !== '0' &&
+          (!query || nameMatches || name.includes(query)) &&
+          (!localQuery || name.includes(localQuery));
+        option.style.display = matches ? '' : 'none';
+        if (matches) anyMatch = true;
+      });
+      stage.style.display = (!query || nameMatches || anyMatch) ? '' : 'none';
+      const count = stage.querySelector('p small');
+      if (count) count.textContent = '(' + Array.from(stage.querySelectorAll('.lebd-stage-option')).filter(function(o){return o.dataset.allowed !== '0';}).length + ')';
+      const group = stage.querySelector('.filter-group');
+      if (group && query && (nameMatches || anyMatch)) group.classList.remove('hide');
+    });
+  }
+  document.addEventListener('DOMContentLoaded', lebdCascadeRefresh);
 
   function showHideSubFilter(e)
 
@@ -1205,8 +1222,6 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
     let sub = e.parentNode.nextElementSibling;
 
     sub.classList.toggle('hide');
-
-
 
     e.firstElementChild.classList.toggle('fa-chevron-down');
 
@@ -1218,25 +1233,21 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
   document.body.classList.add('sidebar-collapse');
 
-
-
   //globaly declare the question area variable
 
   let question_area = document.getElementById('question_area');
-
-
 
   //globaly declare the filter form
 
   const form = document.getElementById('filter_form');
 
-
-
   //assign sub-filters for every where use
 
   let filters = document.getElementsByName('sub_filter');
 
+  let lebdFilterRequest = null;
 
+  let lebdPageRequest = null;
 
   function ajaxFilter(elm)
 
@@ -1244,9 +1255,11 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
     //loading image view
 
-    loading.classList.remove('hide');
+    if (lebdFilterRequest) lebdFilterRequest.abort();
 
+      if (lebdPageRequest) lebdPageRequest.abort();
 
+      loading.classList.remove('hide');
 
     let ids = [];
 
@@ -1260,17 +1273,13 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
     });
 
-
-
     // console.log(ids);
 
     const formData = new FormData(form);
 
     formData.append('filter_ids', ids);
 
-
-
-    $.ajax({
+    lebdFilterRequest = $.ajax({
 
       url: '{{route("question.view.post")}}',
 
@@ -1292,11 +1301,7 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
         loading.classList.add('hide');
 
-
-
         mathImgConverter();
-
-
 
         prevNext();
 
@@ -1308,15 +1313,13 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
       {
 
-        console.log(data);
+        console.error('Question request failed', data);
+
+        loading.classList.add('hide');
 
       }
 
     });
-
-
-
-
 
     const subsource = document.getElementById('sub-source');
 
@@ -1334,7 +1337,7 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
         let options = '';
 
-        data.subsource.forEach(s =>&#x20;
+        data.subsource.forEach(s => 
 
         {
 
@@ -1355,8 +1358,6 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
                       '</li>';
 
         });
-
-
 
         if(options)
 
@@ -1386,11 +1387,7 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
     }
 
-
-
   }
-
-
 
   window.onscroll = function(){
 
@@ -1414,8 +1411,6 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
   }
 
-
-
   // delete question by ajax request
 
   function del(e)
@@ -1435,8 +1430,6 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
       }
 
     });
-
-
 
     $.ajax({
 
@@ -1462,15 +1455,11 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
     });
 
-
-
     //remove item from page
 
     item.remove();
 
   }
-
-
 
   function count(e)
 
@@ -1478,13 +1467,9 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
     let maxq = document.getElementById('maxq');
 
-
-
     //question id/ids
 
     let ids = e.value;
-
-
 
     if(maxq)
 
@@ -1538,7 +1523,25 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
   }
 
+  // Fix46: one-page selection; never modifies the database.
+  // Existing paper workflow retains its original addToPaper behavior.
+  function lebdSelectVisibleQuestions(elm) {
+    const area = document.getElementById('question_area');
+    if (!area) return;
+    const boxes = area.querySelectorAll('input.check[type="checkbox"]');
+    const hasPaper = !!document.getElementById('maxq');
+    if (hasPaper) {
+      checkAll(elm);
+    } else {
+      boxes.forEach(function(box) { box.checked = elm.checked; });
+    }
+    checkAllchecked();
+  }
 
+  function lebdHandleRowSelect(elm) {
+    count(elm);
+    checkAllchecked();
+  }
 
   // check all add to the question paper
 
@@ -1560,8 +1563,6 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
         let e = allQ[i];
 
-
-
         if (!e.checked) {
 
             e.checked = true;
@@ -1571,8 +1572,6 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
             counter++;
 
         }
-
-
 
         if (maxq.innerHTML && counter >= Number(maxq.innerHTML))
 
@@ -1593,8 +1592,6 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
         }
 
       }
-
-
 
       //call to the function for add to the paper.
 
@@ -1636,8 +1633,6 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
       });
 
-
-
       //call to the function for add to the paper
 
       if(ids.length > 0)
@@ -1654,8 +1649,6 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
   }
 
-
-
   // add questions to paper post
 
   function addToPaper(ids, action)
@@ -1670,8 +1663,6 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
     // console.log(...formData);
 
-
-
     $.ajaxSetup({
 
       headers: {
@@ -1681,8 +1672,6 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
         }
 
       });
-
-
 
     $.ajax({
 
@@ -1710,17 +1699,15 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
       error: function(data){
 
-        console.log(data);
+        console.error('Question request failed', data);
+
+        loading.classList.add('hide');
 
       },
 
     });
 
-
-
   }
-
-
 
 </script>
 
@@ -1729,10 +1716,44 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 @endsection
 
 @section('scripts')
+<script>
+(function () {
+  function exportFilteredQuestions(format) {
+    var sourceForm = document.getElementById('filter_form');
+    if (!sourceForm) return;
+    var payload = new FormData(sourceForm);
+    var checked = Array.prototype.slice.call(document.getElementsByName('sub_filter'))
+      .filter(function (c) { return c.checked; })
+      .map(function (c) { return c.value; });
+    payload.set('filter_ids', checked.join(','));
+    payload.set('export_format', format);
+    payload.set('export_limit', document.getElementById('lebd_export_limit').value);
+    var temp = document.createElement('form');
+    temp.method = 'POST';
+    temp.action = @json(route('question.filtered.export'));
+    temp.style.display = 'none';
+    payload.forEach(function (value, key) {
+      if (value instanceof File) return;
+      var hidden = document.createElement('input');
+      hidden.type = 'hidden'; hidden.name = key; hidden.value = value;
+      temp.appendChild(hidden);
+    });
+    document.body.appendChild(temp);
+    temp.submit();
+    setTimeout(function () { if (temp.parentNode) temp.parentNode.removeChild(temp); }, 2000);
+  }
+  document.addEventListener('DOMContentLoaded', function () {
+    ['csv','word'].forEach(function (type) {
+      var b = document.getElementById('lebd_download_' + type);
+      if (b) b.addEventListener('click', function () { exportFilteredQuestions(type); });
+    });
+  });
+})();
+</script>
+
+@include('shared.mathjax-renderer')
 
   <script>
-
-
 
   // get syllabuses
 
@@ -1747,8 +1768,6 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
     const batch_id = e.options[e.selectedIndex];
 
     const department_id = department.options[department.selectedIndex];
-
-
 
     $.ajax({
 
@@ -1784,13 +1803,9 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
   </script>
 
-
-
 <script>
 
   $(function(){$('.select2').select2();});
-
-
 
   // change pagination symble to name
 
@@ -1804,15 +1819,17 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
       {
 
-        paginate[0].firstElementChild.firstElementChild.innerHTML = '&laquo; Previous';
+        const firstLink = paginate[0].querySelector('li:first-child a');
 
-        paginate[0].lastElementChild.firstElementChild.innerHTML = 'Next &raquo;';
+        if (firstLink) firstLink.innerHTML = '&laquo; Previous';
+
+        const lastLink = paginate[0].querySelector('li:last-child a');
+
+        if (lastLink) lastLink.innerHTML = 'Next &raquo;';
 
       }
 
     }
-
-
 
   $(document).ready(function()
 
@@ -1828,13 +1845,17 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
       event.preventDefault();
 
-      var page = $(this).attr('href').split('page=')[1];
+      var href = $(this).attr('href');
+
+      if (!href || href === '#') return;
+
+      var page = new URL(href, window.location.href).searchParams.get('page');
+
+      if (!page || !/^\d+$/.test(page)) return;
 
       fetch_data(page);
 
     });
-
-
 
     // request by pagination page
 
@@ -1846,9 +1867,11 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
       //loading image view
 
-      loading.classList.remove('hide');
+      if (lebdFilterRequest) lebdFilterRequest.abort();
 
+        if (lebdPageRequest) lebdPageRequest.abort();
 
+        loading.classList.remove('hide');
 
       let ids = [];
 
@@ -1862,15 +1885,11 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
       });
 
-
-
       const formData = new FormData(form);
 
       formData.append('filter_ids', ids);
 
-
-
-      $.ajax({
+      lebdPageRequest = $.ajax({
 
         url: '{{route("question.view.post")}}?page='+page,
 
@@ -1890,6 +1909,8 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
           question_area.innerHTML = data;
 
+            mathImgConverter();
+
           loading.classList.add('hide');
 
           prevNext();
@@ -1900,7 +1921,9 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
         error: function(data){
 
-          console.log(data);
+          if (data.statusText !== 'abort') console.error('Pagination request failed', data);
+
+            loading.classList.add('hide');
 
         }
 
@@ -1908,18 +1931,12 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
       question_area.scrollIntoView({ behavior: "smooth" });
 
-
-
     }
 
   });
 
-
-
     prevNext();
-
-
-
+    if (window.LEBDTypesetMath) window.LEBDTypesetMath(question_area);
     // math image converter
 
     function mathImgConverter()
@@ -1930,17 +1947,23 @@ else if(Session::get('_paper') && Session::get('_paper')->type == 'book'){
 
         {
 
-          com.wiris.js.JsPluginViewer.parseElement(document.body);
+          com.wiris.js.JsPluginViewer.parseElement(question_area);
 
         }
 
+        // MathLive saves LaTeX in the question title and MCQ items.
+    // Re-typeset after every AJAX filter/pagination HTML replacement.
+    if (window.LEBDTypesetMath) {
+        window.LEBDTypesetMath(question_area).catch(function (err) {
+            console.warn('MathJax render failed', err);
+        });
     }
-
-
+}
 
 </script>
 
-
 {{-- LEBD-3 v9: Optional E-Book selection, only on ebook_kind + ebook_chapter request. --}}
+
 @include('layouts.questions.ebook-selection-bridge')
+
 @endsection

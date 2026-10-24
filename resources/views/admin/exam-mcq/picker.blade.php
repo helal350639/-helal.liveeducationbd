@@ -1,0 +1,32 @@
+@extends('dashboard')
+@section('title','MCQ for Exam - Add Questions')
+@section('content')
+@include('admin.exam-mcq._head')
+<div class="emcq-panel"><div class="emcq-topline"><h2 class="emcq-h">Main Database MCQ Picker</h2><div class="emcq-actions"><a class="btn btn-default" href="{{route('admin.exam-mcq.detail',['kind'=>$kind,'categoryId'=>$category->id])}}">← Category / Subjects</a><a class="btn btn-info" href="{{route('admin.exam-mcq.questions',['kind'=>$kind,'categoryId'=>$category->id,'subject_id'=>$subjectId?:null,'chapter_id'=>$chapterId?:null])}}">Linked MCQs</a></div></div>
+<p><strong>{{ $category->name }}</strong> / {{ ucfirst($level) }} — Original questions linked, not copied.</p>
+<div class="emcq-tree"><a class="{{ !$subjectId?'active':'' }}" href="{{route('admin.exam-mcq.picker',['kind'=>$kind,'categoryId'=>$category->id])}}">Category Direct MCQ</a>
+@foreach($subjectsTree as $sub)<a class="{{ $subjectId == $sub->id && !$chapterId?'active':'' }}" href="{{route('admin.exam-mcq.picker',['kind'=>$kind,'categoryId'=>$category->id,'subject_id'=>$sub->id])}}">{{ $sub->name }} (Subject)</a>
+@foreach(($chaptersTree[$sub->id] ?? collect()) as $ch)<a class="{{ $chapterId == $ch->id?'active':'' }}" href="{{route('admin.exam-mcq.picker',['kind'=>$kind,'categoryId'=>$category->id,'subject_id'=>$sub->id,'chapter_id'=>$ch->id])}}">↳ {{ $ch->name }}</a>@endforeach
+@endforeach</div>
+<form method="get" action="{{route('admin.exam-mcq.picker',['kind'=>$kind,'categoryId'=>$category->id])}}">
+<input type="hidden" name="subject_id" value="{{$subjectId}}"><input type="hidden" name="chapter_id" value="{{$chapterId}}">
+<div class="emcq-row">
+@foreach(['course_id'=>'courses','department_id'=>'departments','semester_id'=>'semesters','filter_subject_id'=>'subjects','filter_chapter_id'=>'chapters','created_by'=>'users'] as $field=>$list)
+<div class="emcq-field"><label>{{ucwords(str_replace('_',' ',$field))}}</label><select class="form-control" name="{{ $field }}"><option value="">All</option>@foreach($$list as $opt)<option value="{{$opt->id}}" {{(string)request($field)===(string)$opt->id?'selected':''}}>{{$opt->name}}</option>@endforeach</select></div>
+@endforeach
+<div class="emcq-field"><label>Question Text</label><input name="title" class="form-control" value="{{request('title')}}"></div>
+<div class="emcq-field"><label>From Date</label><input type="date" name="start" class="form-control" value="{{request('start')}}"></div><div class="emcq-field"><label>To Date</label><input type="date" name="end" class="form-control" value="{{request('end')}}"></div>
+</div><details style="margin:12px 0"><summary style="cursor:pointer;font-weight:700">Advanced Main DB Filters</summary><div class="emcq-row">@foreach($filters as $filter)<div class="emcq-field"><strong>{{$filter->name}}</strong>@foreach($filter->SubFilter as $sub)<label style="display:block;font-weight:400"><input type="checkbox" name="filter_ids[]" value="{{$sub->id}}" {{in_array((string)$sub->id,array_map('strval',(array)request('filter_ids',[])))?'checked':''}}> {{$sub->name}}</label>@endforeach</div>@endforeach</div></details>
+<button class="btn btn-info" type="submit">Search Questions</button> <a href="{{route('admin.exam-mcq.picker',['kind'=>$kind,'categoryId'=>$category->id,'subject_id'=>$subjectId?:null,'chapter_id'=>$chapterId?:null])}}" class="btn btn-default">Clear</a></form></div>
+<div class="emcq-panel"><div class="emcq-topline"><p><b>{{$questions->total()}}</b> matching questions · 25 per page</p><button class="btn btn-default" type="button" onclick="document.querySelectorAll('.emcq-picker-checkbox:not(:disabled)').forEach(el=>el.checked=!document.getElementById('emcqSelectAll').checked);document.getElementById('emcqSelectAll').checked=!document.getElementById('emcqSelectAll').checked">Select / Unselect Page</button></div>
+<form method="post" action="{{route('admin.exam-mcq.attach',['kind'=>$kind,'categoryId'=>$category->id])}}">@csrf<input type="hidden" name="subject_id" value="{{$subjectId}}"><input type="hidden" name="chapter_id" value="{{$chapterId}}">
+@foreach($questions as $q)
+@php $serial=($questions->currentPage()-1)*$questions->perPage()+$loop->iteration; $opts=$questionOptions[$q->id] ?? collect(); @endphp
+<div class="emcq-card"><label style="display:flex;gap:12px;cursor:pointer;align-items:center"><input class="emcq-picker-checkbox" type="checkbox" name="question_ids[]" value="{{$q->id}}" {{in_array($q->id,$linked)?'disabled':''}}><span class="emcq-qnum">Q-{{str_pad($serial,2,'0',STR_PAD_LEFT)}}</span><span class="emcq-meta">{{in_array($q->id,$linked)?'Already Added':''}}</span></label>
+<div class="emcq-q">{!!$q->title!!}</div>
+@if($opts->count())<div class="emcq-opts">@foreach($opts as $oi=>$opt)<div class="emcq-opt {{ $opt->correct_answer?'correct':'' }}"><b>{{['ক','খ','গ','ঘ'][$oi] ?? ($oi+1)}}.</b> {!!$opt->item!!} @if($opt->image)<img src="{{asset(ltrim($opt->image,'/'))}}" alt="Option image">@endif @if($opt->correct_answer)<span style="color:#07854c">✓</span>@endif</div>@endforeach</div>@endif
+</div>@endforeach
+@if($questions->count())<button class="btn btn-success" type="submit">Add Selected Questions</button>@else<p>No questions match the filters.</p>@endif
+</form><div style="margin-top:16px">{{$questions->links()}}</div></div></div>
+@include('admin.exam-mcq.bulk-actions-v85')
+@endsection

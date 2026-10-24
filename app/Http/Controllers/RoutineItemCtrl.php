@@ -121,109 +121,64 @@ class RoutineItemCtrl extends Controller
 */
 
 public function addItemPost(Request $request)
-{
-    $data = $request->validate([
-        'routine_id' => 'required|integer',
-        'paper_name' => 'required|string|max:255',
-        'exam_at' => 'required|date',
-        'exam_end_at' => 'nullable|date|after_or_equal:exam_at',
-
-        'subject_id' => 'required|array',
-        'subject_item' => 'required|array',
-
-        'department_id' => 'required|array',
-        'department_item' => 'required|array',
-    ]);
-
-    try {
-
-        /*
-        |--------------------------------------------------------------------------
-        | Check Exam Is Already Used
-        |--------------------------------------------------------------------------
-        */
-
-        $alreadyUsed = RoutineItemRow::where(
-            'routine_id',
-            $data['routine_id']
-        )
-        ->where(
-            'paper_name',
-            $data['paper_name']
-        )
-        ->exists();
-
-        if ($alreadyUsed) {
-            return back()
-                ->withInput()
-                ->with(
-                    'error',
-                    'This Exam has already been used in this Routine.'
-                );
+    {
+        $data = $request->validate([
+            'routine_id' => 'required|integer|exists:routines,id',
+            'paper_name' => 'required|string|max:255',
+            'exam_at' => 'required|date',
+            'exam_end_at' => 'nullable|date|after_or_equal:exam_at',
+            'subject_id' => 'nullable|array',
+            'subject_item' => 'nullable|array',
+            'department_id' => 'nullable|array',
+            'department_item' => 'nullable|array',
+        ]);
+        $data['subject_id'] = $data['subject_id'] ?? [];
+        $data['department_id'] = $data['department_id'] ?? [];
+        $data['subject_item'] = $data['subject_item'] ?? [];
+        $data['department_item'] = $data['department_item'] ?? [];
+        $routine = Routine::findOrFail($data['routine_id']);
+        $selections = $this->validatedMcqSelections($request, $routine);
+        $subjectIds = $routine->subjects()->pluck('subjects.id')->map(fn($x)=>(int)$x)->all();
+        $departmentIds = $routine->departments()->pluck('departments.id')->map(fn($x)=>(int)$x)->all();
+        if (array_map('intval',$data['subject_id']) !== $subjectIds || array_map('intval',$data['department_id']) !== $departmentIds) {
+            // Compare sets; pivot order can differ from the view order.
+            $a=array_map('intval',$data['subject_id']); $b=$subjectIds; sort($a); sort($b);
+            $c=array_map('intval',$data['department_id']); $d=$departmentIds; sort($c); sort($d);
+            if ($a !== $b || $c !== $d) return back()->withInput()->with('error','Invalid Routine subjects or departments.');
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Create Main Routine Item
-        |--------------------------------------------------------------------------
-        */
-
-        $routineItem = new RoutineItemRow();
-
-        $routineItem->routine_id = $data['routine_id'];
-        $routineItem->paper_name = $data['paper_name'];
-        $routineItem->exam_at = $data['exam_at'];
-        $routineItem->exam_end_at = $data['exam_end_at'] ?? null;
-
-        $routineItem->save();
-
-        /*
-        |--------------------------------------------------------------------------
-        | Save Subjects
-        |--------------------------------------------------------------------------
-        */
-
-        foreach ($data['subject_id'] as $key => $value) {
-
-            RoutineSubjectRow::insert([
-                'item_id' => $routineItem->id,
-                'subject_id' => $value,
-                'chapter' => $data['subject_item'][$key] ?? '',
+        if (!$routine->exams()->where('name',$data['paper_name'])->exists()) {
+            return back()->withInput()->with('error','Selected Exam does not belong to this Routine.');
+        }
+        if (RoutineItemRow::where('routine_id',$routine->id)->where('paper_name',$data['paper_name'])->exists()) {
+            return back()->withInput()->with('error','This Exam has already been used in this Routine.');
+        }
+        DB::beginTransaction();
+        try {
+            $item = RoutineItemRow::create([
+                'routine_id'=>$routine->id, 'paper_name'=>$data['paper_name'],
+                'exam_at'=>$data['exam_at'], 'exam_end_at'=>$data['exam_end_at'] ?? null,
             ]);
+            foreach ($data['subject_id'] as $i => $id) {
+                $label = $this->labelsForColumn($selections,'subject',(int)$id);
+                RoutineSubjectRow::create(['item_id'=>$item->id,'subject_id'=>$id,'chapter'=>$label !== '' ? $label : ($data['subject_item'][$i] ?? '')]);
+            }
+            foreach ($data['department_id'] as $i => $id) {
+                $label = $this->labelsForColumn($selections,'department',(int)$id);
+                RoutineDepartmentRow::create(['item_id'=>$item->id,'department_id'=>$id,'details'=>$label !== '' ? $label : ($data['department_item'][$i] ?? '')]);
+            }
+            if ($request->exists('mcq_selections')) {
+                $this->saveMcqMappings($item->id,$selections);
+            }
+            app(\App\Services\RoutineAutoQuestion\RoutineBatchDepartmentSync::class)
+                ->sync((int) $routine->id);
+            $this->recalculateCreationDates((int) $routine->id);
+            DB::commit();
+            return $this->afterSave($request, $item->id, $routine->id, 'Routine item successfully added.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return back()->withInput()->with('error',$e->getMessage());
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Save Departments
-        |--------------------------------------------------------------------------
-        */
-
-        foreach ($data['department_id'] as $key => $value) {
-
-            RoutineDepartmentRow::insert([
-                'item_id' => $routineItem->id,
-                'department_id' => $value,
-                'details' => $data['department_item'][$key] ?? '',
-            ]);
-        }
-
-    } catch (\Exception $e) {
-
-        return back()
-            ->withInput()
-            ->with('error', $e->getMessage());
     }
-
-    Session::flash(
-        'success',
-        'Routine item successfully added.'
-    );
-
-    return redirect()->route(
-        'routine.item.show',
-        $data['routine_id']
-    );
-}
 
 
     /*
@@ -290,6 +245,90 @@ public function addItemPost(Request $request)
             ->get();
 
 
+        // LEBD-04 Step 2G: show only the deepest selected MCQ level's name.
+        // Read-only; existing Routine and MCQ selection records remain untouched.
+        $routineMcqLabels = [];
+        $itemIds = $routine_rows->pluck('id')->all();
+
+        if (!empty($itemIds)) {
+            $selectedPaths = DB::table('routine_mcq_selections as selection')
+                ->leftJoin('exam_mcq_categories as category', 'category.id', '=', 'selection.category_id')
+                ->leftJoin('exam_mcq_subjects as mcq_subject', 'mcq_subject.id', '=', 'selection.subject_id')
+                ->leftJoin('exam_mcq_chapters as chapter', 'chapter.id', '=', 'selection.chapter_id')
+                ->whereIn('selection.routine_item_row_id', $itemIds)
+                ->select(
+                    'selection.routine_item_row_id',
+                    'selection.column_kind',
+                    'selection.column_id',
+                    'category.name as category_name',
+                    'mcq_subject.name as subject_name',
+                    'chapter.name as chapter_name',
+                    'selection.range_from',
+                    'selection.range_to'
+                )
+                ->orderBy('selection.id', 'ASC')
+                ->get();
+
+            foreach ($selectedPaths as $path) {
+                $itemId = (int) $path->routine_item_row_id;
+                $columnKind = $path->column_kind;
+                $columnId = (int) $path->column_id;
+                $label = trim((string) ($path->chapter_name ?: $path->subject_name ?: $path->category_name ?: ''));
+                if ($label === '') {
+                    continue;
+                }
+                // Display a range only for this exact MCQ selection when saved.
+                // An unbounded selection retains its plain chapter/subject/category name.
+                $rangeFrom = $path->range_from;
+                $rangeTo = $path->range_to;
+                if ($rangeFrom !== null && $rangeTo !== null
+                    && (int) $rangeFrom >= 1 && (int) $rangeTo >= (int) $rangeFrom) {
+                    $label .= ' (' . (int) $rangeFrom . '-' . (int) $rangeTo . ')';
+                }
+                $routineMcqLabels[$itemId][$columnKind][$columnId][] = $label;
+            }
+        }
+
+        // Combine standard and derived exam rows using the saved RoutineExam order.
+        // Derived records are read-only here; their original Main Exam links are kept.
+        $displayRows = collect();
+        foreach ($routine_rows as $regularRow) {
+            $regularRow->row_kind = 'main';
+            $displayRows->push($regularRow);
+        }
+        $derivedRows = DB::table('routine_derived_exam_items')
+            ->where('routine_id', $id)->get();
+        $derivedIds = $derivedRows->pluck('id')->all();
+        $derivedLinks = collect();
+        if ($derivedIds) {
+            $derivedLinks = DB::table('routine_derived_exam_sources as l')
+                ->join('routine_item_rows as src', 'src.id', '=', 'l.source_item_id')
+                ->whereIn('l.derived_item_id', $derivedIds)
+                ->where('src.routine_id', $id)
+                ->select('l.derived_item_id', 'l.column_kind', 'l.column_id', 'src.paper_name')
+                ->get()->groupBy('derived_item_id');
+        }
+        foreach ($derivedRows as $derived) {
+            $derived->row_kind = 'derived';
+            $derived->paper_name = $derived->exam_name;
+            $derived->linked_exam_names = [];
+            $names = [];
+            foreach ($derivedLinks->get($derived->id, collect()) as $link) {
+                $key = $link->column_kind . ':' . $link->column_id;
+                $names[$key][] = $link->paper_name;
+            }
+            foreach ($names as $key => $values) {
+                $derived->linked_exam_names[$key] = array_values(array_unique($values));
+            }
+            $displayRows->push($derived);
+        }
+        $examOrder = $exams->pluck('name')->flip();
+        $displayRows = $displayRows->sort(function ($a, $b) use ($examOrder) {
+            $aPos = $examOrder->get($a->paper_name, PHP_INT_MAX);
+            $bPos = $examOrder->get($b->paper_name, PHP_INT_MAX);
+            return ($aPos <=> $bPos) ?: ((int)$a->id <=> (int)$b->id);
+        })->values();
+
         return view(
             'layouts.routines.show-item',
             compact(
@@ -298,7 +337,9 @@ public function addItemPost(Request $request)
                 'subjects',
                 'departments',
                 'routine_rows',
-                'exams'
+                'exams',
+                'routineMcqLabels',
+                'displayRows'
             )
         );
     }
@@ -441,6 +482,14 @@ public function addItemPost(Request $request)
             ->get();
 
 
+        $mcqSelections = DB::table('routine_mcq_selections as m')
+            ->leftJoin('exam_mcq_categories as c', 'c.id', '=', 'm.category_id')
+            ->leftJoin('exam_mcq_subjects as s', 's.id', '=', 'm.subject_id')
+            ->leftJoin('exam_mcq_chapters as h', 'h.id', '=', 'm.chapter_id')
+            ->where('m.routine_item_row_id', $routine_row->id)
+            ->select('m.*', 'c.name as mcq_category_name', 's.name as mcq_subject_name', 'h.name as mcq_chapter_name')
+            ->get()->groupBy(fn($r) => $r->column_kind . ':' . $r->column_id);
+
         return view(
             'layouts.routines.edit-item',
             compact(
@@ -452,7 +501,8 @@ public function addItemPost(Request $request)
                 'routine_row',
                 'subject_rows',
                 'department_rows',
-                'exams'
+                'exams',
+                'mcqSelections'
             )
         );
     }
@@ -465,165 +515,58 @@ public function addItemPost(Request $request)
     */
 
     public function update(Request $request, $id)
-{
-
-    $request->validate([
-
-        'routine_id' => 'required|integer',
-
-        'paper_name' => 'required|string|max:255',
-
-        'exam_at' => 'required|date',
-        'exam_end_at' => 'nullable|date|after_or_equal:exam_at',
-
-        'subject_id' => 'required|array',
-
-        'subject_item' => 'required|array',
-
-        'department_id' => 'required|array',
-
-        'department_item' => 'required|array',
-
-    ]);
-
-
-
-    DB::beginTransaction();
-
-
-    try {
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Update Main Item
-        |--------------------------------------------------------------------------
-        */
-
-        RoutineItemRow::where(
-            'id',
-            $id
-        )
-        ->update([
-
-            'routine_id' => $request->routine_id,
-            'paper_name' => $request->paper_name,
-            'exam_at' => $request->exam_at,
-            'exam_end_at' => $request->exam_end_at,
-
-        ]);
-
-
-
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Replace Subject Data
-        |--------------------------------------------------------------------------
-        */
-
-        RoutineSubjectRow::where(
-            'item_id',
-            $id
-        )->delete();
-
-
-
-        foreach($request->subject_id as $key=>$subject_id)
-        {
-
-            RoutineSubjectRow::create([
-
-                'item_id'=>$id,
-
-                'subject_id'=>$subject_id,
-
-                'chapter'=>$request->subject_item[$key] ?? '',
-
-            ]);
-
-        }
-
-
-
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Replace Department Data
-        |--------------------------------------------------------------------------
-        */
-
-
-        RoutineDepartmentRow::where(
-            'item_id',
-            $id
-        )->delete();
-
-
-
-        foreach($request->department_id as $key=>$department_id)
-        {
-
-            RoutineDepartmentRow::create([
-
-                'item_id'=>$id,
-
-                'department_id'=>$department_id,
-
-                'details'=>$request->department_item[$key] ?? '',
-
-            ]);
-
-        }
-
-
-
-
-        DB::commit();
-
-
-
-        Session::flash(
-            'success',
-            'Routine item successfully updated.'
-        );
-
-
-
-        return redirect()->route(
-
-            'routine.item.show',
-
-            $request->routine_id
-
-        );
-
-
-
-    }
-    catch(\Exception $e)
     {
-
-        DB::rollBack();
-
-
-        return back()
-
-        ->withInput()
-
-        ->with(
-
-            'error',
-
-            $e->getMessage()
-
-        );
-
+        $data = $request->validate([
+            'routine_id'=>'required|integer|exists:routines,id',
+            'paper_name'=>'required|string|max:255',
+            'exam_at'=>'required|date',
+            'exam_end_at'=>'nullable|date|after_or_equal:exam_at',
+            'subject_id'=>'nullable|array', 'subject_item'=>'nullable|array',
+            'department_id'=>'nullable|array', 'department_item'=>'nullable|array',
+        ]);
+        $data['subject_id'] = $data['subject_id'] ?? [];
+        $data['department_id'] = $data['department_id'] ?? [];
+        $data['subject_item'] = $data['subject_item'] ?? [];
+        $data['department_item'] = $data['department_item'] ?? [];
+        $item = RoutineItemRow::findOrFail($id);
+        if ((int)$data['routine_id'] !== (int)$item->routine_id) abort(422,'Routine ID mismatch.');
+        $routine = Routine::findOrFail($item->routine_id);
+        $selections = $this->validatedMcqSelections($request, $routine);
+        if (!$routine->exams()->where('name',$data['paper_name'])->exists()) {
+            return back()->withInput()->with('error','Selected Exam does not belong to this Routine.');
+        }
+        if (RoutineItemRow::where('routine_id',$routine->id)->where('paper_name',$data['paper_name'])->where('id','!=',$item->id)->exists()) {
+            return back()->withInput()->with('error','This Exam has already been used in this Routine.');
+        }
+        $a=array_map('intval',$data['subject_id']); $b=$routine->subjects()->pluck('subjects.id')->map(fn($x)=>(int)$x)->all();sort($a);sort($b);
+        $c=array_map('intval',$data['department_id']); $d=$routine->departments()->pluck('departments.id')->map(fn($x)=>(int)$x)->all();sort($c);sort($d);
+        if ($a!==$b || $c!==$d) return back()->withInput()->with('error','Invalid Routine columns.');
+        DB::beginTransaction();
+        try {
+            $item->update(['paper_name'=>$data['paper_name'],'exam_at'=>$data['exam_at'],'exam_end_at'=>$data['exam_end_at'] ?? null]);
+            RoutineSubjectRow::where('item_id',$item->id)->delete();
+            foreach ($data['subject_id'] as $i=>$sid) {
+                $label=$this->labelsForColumn($selections,'subject',(int)$sid);
+                RoutineSubjectRow::create(['item_id'=>$item->id,'subject_id'=>$sid,'chapter'=>$label!=='' ? $label : ($data['subject_item'][$i] ?? '')]);
+            }
+            RoutineDepartmentRow::where('item_id',$item->id)->delete();
+            foreach ($data['department_id'] as $i=>$did) {
+                $label=$this->labelsForColumn($selections,'department',(int)$did);
+                RoutineDepartmentRow::create(['item_id'=>$item->id,'department_id'=>$did,'details'=>$label!=='' ? $label : ($data['department_item'][$i] ?? '')]);
+            }
+            if ($request->exists('mcq_selections')) {
+                $this->saveMcqMappings($item->id,$selections);
+            }
+            app(\App\Services\RoutineAutoQuestion\RoutineBatchDepartmentSync::class)
+                ->sync((int) $routine->id);
+            $this->recalculateCreationDates((int) $routine->id);
+            DB::commit();
+            return $this->afterSave($request, $item->id, $routine->id, 'Routine item successfully updated.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return back()->withInput()->with('error',$e->getMessage());
+        }
     }
-
-}
 
 
     /*
@@ -712,8 +655,10 @@ public function updateExamEnd(Request $request, $id)
 
         $item->exam_end_at = $request->exam_end_at;
 
-
-        $item->save();
+        DB::transaction(function () use ($item) {
+            $item->save();
+            $this->recalculateCreationDates((int) $item->routine_id);
+        });
 
 
         return response()->json([
@@ -816,7 +761,10 @@ public function updateExamEnd(Request $request, $id)
             |--------------------------------------------------------------------------
             */
 
+            DB::table('routine_mcq_selections')->where('routine_item_row_id', $item_row->id)->delete();
+            $routineId = (int) $item_row->routine_id;
             $item_row->delete();
+            $this->recalculateCreationDates($routineId);
 
 
             Session::flash(
@@ -833,6 +781,145 @@ public function updateExamEnd(Request $request, $id)
             'error',
             'Permission Denied'
         );
+    }
+
+
+
+    /**
+     * Fill PDF and question creation dates based only on the ordered Routine exams.
+     * Exam #1 takes the Routine's original creation timestamp. Later exams take
+     * the immediately preceding exam's end timestamp, not the current system time.
+     * Missing predecessor/end means dates remain NULL until it is completed.
+     * Keep all operations on the same connection/transaction as the caller.
+     */
+    private function recalculateCreationDates(int $routineId): void
+    {
+        $routine = Routine::findOrFail($routineId);
+        $orderedExams = $routine->exams()->orderBy('sort_order')->orderBy('id')->get(['id', 'name']);
+        $rows = RoutineItemRow::where('routine_id', $routineId)->get()->keyBy('paper_name');
+        $previousEnd = null;
+        $hasPrevious = false;
+
+        foreach ($orderedExams as $exam) {
+            $row = $rows->get($exam->name);
+            $calculated = $hasPrevious ? $previousEnd : $routine->created_at;
+            if ($row) {
+                RoutineItemRow::whereKey($row->id)->update([
+                    'create_pdf_at' => $calculated,
+                    'question_create_at' => $calculated,
+                ]);
+            }
+            // A missing exam item means no predecessor end can be inferred.
+            $previousEnd = $row ? $row->exam_end_at : null;
+            $hasPrevious = true;
+        }
+    }
+
+    /** Decode and validate selected MCQ for Exam paths; no changes to the MCQ bank. */
+    private function validatedMcqSelections(Request $request, Routine $routine): array
+    {
+        $raw = $request->input('mcq_selections', []);
+        if (!is_array($raw)) {
+            throw \Illuminate\Validation\ValidationException::withMessages(['mcq_selections' => 'Invalid MCQ selection format.']);
+        }
+        $allowed = [
+            'subject' => $routine->subjects()->pluck('subjects.id')->map(fn($id) => (int)$id)->all(),
+            'department' => $routine->departments()->pluck('departments.id')->map(fn($id) => (int)$id)->all(),
+        ];
+        $result = [];
+        foreach ($raw as $columnKind => $columns) {
+            if (!isset($allowed[$columnKind]) || !is_array($columns)) {
+                throw \Illuminate\Validation\ValidationException::withMessages(['mcq_selections' => 'Invalid Routine column.']);
+            }
+            foreach ($columns as $columnId => $json) {
+                if (!in_array((int)$columnId, $allowed[$columnKind], true)) {
+                    throw \Illuminate\Validation\ValidationException::withMessages(['mcq_selections' => 'Routine column not allowed.']);
+                }
+                $entries = is_array($json) ? $json : json_decode((string) $json, true);
+                if (!is_array($entries) || count($entries) > 100) {
+                    throw \Illuminate\Validation\ValidationException::withMessages(['mcq_selections' => 'Invalid or too many selections.']);
+                }
+                $seen = [];
+                foreach ($entries as $entry) {
+                    if (!is_array($entry)) continue;
+                    $kind = $entry['kind'] ?? '';
+                    $cid = (int)($entry['category_id'] ?? 0);
+                    $sid = (int)($entry['subject_id'] ?? 0);
+                    $hid = (int)($entry['chapter_id'] ?? 0);
+                    if ($kind !== ($columnKind === 'subject' ? 'non-department' : 'department') || $cid < 1 || ($hid && !$sid)) {
+                        throw \Illuminate\Validation\ValidationException::withMessages(['mcq_selections' => 'Invalid MCQ selection.']);
+                    }
+                    $cat = DB::table('exam_mcq_categories')->where('id',$cid)->where('kind',$kind)->where('status','Active')->first();
+                    $sub = $sid ? DB::table('exam_mcq_subjects')->where('id',$sid)->where('category_id',$cid)->where('status','Active')->first() : null;
+                    $chapter = $hid ? DB::table('exam_mcq_chapters')->where('id',$hid)->where('subject_id',$sid)->where('status','Active')->first() : null;
+                    if (!$cat || ($sid && !$sub) || ($hid && !$chapter)) {
+                        throw \Illuminate\Validation\ValidationException::withMessages(['mcq_selections' => 'MCQ category, subject or chapter not found.']);
+                    }
+                    $level = $hid ? 'chapter' : ($sid ? 'subject' : 'category');
+                    $entityId = $hid ?: ($sid ?: $cid);
+                    $key = "$columnKind:$columnId:$kind:$cid:$sid:$hid";
+                    if (isset($seen[$key])) continue;
+                    $seen[$key] = true;
+                    $count = DB::table('exam_mcq_question_links as l')->join('questions as q','q.id','=','l.question_id')
+                        ->where('l.category_id',$cid)->where('l.level',$level)->where('l.entity_id',$entityId)
+                        ->where('q.type','MCQ')->distinct()->count('q.id');
+                    $rf = $entry['range_from'] ?? null;
+                    $rt = $entry['range_to'] ?? null;
+                    $hasRange = $rf !== null && $rf !== '' || $rt !== null && $rt !== '';
+                    $from = $to = null;
+                    if ($hasRange) {
+                        if (!is_numeric($rf) || !is_numeric($rt) || (int)$rf < 1 || (int)$rt < (int)$rf || (int)$rt > $count || (string)(int)$rf !== (string)$rf || (string)(int)$rt !== (string)$rt) {
+                            throw \Illuminate\Validation\ValidationException::withMessages(['mcq_selections' => 'Invalid Question Range or range exceeds Available Questions.']);
+                        }
+                        $from = (int)$rf;
+                        $to = (int)$rt;
+                    }
+                    $path = ($kind === 'department' ? 'Department' : 'Non-Department') . ' > ' . $cat->name
+                        . ($sub ? ' > '.$sub->name : '') . ($chapter ? ' > '.$chapter->name : '');
+                    $result[] = [
+                        'column_kind' => $columnKind, 'column_id' => (int)$columnId,
+                        'mcq_kind' => $kind, 'category_id' => $cid,
+                        'subject_id' => $sid ?: null, 'chapter_id' => $hid ?: null,
+                        'available_question_count' => $count, 'range_from' => $from, 'range_to' => $to,
+                        'label' => $path . ' (Available Questions: ' . $count . ')' . ($from !== null ? ' | Question Range: '.$from.'-'.$to : ''),
+                    ];
+                }
+            }
+        }
+        return $result;
+    }
+
+    private function saveMcqMappings(int $itemId, array $selections): void
+    {
+        DB::table('routine_mcq_selections')->where('routine_item_row_id', $itemId)->delete();
+        foreach ($selections as $selection) {
+            DB::table('routine_mcq_selections')->insert([
+                'routine_item_row_id' => $itemId,
+                'column_kind' => $selection['column_kind'], 'column_id' => $selection['column_id'],
+                'mcq_kind' => $selection['mcq_kind'], 'category_id' => $selection['category_id'],
+                'subject_id' => $selection['subject_id'], 'chapter_id' => $selection['chapter_id'],
+                'range_from' => $selection['range_from'], 'range_to' => $selection['range_to'],
+                'created_at' => now(), 'updated_at' => now(),
+            ]);
+        }
+    }
+
+    private function labelsForColumn(array $selections, string $kind, int $id): string
+    {
+        return implode("\n", array_column(array_values(array_filter($selections, fn($s) =>
+            $s['column_kind'] === $kind && $s['column_id'] === $id)), 'label'));
+    }
+
+    private function afterSave(Request $request, int $itemId, int $routineId, string $message)
+    {
+        $action = $request->input('routine_action', 'save');
+        if (in_array($action, ['make_question', 'create_pdf'], true)) {
+            return redirect()->route('routine.mcq.preview', [
+                'id' => $itemId,
+                'mode' => $action === 'create_pdf' ? 'pdf' : 'question',
+            ])->with('success', $message);
+        }
+        return redirect()->route('routine.item.show', $routineId)->with('success', $message);
     }
 
 }

@@ -1,201 +1,70 @@
-@php
-use \App\Http\Controllers\SourceCtrl;
-$source = New SourceCtrl;
-@endphp
-
 @extends('dashboard')
-@section('title', 'View All Questions')
-
-@section('stylesheets')
-<link href="/assets/summernote/summernote.min.css" rel="stylesheet">
-@endsection
-
+@section('title', 'Bulk MCQ CSV Import')
 @section('content')
-<!-- Content Header (Page header) -->
-<section class="content-header">
-  <h1>All Questions</h1>
-  <ol class="breadcrumb">
-    <li><a href="#"><i class="fa fa-dashboard"></i>Dashboard</a></li>
-    {{-- <li><a href="#">Tables</a></li> --}}
-    <li class="active">All Questions</li>
-  </ol>
-</section>
-<!-- Main content -->
+<section class="content-header"><h1>Bulk MCQ CSV Import</h1></section>
 <section class="content">
-    <div class="box box-body">
-      <form action="{{route('question.index')}}" method="GET">
-        @csrf
-        <div class="row">
-          <div class="col-md-4">
-            <div class="form-group">
-              <select name="subject_id" id="" class="form-control">
-                <option value="">Select One</option>
-                @foreach($subjects as $subject)
-                <option value="{{$subject->id}}" {{$subject_id && $subject_id == $subject->id? 'selected':''}}>{{$subject->name}}</option>
-                @endforeach
-              </select>
+    <div class="box box-primary">
+        <div class="box-header with-border"><h3 class="box-title">Upload &amp; Preview</h3></div>
+        <div class="box-body">
+            <p>First select Course, Department, Subject, Chapter, Filters and Level on Add Question. Then upload a UTF-8 CSV file (maximum 2 MB, 500 questions) containing only Question, Options A-D, Correct Answer and Explanation.</p>
+            <p><a class="btn btn-default" href="{{ route('admin.question-csv.template') }}"><i class="fa fa-download"></i> Download CSV Template</a>
+            <a class="btn btn-info" href="{{ route('question.create') }}">Manual Add Question</a></p>
+            @if($context)
+            <div class="alert alert-info"><strong>Selected settings (applies to every CSV question):</strong>
+               Course: {{ $context['course_ids'] }} | Department: {{ $context['department_ids'] }} |
+               Subject: {{ $context['subject_ids'] ?: '—' }} | Chapter: {{ $context['chapter_ids'] ?: '—' }} |
+               Filter / Level IDs: {{ $context['sub_filter_ids'] ?: '—' }} | Labels: {{ $context['labels'] ?: '—' }}
+               <p style="margin-top:8px"><a href="{{ route('question.create') }}">Change selections on Add Question</a></p>
             </div>
-          </div>
-          <div class="col-md-4">
-            <div class="form-group">
-              <input type="text" name="title" class="form-control" placeholder="Question Title" value="{{$title}}">
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="input-group-btn">
-              <button type="submit" class="btn btn-info">
-                <i class="fa fa-search"></i> Search
-              </button>
-            </div>
-          </div>
+            @else
+            <div class="alert alert-warning">No settings selected. Go to <a href="{{ route('question.create') }}">Add Question</a>, select Course/Department/Filters/Level and click <strong>Bulk CSV Upload</strong>.</div>
+            @endif
+            @if($errors->any())<div class="alert alert-danger"><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
+            @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
+            <form method="POST" action="{{ route('admin.question-csv.preview') }}" enctype="multipart/form-data">
+                @csrf
+                <div class="form-group"><label for="question_csv">Select CSV File</label>
+                    <input type="file" name="csv" id="question_csv" accept=".csv,text/csv,text/plain" class="form-control" required></div>
+                <button type="submit" class="btn btn-primary" @if(!$context) disabled @endif><i class="fa fa-eye"></i> Preview &amp; Validate</button>
+            </form>
         </div>
-      </form>
     </div>
-  <div class="row">
-    <div class="col-xs-12">
-      <div class="box">
-        <div class="box-header">
-          <h3 class="box-title">List of Question</h3>
-              <div class="box-tools">
-                <a href="{{route('question.create')}}" class="btn btn-info">
-                  <i class="fa fa-plus"></i> Add Question
-                </a>
-              </div>
-            </div>
-            <!-- /.box-header -->
-            <div class="box-body table-responsive no-padding">
-              <table id="example1" class="table table-bordered table-hover">
+    @if($report)
+    <div class="box box-success"><div class="box-header with-border"><h3 class="box-title">Import Report</h3></div><div class="box-body">
+        <p><strong>Created:</strong> {{ $report['created'] }} &nbsp; <strong>Skipped:</strong> {{ $report['skipped'] }}</p>
+        @if($report['errors'])<div class="alert alert-warning"><strong>Failed rows:</strong><ul>@foreach($report['errors'] as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
+        <a href="{{ route('question.view') }}" class="btn btn-info">View Questions</a>
+    </div></div>
+    @endif
+    @if($preview)
+    <div class="box box-info"><div class="box-header with-border"><h3 class="box-title">CSV Preview</h3></div><div class="box-body">
+        <p><strong>Total:</strong> {{ count($preview['rows']) }} &nbsp;
+            <strong>Ready:</strong> <span class="text-success">{{ $preview['valid_count'] }}</span> &nbsp;
+            <strong>Invalid / Duplicate:</strong> <span class="text-danger">{{ $preview['invalid_count'] }}</span></p>
+        <p class="text-muted">Only valid rows will be imported. Duplicate questions and invalid rows will be skipped. Preview expires after one hour.</p>
+        @if($preview['valid_count'] > 0)
+        <form action="{{ url('/admin/question-csv/import') }}" method="POST" onsubmit="return confirm('Import {{ $preview['valid_count'] }} validated MCQ questions?');">
+            @csrf
+            <input type="hidden" name="token" value="{{ $preview['token'] }}">
+            <button class="btn btn-success" type="submit"><i class="fa fa-check"></i> Confirm Import ({{ $preview['valid_count'] }})</button>
+        </form>
+        @endif
+        <div class="table-responsive" style="margin-top:15px;max-height:650px;overflow:auto">
+            <table class="table table-bordered table-striped">
+                <thead><tr><th>CSV Row</th><th>Question</th><th>Options A / B / C / D</th><th>Answer</th><th>Status</th></tr></thead>
+                <tbody>
+                @foreach($preview['rows'] as $row)
                 <tr>
-                  <th>Id</th>
-                  <th>Title</th>
-                  <th>Type</th>
-                  <th>Chapter</th>
-                  <th>Subject</th>
-                  {{-- <th>Semester</th>
-                  <th>Department</th>
-                  <th>Course</th> --}}
-                  <th>Status</th>
-                  <th width="130">Action</th>
-                </tr>
-                @foreach($mcqs as $mcq)
-                <tr>
-                  <td>{{$mcq->id}}</td>
-                  <td ondblclick="QTitleEdit(this)" data-id="{{$mcq->id}}">{{ $mcq->title }}</td>
-                  <td>{{ $mcq->type }}</td>
-                  <td>
-                    @foreach($mcq->chapters as $val)
-                    <label class="label label-primary"> {{$val->name}}</label>
-                    @endforeach
-                  </td>
-                  <td>
-                    @foreach($mcq->subjects as $val)
-                    <label class="label label-primary"> {{$val->name}}</label>
-                    @endforeach
-                  </td>
-                  {{-- <td>
-                    @foreach($mcq->semesters as $val)
-                    <label class="label label-primary"> {{$val->name}}</label>
-                    @endforeach
-                  </td>
-                  <td>
-                    @foreach($mcq->departments as $val)
-                    <label class="label label-primary"> {{$val->name}}</label>
-                    @endforeach
-                  </td>
-                  <td>
-                    @foreach($mcq->courses as $val)
-                    <label class="label label-primary"> {{$val->name}}</label>
-                    @endforeach
-                  </td> --}}
-                  <td>
-                    @if($mcq->status == 'Active')
-                    <span class="label label-success">Active</span>
-                    @elseif($mcq->status == 'Inactive')
-                    <span class="label label-warning">Inactive</span>
-                    @endif
-                  </td>
-                  <td>
-                    <a href="{{route('question.show', $mcq->id)}}" class="btn btn-info" title="Details"><i class="fa fa-file-text"></i></a>
-                    <a href="{{route('question.edit', $mcq->id)}}" class="btn btn-warning btn-sm" title="Edit this MCQ"><i class="fa fa-edit"></i></a>
-                    <form style="display: inline" action="{{route('question.destroy', $mcq->id)}}" method="POST">
-                      @csrf
-                      @method('DELETE')
-                      <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this one?')"><i class="fa fa-trash"></i></button></form>
-                  </td>
+                    <td>{{ $row['line'] }}</td><td style="min-width:180px">{{ $row['data']['title'] }}</td>
+                    <td style="min-width:180px"><ol type="A" style="padding-left:20px">@foreach(['option_a','option_b','option_c','option_d'] as $f)<li>{{ $row['data'][$f] }}</li>@endforeach</ol></td>
+                    <td>{{ $row['data']['correct_answer'] }}</td>
+                    <td>@if(!$row['errors'])<span class="label label-success">Ready</span>@else<span class="label label-danger">Skipped</span><ul>@foreach($row['errors'] as $error)<li>{{ $error }}</li>@endforeach</ul>@endif</td>
                 </tr>
                 @endforeach
-              </table>
-            </div>
-            <!-- /.box-body -->
-            <div class="box-footer clearfix">
-              <div class="pagination-sm no-margin pull-right">
-                {{$mcqs->links()}}
-              </div>
-            </div>
-          </div>
-          <!-- /.box -->
+                </tbody>
+            </table>
         </div>
-      </div>
-    </section>
-    <!-- /.content -->
-    @endsection
-@section('scripts')
-<script src="/assets/summernote/summernote.min.js"></script>
-  <script>
-    function QTitleEdit(e)
-    {
-      let form = '<div class="input-group">'+
-          '<textarea class="form-control editor">'+e.innerHTML+'</textarea>'+
-          '<span class="input-group-addon" onclick="saveTitle(this)">'+
-            '<i class="fa fa-check text-success"></i>'+
-          '</span>'+
-        '</div>';
-
-      e.innerHTML = form;
-
-      $('.editor').summernote({
-            height: 50,
-            toolbar: [
-              ['view', ['codeview']]
-            ]
-        });
-    }
-
-    function saveTitle(e)
-    {
-      let parent = e.parentNode.parentNode;
-      let id = parent.dataset.id;
-      let title = parent.firstElementChild.firstElementChild.value;
-      $.ajax({
-        type: 'GET',
-        url: '{{route("question.title.save")}}',
-        data: {id:id, title: title},
-        success: function(data){
-          parent.innerHTML = title
-        },
-        error:function(data){
-          console.error(data);
-        }
-      });
-    }
-
-    //this script for text editor
-    $(document).ready(function() {
-      $('.editor').summernote({
-        height: 150
-      });
-    });
-
-    // $(function () {
-    //   $('#example1').DataTable()
-    //   $('#example2').DataTable({
-    //     'paging'      : true,
-    //     'lengthChange': false,
-    //     'searching'   : false,
-    //     'ordering'    : true,
-    //     'info'        : true,
-    //     'autoWidth'   : false
-    //   })
-    // })
-  </script>
+    </div></div>
+    @endif
+</section>
 @endsection

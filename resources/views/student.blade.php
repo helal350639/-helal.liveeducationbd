@@ -16,7 +16,23 @@ $user = Auth::guard('student')->user();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ asset('web/assets/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('web/assets/ajax/libs/font-awesome/6.6.0/css/all.min.css') }}">
+    {{-- Same navigation stylesheet as homepage; supports desktop and mobile menu. --}}
+    <link rel="stylesheet" href="{{ asset('web/assets/css/style2b24.css') }}?v=3.8.40">
+    <link rel="stylesheet" href="{{ asset('web/assets/css/responsive2b24.css') }}?v=3523">
+    <link rel="stylesheet" href="{{ asset('web/css/style.css') }}?v=1.3.4">
+    <style>
+        #Header .logo-img { max-width:170px; }
+        #Header .user-image { max-width:40px; border-radius:25px; }
+        #Header .mobile-user-image { max-width:30px; border-radius:50%; }
+        #Header .img-circle { border-radius:50%; max-width:100px; margin:auto; }
+        #Header .user-header {text-align:center;}
+        @media(max-width:768px) { #Header .logo-img {max-width:120px;} }
+    </style>
     @yield('stylesheets')
+    <!-- LEBD v62: apply saved theme before page paints -->
+    <script>(function(){try{var t=localStorage.getItem('lebd-site-theme');if(t==='dark'){document.documentElement.setAttribute('data-lebd-theme','dark');}}catch(e){}})();</script>
+    <link rel="stylesheet" href="{{ asset('web/css/lebd-global-night-mode-v62.css') }}?v=63">
+
     <link rel="stylesheet" href="{{ asset('web/css/lebd-support-chat-v58.css') }}?v=58">
     <style>
         * { box-sizing: border-box; }
@@ -29,9 +45,7 @@ $user = Auth::guard('student')->user();
 </head>
 <body>
     <!-- Existing shared homepage header. Keep unchanged. -->
-    <header id="Header">
-        @include('homepage.header')
-    </header>
+    @include('homepage.partials.global-header')
     <main>
         @yield('content')
     </main>
@@ -46,6 +60,7 @@ $user = Auth::guard('student')->user();
     @if(Auth::guard('student')->check())
         @include('student-panel.partials.activity-tracker')
     @endif
-    <script src="{{ asset('web/js/lebd-support-chat-v58.js') }}?v=58" defer></script>
+    <script src="{{ asset('web/js/lebd-support-chat-v60.js') }}?v=60" defer></script>
+    <script src="{{ asset('web/js/lebd-global-night-mode-v62.js') }}?v=62" defer></script>
 </body>
 </html>

@@ -1,112 +1,106 @@
-@php
-use \App\Http\Controllers\SourceCtrl;
-$source = New SourceCtrl;
-@endphp
-
 @extends('dashboard')
-@section('title', 'View All Filter')
+@section('title','Filter Connection Management')
 @section('content')
-<!-- Content Header (Page header) -->
 <section class="content-header">
-  <h1>All Filter</h1>
-  <ol class="breadcrumb">
-    <li><a href="#"><i class="fa fa-dashboard"></i>Dashboard</a></li>
-    {{-- <li><a href="#">Tables</a></li> --}}
-    <li class="active">All Filter</li>
-  </ol>
+  <h1>Filter Connection Management</h1>
+  <p class="text-muted">Only eleven fixed filters are shown. Create fresh Sub-filters and connect each to the previous step.</p>
 </section>
-<!-- Main content -->
 <section class="content">
+<div class="box box-primary"><div class="box-header with-border">
+  <h3 class="box-title"><i class="fa fa-sliders"></i> Main Filters</h3>
+  <a class="btn btn-default btn-sm pull-right" href="{{ route('sub-filter.index') }}"><i class="fa fa-list"></i> Manage all Sub-filters</a>
+</div><div class="box-body">
+  <div class="alert alert-info" style="margin-bottom:15px">Only newly created Sub-filters appear here. Older Sub-filter records remain safely stored in the database.</div>
+  @unless($visibilityConfigured)<div class="alert alert-warning">Before adding new Sub-filters, import the Fix 12 visibility checkpoint SQL in phpMyAdmin. Existing database records will not be deleted.</div>@endunless
   <div class="row">
-    <div class="col-xs-12">
-      <div class="box">
-        <div class="box-header">
-          <h3 class="box-title">List of Filter</h3>
-              <div class="box-tools">
-                <a href="{{route('filter.create')}}" class="btn btn-sm btn-info">
-                  <i class="fa fa-plus"></i> Add
-                </a>
-                <form action="{{route('filter.index')}}" method="GET" class="input-group input-group-sm" style="float:right; width: 150px;margin-left:15px">
-                  <input type="text" name="search" class="form-control pull-right" placeholder="Name" value="{{request('search')}}">
-
-                  <div class="input-group-btn">
-                    <button type="submit" class="btn btn-info"><i class="fa fa-search"></i></button>
-                  </div>
-                </form>
-              </div>
+    <div class="col-md-8">
+      @foreach($stages as $stage)
+      @php $parentFilter = $stage['filter']; @endphp
+      <div class="panel panel-default lebd-stage" data-step="{{ $stage['position'] }}" data-filter="{{ $parentFilter ? $parentFilter->id : '' }}" style="margin-bottom:9px">
+        <div class="panel-body" style="padding:11px 13px">
+          <div class="row">
+            <div class="col-sm-8">
+              <label for="stage-{{ $stage['position'] }}" style="display:block;font-size:15px;margin-bottom:6px">{{ $stage['position'] }}. {{ $stage['label'] }}</label>
+              @if($parentFilter)
+                <select id="stage-{{ $stage['position'] }}" class="form-control lebd-stage-select" data-step="{{ $stage['position'] }}">
+                  <option value="">Select {{ $stage['label'] }}</option>
+                </select>
+                <span class="text-muted" style="font-size:11px">{{ $parentFilter->name }} · Filter ID {{ $parentFilter->id }}</span>
+              @else
+                <p class="text-warning" style="margin:0">No existing Filter assigned to this serial. Edit existing filter serials first.</p>
+              @endif
             </div>
-            <!-- /.box-header -->
-            <div class="box-body table-responsive no-padding">
-              <table id="example1" class="table table-bordered table-hover">
-                <tr>
-                  <th>Id</th>
-                  <th>Name</th>
-                  <th>Slug</th>
-                  <th>Order</th>
-                  <th>Course Name</th>
-                  <th>Label</th>
-                  <th>Details</th>
-                  <th>Created At</th>
-                  <th>Status</th>
-                  <th width="110">Action</th>
-                </tr>
-                @foreach($filters as $key => $filter)
-                <tr>
-                  <td>{{$key + 1}}</td>
-                  <td>{{$filter->name}}</td>
-                  <td>{{$filter->slug}}</td>
-                  <td>{{$filter->order_number}}</td>
-                  <td>
-                    @foreach($filter->courses as $course)
-                    <label class="label label-primary">{{$course->name}}</label>
-                    @endforeach
-                  </td>
-                  <td>{{$filter->label}}</td>
-                  <td>{{$filter->details}}</td>
-                  <td>{{$source->dtformat($filter->created_at)}}</td>
-                  <td>
-                    @if($filter->status == 'Active')
-                    <span class="label label-success">Active</span>
-                    @elseif($filter->status == 'Inactive')
-                    <span class="label label-warning">Inactive</span>
-                    @endif
-                  </td>
-                  <td>
-                    <a href="{{route('filter.edit', $filter->id)}}" class="btn btn-warning btn-sm" title="Edit this filter"><i class="fa fa-edit"></i></a>
-                    <form style="display: inline" action="{{route('filter.destroy', $filter->id)}}" method="POST">
-                      @csrf
-                      @method('DELETE')
-                      <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this one?')"><i class="fa fa-trash"></i></button></form>
-                  </td>
-                </tr>
-                @endforeach
-              </table>
-            </div>
-            <!-- /.box-body -->
-            <div class="box-footer clearfix">
-              <div class="pagination-sm no-margin pull-right">
-                {{$filters->links()}}
-              </div>
+            <div class="col-sm-4 text-right" style="padding-top:15px">
+              @if($parentFilter)
+                <a class="btn btn-primary btn-sm" href="{{ route('sub-filter.create', ['filter_id' => $parentFilter->id]) }}"><i class="fa fa-plus"></i> Create Sub-filter</a>
+                <a class="btn btn-default btn-sm" style="margin-top:4px" href="{{ route('sub-filter.index', ['view'=>'manage', 'filter_id'=>$parentFilter->id]) }}"><i class="fa fa-search"></i> Manage / Edit</a>
+              @else
+                <span class="text-muted">Unavailable</span>
+              @endif
             </div>
           </div>
-          <!-- /.box -->
         </div>
       </div>
-    </section>
-    <!-- /.content -->
-    @endsection
-{{-- @section('scripts')
-  <script>
-    $(function () {
-      $('#example1').DataTable()
-      $('#example2').DataTable({
-        'paging'      : true,
-        'lengthChange': false,
-        'searching'   : false,
-        'ordering'    : true,
-        'info'        : true,
-        'autoWidth'   : false
-      })
-    })
-  </script>
-@endsection --}}
+      @endforeach
+    </div>
+    <div class="col-md-4">
+      <div class="well well-sm">
+        <h4>How the connection works</h4>
+        <p>Choose an option in Question Type. Only linked options will appear in Course, then Topic, Department, and the next filters.</p>
+        <p>Each Sub-filter can be linked to earlier filter options using Create/Edit. Question Quality is independent and needs no connections.</p>
+        <p><strong>Note:</strong> Unconnected options are intentionally hidden after the first step. They can be linked through Manage / Edit.</p>
+      </div>
+    </div>
+  </div>
+</div></div>
+</section>
+@endsection
+@section('scripts')
+<script>
+(function () {
+  'use strict';
+  var items = @json($optionPayload);
+  var relations = @json($parentsByChild);
+  var selects = Array.prototype.slice.call(document.querySelectorAll('.lebd-stage-select'));
+  var byStage = {};
+  selects.forEach(function(el) { byStage[Number(el.dataset.step)] = el; });
+  var filters = {};
+  Array.prototype.slice.call(document.querySelectorAll('.lebd-stage')).forEach(function(el) {
+    filters[Number(el.dataset.step)] = Number(el.dataset.filter) || 0;
+  });
+  function resetFrom(step) {
+    for (var n = step; n <= 11; n++) {
+      var select = byStage[n];
+      if (!select) continue;
+      select.innerHTML = '';
+      select.appendChild(new Option('Select an option', ''));
+      select.disabled = n !== 1 && n !== 11;
+    }
+  }
+  function populate(step, parentId) {
+    var select = byStage[step];
+    if (!select || !filters[step]) return;
+    var matches = items.filter(function(item) {
+      if (Number(item.filter_id) !== filters[step]) return false;
+      if (step === 1 || step === 11) return true;
+      return (relations[String(item.id)] || []).some(function(p) { return Number(p) === Number(parentId); });
+    });
+    matches.forEach(function(item) { select.appendChild(new Option(item.name, item.id)); });
+    select.disabled = matches.length === 0;
+    if (!matches.length && step > 1 && step !== 11) select.options[0].text = 'No connected options';
+  }
+  resetFrom(1);
+  populate(1, null);
+  populate(11, null); // Independent Question Quality options, even without any previous choice.
+  selects.forEach(function(select) {
+    select.addEventListener('change', function() {
+      var step = Number(select.dataset.step);
+      if (step === 11) return; // Quality selection must not affect other filters.
+      resetFrom(step + 1);
+      populate(11, null); // Keep independent Quality choices available on every change.
+      if (select.value && step < 10) populate(step + 1, select.value);
+    });
+  });
+})();
+</script>
+@endsection

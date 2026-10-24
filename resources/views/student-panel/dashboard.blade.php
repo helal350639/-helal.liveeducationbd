@@ -198,18 +198,21 @@ $user = Auth::guard('student')->user();
 
             <h4>
 
-                Referral Earn
+                Available Balance
 
             </h4>
 
             @php
-                // Gross referral earnings from existing successful-purchase referral records.
-                // This is NOT wallet balance after withdrawals; the Referral page remains source of truth for that.
-                $lebdReferralEarned = \App\Models\Referrer::query()
-                    ->where('referrer_id', $user->id)
-                    ->sum('referrer_bonus');
+                // Match StudentReferralController::index() exactly:
+                // Available Balance = student's wallet balance - pending withdrawal requests.
+                // This is not gross referral earnings and must not include pending withdrawals.
+                $lebdPendingWithdraw = \App\Models\WithdrawRequest::query()
+                    ->where('student_id', $user->id)
+                    ->where('status', 'pending')
+                    ->sum('amount');
+                $lebdAvailableBalance = (float) ($user->referral_balance ?? 0) - (float) $lebdPendingWithdraw;
             @endphp
-            <h2>৳ {{ number_format((float) $lebdReferralEarned, 2) }}</h2>
+            <h2>৳ {{ number_format($lebdAvailableBalance, 2) }}</h2>
 
             <span class="withdraw-btn">
 
@@ -2367,57 +2370,9 @@ font-size:10px;
 
 </div>
 
-<!-- ================= DYNAMIC EXAM SECTION ================= -->
-
-<section class="exam-section lebd-section-panel lebd-exam-panel">
-    <div class="lebd-section-head">
-        <span class="lebd-head-icon"><i class="fa fa-file-lines"></i></span>
-        <div class="lebd-head-text">
-            <h3>পরীক্ষা বিভাগ</h3>
-            <p>আপনার জন্য উপলব্ধ কোর্সভিত্তিক পরীক্ষা</p>
-        </div>
-        <span class="lebd-head-tag">EXAM</span>
-    </div>
-
-    <div class="exam-grid">
-
-        @forelse($examSectionCourses as $course)
-
-            <a href="{{ route('students.exam.course', ['courseId' => $course->id]) }}">
-
-                <i class="fa fa-book"
-
-                   style="margin-right:6px; color:#0875e1;"></i>
-
-                {{ $course->name }}
-
-            </a>
-
-        @empty
-
-            <div style="
-
-                grid-column: 1 / -1;
-
-                text-align: center;
-
-                padding: 18px;
-
-                font-size: 13px;
-
-                color: #777;
-
-            ">
-
-                এই মুহূর্তে কোনো Exam Course নেই।
-
-            </div>
-
-        @endforelse
-
-    </div>
-
-</section>
+<!-- ================= EXAM SECTION: CATEGORY / SUB-CATEGORY ================= -->
+{{-- LEBD Fix211: Keep the Fix210 Available Balance, restore the linked category cards. --}}
+@include('student.partials.exam-section-category-cards')
 
 <!-- ================= LEARNING PROGRESS ================= -->
 
@@ -2952,6 +2907,65 @@ B+
 
 </div>
 
+<style>
+/* Fix213: Batch-style full-width Circular image area; layout never collapses when image is missing. */
+#lebd-dash-circulars .job-slider-card.lebd-circular-card {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    text-align: left !important;
+    min-width: 0;
+    box-sizing: border-box;
+}
+#lebd-dash-circulars .lebd-circular-media {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: none !important;
+    width: 100% !important;
+    height: 138px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    overflow: hidden !important;
+    background: #e9f3fd;
+}
+#lebd-dash-circulars .lebd-circular-media img {
+    display: block;
+    width: 100%; height: 100%;
+    object-fit: contain;
+    object-position: center;
+    border-radius: 0;
+}
+#lebd-dash-circulars .lebd-circular-media .lebd-circular-placeholder {
+    display: flex;
+    width: 100%; height: 100%;
+    align-items: center; justify-content: center;
+    background: linear-gradient(145deg,#eaf3ff,#f4f8ff);
+    color: #1971df;
+    font-size: 37px;
+}
+#lebd-dash-circulars .lebd-circular-media [hidden] { display: none !important; }
+#lebd-dash-circulars .lebd-circular-card .lebd-circular-card-content {
+    padding: 13px 14px 17px;
+    min-width: 0;
+    flex: 1;
+}
+#lebd-dash-circulars .lebd-circular-card .lebd-circular-card-content h3 {
+    margin: 0 0 9px !important;
+    overflow-wrap: anywhere;
+}
+#lebd-dash-circulars .lebd-circular-card .lebd-circular-card-content p {
+    margin: 5px 0 !important;
+    overflow-wrap: anywhere;
+}
+@media(max-width:600px) {
+    #lebd-dash-circulars .lebd-circular-media { height: 125px !important; }
+}
+</style>
 <!-- ================= HOMEPAGE-MATCHED LIVE CIRCULAR SLIDER ================= -->
 @php
     // Same live source/filter/order as the homepage Circular slider.
@@ -2972,11 +2986,26 @@ B+
             <button class="job-slider-arrow job-prev" type="button" aria-label="আগের বিজ্ঞপ্তি" data-circular-step="-1"><i class="fas fa-chevron-left"></i></button>
             <div class="job-slider-track" id="lebdDashCircularTrack">
                 @forelse($lebdSliderCirculars as $lebdCircular)
-                <a href="{{ route('home.circular.show', $lebdCircular->id) }}" class="job-slider-card {{ ['slider-pink','slider-blue','slider-green','slider-orange','slider-purple','slider-yellow'][$loop->index % 6] }}">
-                    <div class="slider-logo"><i class="fas fa-briefcase"></i></div>
-                    <h3>{{ $lebdCircular->title }}</h3>
-                    <p><i class="far fa-calendar-alt"></i> শেষ: {{ \Carbon\Carbon::parse($lebdCircular->end_at)->format('d/m/Y') }}</p>
-                    @if($lebdCircular->position)<p><i class="far fa-file-alt"></i> {{ $lebdCircular->position }}</p>@endif
+                <a href="{{ route('home.circular.show', $lebdCircular->id) }}" class="job-slider-card lebd-circular-card {{ ['slider-pink','slider-blue','slider-green','slider-orange','slider-purple','slider-yellow'][$loop->index % 6] }}">
+                    @php
+                        // Circular image is the Admin-uploaded image field (single path or JSON image list).
+                        $lebdImages = json_decode($lebdCircular->image ?? '', true);
+                        $lebdImage = is_array($lebdImages) ? ($lebdImages[0] ?? null) : $lebdCircular->image;
+                        $lebdImageUrl = $lebdImage ? (preg_match('~^https?://~i', $lebdImage) ? $lebdImage : asset(ltrim($lebdImage, '/'))) : null;
+                    @endphp
+                    <div class="lebd-circular-media">
+                        @if($lebdImageUrl)
+                            <img src="{{ $lebdImageUrl }}" alt="{{ $lebdCircular->title }}" loading="lazy" onerror="this.hidden=true;this.nextElementSibling.hidden=false;" />
+                            <span class="lebd-circular-placeholder" hidden aria-hidden="true"><i class="fas fa-briefcase"></i></span>
+                        @else
+                            <span class="lebd-circular-placeholder" aria-hidden="true"><i class="fas fa-briefcase"></i></span>
+                        @endif
+                    </div>
+                    <div class="lebd-circular-card-content">
+                        <h3>{{ $lebdCircular->title }}</h3>
+                        <p><i class="far fa-calendar-alt"></i> শেষ: {{ \Carbon\Carbon::parse($lebdCircular->end_at)->format('d/m/Y') }}</p>
+                        @if($lebdCircular->position)<p><i class="far fa-file-alt"></i> {{ $lebdCircular->position }}</p>@endif
+                    </div>
                 </a>
                 @empty
                     <div class="lebd-dash-circular-empty">এই মুহূর্তে আবেদন চলমান কোনো নিয়োগ বিজ্ঞপ্তি নেই।</div>

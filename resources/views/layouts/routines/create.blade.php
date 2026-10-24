@@ -4,6 +4,8 @@
 <link href="/assets/summernote/summernote.min.css" rel="stylesheet">
 @endsection
 @section('content')
+@include('layouts.routines.partials.all-pages-navigation')
+
 <section class="content-header">
   <h1>Create a Routine</h1>
   <ol class="breadcrumb">

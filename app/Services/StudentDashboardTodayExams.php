@@ -6,116 +6,68 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-/**
- * LEBD: student-visible exam schedule for today, from published routines.
- * Read-only. Never creates Exam attempts or mutates any tables.
- */
-class StudentDashboardTodayExams
+/** Exam Section live-paper feed for the existing student dashboard. */
+final class StudentDashboardTodayExams
 {
-    public static function forStudent($student): array
+    public static function forStudent($student = null): array
     {
-        if (!$student || !Schema::hasTable('routines') || !Schema::hasTable('routine_item_rows')
-            || !Schema::hasTable('papers')) {
-            return [];
+        foreach (['lebd_exam_section_routines', 'lebd_exam_section_routine_items', 'lebd_exam_section_categories'] as $table) {
+            if (!Schema::hasTable($table)) return [];
         }
 
         $now = Carbon::now('Asia/Dhaka');
-        $dayStart = $now->copy()->startOfDay();
-        $dayEnd = $now->copy()->endOfDay();
-        $batchIds = $student->batches()->pluck('batches.id')->map(fn ($id) => (int) $id)->all();
-        $departmentIds = $student->departments()->pluck('departments.id')->map(fn ($id) => (int) $id)->all();
-        $groupIds = method_exists($student, 'groups')
-            ? $student->groups()->pluck('groups.id')->map(fn ($id) => (int) $id)->all() : [];
+        $rows = DB::table('lebd_exam_section_routine_items as i')
+            ->join('lebd_exam_section_routines as r', 'r.id', '=', 'i.routine_id')
+            ->join('lebd_exam_section_categories as c', 'c.id', '=', 'r.category_id')
+            ->leftJoin('lebd_exam_section_subcategories as s', 's.id', '=', 'r.subcategory_id')
+            ->whereRaw('LOWER(TRIM(i.type)) = ?', ['exam'])
+            ->whereRaw('LOWER(TRIM(r.status)) = ?', ['published'])
+            ->whereRaw('LOWER(TRIM(c.status)) = ?', ['active'])
+            ->where(function ($query) {
+                $query->whereNull('r.subcategory_id')
+                    ->orWhereRaw('LOWER(TRIM(s.status)) = ?', ['active']);
+            })
+            ->whereNotNull('i.exam_start_at')
+            ->whereNotNull('i.exam_end_at')
+            ->where('i.exam_start_at', '<=', $now->format('Y-m-d H:i:s'))
+            ->where('i.exam_end_at', '>', $now->format('Y-m-d H:i:s'))
+            ->select('i.id', 'i.exam_name', 'i.exam_start_at', 'i.exam_end_at',
+                'r.name as routine_name', 'r.category_id', 'r.subcategory_id',
+                'c.name as category_name', 's.name as subcategory_name')
+            ->orderBy('i.exam_end_at')->orderBy('i.id')->get();
 
-        $hasEndColumn = Schema::hasColumn('routine_item_rows', 'exam_end_at');
-        $query = DB::table('routines as r')
-            ->join('routine_item_rows as i', 'i.routine_id', '=', 'r.id')
-            ->where('r.status', 'Published')
-            ->where('i.exam_at', '<=', $dayEnd->toDateTimeString())
-            ->where('i.exam_at', '>=', $dayStart->copy()->subDays(30)->toDateTimeString())
-            ->select(
-                'r.course_id', 'r.batch_id', 'r.department_id',
-                'i.id as routine_item_id', 'i.paper_name', 'i.exam_at'
-            );
-        $query->addSelect($hasEndColumn ? 'i.exam_end_at' : DB::raw('NULL as exam_end_at'));
-        // Every One papers remain public; filter strictly below before presenting any row.
-        $items = $query->orderBy('i.exam_at')->get();
-        if ($items->isEmpty()) return [];
+        $urlPrefix = '/lebd-exam-take/';
+        $list = [];
+        foreach ($rows as $row) {
+            $start = Carbon::parse($row->exam_start_at, 'Asia/Dhaka');
+            $end = Carbon::parse($row->exam_end_at, 'Asia/Dhaka');
+            // Defensively recheck the clock; a category can be updated during the request.
+            if (!$now->betweenIncluded($start, $end) || $now->equalTo($end)) continue;
+            $seconds = max(0, $now->diffInSeconds($end, false));
+            $minutes = intdiv((int)$seconds, 60);
+            $batchLabel = $row->category_name;
+            if ($row->subcategory_name) $batchLabel .= ' > ' . $row->subcategory_name;
 
-        $papers = DB::table('papers')
-            ->whereIn('status', ['Published', 'Scheduled'])
-            ->get(['id','name','course_id','batch_id','department_id','group_id',
-                   'permit','status','close','time']);
-        $names = DB::table('batches')->pluck('name', 'id');
-        $counts = Schema::hasTable('paper_question')
-            ? DB::table('paper_question')->select('paper_id')
-                ->selectRaw('COUNT(DISTINCT question_id) AS total')
-                ->groupBy('paper_id')->pluck('total', 'paper_id') : collect();
-
-        $completedPaperIds = Schema::hasTable('exams')
-            ? DB::table('exams')->where('student_id', $student->id)
-                ->where('status', 'Completed')->distinct()->pluck('paper_id')->map(fn ($v)=>(int)$v)->all()
-            : [];
-
-        $result = [];
-        $seen = [];
-        foreach ($items as $item) {
-            // Several departments can have different Papers with the same title.
-            // Select a paper the current student is actually allowed to view.
-            $paper = $papers->first(function ($p) use ($item, $batchIds, $departmentIds, $groupIds) {
-                if ((int)$p->course_id !== (int)$item->course_id
-                    || (int)$p->batch_id !== (int)$item->batch_id
-                    || trim((string)$p->name) !== trim((string)$item->paper_name))
-                    return false;
-                if ($item->department_id !== null && (int)$item->department_id !== 0
-                    && (int)$p->department_id !== (int)$item->department_id)
-                    return false;
-                $inBatch = in_array((int)$p->batch_id, $batchIds, true);
-                $inDepartment = in_array((int)$p->department_id, $departmentIds, true);
-                $inGroup = in_array((int)$p->group_id, $groupIds, true);
-                return match (trim((string)$p->permit)) {
-                    'Every One' => true,
-                    'Batch' => $inBatch,
-                    'Department' => $inBatch && $inDepartment,
-                    'Group' => $inBatch && $inGroup,
-                    default => false,
-                };
-            });
-            if (!$paper || isset($seen[$paper->id])) continue;
-
-            $start = Carbon::parse($item->exam_at, 'Asia/Dhaka');
-            $endValue = $item->exam_end_at ?: $paper->close;
-            $end = $endValue ? Carbon::parse($endValue, 'Asia/Dhaka') : null;
-            if ($start->gt($dayEnd) || ($start->lt($dayStart) && (!$end || $end->lt($dayStart)))) continue;
-
-            $isPublished = $paper->status === 'Published';
-            $status = $now->lt($start) ? 'upcoming' : ($end && $now->lt($end) ? 'live' : 'ended');
-            $hasCompleted = in_array((int)$paper->id, $completedPaperIds, true);
-            $resultUrl = $hasCompleted ? route('students.result', $paper->id) : null;
-            $infoUrl = route('students.exam.info', array_filter([
-                'paper' => (int)$paper->id,
-                'department_id' => $paper->department_id ? (int)$paper->department_id : null,
-            ], static fn ($value) => $value !== null));
-            $canOpen = $isPublished && $end && $end->greaterThan($start);
-            $result[] = [
-                'id' => (int)$paper->id,
-                'batch' => $names[$paper->batch_id] ?? ('Batch #' . $paper->batch_id),
-                'name' => (string)$paper->name,
-                'start_ms' => $start->getTimestamp() * 1000,
-                'end_ms' => $end?->getTimestamp() * 1000,
-                'start_label' => $start->format('h:i A'),
-                'end_label' => $end ? $end->format('h:i A') : 'শেষ সময় নির্ধারিত নয়',
-                'question_count' => $counts->has($paper->id) ? (int)$counts[$paper->id] : null,
-                'status' => $status,
-                'status_label' => $status === 'upcoming' ? 'আসন্ন' : ($status === 'live' && $isPublished ? 'লাইভ চলছে' : 'সময়সীমা শেষ'),
-                'timer_label' => $status === 'upcoming' ? 'শুরু হতে বাকি' : ($status === 'live' ? 'সময় বাকি' : 'অবস্থা'),
-                'timer_value' => $status === 'ended' ? 'সময় শেষ' : '00:00:00',
-                'can_open' => $canOpen,
-                'info_url' => ($canOpen && $status !== 'ended') ? $infoUrl : null,
-                'result_url' => $resultUrl,
+            // The endpoint is protected by the existing student exam admission checks;
+            // listing a link never grants access to paid/unpublished/unenrolled papers.
+            $list[] = [
+                'id' => (int) $row->id,
+                'batch' => $batchLabel,
+                'name' => $row->exam_name,
+                'status' => 'live',
+                'status_label' => 'চলমান',
+                'start_ms' => $start->timestamp * 1000,
+                'end_ms' => $end->timestamp * 1000,
+                'start_label' => $start->format('d M Y h:i A'),
+                'end_label' => $end->format('d M Y h:i A'),
+                'timer_label' => 'সময় বাকি',
+                'timer_value' => sprintf('%02d:%02d:%02d', intdiv($minutes, 60), $minutes % 60, (int)$seconds % 60),
+                'question_count' => null,
+                'can_open' => true,
+                'info_url' => url($urlPrefix . (int)$row->id),
+                'result_url' => null,
             ];
-            $seen[$paper->id] = true;
         }
-        return $result;
+        return $list;
     }
 }

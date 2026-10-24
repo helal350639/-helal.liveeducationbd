@@ -1,0 +1,47 @@
+/* LEBD-3 v78: safe layout-only fix, loaded by shared header on homepage/student pages. */
+/* Header should occupy normal document flow. Some course and dashboard styles force fixed header. */
+html body #Header {position:relative!important;top:auto!important;left:auto!important;right:auto!important;bottom:auto!important;width:100%!important;transform:none!important;z-index:1050!important;}
+html body #Header > .navbar {position:relative!important;top:auto!important;}
+html body #Header + main,html body main {scroll-margin-top:10px;}
+/* Preserve mobile 4-link header and prevent legacy page-specific body padding offsets. */
+@media(max-width:991.98px){
+ html body:has(#Header) {padding-top:0!important;}
+ html body #Header .lebd-mobile-quicknav {position:relative!important;top:auto!important;bottom:auto!important;}
+ html body #Header #navbarSupportedContent {z-index:1080!important;}
+ html body #Header .lebd-mobile-profile-menu {z-index:1090!important;}
+ html body .batch-detail-page {padding-top:12px!important;}
+ html body #lebd-student-dashboard {padding-top:15px!important;}
+}
+/* Student dashboard: retain original horizontal profile/referral composition on ALL viewports. */
+@media(max-width:767.98px){
+ html body #lebd-student-dashboard .student-profile-card {display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:space-between!important;gap:8px!important;min-height:105px!important;padding:12px 10px!important;}
+ html body #lebd-student-dashboard .student-profile-card .profile-left {display:flex!important;flex:1 1 0!important;width:auto!important;min-width:0!important;gap:7px!important;}
+ html body #lebd-student-dashboard .student-profile-card .profile-avatar {width:38px!important;height:38px!important;flex:0 0 38px!important;}
+ html body #lebd-student-dashboard .student-profile-card .profile-info {min-width:0!important;flex:1 1 auto!important;}
+ html body #lebd-student-dashboard .student-profile-card .profile-info h4{font-size:12px!important;line-height:1.35!important;margin-bottom:4px!important;}
+ html body #lebd-student-dashboard .student-profile-card .profile-info p {font-size:10px!important;line-height:1.35!important;margin:2px 0!important;overflow-wrap:anywhere!important;}
+ html body #lebd-student-dashboard .student-profile-card .referral-link {width:auto!important;display:block!important;flex:0 0 115px!important;max-width:115px!important;}
+ html body #lebd-student-dashboard .student-profile-card .referral-card {width:115px!important;max-width:115px!important;min-height:78px!important;height:auto!important;padding:8px 5px!important;border-radius:12px!important;}
+ html body #lebd-student-dashboard .student-profile-card .referral-content {width:100%!important;text-align:center!important;}
+ html body #lebd-student-dashboard .student-profile-card .referral-content h4 {font-size:10px!important;line-height:1.2!important;margin:0 0 3px!important;}
+ html body #lebd-student-dashboard .student-profile-card .referral-content h2 {font-size:14px!important;line-height:1.3!important;margin:0 0 4px!important;}
+ html body #lebd-student-dashboard .student-profile-card .withdraw-btn {display:block!important;min-width:0!important;width:100%!important;padding:5px 4px!important;font-size:10px!important;}
+}
+@media(min-width:500px) and (max-width:767.98px){
+ html body #lebd-student-dashboard .student-profile-card .referral-link {flex-basis:160px!important;max-width:160px!important;}
+ html body #lebd-student-dashboard .student-profile-card .referral-card {width:160px!important;max-width:160px!important;}
+ html body #lebd-student-dashboard .student-profile-card .profile-avatar {width:48px!important;height:48px!important;flex-basis:48px!important;}
+}
+/* Running batch homepage carousel: keep compact cards when only 1-2 batches are active. */
+@media(min-width:851px){
+ html body .lebd-homepage-canvas .lebd-home-batch-slider .lebd-home-batch-card,
+ html body .lebd-homepage-canvas .lebd-home-batch-slider.lebd-home-few-batches .lebd-home-batch-card {flex:0 0 calc((100% - 36px)/3)!important;max-width:calc((100% - 36px)/3)!important;}
+}
+@media(min-width:681px) and (max-width:850px){
+ html body .lebd-homepage-canvas .lebd-home-batch-slider .lebd-home-batch-card,
+ html body .lebd-homepage-canvas .lebd-home-batch-slider.lebd-home-few-batches .lebd-home-batch-card {flex:0 0 calc((100% - 18px)/2)!important;max-width:calc((100% - 18px)/2)!important;}
+}
+@media(max-width:680px){
+ html body .lebd-homepage-canvas .lebd-home-batch-slider .lebd-home-batch-card,
+ html body .lebd-homepage-canvas .lebd-home-batch-slider.lebd-home-few-batches .lebd-home-batch-card {flex:0 0 85%!important;max-width:85%!important;}
+}

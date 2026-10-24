@@ -1,1162 +1,647 @@
 <?php
 
 use \App\Http\Controllers\SourceCtrl;
-
-$source = new SourceCtrl;
+$source = New SourceCtrl;
 
 $user = [];
-
-if (Auth::guard('student')->user()) {
-    $user = Auth::guard('student')->user();
+if(Auth::guard('student')->user())
+{
+  $user = Auth::guard('student')->user();
 }
 
+function active($name)
+{
+  $uri = explode('/', $_SERVER['REQUEST_URI']);
+  if(isset($uri[2]) && $uri[2] == $name || $_SERVER['REQUEST_URI'] == $name)
+  {
+    return 'active';
+  }
+}
 ?>
 
-<header id="Header">
-
-    <nav class="navbar">
-
-        <div class="container">
-
-            <!-- =====================================================
-                 ROW 1
-                 LOGO + DASHBOARD + NOTIFICATION + USER
-            ====================================================== -->
-
-            <div class="header-top-row">
-
-                <!-- LOGO -->
-
-                <div class="main-logo">
-
-                    <a href="{{ route('homepage') }}">
-
-                        <img
-                            src="/web/img/logo.png?v=1.1.2"
-                            alt="LiveEducationBD"
-                            class="logo-img"
-                        >
-
-                    </a>
-
-                </div>
-
-
-                <!-- RIGHT SIDE -->
-
-                <div class="header-actions">
-
-                    <!-- STUDENT DASHBOARD -->
-
-                    @if(!empty($user))
-
-                        <div class="student-dashboard-btn">
-
-                            <a href="{{ route('students.dashboard') }}">
-
-                                <i class="fa-solid fa-gauge-high"></i>
-
-                                <span>Dashboard</span>
-
-                            </a>
-
-                        </div>
-
-                    @endif
-
-
-                    <!-- NOTIFICATION -->
-
-                    <div class="dropdown notification-area">
-
-                        <a
-                            href="javascript:void(0)"
-                            class="dropdown-toggle"
-                            id="Bell"
-                            data-bs-toggle="dropdown"
-                            aria-expanded="false"
-                        >
-
-                            <i class="fa fa-bell"></i>
-
-                        </a>
-
-
-                        <ul class="dropdown-menu dropdown-menu-end">
-
-                            <li>
-
-                                <a class="dropdown-item" href="#">
-                                    কোনো নতুন নোটিফিকেশন নেই
-                                </a>
-
-                            </li>
-
-                        </ul>
-
-                    </div>
-
-
-                    <!-- USER / LOGIN -->
-
-                    @if(empty($user))
-
-                        <div class="login-button">
-
-                            <a
-                                href="{{ route('students.login') }}"
-                                class="login-btn"
-                            >
-                                Login
-                            </a>
-
-                        </div>
-
-                    @else
-
-                        <div class="dropdown user user-menu">
-
-                            <div
-                                class="dropdown-toggle user-toggle"
-                                data-bs-toggle="dropdown"
-                                aria-expanded="false"
-                            >
-
-                                <img
-                                    src="{{ $user->image ?: '/img/avatar.png' }}"
-                                    class="mobile-user-image"
-                                    alt="Student"
-                                >
-
-                            </div>
-
-
-                            <ul class="dropdown-menu dropdown-menu-end">
-
-                                <li>
-
-                                    <a
-                                        class="dropdown-item"
-                                        href="{{ route('students.dashboard') }}"
-                                    >
-                                        ড্যাশবোর্ড
-                                    </a>
-
-                                </li>
-
-
-                                <li>
-
-                                    <a
-                                        class="dropdown-item"
-                                        href="{{ route('students.my-course') }}"
-                                    >
-                                        আমার কোর্স
-                                    </a>
-
-                                </li>
-
-
-                                <li>
-
-                                    <form
-                                        action="{{ route('students.logout') }}"
-                                        method="post"
-                                    >
-
-                                        @csrf
-
-                                        <button
-                                            type="submit"
-                                            class="dropdown-item"
-                                        >
-                                            লগআউট
-                                        </button>
-
-                                    </form>
-
-                                </li>
-
-                            </ul>
-
-                        </div>
-
-                    @endif
-
-                </div>
-
+<!DOCTYPE html>
+<html lang="en">
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+<head>
+    <title>Live Education BD</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <link rel="icon" href="/web/img/favicon.png?v=1.1.3" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="robots" content="index" />
+    @yield('stylesheets')
+    <!-- Preconnect & Preload Resources -->
+    <link href="{{'/web/assets/fonts.googleapis.com/css24d2f.css?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap" rel="stylesheet'}}">
+    <link href="{{'/web/assets/fonts.googleapis.com/css26dcd.css?family=Noto+Sans+Bengali:wght@100..900&amp;display=swap" rel="stylesheet'}}" />
+
+    <!-- External CSS Libraries -->
+    <link rel="stylesheet" href="{{'/web/assets/ajax/libs/font-awesome/6.6.0/css/all.min.css'}}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="{{'/web/assets/npm/sweetalert2%4011.7.3/dist/sweetalert2.min.css'}}"  />
+    <link rel="stylesheet" href="{{'/web/assets-old/css/owl.theme.default.min.css'}}" />
+    <link rel="stylesheet" href="{{'/web/assets/css/bootstrap.min.css'}}" />
+    <link rel="stylesheet" href="{{'/web/assets/vendors/slick/slick.css'}}" />
+    <link rel="stylesheet" href="{{'/web/assets/vendors/slick/slick-theme.css'}}"/>
+    <link rel="stylesheet" href="{{'/web/assets-old/css/owl.carousel.min.css'}}" />
+    <!-- Custom CSS (With Cache Busting) -->
+    <link rel="stylesheet" href="{{'/web/assets/css/style2b24.css?v=3.8.40'}}" />
+    <link rel="stylesheet" href="{{'/web/assets/css/responsive2b24.css?v=3523'}}" />
+    <link rel="stylesheet" href="{{'/web/css/style.css?v=1.3.4'}}" />
+    <style>
+      .user-image{
+        max-width: 40px;
+        border-radius: 25px
+      }
+      .mobile-user-image{
+        max-width: 30px;
+        border-radius: 50%
+      }
+      .img-circle{
+        border-radius: 50%;
+        max-width: 100px;
+        margin:auto
+      }
+      .user-header{
+        text-align: center
+      }
+      @media(min-width:769px){
+        .logo-img{
+          max-width: 170px;
+        }
+      }
+      @media(max-width:768px){
+        .logo-img{
+          max-width: 120px;
+        }
+        #Home_add{margin-top: 15px}
+      }
+    </style>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0DK9PN2V96"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-0DK9PN2V96');
+    </script>
+    <script src="https://www.wiris.net/demo/plugins/app/WIRISplugins.js?viewer=image"></script>
+
+    <!-- Meta Pixel Code -->
+<script>
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '1404800934199536');
+  fbq('track', 'PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none"
+  src="https://www.facebook.com/tr?id=1404800934199536&ev=PageView&noscript=1"
+  /></noscript>
+  <!-- End Meta Pixel Code -->
+
+
+  <header id="Header">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container">
+        <div class="mobile-menu d-flex justify-content-between align-items-center">
+          <div class="main-logo">
+            <a href="{{route('homepage')}}">
+              <img src="/web/img/logo.png?v=1.1.2" alt="Logo" class="logo-img">
+            </a>
+          </div>
+          <div class="moblie-icon">
+
+            <div class="dropdown">
+              <a href="javascript:void(0)" class="dropdown-/toggle text-warning" id="Bell" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: black;">
+                <i class="fa fa-bell"></i>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="Bell">
+                <li class="nav-item">
+                  <a class="nav-link" href="javascript:void(0)">...</a>
+                </li>
+              </ul>
             </div>
 
+            @if(!empty($user))
+              <div class="dropdown user user-menu">
+                <div class="dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  <!-- The user image in the navbar-->
+                  <img src="{{$user->image ? : '/img/avatar.png' }}" class="mobile-user-image" alt="">
+                </div>
+                <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow dropdown-center">
+                  <!-- The user image in the menu -->
+                  <div class="user-header">
+                    <img src="{{$user->image ? :'/img/avatar.png' }} " class="img-circle md-3" alt="Photo"/>
 
-            <!-- =====================================================
-                 ROW 2
-                 NAVIGATION
-            ====================================================== -->
+                    <h4 style="color: #000; font-size:16px" class="mt-3">
+                      <b>{{$user->name}}</b>
+                      </br>
+                      <small>Reg. ID: {{$source->numset($user->id, 6)}}<br>
+                      {{$user->email}}</br>
+                      {{$user->contact}}</small>
+                      </h4>
+                    <div class="clearfix"></div>
+                  </div>
 
-            <div class="header-menu-row">
+                  <li><a class="dropdown-item" href="{{route('students.dashboard')}}">ড্যাশবোর্ড</a></li>
+                  <li>
+                    <a class="dropdown-item" href="{{route('students.my-syllabus')}}">সিলেবাস সমূহ</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="{{route('students.my-course')}}">আমার কোর্স সমূহ</a>
+                  </li>
+                  <li>
+                    <a href="{{route('students.profile')}}" class="dropdown-item ">প্রোফাইল</a>
+                  </li>
+                  <li>
+                    <form action="{{route('students.logout')}}" method="post" class="onclick">
+                      @csrf
+                      <button type="submit" class="dropdown-item btn btn-warning btn-fluid" onclick="return confirm('Are you sure you want to logout?')">লগআউট</button>
+                    </form>
+                  </li>
+                </div>
+              </div>
+            @else
+              <div class="nav-item login-button">
+                <a href="{{route('students.login')}}" type="button" class="btn btn-success btn-sm">Login</a>
+              </div>
+            @endif
 
-                <ul class="navbar-nav">
-
-                    <li class="nav-item">
-
-                        <a
-                            class="nav-link active"
-                            href="{{ route('homepage') }}"
-                        >
-                            হোম
-                        </a>
-
-                    </li>
-
-
-                    <li class="nav-item">
-
-                        <a class="nav-button" href="{{ route('homepage.courses') }}">
-                        কোর্স
-                        </a>
-
-
-                    </li>
-
-
-                    <li class="nav-item">
-
-                        <a class="nav-button" href="{{ route('homepage.running.batches') }}">
-                        ব্যাচ
-                        </a>
-
-                    </li>
-
-
-                    <li class="nav-item">
-
-                        <a
-                            class="nav-link"
-                            href="/#our-success"
-                        >
-                       পরীক্ষা
-                        </a>
-
-                    </li>
-
-
-                    <li class="nav-item">
-
-                        <a
-                            class="nav-link"
-                            href="/#circular"
-                        >
-                            নিয়োগ
-                        </a>
-
-                    </li>
-
-
-                    <li class="nav-item">
-
-                        <a
-                            class="nav-link"
-                            href="/#our-services"
-                        >
-                            সেবাসমূহ
-                        </a>
-
-                    </li>
-
-                </ul>
-
+            <div>
+              <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" onclick="extMenuShowHide(this)">
+                <span class="navbar-toggler-icon"></span>
+              </button>
             </div>
-
+          </div>
         </div>
 
+
+        <nav class="navbar-2 navbar-expand navbar-light" id="extra-mobile-nav">
+          <div class="container">
+            <div class="navbar-collapse">
+              <ul class="navbar-nav justify-content-center w-100">
+                <li class="nav-item">
+                  <a class="nav-link" href="{{route('students.dashboard')}}"  style="color: #1CAB55; background:#eee; border-radius:10px">ড্যাশবোর্ড</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/#our_courses" style="color: #1CAB55;">
+                    কোর্স
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{{ route('homepage.running.batches') }}" style="color: #1CAB55;">ব্যাচ</a>
+                </li>
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="/#exam-section" style="color: #1CAB55;">পরীক্ষা </a>
+                  <ul class="dropdown-menu" aria-labelledby="moreDropdown">
+                    <li class="nav-item">
+                      <a class="nav-link" href="{{route('category.batches', 'Free Exams')}}">ফ্রি পরীক্ষা সমূহ</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="{{route('category.batches', 'Premium Exams')}}">প্রিমিয়াম পরীক্ষা সমূহ</a>
+                    </li>
+                  </ul>
+                </li>
+                <!-- More Dropdown -->
+                <li class="nav-item dropdown more">
+                  <a class="nav-link dropdown-toggle" href="javascript:void(0)" id="moreDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: #1CAB55;">
+                  আরও
+                  </a>
+                  <ul class="dropdown-menu" aria-labelledby="moreDropdown">
+                    <li class="nav-item">
+                      <a class="nav-link" href="{{route('students.my-syllabus')}}" style="color: #1CAB55;">
+                       সিলেবাস
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="/#our-success">আমাদের সাফল্য</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="/#circular">নিয়োগ বিজ্ঞপ্তি</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="/#our-services">সেবা সমূহ</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="/#Student_review">শিক্ষার্থীদের মতামত</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="{{route('students.complain')}}">অভিযোগ দিন</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="/#book-storage">বুক স্টোরেজ</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="/#our_teacher">শিক্ষক মণ্ডলী</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="{{route('students.my-course')}}">আমার কোর্স সমূহ</a>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+            <div class="search_button">
+              <form class="search_button_area" action="#" method="POST" onclick="event.preventDefault()">
+                <input type="hidden" name="_token" value="WlWD0OcHgoiFVuFIs7j0oumKvc7rASkRL84qLvMq" autocomplete="off">                            
+                <div class="input-group">
+                  <span class="input-group-text border-0">
+                  <button class="" type="submit">
+                  <i class="fa-solid fa-magnifying-glass"></i>
+                  </button>
+                  </span>
+                  <input type="text" class="form-control border-0 shadow-none"
+                    placeholder="Search courses" name="search" />
+                </div>
+              </form>
+            </div>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page"
+                href="{{route('homepage')}}">হোম</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/#our_courses">
+                কোর্স
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ route('homepage.running.batches') }}">ব্যাচ</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="/#exam-section">পরীক্ষা</a>
+              <ul class="dropdown-menu" aria-labelledby="moreDropdown">
+                <li class="nav-item">
+                  <a class="nav-link" href="{{route('category.batches', 'Free Exams')}}">ফ্রি পরীক্ষা সমূহ</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{{route('category.batches', 'Premium Exams')}}">প্রিমিয়াম পরীক্ষা সমূহ</a>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/#our-success">আমাদের সাফল্য</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/#circular">নিয়োগ বিজ্ঞপ্তি</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="javascript:void(0)" id="moreDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                আরও
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="moreDropdown">
+                <li class="nav-item">
+                  <a class="nav-link" href="/#our-services">সেবা সমূহ</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/#Student_review">শিক্ষার্থীদের মতামত</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{{route('students.complain')}}">অভিযোগ দিন</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/#book-storage">বুক স্টোরেজ</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/#our_teacher">শিক্ষক মণ্ডলী</a>
+                </li>
+              </ul>
+            </li>
+            <form class="search_button_area mt-lg-1 desk-top-search d-none d-lg-block" action="#" method="POST" onclick="event.preventDefault()">
+              <input type="hidden" name="_token" value="WlWD0OcHgoiFVuFIs7j0oumKvc7rASkRL84qLvMq" autocomplete="off">                        
+              <div class="input-group">
+                <span class="input-group-text border-0">
+                <button class="" type="submit">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+                </span>
+                <input type="text" class="form-control border-0 shadow-none" placeholder="Search courses"
+                  name="search_content" value="" />
+              </div>
+            </form>
+          </ul>
+
+          @if(!empty($user))
+          <div class="dropdown user user-menu d-none d-lg-block">
+            <div class="dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <!-- The user image in the navbar-->
+              <img src="{{$user->image ? :'/img/avatar.png' }}" class="user-image" alt="">
+              <span class="hidden-xs">{{$user->name}}</span>
+            </div>
+            <ul class="dropdown-menu">
+              <!-- The user image in the menu -->
+              <div class="user-header">
+                <img src="{{$user->image ? :'/img/avatar.png' }} " class="img-circle md-3" alt="User Image"/>
+
+                <h4 style="color: #000; font-size:16px" class="mt-3">
+                  <b>{{$user->name}}</b>
+                  </br>
+                  <small>Reg. ID: {{$source->numset($user->id, 6)}}<br>
+                  {{$user->email}}</br>
+                  {{$user->contact}}</small>
+                </h4>
+              </div>
+
+                <li><a class="dropdown-item" href="{{route('students.dashboard')}}">ড্যাশবোর্ড</a></li>
+                <li>
+                  <a class="dropdown-item" href="{{route('students.my-syllabus')}}">সিলেবাস সমূহ</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="{{route('students.my-course')}}">আমার কোর্স সমূহ</a>
+                </li>
+                <li>
+                  <a href="{{route('students.profile')}}" class="dropdown-item ">প্রোফাইল</a>
+                </li>
+                <li>
+                  <form action="{{route('students.logout')}}" method="post" class="btn">
+                    @csrf
+                    <button type="submit" class="dropdown-item btn btn-warning btn-fluid" onclick="return confirm('Are you sure you want to logout?')">লগআউট</button>
+                  </form>
+                </li>
+
+            </ul>
+          </div>
+          @else
+          <div class="desk-top-login">
+            <div class="nav-item login-button">
+              <a href="{{route('students.login')}}" type="button" class="btn btn_warning btn-sm">Login</a>
+            </div>
+          </div>
+          @endif
+        </div>
+        
+      </div> <!-- /.container -->
     </nav>
-
-</header>
-
-
-<style>
-
-/* =========================================================
-   LIVE EDUCATION BD HEADER
-   CLEAN PROFESSIONAL VERSION
-========================================================= */
-
-
-/* =========================================================
-   COMMON
-========================================================= */
-
-#Header,
-#Header * {
-    box-sizing: border-box;
-}
-
-#Header {
-    width: 100%;
-    background: #ffffff;
-    position: relative;
-    z-index: 1000;
-    border-bottom: 1px solid #e5e7eb;
-}
-
-#Header .navbar {
-    width: 100%;
-    padding: 0 !important;
-    margin: 0 !important;
-    background: #ffffff !important;
-}
-
-
-/* =========================================================
-   MAIN CONTAINER
-========================================================= */
-
-#Header .navbar > .container {
-    width: 100%;
-    max-width: 1250px;
-
-    margin: 0 auto;
-    padding: 0 !important;
-
-    display: block;
-}
-
-
-/* =========================================================
-   ROW 1
-========================================================= */
-
-#Header .header-top-row {
-    width: 100%;
-    height: 78px;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    padding: 8px 0;
-
-    background: #ffffff;
-}
-
-
-/* =========================================================
-   LOGO
-========================================================= */
-
-#Header .main-logo {
-    display: flex;
-    align-items: center;
-
-    flex-shrink: 0;
-}
-
-#Header .main-logo a {
-    display: flex;
-    align-items: center;
-
-    text-decoration: none;
-}
-
-#Header .logo-img {
-    width: 155px;
-    height: auto;
-
-    display: block;
-}
-
-
-/* =========================================================
-   RIGHT SIDE
-   Dashboard + Notification + User
-========================================================= */
-
-#Header .header-actions {
-    display: flex;
-    align-items: center;
-
-    gap: 9px;
-
-    margin-left: auto;
-}
-
-
-/* =========================================================
-   DASHBOARD BUTTON
-========================================================= */
-
-#Header .student-dashboard-btn {
-    display: flex;
-    align-items: center;
-}
-
-#Header .student-dashboard-btn a {
-    height: 38px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    gap: 7px;
-
-    padding: 0 14px;
-
-    color: #ffffff;
-
-    background: linear-gradient(
-        180deg,
-        #3d91ff 0%,
-        #1677ff 55%,
-        #0864df 100%
-    );
-
-    border: 1px solid #075dcc;
-
-    border-radius: 9px;
-
-    font-size: 13px;
-    font-weight: 600;
-
-    text-decoration: none;
-
-    white-space: nowrap;
-
-    box-shadow:
-        0 3px 0 #064da8,
-        0 5px 10px rgba(22,119,255,.20);
-
-    transition: .15s ease;
-}
-
-#Header .student-dashboard-btn a:hover {
-    transform: translateY(-1px);
-
-    box-shadow:
-        0 4px 0 #064da8,
-        0 7px 14px rgba(22,119,255,.25);
-}
-
-#Header .student-dashboard-btn a:active {
-    transform: translateY(2px);
-
-    box-shadow:
-        0 1px 0 #064da8,
-        0 2px 5px rgba(22,119,255,.15);
-}
-
-#Header .student-dashboard-btn i {
-    font-size: 14px;
-}
-
-
-/* =========================================================
-   NOTIFICATION
-========================================================= */
-
-#Header .notification-area {
-    position: relative;
-}
-
-#Header #Bell {
-    width: 40px;
-    height: 40px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    padding: 0;
-    margin: 0;
-
-    color: #f5a900;
-
-    background: #fff8e6;
-
-    border-radius: 50%;
-
-    text-decoration: none;
-
-    transition: .2s ease;
-}
-
-#Header #Bell:hover {
-    background: #fff0c2;
-    transform: translateY(-1px);
-}
-
-#Header #Bell i {
-    font-size: 18px;
-}
-
-
-/* =========================================================
-   DROPDOWN
-========================================================= */
-
-#Header .dropdown-menu {
-    min-width: 180px;
-
-    padding: 6px;
-
-    margin-top: 7px !important;
-
-    border: 1px solid #e5e7eb;
-
-    border-radius: 11px;
-
-    background: #ffffff;
-
-    box-shadow: 0 8px 25px rgba(0,0,0,.12);
-
-    z-index: 99999;
-}
-
-#Header .dropdown-item {
-    padding: 9px 12px;
-
-    border-radius: 7px;
-
-    font-size: 14px;
-
-    color: #243b53;
-
-    white-space: nowrap;
-}
-
-#Header .dropdown-item:hover {
-    background: #f1f6ff;
-    color: #1677ff;
-}
-
-
-/* =========================================================
-   USER PROFILE
-========================================================= */
-
-#Header .user-menu {
-    width: 46px;
-    height: 46px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    position: relative;
-}
-
-#Header .user-toggle {
-    width: 46px;
-    height: 46px;
-
-    padding: 2px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 50%;
-
-    background: #f4f7fb;
-
-    cursor: pointer;
-}
-
-#Header .mobile-user-image {
-    width: 42px;
-    height: 42px;
-
-    min-width: 42px;
-    min-height: 42px;
-
-    max-width: 42px;
-    max-height: 42px;
-
-    display: block;
-
-    object-fit: cover;
-
-    border-radius: 50%;
-
-    border: 2px solid #e5e7eb;
-}
-
-#Header .user-menu .dropdown-menu {
-    position: absolute;
-
-    top: calc(100% + 5px);
-
-    right: 0;
-    left: auto;
-}
-
-
-/* =========================================================
-   LOGIN
-========================================================= */
-
-#Header .login-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    height: 38px;
-
-    padding: 0 16px;
-
-    background: #16a34a;
-
-    color: #ffffff;
-
-    border-radius: 8px;
-
-    text-decoration: none;
-
-    font-size: 13px;
-    font-weight: 600;
-}
-
-
-/* =========================================================
-   ROW 2 - NAVIGATION
-========================================================= */
-
-#Header .header-menu-row {
-    width: 100%;
-    height: 52px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: #ffffff;
-
-    border-top: 1px solid #f0f2f5;
-    border-bottom: 1px solid #e5e7eb;
-
-    overflow-x: auto;
-    overflow-y: hidden;
-
-    scrollbar-width: none;
-}
-
-#Header .header-menu-row::-webkit-scrollbar {
-    display: none;
-}
-
-
-/* NAV LIST */
-
-#Header .header-menu-row .navbar-nav {
-    width: max-content;
-    height: 52px;
-
-    display: flex;
-
-    flex-direction: row;
-
-    align-items: center;
-    justify-content: center;
-
-    gap: 2px;
-
-    margin: 0;
-    padding: 0;
-
-    list-style: none;
-}
-
-
-/* =========================================================
-   3D PROFESSIONAL NAVIGATION
-========================================================= */
-
-#Header .header-menu-row .nav-link {
-
-    height: 42px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    padding: 0 17px;
-
-    margin: 0 3px;
-
-    color: #183b66;
-
-    background: linear-gradient(
-        180deg,
-        #ffffff 0%,
-        #f4f8ff 55%,
-        #e5edf9 100%
-    );
-
-    border: 1px solid #d5dfed;
-
-    border-radius: 9px;
-
-    font-size: 15px;
-    font-weight: 600;
-
-    line-height: 1;
-
-    text-decoration: none;
-
-    white-space: nowrap;
-
-    /* 3D depth */
-    box-shadow:
-        0 3px 0 #c4d0df,
-        0 5px 9px rgba(30, 70, 110, 0.12);
-
-    transition:
-        transform .15s ease,
-        box-shadow .15s ease,
-        background .15s ease,
-        color .15s ease;
-
-}
-
-
-/* HOVER */
-
-#Header .header-menu-row .nav-link:hover {
-
-    color: #0864df;
-
-    background: linear-gradient(
-        180deg,
-        #ffffff 0%,
-        #edf5ff 50%,
-        #dceaff 100%
-    );
-
-    transform: translateY(-2px);
-
-    box-shadow:
-        0 4px 0 #aebfd4,
-        0 7px 13px rgba(22,119,255,.18);
-
-}
-
-
-/* CLICK / ACTIVE */
-
-#Header .header-menu-row .nav-link:active {
-
-    transform: translateY(2px);
-
-    box-shadow:
-        0 1px 0 #b6c3d3,
-        0 2px 5px rgba(0,0,0,.10);
-
-}
-
-
-/* ACTIVE PAGE */
-
-#Header .header-menu-row .nav-link.active {
-
-    color: #ffffff;
-
-    background: linear-gradient(
-        180deg,
-        #4b9cff 0%,
-        #1677ff 55%,
-        #075dcc 100%
-    );
-
-    border-color: #075dcc;
-
-    box-shadow:
-        0 3px 0 #064da8,
-        0 5px 10px rgba(22,119,255,.25);
-
-}
-
-
-/* ACTIVE HOVER */
-
-#Header .header-menu-row .nav-link.active:hover {
-
-    color: #ffffff;
-
-    background: linear-gradient(
-        180deg,
-        #5ba5ff 0%,
-        #1677ff 55%,
-        #075dcc 100%
-    );
-
-}
-
-
-/* =========================================================
-   NAVIGATION LIST
-========================================================= */
-
-#Header .header-menu-row .navbar-nav {
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    gap: 5px;
-
-    margin: 0;
-
-    padding: 5px 0;
-
-}
-
-
-/* =========================================================
-   NAV ITEM
-========================================================= */
-
-#Header .header-menu-row .nav-item {
-
-    height: 42px;
-
-    display: flex;
-
-    align-items: center;
-
-    flex: 0 0 auto;
-
-}
-
-
-/* =========================================================
-   MOBILE 3D NAV
-========================================================= */
-
-@media (max-width: 768px) {
-
-    #Header .header-menu-row .navbar-nav {
-
-        gap: 3px;
-
-        padding: 4px 6px;
-
-    }
-
-
-    #Header .header-menu-row .nav-link {
-
-        height: 34px;
-
-        padding: 0 10px;
-
-        margin: 0 1px;
-
-        border-radius: 7px;
-
-        font-size: 11px;
-
-        font-weight: 600;
-
-        box-shadow:
-            0 2px 0 #c4d0df,
-            0 3px 6px rgba(30,70,110,.10);
-
-    }
-
-
-    #Header .header-menu-row .nav-link:hover {
-
-        transform: translateY(-1px);
-
-        box-shadow:
-            0 3px 0 #aebfd4,
-            0 5px 8px rgba(22,119,255,.15);
-
-    }
-
-
-    #Header .header-menu-row .nav-link:active {
-
-        transform: translateY(1px);
-
-        box-shadow:
-            0 1px 0 #b6c3d3,
-            0 2px 4px rgba(0,0,0,.10);
-
-    }
-
-}
-
-
-
-/* =========================================================
-   DESKTOP
-========================================================= */
-
-@media (min-width: 769px) {
-
-    #Header .navbar > .container {
-        max-width: 1250px;
-    }
-
-    #Header .header-top-row {
-        height: 78px;
-    }
-
-    #Header .header-menu-row {
-        height: 52px;
-    }
-
-}
-
-
-/* =========================================================
-   MOBILE
-========================================================= */
-
-@media (max-width: 768px) {
-
-    #Header {
-        width: 100%;
-        overflow: visible;
-    }
-
-    #Header .navbar > .container {
-        width: 100%;
-        max-width: 100%;
-
-        padding: 0;
-
-        margin: 0;
-    }
-
-
-    /* -----------------------------
-       MOBILE ROW 1
-    ------------------------------ */
-
-    #Header .header-top-row {
-
-        width: 100%;
-
-        height: 60px;
-        min-height: 60px;
-
-        padding: 7px 10px;
-
-        display: flex;
-
-        align-items: center;
-
-        justify-content: space-between;
-    }
-
-
-    /* MOBILE LOGO */
-
-    #Header .logo-img {
-
-        width: 120px;
-        max-width: 120px;
-
-        height: auto;
-    }
-
-
-    /* MOBILE ACTIONS */
-
-    #Header .header-actions {
-
-        gap: 6px;
-
-        margin-left: auto;
-    }
-
-
-    /* DASHBOARD ICON ONLY */
-
-    #Header .student-dashboard-btn a {
-
-        width: 35px;
-        height: 34px;
-
-        padding: 0;
-
-        border-radius: 8px;
-
-        box-shadow:
-            0 2px 0 #064da8,
-            0 3px 7px rgba(22,119,255,.18);
-    }
-
-    #Header .student-dashboard-btn span {
-        display: none;
-    }
-
-    #Header .student-dashboard-btn i {
-        font-size: 14px;
-    }
-
-
-    /* MOBILE BELL */
-
-    #Header #Bell {
-
-        width: 34px;
-        height: 34px;
-
-        font-size: 14px;
-    }
-
-    #Header #Bell i {
-        font-size: 15px;
-    }
-
-
-    /* MOBILE USER */
-
-    #Header .user-menu {
-
-        width: 37px;
-        height: 37px;
-    }
-
-    #Header .user-toggle {
-
-        width: 37px;
-        height: 37px;
-
-        padding: 1px;
-    }
-
-    #Header .mobile-user-image {
-
-        width: 35px;
-        height: 35px;
-
-        min-width: 35px;
-        min-height: 35px;
-
-        max-width: 35px;
-        max-height: 35px;
-
-        border-width: 1px;
-    }
-
-
-    /* -----------------------------
-       MOBILE NAVIGATION
-    ------------------------------ */
-
-    #Header .header-menu-row {
-
-        width: 100%;
-
-        height: 42px;
-        min-height: 42px;
-
-        display: flex;
-
-        align-items: center;
-
-        justify-content: flex-start;
-
-        overflow-x: auto;
-        overflow-y: hidden;
-
-        scrollbar-width: none;
-    }
-
-    #Header .header-menu-row::-webkit-scrollbar {
-        display: none;
-    }
-
-
-    #Header .header-menu-row .navbar-nav {
-
-        width: max-content;
-        min-width: max-content;
-
-        height: 42px;
-
-        display: flex;
-
-        flex-direction: row;
-
-        align-items: center;
-
-        justify-content: flex-start;
-
-        gap: 0;
-
-        padding: 0 4px;
-    }
-
-
-    #Header .header-menu-row .nav-item {
-
-        height: 42px;
-
-        flex: 0 0 auto;
-    }
-
-
-    #Header .header-menu-row .nav-link {
-
-        height: 42px;
-
-        padding: 0 9px;
-
-        font-size: 12px;
-
-        white-space: nowrap;
-
-        border-bottom: 2px solid transparent;
-    }
-
-
-    /* MOBILE DROPDOWNS */
-
-    #Header .dropdown-menu {
-
-        min-width: 155px;
-
-        padding: 5px;
-
-        margin-top: 5px !important;
-    }
-
-    #Header .dropdown-item {
-
-        padding: 8px 10px;
-
-        font-size: 13px;
-    }
-
-}
-
-
-/* =========================================================
-   VERY SMALL MOBILE
-========================================================= */
-
-@media (max-width: 380px) {
-
-    #Header .logo-img {
-        width: 105px;
-    }
-
-    #Header .header-actions {
-        gap: 4px;
-    }
-
-    #Header .header-menu-row .nav-link {
-        padding: 0 7px;
-        font-size: 11px;
-    }
-
-}
-
-
-</style>
+    <br><br>
+  </header>
+
+    
+    <!-- Preloader -->
+
+    <main>
+      @yield('content')
+    </main>
+    <!-- Modal -->
+        <!-- <div class="modal fade" id="popupModal" data-bs-backdrop="static" data-modal-parent="courseContentModal">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="modal-body p-0">
+                        <div class="card card-body p-0">
+                            <img src="/web/../expert-it-bucket.s3.ap-south-1.amazonaws.com/backend/assets/uploaded-files/additional-features-management/popup-notifications/pop-noti-1745129731-691390573370621.webp"
+                            alt="popup-img" class="popup-img" style="height: 60%;" loading="lazy" srcset="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> -->
+        
+    <!-- Bootstrap Modal Structure -->
+    <div class="modal fade" id="videoModal" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+            <div class="embed-responsive embed-responsive-16by9">
+              <iframe id="modalVideo" class="embed-responsive-item" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="position: absolute;"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Premium StudyRoom Bootstrap 5 Modal -->
+    <div class="modal fade" id="homeServicesModalOne" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg rounded-4">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title mx-auto" id="modalTitle">📚 BCS & JOBS</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body text-center p-4" id="modalContent">
+            <div id="bcs-jobs" class="modal-static-content">
+              <p></p>
+            </div>
+          </div>
+          <div class="modal-footer d-flex justify-content-between">
+            <button type="button" class="btn btn-secondary flex-fill me-2" data-bs-dismiss="modal">Back</button>
+            <button type="button" class="btn btn-success flex-fill ms-2" id="goToNextButton">Go to Next</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <footer id="Footer">
+    <div class="container">
+      <div class="row g-4">
+          <div class="col-sm-12 col-md-4">
+              <div class="footer-logo-content mb-lg-5">
+                  <div class="footer-logo">
+                      <div class="footer-logo-image">
+                          <img src="/web/img/logo.png?v=1.1.2" alt="">
+                      </div>
+                  </div>
+                  <div class="footer-logo-text">
+                      <p>For countless students across the country,<br>
+                        LiveEducationBD is the leading online education platform — a symbol of excellence and inspiration.
+                        Begin your journey with confidence and experience dedicated support at every step.</p>
+                  </div>
+                  <div class="footer-social-media-area">
+                      <div class="social-media-icon">
+                          <div class="facebook-icon">
+                              <a href="javascript:void(0)" target="_blank">
+                                <i class="fa-brands fa-facebook"></i>
+                              </a>
+                          </div>
+                          <div class="youtube-icon">
+                            <a href="javascript:void(0)" target="_blank">
+                              <i class="fa-brands fa-youtube"></i>
+                            </a>
+                          </div>
+                          <div class="instagram-icon">
+                            <a href="javascript:void(0)" target="_blank">
+                              <i class="fa-brands fa-instagram"></i>
+                            </a>
+                          </div>
+                          <div class="linkedin-icon">
+                            <a href="javascript:void(0)" target="_blank">
+                              <i class="fa-brands fa-linkedin"></i>
+                            </a>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <div class="col-md-8">
+              <div class="footer-others-div">
+                  <div class="row g-4">
+                      <div class="col-6 col-md-4">
+                          <div class="about-us">
+                              <h3>About Us</h3>
+                              <ul>
+                                <li>
+                                  <a href="javascript:void(0)">Our Success</a>
+                                </li>
+                                <li>
+                                  <a href="javascript:void(0)">Instructors</a>
+                                </li>
+                                <li>
+                                  <a href="javascript:void(0)">Our Services</a>
+                                </li>
+                                <li>
+                                  <a href="javascript:void(0)">Book Storage</a>
+                                </li>
+                                <li>
+                                  <a href="javascript:void(0)">Circular</a>
+                                </li>
+                              </ul>
+                          </div>
+                      </div>
+                      <div class="col-6 col-md-4">
+                          <div class="resources">
+                            <h3>Resources</h3>
+                            <ul>
+                              <li><a href="javascript:void(0)">Courses</a></li>
+                              <li><a href="javascript:void(0)">Exams</a></li>
+                              <li><a href="javascript:void(0)">Terms & Conditions</a></li>
+                              <li><a href="javascript:void(0)">Privacy Policy</a></li>
+                              <li><a href="javascript:void(0)">Return Policy</a></li>
+                            </ul>
+                          </div>
+                      </div>
+                      <div class="col-sm-12 col-md-4">
+                        <div class="official-info">
+                          <h3>Official Info</h3>
+                          <ul>
+                            <li>
+                              <i class="fa-regular fa-envelope"></i>
+                              <a href="mailto:liveeducationbd24@gmail.com">liveeducationbd24@gmail.com</a>
+                            </li>
+                            <li>
+                                <i class="fa-solid fa-phone"></i>
+                                <a href="tel:+01718778184">01718778184</a>
+                            </li>
+                            <li>
+                                <i class="fa-solid fa-location-dot"></i>
+                                <a href="javascript:void(0)">Address: Jogendranagar, Sabgari-6450, Gurudaspur, Natore, Bangladesh<br>
+                                  Trade License No. 69141130786</a>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+      <div class="col-sm-12 col-md-12">
+        <img class="img-fluid" src="/web/img/pay-buttons.png" alt="SSL Image" srcset="" style="width: 100%;">
+      </div>
+      <br>
+    </div>
+    <div class="copy-right-section">
+      <div class="container">
+        <p>Copyright © 2025 <span><a href="/">LiveEuducationBD</a></span> All rights reserved</p>
+      </div>
+    </div>
+  </footer>
+  
+  <div class="objection btn">
+    <a href="https://wa.me/8801718778184" target="blank">
+      <i class="fa-brands fa-whatsapp"></i> WhatsApp
+    </a>
+    |
+    <a href="https://m.me/saeonlineexamgroup" target="blank">
+      <i class="fab fa-facebook-messenger"></i> Messenger
+    </a>
+    
+  </div>
+  
+  <!-- JavaScript Libraries (footer) -->
+  <script src="{{'/web/assets/js/jquery-3.6.0.min.js'}}"></script>
+  <script src="{{'/web/assets/js/bootstrap.bundle.min.js'}}" defer></script>
+  <script src="{{'/web/assets/vendors/slick/slick.min.js'}}" defer></script>
+  <script src="{{'/web/assets-old/js/owl.carousel.min.js'}}" type="text/javascript" defer></script>
+  <script src="{{'/web/assets/js/main.js'}}" defer></script>
+
+  <!-- Toastr JS -->
+  {{-- <link rel="stylesheet" href="{{'/web/assets/ajax/libs/toastr.js/latest/toastr.min.css'}}" /> --}}
+  {{-- <script src="{{'/web/assets/ajax/libs/toastr.js/latest/toastr.min.js'}}"></script> --}}
+
+  <!-- Sweet Alert -->
+  <script async src="{{'/web/assets/npm/sweetalert2%4011.7.3/dist/sweetalert2.all.min.js'}}"></script>
+
+  <!-- Google Tag Manager (noscript) -->
+  <!-- <noscript>
+      <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T642VTXN" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+  </noscript> -->
+  <!-- End Google Tag Manager (noscript) -->
+    <script>
+      $(function() {
+        $('#popupModal').modal('show');
+      });
+    </script>
+
+    <script>
+      let extraMenu = document.querySelector('extra-mobile-nav');
+      function extMenuShowHide(e){
+        console.log(extraMenu);
+      }
+    </script>
+    
+   
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const preloader = document.querySelector('.preloader');
+
+        // Start flush animation immediately
+        preloader.style.animation = 'flush 1s ease-in-out forwards';
+
+        // Remove preloader after the animation ends
+        preloader.addEventListener('animationend', function() {
+          preloader.remove();
+        });
+      });
+
+    </script>
+    
+    <script>
+      // Function to show video modal and set video source
+      function showVideoModal(videoSrc) {
+        document.getElementById('modalVideo').src = videoSrc; // Autoplay the video
+        $('#videoModal').modal('show');
+      }
+      // When the modal is hidden, remove the src to stop the video
+      $('#videoModal').on('click', '.btn-close', function() {
+        document.getElementById('modalVideo').src = ''; // This will stop the video
+        $('#videoModal').modal('hide');
+      });
+    </script>
+    <script>
+    setTimeout(function () {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+          new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    }, 1000); // Delay of 1 second
+    $(document).ready(function () {
+        $('[data-bs-toggle="tooltip"]').tooltip();
+    });
+
+</script>
+
+@yield('scripts')
+
+</body>
+</html>

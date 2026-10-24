@@ -51,12 +51,16 @@ function checkIn($id, $columns)
     margin-top:10px;
 }
 
+.routine-exam-name-list { min-height: 28px; padding: 5px 2px; }
+.routine-exam-name-list .exam-name-item { margin-bottom: 4px; }
 </style>
 
 @endsection
 
 
 @section('content')
+@include('layouts.routines.partials.all-pages-navigation')
+
 
 <section class="content-header">
 
@@ -343,69 +347,64 @@ function checkIn($id, $columns)
 
 
 <div class="exam-name-box">
-
-    <div id="examNameList">
-
-        @if(isset($value->exams))
-
-            @foreach($value->exams as $exam)
-
-                <span
-                    class="exam-name-item"
-                    data-id="{{$exam->id}}">
-
-                    {{$exam->name}}
-
-                    <span
-                        class="remove-exam"
-                        data-id="{{$exam->id}}">
-
-                        <i class="fa fa-times"></i>
-
-                    </span>
-
-                    <input
-                        type="hidden"
-                        name="exam_names[]"
-                        value="{{$exam->name}}">
-
+    {{-- Main Exam names --}}
+    <label>Main Exam Name</label>
+    <div id="examNameList" class="routine-exam-name-list">
+        @foreach($value->exams ?? [] as $exam)
+            @php $examKind = preg_match('/^(revision|revition|revison|রিভিশন)/iu', trim($exam->name)) ? 'revision' : (preg_match('/^(model|মডেল)/iu', trim($exam->name)) ? 'model' : 'main'); @endphp
+            @if($examKind === 'main')
+                <span class="exam-name-item" data-id="{{ $exam->id }}">
+                    {{ $exam->name }}
+                    <span class="remove-exam" title="Remove"><i class="fa fa-times"></i></span>
+                    <input type="hidden" name="exam_names[]" value="{{ $exam->name }}">
                 </span>
-
-            @endforeach
-
-        @endif
-
+            @endif
+        @endforeach
+    </div>
+    <div class="exam-add-row input-group">
+        <input type="text" id="newExamName" class="form-control" placeholder="Exam Name লিখুন">
+        <span class="input-group-btn"><button type="button" class="btn btn-success" id="addExamBtn"><i class="fa fa-plus"></i> Add Exam Name</button></span>
     </div>
 
-
+    {{-- Revision Exam names --}}
     <div class="exam-add-row">
-
-        <div class="input-group">
-
-            <input
-                type="text"
-                id="newExamName"
-                class="form-control"
-                placeholder="Exam Name লিখুন">
-
-            <span class="input-group-btn">
-
-                <button
-                    type="button"
-                    class="btn btn-success"
-                    id="addExamBtn">
-
-                    <i class="fa fa-plus"></i>
-                    Add Exam Name
-
-                </button>
-
-            </span>
-
+        <label for="newRevisionExamName">Revision Exam Name</label>
+        <div id="revisionExamNameList" class="routine-exam-name-list">
+            @foreach($value->exams ?? [] as $exam)
+                @if(preg_match('/^(revision|revition|revison|রিভিশন)/iu', trim($exam->name)))
+                    <span class="exam-name-item" data-id="{{ $exam->id }}">
+                        {{ $exam->name }}
+                        <span class="remove-exam" title="Remove"><i class="fa fa-times"></i></span>
+                        <input type="hidden" name="exam_names[]" value="{{ $exam->name }}">
+                    </span>
+                @endif
+            @endforeach
         </div>
-
+        <div class="input-group">
+            <input type="text" id="newRevisionExamName" class="form-control" placeholder="Revision Exam-01">
+            <span class="input-group-btn"><button type="button" id="addRevisionExamBtn" class="btn btn-success"><i class="fa fa-plus"></i> Add Revision Exam</button></span>
+        </div>
     </div>
 
+    {{-- Model Exam names --}}
+    <div class="exam-add-row">
+        <label for="newModelExamName">Model Exam Name</label>
+        <div id="modelExamNameList" class="routine-exam-name-list">
+            @foreach($value->exams ?? [] as $exam)
+                @if(preg_match('/^(model|মডেল)/iu', trim($exam->name)))
+                    <span class="exam-name-item" data-id="{{ $exam->id }}">
+                        {{ $exam->name }}
+                        <span class="remove-exam" title="Remove"><i class="fa fa-times"></i></span>
+                        <input type="hidden" name="exam_names[]" value="{{ $exam->name }}">
+                    </span>
+                @endif
+            @endforeach
+        </div>
+        <div class="input-group">
+            <input type="text" id="newModelExamName" class="form-control" placeholder="Model Test-01">
+            <span class="input-group-btn"><button type="button" id="addModelExamBtn" class="btn btn-success"><i class="fa fa-plus"></i> Add Model Exam</button></span>
+        </div>
+    </div>
 </div>
 
 </div>
@@ -704,126 +703,46 @@ function getDepartments(e)
 
 
 /* =====================================================
-   ADD EXAM NAME
+   SEPARATE MAIN / REVISION / MODEL NAME LISTS
+   Existing exam_names[] persistence remains unchanged.
 ===================================================== */
-
-$(document).on(
-    'click',
-    '#addExamBtn',
-    function()
-{
-
-    let examName =
-        $('#newExamName')
-        .val()
-        .trim();
-
-
-    if(examName === '')
-    {
-
-        alert(
-            'অনুগ্রহ করে Exam Name লিখুন।'
-        );
-
-        return;
-
+function addRoutineExamName(inputSelector, listSelector, type) {
+    var $input = $(inputSelector);
+    var name = String($input.val() || '').trim();
+    if (!name) { alert('অনুগ্রহ করে Exam Name লিখুন।'); $input.focus(); return; }
+    var isRevision = /^(revision|revition|revison|রিভিশন)/i.test(name);
+    var isModel = /^(model|মডেল)/i.test(name);
+    if (type === 'revision' && !isRevision) name = 'Revision ' + name;
+    if (type === 'model' && !isModel) name = 'Model ' + name;
+    if (type === 'main' && (isRevision || isModel)) {
+        alert('Revision/Model Exam সংশ্লিষ্ট আলাদা সারি থেকে Add করুন।'); return;
     }
-
-
-    let exists = false;
-
-
-    $('input[name="exam_names[]"]')
-        .each(function()
-        {
-
-            if(
-                $(this)
-                .val()
-                .toLowerCase()
-                ===
-                examName.toLowerCase()
-            )
-            {
-
-                exists = true;
-
-            }
-
-        });
-
-
-    if(exists)
-    {
-
-        alert(
-            'এই Exam Name ইতোমধ্যে যোগ করা হয়েছে।'
-        );
-
-        return;
-
-    }
-
-
-    let html = `
-
-        <span class="exam-name-item">
-
-            ${examName}
-
-            <span
-                class="remove-exam"
-                onclick="$(this).parent().remove();">
-
-                <i class="fa fa-times"></i>
-
-            </span>
-
-            <input
-                type="hidden"
-                name="exam_names[]"
-                value="${examName}">
-
-        </span>
-
-    `;
-
-
-    $('#examNameList')
-        .append(html);
-
-
-    $('#newExamName')
-        .val('')
-        .focus();
-
-});
-
-
-
-/* =====================================================
-   ENTER KEY → ADD EXAM
-===================================================== */
-
-$(document).on(
-    'keypress',
-    '#newExamName',
-    function(e)
-{
-
-    if(e.which === 13)
-    {
-
+    var exists = false;
+    $('input[name="exam_names[]"]').each(function () {
+        if (String($(this).val()).trim().toLocaleLowerCase() === name.toLocaleLowerCase()) exists = true;
+    });
+    if (exists) { alert('এই Exam Name ইতোমধ্যে যোগ করা হয়েছে।'); return; }
+    var $item = $('<span/>', {'class':'exam-name-item'});
+    $item.append(document.createTextNode(name));
+    $item.append($('<span/>', {'class':'remove-exam', 'title':'Remove'}).append($('<i/>', {'class':'fa fa-times'})));
+    $item.append($('<input/>', {'type':'hidden', 'name':'exam_names[]'}).val(name));
+    $(listSelector).append($item);
+    $input.val('').focus();
+}
+$(document).on('click','#addExamBtn',function () { addRoutineExamName('#newExamName','#examNameList','main'); });
+$(document).on('click','#addRevisionExamBtn',function () { addRoutineExamName('#newRevisionExamName','#revisionExamNameList','revision'); });
+$(document).on('click','#addModelExamBtn',function () { addRoutineExamName('#newModelExamName','#modelExamNameList','model'); });
+$(document).on('keydown','#newExamName, #newRevisionExamName, #newModelExamName',function (e) {
+    if (e.key === 'Enter') {
         e.preventDefault();
-
-        $('#addExamBtn').click();
-
+        if(this.id === 'newExamName') $('#addExamBtn').trigger('click');
+        else if(this.id === 'newRevisionExamName') $('#addRevisionExamBtn').trigger('click');
+        else $('#addModelExamBtn').trigger('click');
     }
-
 });
-
-
+$(document).on('click','.routine-exam-name-list .remove-exam',function () {
+    $(this).closest('.exam-name-item').remove();
+});
 
 /* =====================================================
    SUMMERNOTE

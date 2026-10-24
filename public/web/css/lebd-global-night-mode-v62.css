@@ -1,0 +1,99 @@
+/* LEBD-3 v66 — OUTER BACKGROUND ONLY night mode.
+   Replace the old CSS completely, do not append.
+   Preserve all header/card/content/text/button colors.
+   Existing v62 theme JS and data-lebd-theme attribute remain unchanged.
+*/
+:root { color-scheme: light; }
+html[data-lebd-theme="dark"] {
+  --lebd-outer-night-bg: #08172b;
+  color-scheme: light;
+  background-color: var(--lebd-outer-night-bg) !important;
+}
+html[data-lebd-theme="dark"] body {
+  background-color: var(--lebd-outer-night-bg) !important;
+  background-image: none !important;
+}
+/* Base canvas: prevent white gutters around sections. */
+html[data-lebd-theme="dark"] .lebd-homepage-canvas,
+html[data-lebd-theme="dark"] .lebd-student-dashboard,
+html[data-lebd-theme="dark"] .batch-detail-page,
+html[data-lebd-theme="dark"] .content-wrapper {
+  background-color: var(--lebd-outer-night-bg) !important;
+}
+html[data-lebd-theme="dark"] main,
+html[data-lebd-theme="dark"] body > .main-content {
+  background-color: transparent !important;
+}
+/* Confirmed from homepage/index.blade.php:
+   1) top Course + Running Batch showcase
+   2) Success Students advice panel
+   Both have their own light background separate from body. */
+html[data-lebd-theme="dark"] .lebd-homepage-canvas > .lebd-home-showcase,
+html[data-lebd-theme="dark"] .lebd-homepage-canvas .lebd-home-showcase,
+html[data-lebd-theme="dark"] .lebd-homepage-canvas > .success-students-section,
+html[data-lebd-theme="dark"] .lebd-homepage-canvas .success-students-section {
+  background: var(--lebd-outer-night-bg) !important;
+}
+/* Programs and outer section backdrop, NEVER inner colorful panels. */
+html[data-lebd-theme="dark"] .lebd-homepage-canvas > .lebd-program-section {
+  background: var(--lebd-outer-night-bg) !important;
+}
+/* The admin success partial is a top-level section. Its CARD colors remain intact.
+   Keep this intentionally limited to direct child sections only. */
+html[data-lebd-theme="dark"] .lebd-homepage-canvas > section:not(.daily-feature-section):not(.job-notice-wrapper) {
+  background-color: var(--lebd-outer-night-bg) !important;
+}
+/* Night toggle styling retained from v62; no logic changes. */
+#lebdNightToggle{position:fixed;left:16px;bottom:18px;z-index:2147483100;border:1px solid #8eb6e5;border-radius:999px;display:flex;align-items:center;gap:8px;padding:10px 14px;background:linear-gradient(135deg,#143f80,#0b2660);color:#fff;font:700 13px/1.2 'Noto Sans Bengali',system-ui,sans-serif;box-shadow:0 8px 26px #001b3c40;cursor:pointer;touch-action:manipulation;transition:box-shadow .15s,transform .15s}
+#lebdNightToggle:hover{transform:translateY(-2px);box-shadow:0 12px 30px #001b3c55}
+#lebdNightToggle:focus-visible{outline:3px solid #54aafa;outline-offset:3px}
+#lebdNightToggle .lebd-night-icon{font-size:19px;line-height:1}
+html[data-lebd-theme="dark"] #lebdNightToggle{background:linear-gradient(135deg,#ffd76d,#ffaa3b);border-color:#ffe6a2;color:#1b2940}
+@media(max-width:600px){#lebdNightToggle{left:10px;bottom:14px;padding:10px 12px;font-size:11px}#lebdNightToggle .lebd-night-icon{font-size:17px}}
+@media print{#lebdNightToggle{display:none!important}}
+
+/* LEBD-3 v67: readable OUTER section headings over dark navy.
+   Never change text within white/pastel content cards or purchase widgets. */
+html[data-lebd-theme="dark"] .lebd-homepage-canvas .lebd-home-showcase .lebd-home-section-title h2,
+html[data-lebd-theme="dark"] .lebd-homepage-canvas .lebd-home-showcase .lebd-home-section-title-copy h2,
+html[data-lebd-theme="dark"] .lebd-homepage-canvas .job-slider-title h2,
+html[data-lebd-theme="dark"] .lebd-homepage-canvas .success-heading h2,
+html[data-lebd-theme="dark"] .lebd-homepage-canvas .success-heading h2:not(span),
+html[data-lebd-theme="dark"] .lebd-homepage-canvas .success-students-section .success-heading h2 {
+  color:#f2f7ff !important;
+  -webkit-text-fill-color:#f2f7ff;
+}
+/* Restore intentionally red accent within headings. */
+html[data-lebd-theme="dark"] .lebd-homepage-canvas .success-heading h2 span {color:#ff4c67!important;-webkit-text-fill-color:#ff4c67!important;}
+html[data-lebd-theme="dark"] .lebd-homepage-canvas .lebd-home-showcase .lebd-home-section-title p,
+html[data-lebd-theme="dark"] .lebd-homepage-canvas .success-heading p,
+html[data-lebd-theme="dark"] .lebd-homepage-canvas .success-students-section .success-heading p {color:#c5d5ec!important;-webkit-text-fill-color:#c5d5ec;}
+/* All heading typography only, outside success cards: v35 uses separate partial. */
+html[data-lebd-theme="dark"] .lebd-homepage-canvas .lebd-home-showcase .lebd-home-section-title h2,
+html[data-lebd-theme="dark"] .lebd-homepage-canvas .job-slider-title h2,
+html[data-lebd-theme="dark"] .lebd-homepage-canvas .success-heading h2 {text-shadow:0 1px 1px rgba(0,0,0,.15);}
+/* Section headings specifically associated with the admin-managed 'Our Success' partial.
+   Restrict to title/header patterns, excluding all content panels. */
+html[data-lebd-theme="dark"] .lebd-homepage-canvas :is(.lebd-success-heading,.lebd-success-title,.home-success-heading,.home-success-title) h2,
+html[data-lebd-theme="dark"] .lebd-homepage-canvas :is(.lebd-success-heading,.lebd-success-title,.home-success-heading,.home-success-title) h3 {color:#f2f7ff!important;-webkit-text-fill-color:#f2f7ff;}
+html[data-lebd-theme="dark"] .lebd-homepage-canvas :is(.lebd-success-heading,.home-success-heading) p {color:#c5d5ec!important;-webkit-text-fill-color:#c5d5ec;}
+
+/* LEBD-3 v79: ICON ONLY, EMBEDDED IN SHARED HEADER, NO FLOATING BOTTOM BUTTON. */
+#lebdNightToggle.lebd-night-header-icon {
+ position:relative!important;inset:auto!important;top:auto!important;left:auto!important;right:auto!important;bottom:auto!important;
+ display:inline-flex!important;flex:0 0 34px!important;align-items:center!important;justify-content:center!important;
+ width:34px!important;height:34px!important;min-width:34px!important;min-height:34px!important;
+ padding:0!important;margin:0 5px!important;border:1px solid #d7e4f3!important;border-radius:11px!important;
+ background:#eef5ff!important;color:#155aa3!important;box-shadow:none!important;transform:none!important;
+ font-size:0!important;line-height:1!important;vertical-align:middle!important;z-index:auto!important;
+}
+#lebdNightToggle.lebd-night-header-icon .lebd-night-icon {font-size:19px!important;line-height:1!important;}
+#lebdNightToggle.lebd-night-header-icon .lebd-night-label {display:none!important;}
+html[data-lebd-theme=dark] #lebdNightToggle.lebd-night-header-icon {background:#16345d!important;color:#ffcb69!important;border-color:#4e709d!important;}
+#lebdNightToggle.lebd-night-header-icon:hover{filter:brightness(1.08);transform:none!important;}
+#lebdNightToggle.lebd-night-header-icon:focus-visible{outline:2px solid #1783ea!important;outline-offset:2px!important;}
+@media(max-width:991px){#lebdNightToggle.lebd-night-header-icon{width:30px!important;height:30px!important;min-width:30px!important;min-height:30px!important;margin:0 4px!important;}}
+/* If shared header has not loaded, show icon at the upper left, not at page bottom. */
+#lebdNightToggle:not(.lebd-night-header-icon){left:10px!important;right:auto!important;top:105px!important;bottom:auto!important;width:36px!important;height:36px!important;padding:0!important;border-radius:10px!important;justify-content:center!important;}
+#lebdNightToggle:not(.lebd-night-header-icon) .lebd-night-label{display:none!important;}
+@media print{#lebdNightToggle{display:none!important;}}

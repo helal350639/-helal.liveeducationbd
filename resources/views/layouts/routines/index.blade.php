@@ -6,6 +6,8 @@ $source = New SourceCtrl;
 @extends('dashboard')
 @section('title', 'View All Routine')
 @section('content')
+@include('layouts.routines.partials.all-pages-navigation')
+
 <style>
   .tools{text-align: right;}
 </style>

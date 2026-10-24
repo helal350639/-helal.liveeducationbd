@@ -290,12 +290,185 @@
 
 }
 
+
+/* Step 3P integrated table viewport */
+.content-wrapper .content, .content-wrapper .content .col-md-12 { min-width: 0; }
+.routine-table-wrapper.lebd-sticky-routine { display:block; }
+
+/* Scroll within the routine table, leaving the page navigation available. */
+.routine-table-wrapper.lebd-sticky-routine {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 205px);
+    max-height: calc(100vh - 205px);
+    min-height: 250px;
+    overflow: auto !important;
+    overscroll-behavior: contain;
+    isolation: isolate;
+    border: 1px solid #d9e1e8;
+}
+.routine-table-wrapper.lebd-sticky-routine .routine-table {
+    width: max-content !important;
+    min-width: 100% !important;
+    table-layout: auto;
+    margin-bottom: 0;
+    border-collapse: separate !important;
+    border-spacing: 0;
+}
+.routine-table-wrapper.lebd-sticky-routine .routine-table th,
+.routine-table-wrapper.lebd-sticky-routine .routine-table td {
+    box-sizing: border-box;
+    background: #fff;
+}
+.routine-table-wrapper.lebd-sticky-routine .routine-table thead th {
+    position: sticky !important;
+    top: 0;
+    z-index: 11;
+    background: #f1f5f9 !important;
+    box-shadow: 0 1px #cbd5e1;
+}
+/* Two frozen columns on the left. */
+.routine-table-wrapper.lebd-sticky-routine .routine-table .id-column {
+    width: 56px !important;
+    min-width: 56px !important;
+    max-width: 56px !important;
+    position: sticky !important;
+    left: 0;
+    z-index: 7;
+    background: #fff !important;
+}
+.routine-table-wrapper.lebd-sticky-routine .routine-table .exam-column {
+    width: 145px !important;
+    min-width: 145px !important;
+    max-width: 145px !important;
+    position: sticky !important;
+    left: 56px;
+    z-index: 7;
+    background: #fff !important;
+    box-shadow: 2px 0 3px rgba(0,0,0,.08);
+}
+/* Frozen Action column on the right. */
+.routine-table-wrapper.lebd-sticky-routine .routine-table .action-column {
+    width: 88px !important;
+    min-width: 88px !important;
+    max-width: 88px !important;
+    position: sticky !important;
+    right: 0;
+    z-index: 7;
+    background: #fff !important;
+    box-shadow: -2px 0 3px rgba(0,0,0,.08);
+}
+.routine-table-wrapper.lebd-sticky-routine .routine-table thead .id-column,
+.routine-table-wrapper.lebd-sticky-routine .routine-table thead .exam-column,
+.routine-table-wrapper.lebd-sticky-routine .routine-table thead .action-column {
+    z-index: 15;
+    background: #e7eef7 !important;
+}
+/* Show full content in every cell rather than hiding long syllabus/links. */
+.routine-table-wrapper.lebd-sticky-routine .routine-content {
+    max-height: none !important;
+    overflow: visible !important;
+    overflow-wrap: anywhere;
+    white-space: normal;
+}
+.routine-table-wrapper.lebd-sticky-routine .routine-table tbody tr,
+.routine-table-wrapper.lebd-sticky-routine .routine-table tbody td {
+    height: auto !important;
+}
+.routine-table-wrapper.lebd-sticky-routine .routine-table .data-column {
+    min-width: 155px !important;
+    max-width: 280px !important;
+}
+.routine-table-wrapper.lebd-sticky-routine .routine-table .date-column {
+    min-width: 190px !important;
+}
+/* Step 3S: fit the ordinary table viewport to the actual visible page. */
+.routine-table-wrapper.lebd-sticky-routine:not(.lebd-fullscreen):not(:fullscreen) {
+    height: var(--lebd-available-table-height, calc(100dvh - 185px)) !important;
+    max-height: none !important;
+    min-height: 220px !important;
+    overflow: auto !important;
+    scrollbar-gutter: stable;
+}
+
+/* Step 3R: native browser fullscreen, with fixed-position fallback. */
+.routine-table-wrapper.lebd-sticky-routine:fullscreen,
+.routine-table-wrapper.lebd-sticky-routine:-webkit-full-screen,
+.routine-table-wrapper.lebd-sticky-routine.lebd-fullscreen {
+    box-sizing: border-box !important;
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    inset: 0 !important;
+    display: block !important;
+    width: 100vw !important;
+    min-width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    min-height: 100vh !important;
+    max-height: 100vh !important;
+    max-height: 100dvh !important;
+    margin: 0 !important;
+    padding: 48px 0 0 !important;
+    overflow: auto !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: #fff !important;
+    z-index: 2147483000 !important;
+    isolation: isolate;
+    transform: none !important;
+}
+.routine-table-wrapper.lebd-sticky-routine:fullscreen .routine-table,
+.routine-table-wrapper.lebd-sticky-routine.lebd-fullscreen .routine-table {
+    width: max-content !important;
+    min-width: 100% !important;
+}
+.lebd-routine-expand-btn { margin-right: 7px; }
+.lebd-routine-fullscreen-toolbar {
+    display: none;
+    box-sizing: border-box;
+    position: sticky;
+    top: -48px;
+    left: 0;
+    width: 100%;
+    height: 48px;
+    margin-top: -48px;
+    padding: 7px 16px;
+    background: #174c75;
+    color: white;
+    z-index: 40;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+.routine-table-wrapper.lebd-sticky-routine:fullscreen .lebd-routine-fullscreen-toolbar,
+.routine-table-wrapper.lebd-sticky-routine:-webkit-full-screen .lebd-routine-fullscreen-toolbar,
+.routine-table-wrapper.lebd-sticky-routine.lebd-fullscreen .lebd-routine-fullscreen-toolbar { display: flex; }
+body.lebd-routine-screen-active { overflow: hidden !important; }
+/* Sticky table header must remain underneath the fullscreen toolbar. */
+.routine-table-wrapper.lebd-sticky-routine:fullscreen .routine-table thead th,
+.routine-table-wrapper.lebd-sticky-routine.lebd-fullscreen .routine-table thead th { top: 0 !important; }
+@media (max-width: 768px) {
+    .routine-table-wrapper.lebd-sticky-routine { max-height: 70vh; }
+    .routine-table-wrapper.lebd-sticky-routine .routine-table .exam-column {
+        min-width: 118px !important; width: 118px !important; max-width: 118px !important;
+    }
+    .routine-table-wrapper.lebd-sticky-routine .routine-table .id-column { width: 48px !important; min-width: 48px !important; max-width: 48px !important; }
+    .routine-table-wrapper.lebd-sticky-routine .routine-table .exam-column { left: 48px; }
+}
+
 </style>
 
 @endsection
 
 
 @section('content')
+
+{{-- Preserve shared navigation when installed; no dependency when absent. --}}
+@includeIf('layouts.routines.partials.all-pages-navigation')
 
 <section class="content-header">
 
@@ -381,7 +554,7 @@
      TABLE
 ===================================================== --}}
 
-<div class="routine-table-wrapper">
+<div class="routine-table-wrapper" tabindex="0">
 
 <table class="table table-bordered table-hover routine-table">
 
@@ -442,6 +615,10 @@
 
 </th>
 
+    {{-- EXTRA DATES (display only; managed on Add/Edit Item) --}}
+    <th class="date-column">Create PDF Date &amp; Time</th>
+    <th class="date-column">Question Create Date &amp; Time</th>
+
     {{-- ACTION --}}
 
     <th class="action-column">
@@ -456,7 +633,7 @@
 <tbody>
 
 
-@foreach($routine_rows as $item)
+@foreach($displayRows as $item)
 
 <tr>
 
@@ -477,62 +654,87 @@
     ================================================= --}}
 
     <td class="exam-column">
-
-        {{ $item->paper_name }}
-
+        <strong>{{ $item->paper_name }}</strong>
     </td>
 
+    {{-- Each Subject column shows ONLY its own linked Main Exam numbers for Revision/Model. --}}
+    @if($item->row_kind === 'derived')
+        @foreach($subjects as $subject)
+            @php
+                $linkedNumbers = $item->linked_exam_names['subject:'.$subject->id] ?? [];
+            @endphp
+            <td class="data-column">
+                <div class="routine-content" title="{{ implode(', ', $linkedNumbers) }}">
+                    @forelse($linkedNumbers as $linkedNumber)
+                        <div>{{ $linkedNumber }}</div>
+                    @empty
+                        <span class="text-muted">—</span>
+                    @endforelse
+                </div>
+            </td>
+        @endforeach
+    @else
+        @foreach($subjects as $subject)
+            @php
+                $subjectRow = $item->subjects->firstWhere('subject_id', $subject->id);
+                $labels = $routineMcqLabels[$item->id]['subject'][$subject->id] ?? [];
+            @endphp
+            <td class="data-column">
+                @if(count($labels))
+                    <div class="routine-content" title="{{ implode(' | ', $labels) }}">
+                        @foreach($labels as $label)
+                            <div>{{ $label }}</div>
+                        @endforeach
+                    </div>
+                @elseif($subjectRow)
+                    <div class="routine-content" title="{{ strip_tags($subjectRow->chapter) }}">{!! $subjectRow->chapter !!}</div>
+                @endif
+            </td>
+        @endforeach
+    @endif
 
-    {{-- =================================================
-         SUBJECTS
-    ================================================= --}}
-
-    @foreach($item->subjects as $subject)
-
-        <td class="data-column">
-
-            <div
-                class="routine-content"
-                title="{{ strip_tags($subject->chapter) }}"
-            >
-
-                {!! $subject->chapter !!}
-
-            </div>
-
-        </td>
-
-    @endforeach
-
-
-    {{-- =================================================
-         DEPARTMENTS
-    ================================================= --}}
-
-    @foreach($item->departments as $department)
-
-        <td class="data-column">
-
-            <div
-                class="routine-content"
-                title="{{ strip_tags($department->details) }}"
-            >
-
-                {!! $department->details !!}
-
-            </div>
-
-        </td>
-
-    @endforeach
-
+    {{-- Each Department column also shows ONLY its own linked Main Exam numbers. --}}
+    @if($item->row_kind === 'derived')
+        @foreach($departments as $department)
+            @php
+                $linkedNumbers = $item->linked_exam_names['department:'.$department->id] ?? [];
+            @endphp
+            <td class="data-column">
+                <div class="routine-content" title="{{ implode(', ', $linkedNumbers) }}">
+                    @forelse($linkedNumbers as $linkedNumber)
+                        <div>{{ $linkedNumber }}</div>
+                    @empty
+                        <span class="text-muted">—</span>
+                    @endforelse
+                </div>
+            </td>
+        @endforeach
+    @else
+        @foreach($departments as $department)
+            @php
+                $departmentRow = $item->departments->firstWhere('department_id', $department->id);
+                $labels = $routineMcqLabels[$item->id]['department'][$department->id] ?? [];
+            @endphp
+            <td class="data-column">
+                @if(count($labels))
+                    <div class="routine-content" title="{{ implode(' | ', $labels) }}">
+                        @foreach($labels as $label)
+                            <div>{{ $label }}</div>
+                        @endforeach
+                    </div>
+                @elseif($departmentRow)
+                    <div class="routine-content" title="{{ strip_tags($departmentRow->details) }}">{!! $departmentRow->details !!}</div>
+                @endif
+            </td>
+        @endforeach
+    @endif
 
     {{-- =================================================
          DATE & TIME
     ================================================= --}}
 
 <td class="exam-date-cell date-column"
-    data-id="{{ $item->id }}">
+    data-id="{{ $item->id }}" data-row-kind="{{ $item->row_kind }}">
 
     <div class="exam-date-display">
 
@@ -542,14 +744,14 @@
 
         <br>
 
-        <small style="color:#999;">
-            <i class="fa fa-pencil"></i>
-            Click to edit
-        </small>
+        @if(true)
+        <small style="color:#999;"><i class="fa fa-pencil"></i> Click to edit</small>
+        @endif
 
     </div>
 
 
+    @if(true)
     <div class="exam-edit-box">
 
         <input type="datetime-local"
@@ -579,6 +781,7 @@
 
     </div>
 
+    @endif
 </td>
 
 
@@ -588,7 +791,7 @@
 <td 
     class="exam-end-cell date-column"
     data-id="{{ $item->id }}"
-    data-original="{{ $item->exam_end_at }}"
+    data-original="{{ $item->exam_end_at }}" data-row-kind="{{ $item->row_kind }}"
 >
 
 
@@ -602,16 +805,19 @@
     <br>
 
 
-    <small style="color:#999;">
+    @if(true)
+<small style="color:#999;">
         <i class="fa fa-pencil"></i>
         Click to edit
     </small>
+@endif
 
 
 </div>
 
 
 
+@if(true)
 <div class="exam-end-edit-box" style="display:none;">
 
     <input 
@@ -636,12 +842,35 @@
 </div>
 
 
+@endif
 </td>
 
 
 
+{{-- CREATE PDF DATE & TIME --}}
+<td class="date-column">
+    @if($item->create_pdf_at)
+        {{ \Carbon\Carbon::parse($item->create_pdf_at)->format('Y-m-d H:i:s') }}
+    @else
+        <span class="text-muted">—</span>
+    @endif
+</td>
+
+{{-- QUESTION CREATE DATE & TIME --}}
+<td class="date-column">
+    @if($item->question_create_at)
+        {{ \Carbon\Carbon::parse($item->question_create_at)->format('Y-m-d H:i:s') }}
+    @else
+        <span class="text-muted">—</span>
+    @endif
+</td>
+
 {{-- ACTION --}}
 <td class="action-column">
+@if($item->row_kind === 'derived')
+<a href="{{ route('routine.derived.edit', $item->id) }}" class="btn btn-warning btn-xs" title="Edit {{ ucfirst($item->exam_type) }}"><i class="fa fa-pencil"></i></a>
+<form method="POST" action="{{ route('routine.derived.destroy', $item->id) }}" style="display:inline" onsubmit="return confirm('Delete this Revision/Model Exam?');">@csrf @method('DELETE')<button type="submit" class="btn btn-danger btn-xs" title="Delete"><i class="fa fa-trash"></i></button></form>
+@else
 
     <a href="{{ route('routine.item.edit',$item->id) }}"
        class="btn btn-warning btn-xs">
@@ -659,6 +888,7 @@
 
     </a>
 
+@endif
 </td>
 
 @endforeach
@@ -849,9 +1079,9 @@ $(document).ready(function(){
 
             $.ajax({
 
-                url:
-                    "{{ url('/routine/item/update-exam-at') }}/"
-                    + id,
+                url: cell.data('row-kind') === 'derived'
+                    ? "{{ url('/routine/derived-item') }}/" + id + "/date"
+                    : "{{ url('/routine/item/update-exam-at') }}/" + id,
 
                 type: 'POST',
 
@@ -860,8 +1090,8 @@ $(document).ready(function(){
                     _token:
                         "{{ csrf_token() }}",
 
-                    exam_at:
-                        newDate
+                    exam_at: newDate,
+                    field: 'exam_at', value: newDate
 
                 },
 
@@ -873,7 +1103,7 @@ $(document).ready(function(){
 
                         let date =
                             new Date(
-                                response.exam_at
+                                (response.exam_at || response.value)
                             );
 
 
@@ -1188,7 +1418,9 @@ $(document).on(
 
         $.ajax({
 
-            url: "{{ url('/routine/item/update-exam-end') }}/" + id,
+            url: td.data('row-kind') === 'derived'
+                ? "{{ url('/routine/derived-item') }}/" + id + "/date"
+                : "{{ url('/routine/item/update-exam-end') }}/" + id,
 
             type: "POST",
 
@@ -1197,7 +1429,8 @@ $(document).on(
 
                 _token: "{{ csrf_token() }}",
 
-                exam_end_at: value
+                exam_end_at: value,
+                field: 'exam_end_at', value: value
 
             },
 
@@ -1219,7 +1452,7 @@ $(document).on(
           .show();
 
 
-        alert('Exam End Updated Successfully');
+        window.location.reload();
 
 
     }
@@ -1246,6 +1479,101 @@ $(document).on(
 
 });
 
+
+/* Step 3R: use real browser fullscreen; fall back to a fixed viewport overlay. */
+(function () {
+    function init() {
+        var wrap = document.querySelector('.routine-table-wrapper');
+        if (!wrap || wrap.dataset.routineViewport === 'ready') return;
+        wrap.dataset.routineViewport = 'ready';
+        wrap.classList.add('lebd-sticky-routine');
+        var box = wrap.closest('.box');
+        var header = box ? box.querySelector('.box-header') : null;
+        var home = wrap.parentNode;
+        var marker = document.createComment('routine table original position');
+        home.insertBefore(marker, wrap);
+
+        var toolbar = document.createElement('div');
+        toolbar.className = 'lebd-routine-fullscreen-toolbar';
+        var name = document.createElement('strong');
+        name.textContent = @json($routine->name) + ' — Routine Items';
+        var close = document.createElement('button');
+        close.type = 'button';
+        close.className = 'btn btn-danger btn-sm';
+        close.textContent = 'Exit Full Screen';
+        toolbar.appendChild(name);
+        toolbar.appendChild(close);
+        wrap.insertBefore(toolbar, wrap.firstChild);
+
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn btn-sm btn-primary lebd-routine-expand-btn';
+        btn.textContent = 'Full Screen';
+        btn.setAttribute('aria-pressed', 'false');
+        if (header) header.appendChild(btn);
+        else home.insertBefore(btn, marker);
+
+        /* Keep the horizontal scrollbar at the bottom of the usable browser area
+           when not fullscreen; resize/reposition does not change table content. */
+        function fitOrdinaryViewport() {
+            if (document.fullscreenElement === wrap || wrap.classList.contains('lebd-fullscreen')) return;
+            var rect = wrap.getBoundingClientRect();
+            var available = Math.floor(window.innerHeight - rect.top - 12);
+            if (available < 220) available = 220;
+            wrap.style.setProperty('--lebd-available-table-height', available + 'px');
+        }
+        window.addEventListener('resize', fitOrdinaryViewport);
+        window.addEventListener('scroll', fitOrdinaryViewport, { passive: true });
+        fitOrdinaryViewport();
+        function active() {
+            return document.fullscreenElement === wrap || wrap.classList.contains('lebd-fullscreen');
+        }
+        function sync() {
+            var opened = active();
+            btn.textContent = opened ? 'Exit Full Screen' : 'Full Screen';
+            btn.setAttribute('aria-pressed', opened ? 'true' : 'false');
+            if (!opened) {
+                document.body.classList.remove('lebd-routine-screen-active');
+                if (marker.parentNode && wrap.parentNode !== marker.parentNode) {
+                    marker.parentNode.insertBefore(wrap, marker.nextSibling);
+                }
+                fitOrdinaryViewport();
+            }
+        }
+        async function enter() {
+            if (document.fullscreenEnabled && typeof wrap.requestFullscreen === 'function') {
+                try {
+                    await wrap.requestFullscreen();
+                    wrap.scrollTop = 0;
+                    sync();
+                    return;
+                } catch (e) { /* Use fixed-position fallback. */ }
+            }
+            document.body.appendChild(wrap);
+            wrap.classList.add('lebd-fullscreen');
+            document.body.classList.add('lebd-routine-screen-active');
+            wrap.scrollTop = 0;
+            sync();
+        }
+        async function exit() {
+            if (document.fullscreenElement === wrap) {
+                try { await document.exitFullscreen(); } catch (e) { /* Continue restoring. */ }
+            }
+            wrap.classList.remove('lebd-fullscreen');
+            document.body.classList.remove('lebd-routine-screen-active');
+            if (marker.parentNode) marker.parentNode.insertBefore(wrap, marker.nextSibling);
+            sync();
+        }
+        btn.addEventListener('click', function () { active() ? exit() : enter(); });
+        close.addEventListener('click', exit);
+        document.addEventListener('fullscreenchange', sync);
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && wrap.classList.contains('lebd-fullscreen')) exit();
+        });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+    else init();
+})();
 </script>
 
 @endsection

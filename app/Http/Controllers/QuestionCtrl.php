@@ -94,7 +94,7 @@ class QuestionCtrl extends Controller
             'created_by' => null,
         ];
 
-        $questions = Question::orderBy('id', 'DESC')
+        $questions = Question::with(['getitems', 'mcqitems'])->orderBy('id', 'DESC')
         ->where('type', 'MCQ')
         ->paginate(25);
 
@@ -120,7 +120,7 @@ class QuestionCtrl extends Controller
             'filter_ids' => 'nullable|string',
         ]);
 
-        $questions = Question::query()->orderByDesc('id')
+        $questions = Question::query()->with(['getitems', 'mcqitems'])->orderByDesc('id')
             ->where('type', $request->input('type', 'MCQ'));
 
         foreach (['course_id' => 'courses', 'department_id' => 'departments',
@@ -190,8 +190,58 @@ class QuestionCtrl extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
+      // Fix22: corrected legacy cutoff fallback; read-only JSON option source for the NEW Question filters.
+      // Uses the exact fixed-stage order / fresh visibility criteria of Filter Management.
+      if ($request->query('_lebd_fresh_filter_options') === '1') {
+          $stageLabels = [
+              'প্রশ্ন টাইপ','কোর্সের নাম','প্রশ্ন টপিক','ডিপার্টমেন্ট নাম',
+              'বুক প্রকাশনির নাম','সাবজেক্ট নাম','চ্যাপ্টার নাম',
+              'প্রশ্ন সোর্স','সাব-সোর্স','পরীক্ষার সন','Question Quality filter',
+          ];
+          $mainFilters = Filter::where('status', 'Active')
+              ->orderBy('order_number')->orderBy('id')->get(['id','name']);
+          $stages = [];
+          foreach ($stageLabels as $i => $label) {
+              $main = $mainFilters->get($i);
+              $stages[] = ['position' => $i + 1, 'name' => $label,
+                  'filter_id' => $main ? (int)$main->id : 0];
+          }
+          $baselineReady = \Illuminate\Support\Facades\Schema::hasTable('lebd_filter_visibility_baselines');
+          $connectionReady = \Illuminate\Support\Facades\Schema::hasTable('sub_filter_connections');
+          $cutoff = $baselineReady
+              ? (int) (\Illuminate\Support\Facades\DB::table('lebd_filter_visibility_baselines')
+                  ->where('id', 1)->value('legacy_max_sub_filter_id') ?? 18)
+              : 18; // Fix22: legacy records precede confirmed new IDs 19, 21, 23; never MAX(id)
+          $filterIds = array_values(array_filter(array_column($stages, 'filter_id')));
+          $items = SubFilter::query()->where('id', '>', $cutoff)
+              ->whereIn('filter_id', $filterIds)->where('status', 'Active')
+              ->orderBy('id')->get(['id','filter_id','name','parent_id']);
+          $connections = [];
+          if ($connectionReady && $items->isNotEmpty()) {
+              $links = \Illuminate\Support\Facades\DB::table('sub_filter_connections')
+                  ->whereIn('child_sub_filter_id', $items->pluck('id')->all())
+                  ->get(['child_sub_filter_id','parent_sub_filter_id']);
+              foreach ($links as $link) {
+                  $connections[(int)$link->child_sub_filter_id][] = (int)$link->parent_sub_filter_id;
+              }
+          }
+          $options = $items->map(function ($item) use ($connections) {
+              $parents = $connections[(int)$item->id] ?? [];
+              if ($item->parent_id && !in_array((int)$item->parent_id, $parents, true)) {
+                  $parents[] = (int)$item->parent_id;
+              }
+              return ['id'=>(int)$item->id, 'filter_id'=>(int)$item->filter_id,
+                  'name'=>$item->name, 'parents'=>$parents];
+          })->values();
+          return response()->json([
+              'ok'=>true, 'baseline_ready'=>$baselineReady,
+              'connection_ready'=>$connectionReady, 'stages'=>$stages,
+              'options'=>$options, 'fresh_count'=>$items->count(),
+          ])->header('Cache-Control','no-store, no-cache, must-revalidate');
+      }
+
       $courses = Course::where('status', 'Active')
       ->select('id', 'name')
       ->get();

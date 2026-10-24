@@ -1,95 +1,127 @@
+@php
+  // Display labels only. Real existing Filter IDs and stored connections are unchanged.
+  $fixedMainFilterNames = ['প্রশ্ন টাইপ', 'কোর্সের নাম', 'প্রশ্ন টপিক', 'ডিপার্টমেন্ট নাম', 'বুক প্রকাশনির নাম', 'সাবজেক্ট নাম', 'চ্যাপ্টার নাম', 'প্রশ্ন সোর্স', 'সাব-সোর্স', 'পরীক্ষার সন', 'Question Quality filter'];
+@endphp
 @extends('dashboard')
-@section('title', 'Add New Sub-Filter')
+@section('title', 'Create Sub-filter')
 @section('content')
-<section class="content-header">
-  <h1>Add a Sub-Filter</h1>
-  <ol class="breadcrumb">
-    <li><a href="#"><i class="fa fa-dashboard"></i> Sub-Filters</a></li>
-    <li class="active">Add Sub-Filter</li>
-</ol>
-</section>
-
-<!-- Main content -->
+<section class="content-header"><h1>Create Sub-filter</h1></section>
 <section class="content">
-  <div class="row"> <!-- left column -->
-    <div class="col-md-8"> <!-- general form elements -->
-      <div class="box box-primary">
-        <div class="box-header with-border">
-            <h3 style="color: #800" class="box-title">Sub-Filter Details</h3>
+  <div class="row"><div class="col-md-9"><div class="box box-primary">
+    <div class="box-header with-border">
+      <h3 class="box-title">Create your option and connect it to earlier filters</h3>
+      <a class="btn btn-default btn-sm pull-right" href="{{ route('filter.index') }}"><i class="fa fa-arrow-left"></i> Filter Management</a>
+    </div>
+    <form action="{{ route('sub-filter.store') }}" method="POST">
+      @csrf
+      
+      <div class="box-body">
+        @if($errors->any())
+          <div class="alert alert-danger"><strong>Please correct the following:</strong><ul>
+            @foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach
+          </ul></div>
+        @endif
+        <div class="form-group">
+          <label for="filter_id">Main Filter / Step <span class="text-danger">*</span></label>
+          <select class="form-control" name="filter_id" id="filter_id" required>
+            <option value="">Select a filter</option>
+            @foreach($filters as $filter)
+              <option value="{{ $filter->id }}" {{ (string) (old('filter_id', $selectedFilterId ?? '')) === (string) $filter->id ? 'selected' : '' }}>
+                {{ $loop->iteration }} — {{ $fixedMainFilterNames[$loop->index] ?? $filter->name }}
+              </option>
+            @endforeach
+          </select>
         </div>
-        <form action="{{route('sub-filter.store')}}" method="POST">
-            @csrf
-            <div class="box-body">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label for="name">Filter Name</label>
-                        <select class="form-control" name="filter_id" id="filter_id" required>
-                            <option value="">Select One</option>
-                            @foreach($filters as $val)
-                            <option value="{{$val->id}}">{{$val->name}}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label for="name">Sub-Filter Name</label>
-                        <input type="text" class="form-control" name="name" id="name" required>
-                    </div>
-                </div>
-                <div class="clearfix"></div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label for="details">Details</label>
-                        <textarea class="form-control" name="details" id="details" rows="5"></textarea>
-                    </div>
-                </div>
-            </div> <!-- /.box body -->
-            <div class="box-footer">
-                <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-save"></i> Save</button>
-            </div>
-        </form>
-    </div> <!-- /.box -->
-    </div> <!--/.col (left) -->
-</div> <!-- /.row -->
-</section> <!-- /.content -->
+        <div class="form-group">
+          <label for="name">Sub-filter Name <span class="text-danger">*</span></label>
+          <input class="form-control" name="name" id="name" type="text" maxlength="255" value="{{ old('name', '') }}" required>
+        </div>
+        <div class="well well-sm" id="parent_connection_panel">
+          <h4><i class="fa fa-link"></i> Connections to All Previous Main Filters</h4>
+          <p class="help-block">প্রতিটি Main Filter-এর নিচে তার নতুন Sub-filter থেকে একটি বা একাধিক নির্বাচন করুন। ঠিক আগের ধাপ থেকে অন্তত একটি নির্বাচন প্রয়োজন।</p>
+          @php $selectedParents = array_map('intval', (array) (old('parent_connections', []))); @endphp
+          <div id="previous_filter_groups">
+            @foreach($filters as $parentFilter)
+              <div class="form-group previous-filter-group" data-step-filter="{{ $parentFilter->id }}" style="display:none; border:1px solid #ddd; border-radius:4px; padding:12px; background:white">
+                <label for="parent_filter_{{ $parentFilter->id }}">
+                  {{ $loop->iteration }}. {{ $fixedMainFilterNames[$loop->index] ?? $parentFilter->name }}
+                  <span class="text-danger immediate-required" style="display:none">* (required)</span>
+                </label>
+                <select id="parent_filter_{{ $parentFilter->id }}" name="parent_connections[]" class="form-control parent-step-select"
+                        data-parent-filter="{{ $parentFilter->id }}" multiple style="width:100%" disabled>
+                  @foreach($subfilters->where('filter_id', $parentFilter->id) as $candidate)
+                    <option value="{{ $candidate->id }}" {{ in_array((int)$candidate->id, $selectedParents, true) ? 'selected' : '' }}>{{ $candidate->name }} (ID {{ $candidate->id }})</option>
+                  @endforeach
+                </select>
+                @if($subfilters->where('filter_id', $parentFilter->id)->isEmpty())
+                  <small class="text-muted">এই Main Filter-এ এখনো নতুন Sub-filter তৈরি করা হয়নি।</small>
+                @endif
+              </div>
+            @endforeach
+          </div>
+          <div class="alert alert-info" id="no_parent_message">Filter 1 has no parent connections.</div>
+          <span class="label label-info" id="parent_count">0 connected parents</span>
+        </div>
+        <div class="form-group">
+          <label for="details">Details</label>
+          <textarea class="form-control" name="details" id="details" rows="4">{{ old('details', '') }}</textarea>
+        </div>
+      </div>
+      <div class="box-footer">
+        <a class="btn btn-default" href="{{ route('sub-filter.index') }}">Cancel</a>
+        <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-save"></i> Save Sub-filter &amp; Connections</button>
+      </div>
+    </form>
+  </div></div></div>
+</section>
 @endsection
-
 @section('scripts')
-<script type="text/javascript">
-    function getsubcats(elm){
+<script>
+(function () {
+  'use strict';
+  var stages = @json($filters->map(function ($f) { return ['id' => (int)$f->id, 'name' => $f->name]; })->values());
+  var filterSelect = $('#filter_id');
+  var groups = $('.previous-filter-group');
+  var selectors = $('.parent-step-select');
 
-        var catid = elm.options[elm.options.selectedIndex].value;
+  selectors.each(function () {
+    $(this).select2({ width: '100%', placeholder: 'Sub-filter-এর নাম বা ID দিয়ে খুঁজুন', closeOnSelect: true });
+  });
 
-        $.ajax({
-            type: 'GET', //THIS NEEDS TO BE GET
-            url: '/get_sub_cats/'+catid,
-            success: function (data) {
+  function updateCount() {
+    var count = 0;
+    selectors.filter(':enabled').each(function () { count += ($(this).val() || []).length; });
+    $('#parent_count').text(count + (count === 1 ? ' connected parent' : ' connected parents'));
+  }
 
-                var obj = JSON.parse(JSON.stringify(data));
-                var sub_cat_html = "";
-
-                $.each(obj['subcats'], function (key, val) {
-                   sub_cat_html += "<option value="+val.id+">"+val.name+"</option>";
-                });
-
-                if(sub_cat_html != ""){
-                    $("#sub_cat").html('<option value="">Select SubCategory</option>'+sub_cat_html)
-                }else{
-                    $("#sub_cat").html('<option value="">No SubCategory</option>')
-                }
-
-                // console.log(obj['subcats'].count());
-
-                // $("#sub_cat").append(you_html); //// For Append
-                   //// For replace with previous one
-            },
-            error: function(data) { 
-                 console.log('data error');
-            }
-        });
+  function updateStages() {
+    var selected = Number(filterSelect.val());
+    var index = stages.findIndex(function (step) { return step.id === selected; });
+    groups.hide();
+    selectors.prop('disabled', true).prop('required', false);
+    groups.find('.immediate-required').hide();
+    var independent = index === 10;
+    if (index > 0 && !independent) {
+      for (var i = 0; i < index; i++) {
+        var container = groups.filter('[data-step-filter="' + stages[i].id + '"]');
+        container.show();
+        var field = container.find('select');
+        field.prop('disabled', false);
+        if (i === index - 1) {
+          field.prop('required', true);
+          container.find('.immediate-required').show();
+        }
+        field.trigger('change.select2');
+      }
     }
-
-    // getsubcats(elm);
+    $('#parent_connection_panel').toggle(index >= 0 && !independent);
+    $('#no_parent_message').toggle(index <= 0)
+      .text(index === 0 ? 'Filter 1: no parent required.' : 'Choose a Main Filter above to view its earlier filters.');
+    updateCount();
+  }
+  filterSelect.on('change', updateStages);
+  selectors.on('change', updateCount);
+  updateStages();
+})();
 </script>
 @endsection

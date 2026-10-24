@@ -1,1826 +1,946 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use Illuminate\Support\Facades\Route;
-
 use Illuminate\Support\Facades\Auth;
-
 use Illuminate\Support\Facades\Artisan;
-
 use App\Http\Controllers\Auth\LoginController;
-
 use App\Http\Controllers\Auth\RegisterController;
-
 use App\Http\Controllers\Auth\ForgotPasswordController;
-
 use App\Http\Controllers\Auth\VerificationController;
-
 use App\Http\Controllers\Auth\StudentLogin;
-
 use App\Http\Controllers\Auth\TeacherLoginCtrl;
-
 use App\Http\Controllers\Students\StudentHomeCtrl;
-
 use App\Http\Controllers\Students\QuestionReadingController;
-
 use App\Http\Controllers\Teachers\TeacherHomeCtrl;
-
 use App\Http\Controllers\Homepage\CategoryCtrl;
-
 use App\Http\Controllers\Homepage\JobPreparationCtrl;
-
 use App\Http\Controllers\Homepage\HomePageCtrl;
-
 use App\Http\Controllers\Homepage\HomepageSettingCtrl;
-
 use App\Http\Controllers\Admin\DailyExamController;
-
 use App\Http\Controllers\Admin\DailyExamQuestionController;
-
 use App\Http\Controllers\Admin\DailyExamPaperController;
-
 use App\Http\Controllers\RoutineItemCtrl;
-
 use App\Http\Controllers\PaperCtrl;
-
 use Laravel\Socialite\Facades\Socialite;
-
 use App\Models\Student;
-
 use App;
-
 use URL;
-
 use Illuminate\Support\Facades\Log;
-
 use App\Http\Controllers\StudentReferralController;
-
 use App\Http\Controllers\WithdrawController;
-
 use App\Http\Controllers\Admin\WithdrawController as AdminWithdrawController;
-
 /*
-
 |--------------------------------------------------------------------------
-
 | Web Routes
-
 |--------------------------------------------------------------------------
-
 |
-
 | Here is where you can register web routes for your application. These
-
 | routes are loaded by the RouteServiceProvider within a group which
-
 | contains the "web" middleware group. Now create something great!
-
 |
-
 */
-
 Route::get('/auth/github', function () {
-
     return Socialite::driver('github')->redirect();
-
 });
-
 Route::get('/auth/google', function () {
-
     return Socialite::driver('google')->redirect();
-
 });
-
 // force https on production server
-
 if (App::environment('production'))
-
 {
-
     URL::forceScheme('https');
-
 }
-
 // LEBD-3: Public list of currently open job circulars (no login required).
-
 Route::get('/job-circulars', function () {
-
     $today = \Carbon\Carbon::today('Asia/Dhaka')->toDateString();
-
     $circulars = \App\Models\Circular::query()
-
         ->where('status', 'Active')
-
         ->whereNotNull('start_at')
-
         ->whereNotNull('end_at')
-
         ->whereDate('start_at', '<=', $today)
-
         ->whereDate('end_at', '>=', $today)
-
         ->orderByDesc('updated_at')
-
         ->orderByDesc('id')
-
         ->paginate(12);
-
     return view('job-circulars.index', compact('circulars'));
-
 })->name('home.circular.active');
-
 Route::controller(HomePageCtrl::class)->group(function()
-
 {
-
     Route::get('/', 'index')->name('homepage');
-
     Route::get('home/course', 'course')->name('home.course');
-
     Route::get('home/course/{id}', 'courseShow')->name('home.course.show');
-
   Route::get('course/details/{id}',[HomePageCtrl::class,'courseDetails'])->name('course.details');
-
     Route::get('home/pages/{slug}', 'page')->name('home.page');
-
   Route::get('home/coming-soon', 'comingSoon')->name('home.coming-soon');
-
   Route::get('home/circular/{id?}', 'circular')->name('home.circular');
-
   Route::get('home/circular-details/{id}', 'circularShow')->name('home.circular.show');
-
   Route::get('home/results/{paper}', 'resultList')->name('home.results');
-
   Route::get('home/routine-filter/{id}/{department?}', 'routineFilter')->name('home.routine.filter');
-
   Route::get('home/course-routine/{id}', 'courseRoutine')->name('home.course.routine');
-
   Route::get('service-details/{id}', 'serviceShow')->name('home.service.show');
-
   Route::get('/get_departments_by_course/{course_id}',[PaperCtrl::class, 'getDepartmentsByCourse'])->name('get.departments.by.course');
-
   //books related routes on homepage
-
   Route::get('books/department/{id}', 'booksDepartment')->name('home.books.department');
-
   Route::get('books/{id}', 'books')->name('home.books');
-
   Route::get('books-read/{id}', 'readBook')->name('home.book.read');});
-
 Route::controller(CategoryCtrl::class)->group(function()
-
 {
-
   Route::prefix('category')->group(function()
-
   {
-
     Route::get('courses/{type?}', 'courses')->name('category.courses');
-
     Route::get('batch/{type?}/{course}', 'batch')->name('category.batch');
-
     Route::get('semesters/{type}', 'semesters')->name('category.semesters');
-
     Route::get('departments/{type}/{semester?}', 'departments')->name('category.departments');
-
     Route::get('batches/{type?}/{dashboard?}', 'batches')->name('category.batches');
-
     Route::get('department/{type}/{batch?}/{dashboard?}', 'department')->name('category.department');
-
     Route::get('paper/{type}/{batch}/{department?}', 'paper')->name('category.paper');
-
     Route::get('result-option', 'resultOption')->name('category.result.option');
-
     Route::get('check-method/{type}/{batch}/{department?}', 'checkMethod')->name('category.check-method');
-
     Route::get('subjects/{type}/{batch?}/{department?}', 'subjects')->name('category.subjects');
-
     Route::get('chapters/{type}/{subject?}', 'chapters')->name('category.chapters');
-
     Route::get('recorded-course/{type?}/{chapter?}', 'recordedVideo')->name('category.recorded-video');
-
   });
-
 });
-
 Route::controller(JobPreparationCtrl::class)->group(function()
-
 {
-
   Route::get('homepage/courses', 'courses')->name('homepage.courses');
-
   Route::get('homepage/batch/{course_id}', 'batches')->name('homepage.batches');
-
-  Route::get('homepage/running-batches', 'runningBatches')->name('homepage.running.batches');
-
+  Route::get('homepage/running-batches', [\App\Http\Controllers\Homepage\RunningBatchesUnifiedController::class, 'index'])->name('homepage.running.batches');
 });
-
 Route::get('/login', function(){return view('auth.login');})->name('login');
-
 Route::post('/login', [LoginController::class, 'loginPost'])->name('login.post');
-
 Route::controller(RegisterController::class)->group(function()
-
 {
-
     Route::get('/register', 'signup')->name('register');
-
   Route::post('/register', 'signupPost')->name('register.post');
-
     Route::get('/account_verify/{code}', 'verify')->name('email.verify');
-
 });
-
 Route::controller(StudentLogin::class)->group(function()
-
 {
-
     Route::get('students/login', 'login')->name('students.login');
-
     Route::post('students/login', 'loginPost')->name('students.login.post');
-
     Route::post('students/logout', 'logout')->name('students.logout');
-
     Route::get('/auth/github/callback', 'oAuthGithub');
-
     Route::get('/auth/google/callback', 'oAuthGoogle');
-
 });
-
 Route::controller(ForgotPasswordController::class)->group(function()
-
 {
-
     Route::get('students/forgot-password', function() {
-
         return view('auth.passwords.email');
-
     })->middleware('guest')->name('password.request');
-
     Route::post('students/email-password', 'emailPassword')->name('password.email');
-
     Route::get('/reset-password/{token}', 'passwordReset')->middleware('guest')->name('password.reset');
-
     Route::post('password.update', 'updatePassword')->name('password.update');
-
 });
-
 Route::controller(SslCommerzPaymentController::class)->group(function()
-
 {
-
     // SSLCOMMERZ Start
-
     Route::get('/example1', 'exampleEasyCheckout');
-
     Route::get('/payment-proceed', 'exampleHostedCheckout');
-
     Route::post('/students/pay', 'index')->name('payment.proceed');
-
     Route::post('/pay-via-ajax', 'payViaAjax');
-
     Route::post('/students/success', 'success');
-
     Route::post('/students/fail', 'fail');
-
     Route::post('/students/cancel', 'cancel');
-
     Route::post('/students/ipn', 'ipn');
-
     //SSLCOMMERZ END
-
 });
-
 Route::middleware('auth:student')->group(function()
-
 {
-
     Route::controller(StudentHomeCtrl::class)->group(function()
-
     {
-
     Route::prefix('students')->group(function()
-
     {
-
       Route::get('/', 'dashboard')->name('students.dashboard');
-
       Route::get('home', 'home')->name('students.home');
-
       Route::get('exam', 'exam')->name('students.exam');
-
       Route::get('free-exam', 'freeExam')->name('students.free-exam');
-
       Route::get('batch-exam/{batch}', 'batchExam')->name('students.batch-exam');
-
       Route::get('check/{paper}', 'check')->name('students.check');
-
       Route::get('instruction/{paper}', 'instruction')->name('students.instruction');
-
       Route::get('exam/{id}', 'examShow')->name('students.exam.show');
-
       Route::get('start-routine-exam/{id}', 'startRoutineExam')->whereNumber('id')->name('students.exam.start-routine');
-
       Route::get('questions/{paper_id}', 'getQuestions')->name('students.exam.questions');
-
       Route::get('batch-result', 'batchResult')->name('students.batch-result');
-
       Route::get('batch-routine', 'batchRoutine')->name('students.batch-routine');
-
       Route::get('result/{id}/{after?}', 'result')->name('students.result');
-
       Route::get('exam-paper/{id}', 'examPaper')->name('students.exam.paper');
-
       Route::get('solution/{id}', 'solution')->name('students.solution');
-
       Route::get('course', 'course')->name('students.course');
-
       Route::get('course/{id}', 'courseShow')->name('students.course.show');
-
       Route::post('course-apply', 'applyCourse')->name('students.course.apply');
-
       Route::get('checkout/{id}', 'checkout')->name('students.course.checkout');
-
       Route::get('confirm', 'confirm')->name('students.course.confirm');
-
       Route::get('my-course', 'myCourse')->name('students.my-course');
-
       Route::get('my-syllabus', 'mySyllabus')->name('students.my-syllabus');
-
       Route::post('my-syllabus', 'mySyllabusPost')->name('students.my-syllabus.post');
-
       Route::post('student/exam_add', 'examAdd')->name('student.exam.add');
-
       Route::get('syllabus/{id}', 'syllabus')->name('student.syllabus');
-
       Route::get('syllabus/{id}/pdf', 'generatePDF')->name('students.syllabus.pdf');
-
       Route::get('syllabus/pdf-download/{filename}', 'download')->name('students.syllabus.download');
-
       Route::get('complain', 'complain')->name('students.complain');
-
       Route::post('complain', 'complainStore')->name('students.complain.store');
-
       Route::get('update-paper/{id}', 'updatePaperAjax')->name('paper.update.ajax');
-
       Route::get('profile', 'profile')->name('students.profile');
-
       Route::get('batch-reference/{type?}/{batch}/{referrer}', 'batchReference')->name('student.batch-reference');
-
       Route::get('/referral', [StudentReferralController::class, 'index'])->name('students.referral');
-
       Route::get('/withdraw',[WithdrawController::class,'create'])->name('student.withdraw');
-
       Route::post('/withdraw',[WithdrawController::class,'store'])->name('student.withdraw.store');
-
       Route::get('/referral-history',[\App\Http\Controllers\StudentReferralController::class,'history'])->name('student.referral.history');
-
     });
-
     });
-
     Route::controller(VerificationController::class)->group(function()
-
     {
-
         Route::post('contact-check', 'contactCheck')->name('contact-check');
-
         Route::post('otp-check', 'otpCheck')->name('otp-check');
-
     });
-
   //book question
-
   Route::controller(QuestionReadingController::class)->group(function()
-
   {
-
     //reaction,
-
     Route::post('book-question-react', 'reactStore')->name('question.react.store');
-
     Route::get('book-question-react/{question_id}', 'reactShow')->name('question.react.show');
-
     //comments,
-
     Route::post('book-question-comment', 'commentStore')->name('question.comment.store');
-
     Route::get('book-question-comment/{question_id}', 'commentShow')->name('question.comment.show');
-
     //rating,
-
     Route::post('book-question-rate', 'rateStore')->name('question.rate.store');
-
     Route::get('book-question-rate/{question_id}', 'rateShow')->name('question.rate.show');
-
     //reading marking
-
     Route::post('book-question-reading', 'readingStore')->name('question.reading.store');
-
     Route::get('book-question-reading/{question_id}', 'readingShow')->name('question.reading.show');
-
   });
-
 });
-
 Route::prefix('teachers')->group(function()
-
 {
-
   Route::controller(TeacherLoginCtrl::class)->group(function()
-
   {
-
     Route::get('/login', 'login')->name('teachers.login');
-
     Route::post('/login', 'loginPost')->name('teachers.login.post');
-
     Route::post('logout', 'logout')->name('teachers.logout');
-
     Route::get('/auth/github/callback', 'oAuthGithub');
-
     Route::get('/auth/google/callback', 'oAuthGoogle');
-
   });
-
 });
-
 Route::middleware('auth:teacher')->prefix('teachers')->group(function()
-
 {
-
     Route::controller(TeacherHomeCtrl::class)->group(function()
-
     {
-
     Route::get('/', 'dashboard')->name('teachers.dashboard');
-
     Route::get('courses', 'courses')->name('teachers.courses');
-
   });
-
 });
-
  /*
-
 |--------------------------------------------------------------------------
-
 | LEBD Student Exam Routine
-
 |--------------------------------------------------------------------------
-
 | IMPORTANT: Keep this BEFORE student/{student} resource route
-
 |--------------------------------------------------------------------------
-
 */
-
 Route::middleware('auth:student')->get('/student/exam-routine',function () {
-
         return view('student-exams.routine', ['examTitle' => request()->query('title','Exam Routine'
-
             )
-
         ]);
-
     }
-
 )->name('students.exam.routine');
-
 /*
-
 |--------------------------------------------------------------------------
-
 | LEBD STUDENT EXAM INFORMATION PAGE
-
 |--------------------------------------------------------------------------
-
 | Exam No, Time, Instructions, Question Count
-
 | Uses StudentExamPaperInfo Service
-
 |--------------------------------------------------------------------------
-
 */
-
 Route::middleware('auth:student')->get('/students/exam-info/{paper}', function (
-
         \Illuminate\Http\Request $request,
-
         $paper
-
     ) {
-
         // Validate Department ID
-
         $request->validate(['department_id' => 'nullable|integer|min:1',
-
         ]);
-
         // Find Question Paper
-
         $questionPaper = \App\Models\Paper::findOrFail(
-
             $paper
-
         );
-
         // Published / Scheduled papers only
-
         abort_unless(in_array($questionPaper->status,['Published', 'Scheduled'],
-
                 true
-
             ),
-
             404
-
         );
-
         // Get Selected Department
-
         $departmentId = $request->filled('department_id')
-
         ? (int) $request->query('department_id')
-
             : null;
-
         // Load Exam Information
-
         $data = \App\Services\StudentExamPaperInfo::get(
-
             (int) $questionPaper->id,
-
             $departmentId
-
         );
-
         // Back Button URL
-
         $data['backUrl'] = url()->previous();
-
         // Open New Exam Information Blade
-
         return view(
-
             'student-exams.exam-info',
-
             $data
-
         );
-
     })
-
     ->whereNumber('paper')
-
     ->name('students.exam.info');
-
 Route::middleware(['auth'])->group(function()
-
 {
-
   Route::controller(HomeCtrl::class)->group(function(){
-
     Route::get('/home', 'index')->name('home');
-
     /*
-
 |--------------------------------------------------------------------------
-
 | ADMIN DASHBOARD ROUTES
-
 |--------------------------------------------------------------------------
-
 */
-
 // Default Dashboard - Exam Activity
-
 Route::get('/home', function () {
-
     return redirect()->route('admin.exam.activity');
-
 })->name('home');
-
 // Old Dashboard - Keep Existing Design
-
 Route::get('/home/old', 'index')
-
     ->name('admin.dashboard.old');
-
     Route::get('/visitors', 'visitors')->name('visitors');
-
     Route::get('/google-analytics', 'googleAnalytics')->name('google.analytics');
-
   });
-
   /*
-
 |--------------------------------------------------------------------------
-
 | LEBD - Exam Activity Dashboard
-
 |--------------------------------------------------------------------------
-
 */
-
 Route::get('/exam-activity-dashboard', function () {
-
     $data = \App\Services\AdminExamActivityDashboard::build();
-
     return view(
-
         'admin.exam-activity-dashboard',
-
         $data
-
     );
-
 })->name('admin.exam.activity');
-
     /*
-
     |--------------------------------------------------------------------------
-
     | LEBD | ADMIN DAILY UPDATE MANAGEMENT (CREATE + CATEGORIES + ALL LIVE)
-
     |--------------------------------------------------------------------------
-
     | Protected by the existing Route::middleware(['auth']) parent group.
-
     | Categories, Add Update and All Updates use MySQL; comments/dashboard remain Demo.
-
     | Admin login: standard web guard (not auth:student).
-
     |--------------------------------------------------------------------------
-
     */
-
     Route::prefix('admin/daily-update')
-
         ->name('admin.daily-update.')
-
         ->group(function () {
-
             // /admin/daily-update : Step 1 management dashboard
-
             Route::get('/', function () {
-
                 return view('admin.daily-update-dashboard');
-
             })->name('index');
-
             // STEP 14 — LIVE create form and CSRF-protected question save.
-
             // Keep GET (display) separate from POST (database write).
-
             Route::get('/create', [\App\Http\Controllers\Admin\DailyUpdateController::class, 'create'])
-
                 ->name('create');
-
             Route::post('/store', [\App\Http\Controllers\Admin\DailyUpdateController::class, 'store'])
-
                 ->name('store');
-
             // Step 12: Categories — LIVE MySQL CRUD, handled by existing Admin Controller.
-
             // Preserve the existing categories route NAME used by Sidebar and Dashboard.
-
             Route::get('/categories', [\App\Http\Controllers\Admin\DailyUpdateCategoryController::class, 'index'])
-
                 ->name('categories');
-
             Route::post('/categories', [\App\Http\Controllers\Admin\DailyUpdateCategoryController::class, 'store'])
-
                 ->name('categories.store');
-
             Route::patch('/categories/{category}/toggle', [\App\Http\Controllers\Admin\DailyUpdateCategoryController::class, 'toggle'])
-
                 ->whereNumber('category')->name('categories.toggle');
-
             Route::patch('/categories/{category}', [\App\Http\Controllers\Admin\DailyUpdateCategoryController::class, 'update'])
-
                 ->whereNumber('category')->name('categories.update');
-
             Route::delete('/categories/{category}', [\App\Http\Controllers\Admin\DailyUpdateCategoryController::class, 'destroy'])
-
                 ->whereNumber('category')->name('categories.destroy');
-
             // BULK QUESTIONS: 1–100 rows via Excel-paste / UTF-8 CSV, transactional import.
-
             Route::get('/bulk', [\App\Http\Controllers\Admin\DailyUpdateController::class, 'bulkCreate'])->name('bulk');
-
             Route::post('/bulk', [\App\Http\Controllers\Admin\DailyUpdateController::class, 'bulkStore'])->name('bulk.store');
-
             // Only logged-in admins get a student-design preview containing DRAFTS.
-
             Route::get('/preview', [\App\Http\Controllers\Admin\DailyUpdateController::class, 'studentPreview'])->name('preview');
-
             Route::post('/preview/publish-month', [\App\Http\Controllers\Admin\DailyUpdateController::class, 'publishMonth'])->name('publish-month');
-
             // STEP 15 — LIVE All Updates. Read operations use GET; writes require CSRF + PATCH/DELETE.
-
             Route::get('/all', [\App\Http\Controllers\Admin\DailyUpdateController::class, 'index'])
-
                 ->name('all');
-
             Route::get('/all/{update}/edit', [\App\Http\Controllers\Admin\DailyUpdateController::class, 'edit'])
-
                 ->whereNumber('update')->name('edit');
-
             Route::patch('/all/{update}', [\App\Http\Controllers\Admin\DailyUpdateController::class, 'update'])
-
                 ->whereNumber('update')->name('update');
-
             Route::patch('/all/{update}/status', [\App\Http\Controllers\Admin\DailyUpdateController::class, 'togglePublication'])
-
                 ->whereNumber('update')->name('toggle');
-
             Route::delete('/all/{update}', [\App\Http\Controllers\Admin\DailyUpdateController::class, 'destroy'])
-
                 ->whereNumber('update')->name('destroy');
-
             // /admin/daily-update/comments : Step 7 Comments Management (demo only)
-
             Route::get('/comments', function () {
-
                 return view('admin.daily-update-comments');
-
             })->name('comments');
-
             // Later: Question CRUD, Comment Moderation and Publish routes
-
             // will be registered with authenticated controllers when ready.
-
         });
-
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-
     //user routes
-
     Route::resource('/user', 'UserCtrl');
-
   Route::controller(UserCtrl::class)->group(function()
-
   {
-
     // profile
-
     Route::get('profile', 'profile')->name('profile');
-
     Route::get('profile/edit', 'profileEdit')->name('profile.edit');
-
     Route::put('profile/update', 'profileUpdate')->name('profile.update');
-
     // password change
-
     Route::get('/change_password', 'changePassword')->name('user.password.change');
-
     Route::put('/change_password', 'updatePassword')->name('user.change.password');
-
     // user roles
-
     Route::get('user-roles', 'userRoles')->name('user-roles');
-
     Route::get('edit-user-roles/{id}', 'editUserRole')->name('edit-user-role');
-
     Route::put('update-user-role', 'updateUserRole')->name('update-user-role');
-
   });
-
     /*\\\\\\* -------------------- Resource Routes --------------- */
-
     Route::resource('filter', 'FilterCtrl');
-
     Route::resource('sub-filter', 'SubFilterCtrl');
-
     Route::resource('course', 'CourseCtrl');
-
     Route::resource('department', 'DepartmentCtrl');
-
     Route::resource('semester', 'SemesterCtrl');
-
     Route::resource('subject', 'SubjectCtrl');
-
     Route::resource('chapter', 'ChapterCtrl');
-
+    // LEBD-04 Fix41: independent, authenticated Question CSV import (manual QuestionCtrl unchanged).
+    Route::get('admin/question-csv', [\App\Http\Controllers\Admin\QuestionCsvImportController::class, 'index'])->name('admin.question-csv.index');
+    Route::get('admin/question-csv/template', [\App\Http\Controllers\Admin\QuestionCsvImportController::class, 'template'])->name('admin.question-csv.template');
+    Route::post('admin/question-csv/context', [\App\Http\Controllers\Admin\QuestionCsvImportController::class, 'setContext'])->name('admin.question-csv.context');
+    Route::post('admin/question-csv/preview', [\App\Http\Controllers\Admin\QuestionCsvImportController::class, 'preview'])->name('admin.question-csv.preview');
+    Route::post('admin/question-csv/import', [\App\Http\Controllers\Admin\QuestionCsvImportController::class, 'import'])->name('admin.question-csv.import');
+    // Fix54: legacy Fix44 form route forwards to the same simple Fix43 import action.
+    Route::post('admin/question-csv/confirm', [\App\Http\Controllers\Admin\QuestionCsvImportController::class, 'import'])->name('admin.question-csv.confirm');
     Route::resource('question', 'QuestionCtrl');
-
     Route::resource('answer-file', 'AnswerFileCtrl');
-
     Route::resource('label', 'LabelCtrl');
-
   Route::get('paper/get-available-questions',[PaperCtrl::class, 'getAvailableQuestions'])->name('paper.available.questions');
-
     Route::resource('paper', 'PaperCtrl');
-
     Route::resource('batch', 'BatchCtrl');
-
     Route::resource('group', 'GroupCtrl');
-
     Route::resource('student', 'StudentCtrl');
-
     Route::resource('syllabus', 'SyllabusCtrl');
-
     Route::resource('teacher', 'TeacherCtrl');
-
     Route::resource('complain', 'ComplainCtrl');
-
     Route::resource('order', 'OrderCtrl');
-
     Route::resource('exam', 'ExamCtrl');
-
 Route::get('daily-exam', [DailyExamController::class, 'index'])
-
     ->name('admin.daily-exam.index');
-
 Route::get('daily-exam/create', [DailyExamController::class, 'create'])
-
     ->name('admin.daily-exam.create');
-
 Route::post('daily-exam/store', [DailyExamController::class, 'store'])
-
     ->name('admin.daily-exam.store');
-
 Route::get('daily-exam/{id}/edit', [DailyExamController::class, 'edit'])
-
     ->name('admin.daily-exam.edit');
-
 Route::put('daily-exam/{id}', [DailyExamController::class, 'update'])
-
     ->name('admin.daily-exam.update');
-
     // Withdraw Management
-
 Route::get('withdraw-requests',
-
 [AdminWithdrawController::class,'index'])->name('admin.withdraw.index');
-
 Route::get('withdraw-approve/{id}',[AdminWithdrawController::class,'approve'])->name('admin.withdraw.approve');
-
 Route::get('withdraw-reject/{id}',[AdminWithdrawController::class,'reject'])->name('admin.withdraw.reject');
-
 /*
-
 |--------------------------------------------------------------------------
-
 | Question Management
-
 |--------------------------------------------------------------------------
-
 */
-
 Route::get('daily-exam/{id}/question',
-
     [DailyExamController::class,'questionCreate'])
-
     ->name('admin.daily-exam.question.create');
-
 Route::get('daily-exam/{id}/question/manual',
-
     [DailyExamQuestionController::class,'create'])
-
     ->name('admin.daily-exam.question.manual');
-
 Route::post('daily-exam/question/store',
-
     [DailyExamQuestionController::class,'store'])
-
     ->name('admin.daily-exam.question.store');
-
     Route::get('daily-exam/{id}/paper/create',
-
     [DailyExamPaperController::class,'create'])
-
     ->name('admin.daily-exam.paper.create');
-
 Route::post('daily-exam/paper/store',
-
     [DailyExamPaperController::class,'store'])
-
     ->name('admin.daily-exam.paper.store');
-
     Route::get('daily-exam/paper/{id}/edit',
-
 [DailyExamPaperController::class,'edit'])
-
 ->name('admin.daily-exam.paper.edit');
-
 Route::put('daily-exam/paper/{id}',
-
 [DailyExamPaperController::class,'update'])
-
 ->name('admin.daily-exam.paper.update');
-
 Route::delete('daily-exam/paper/{id}',
-
 [DailyExamPaperController::class,'destroy'])
-
 ->name('admin.daily-exam.paper.delete');
-
 Route::get('daily-exam/{id}',
-
     [DailyExamController::class, 'show'])
-
     ->name('admin.daily-exam.show');
-
     Route::resource('page', 'PageCtrl');
-
     Route::resource('routine', 'RoutineCtrl');
-
   Route::get('routine/{id}/copy', 'RoutineCtrl@copy')->name('routine.copy');
-
   Route::post('/routine/item/update-exam-at/{id}',[RoutineItemCtrl::class, 'updateExamAt'])->name('routine.item.update-exam-at');
-
   Route::post('/routine/item/update-exam-end/{id}',[RoutineItemCtrl::class,'updateExamEnd'])->name('routine.item.update.date');
-
     Route::resource('sms', 'SmsCtrl');
-
     Route::resource('email', 'EmailCtrl');
-
     Route::resource('circular-type', 'CircularTypeCtrl');
-
     Route::resource('circular', 'CircularCtrl');
-
     Route::resource('ad', 'AdCtrl');
-
     Route::resource('video', 'VideoCtrl');
-
     Route::resource('service', 'ServiceCtrl');
-
     Route::resource('book-category', 'BookCategoryCtrl');
-
     Route::resource('book', 'BookCtrl');
-
     /*\\\\\\* -------------------- Custom Routes ------------------ */
-
     Route::controller(DepartmentCtrl::class)->group(function()
-
     {
-
         Route::get('get_departments/{course_id}', 'getDepartments');
-
         Route::get('get_departments_by_batch/{batch_id}', 'getDepartmentsByBatch');
-
     });
-
     Route::controller(SemesterCtrl::class)->group(function()
-
     {
-
         Route::get('get_semesters/{department_id}', 'getSemesters');
-
     });
-
     Route::controller(SubjectCtrl::class)->group(function()
-
     {
-
         Route::get('get_sems_subjects/{semester_id}', 'getSemsSubjects');
-
         Route::get('get_subjects/{department_id}', 'getSubjects');
-
     Route::get('search-subject', 'search')->name('subject.search');
-
     });
-
     Route::controller(QuestionCtrl::class)->group(function()
-
     {
-
         Route::get('view_question', 'viewQuestion')->name('question.view');
-
         Route::post('question_view', 'viewQuestionPost')->name('question.view.post');
-
         Route::post('check_question_exist', 'Questions')->name('questions.title');
-
         Route::get('question_search', 'QuestionSearch')->name('question.search');
-
     Route::get('question-title-save', 'saveTitle')->name('question.title.save');
-
     });
-
     Route::controller(ChapterCtrl::class)->group(function()
-
     {
-
         Route::get('get_chapters/{subject_id}', 'getChapters');
-
     Route::get('search-chapter/{data?}', 'search')->name('chapter.search');
-
     });
-
     Route::controller(FilterCtrl::class)->group(function()
-
     {
-
         Route::get('get_filters/{course_id}', 'getFilters');
-
     });
-
   Route::controller(SubFilterCtrl::class)->group(function()
-
     {
-
         Route::get('get-sub-filter/{parent_id}', 'getSubSource')->name('subfilter.subsource');
-
     });
-
     Route::controller(PaperCtrl::class)->group(function()
-
     {
-
     Route::prefix('paper')->group(function()
-
     {
-
       Route::get('add-question/{paper_id}', 'addQuestion')->name('paper.add.question');
-
       Route::post('add_to_paper', 'addToPaper')->name('paper.addtopaper');
-
       Route::get('get-available-questions','getAvailableQuestions')->name('paper.available.questions');
-
       Route::get('view/{id}', 'view')->name('paper.view');
-
       Route::get('exam/{id}', 'exam')->name('paper.exam');
-
       Route::get('solution/{id}', 'solution')->name('paper.solution');
-
       Route::get('solution-ajax/{id}', 'solutionAjax')->name('paper.solution.ajax');
-
       Route::get('result/{id}', 'result')->name('paper.result');
-
       Route::get('result/csv/{id}', 'resultCsv')->name('paper.result.csv');
-
       Route::get('copy/{id}', 'copy')->name('paper.copy');
-
       Route::post('copy-store', 'copyStore')->name('paper.copy.store');
-
       Route::get('recheck_result/{id}', 'reCheckResult')->name('paper.recheck.result');
-
       Route::get('detach/{paperId}/{questionId}', 'detachQuestion')->name('paper.detach.question');
-
     });
-
     Route::get('paper-search', 'search')->name('paper.search');
-
     Route::get('get-papers/{id}', 'getPapers')->name('get.papers');
-
     Route::get('get-routine-exams/{batch_id}','getRoutineExams')->name('paper.routine.exams');
-
     Route::get('/paper/auto-add-question/{id}',[PaperCtrl::class,'autoAddQuestion'])->name('paper.auto.add.question');
-
     });
-
     Route::controller(BatchCtrl::class)->group(function()
-
     {
-
         Route::get('get_batches/{batch_id}', 'getBatches');
-
         Route::get('batch_send_sms/{id}', 'sendSMS')->name('batch.sms');
-
     Route::get('batch-by-course', 'courseBatch')->name('batch.course-batch');
-
     });
-
     Route::controller(StudentCtrl::class)->group(function()
-
     {
-
         Route::get('add-students/{id}/{name}', 'addStudent')->name('students.add');
-
         Route::post('add-student-object', 'addStudentObject')->name('students.add.object');
-
         Route::get('add-student-complete', 'addStudentComplete')->name('students.add.complete');
-
         Route::get('student/view/{id}/{name}', 'view')->name('student.view');
-
         Route::get('student/remove/{id}/{name}/{obj}', 'remove')->name('student.remove');
-
         Route::get('student/send_verify/{id}', 'sendVerifyEmail')->name('send.verify.email');
-
         Route::post('student.search', 'search')->name('student.search');
-
         Route::get('student/login-by-id/{id}', 'loginById')->name('student.login-by-id');
-
     });
-
     Route::controller(SyllabusCtrl::class)->group(function()
-
     {
-
         Route::get('add-question/{syllabus}/{paper_id}', 'addQuestion')->name('syllabus.add.question');
-
         Route::post('syllabus/add_to_paper', 'addToPaper')->name('syllabus.addtopaper');
-
         Route::get('syllabus/view/{id}', 'view')->name('syllabus.view');
-
         Route::get('syllabus/pdf/{id}', 'pdf')->name('syllabus.pdf');
-
     Route::get('syllbus/copy/{id}', 'copy')->name('syllabus.copy');
-
     Route::post('syllbus/copy-store', 'copyStore')->name('syllabus.copy.store');
-
     Route::get('get-syllabus', 'getSyllabus')->name('syllabus.get-syllabus');
-
     });
-
     Route::controller(ExamCtrl::class)->group(function()
-
     {
-
         Route::get('/exam-live', 'live')->name('exam.live');
-
         Route::post('/exam/view', 'view')->name('exam.view');
-
         Route::get('/exam/paper/{exam_id}', 'paper')->name('exam.paper');
-
     });
-
     Route::controller(ComplainCtrl::class)->group(function()
-
     {
-
         Route::post('/complain-reply', 'reply')->name('complain.reply');
-
     });
-
     Route::controller(SmsCtrl::class)->group(function()
-
     {
-
         Route::post('sms/confirm', 'confirm')->name('sms.confirm');
-
         //this route for ajax call
-
         Route::get('sms/batch_student/{batch_ids}', 'getBatchStudents')->name('sms.batch.student');
-
     });
-
     Route::controller(EmailCtrl::class)->group(function()
-
     {
-
         Route::post('email/confirm', 'confirm')->name('email.confirm');
-
         //this route for ajax call
-
         Route::get('email/batch_student/{batch_ids}', 'getBatchStudents')->name('email.batch.student');
-
     });
-
     Route::controller(OrderCtrl::class)->group(function()
-
     {
-
         Route::get('order/add_to_batch/{id}', 'addToBatch')->name('student.addto.batch');
-
     Route::get('referrer-order', 'referrerOrder')->name('order.referrer-order');
-
     });
-
   Route::controller(RoutineCtrl::class)->group(function()
-
   {
-
     //
-
   });
-
   Route::controller(RoutineItemCtrl::class)->group(function()
-
   {
-
-    Route::get('routine/add-item/{id}', 'addItem')->name('routine.add-item');
-
+    // Step 3D: The named Add Item GET route is registered below this group.
+    // Keep every POST/PUT/DELETE Routine Item route unchanged.
     Route::post('routine/add-item-store', 'addItemPost')->name('routine.add-item.store');
-
     Route::get('routine/delete-item/{item_id}', 'deleteItem')->name('routine.item.delete');
-
     Route::get('routine/edit-item/{id}', 'editItem')->name('routine.item.edit');
-
     Route::put('routine/item/update/{id}', 'update')->name('routine.item-update');
-
     Route::get('routine/show-item/{id}', 'showItem')->name('routine.item.show');
-
   });
-
+  // LEBD-04 Step 3D: Entry page always shows Exam / Revision / Model choices.
+  // mode=exam delegates to the existing complete RoutineItemCtrl form.
+  Route::get('routine/add-item/{id}', [\App\Http\Controllers\RoutineEntryController::class, 'select'])
+      ->whereNumber('id')->name('routine.add-item');
   Route::controller(BookCtrl::class)->group(function()
-
     {
-
         Route::get('book-add-question/{book}/{id}', 'addQuestion')->name('book.add.question');
-
         Route::post('book/add_to_paper', 'addToPaper')->name('book.addtopaper');
-
         Route::get('book/view/{id}', 'view')->name('book.view');
-
         Route::get('book/pdf/{id}', 'pdf')->name('book.pdf');
-
   });
-
   Route::controller(HomePageSettingCtrl::class)->group(function()
-
   {
-
     Route::get('about-us', 'aboutUs')->name('settings.about-us');
-
     Route::post('about-us/update', 'aboutUsUpdate')->name('about.update');
-
     //notices
-
     Route::get('notice-edit', 'noticeEdit')->name('noitice.edit');
-
     Route::put('noitce-update/{id}', 'noticeUpdate')->name('notice.update');
-
   });
-
   // database backup
-
   Route::get('/download-database', [BackupController::class, 'downloadRawSql'])->name('database.download');
-
   Route::controller(ScheduleCtrl::class)->group(function()
-
   {
-
     Route::get('/schedule/send-email/{id?}', 'scheduleEmail')->name('schedule.send-email');
-
   });
-
   Route::controller(ReferrerCtrl::class)->group(function()
-
   {
-
     Route::get('/referrer-edit/{id}', 'edit')->name('referrer.edit');
-
     Route::patch('/referrer-update/{id}', 'update')->name('referrer.update');
-
   });
-
 });
-
 //default auth auth::user end
-
 Route::controller(ScheduleCtrl::class)->group(function()
-
 {
-
   Route::prefix('/schedule')->group(function()
-
   {
-
     Route::get('send-sms', 'sendSms');
-
     Route::get('send-email', 'scheduleEmail');
-
   });
-
 });
-
 Route::get('create-log', function(){
-
   Log::info('test log');
-
   return 'working...';
-
 });
-
 Route::get('schedule-test', [HomePageCtrl::class, 'scheduleTest']);
-
 // cache clear
-
 Route::get('reboot', function ()
-
 {
-
   Artisan::call('cache:clear');
-
   Artisan::call('view:clear');
-
   Artisan::call('route:clear');
-
   Artisan::call('config:clear');
-
   Artisan::call('view:clear');
-
   return redirect('/')->with('success', 'Application cache cleared!');
-
 });
-
 /*
-
 |--------------------------------------------------------------------------
-
 | LEBD Common Student Exam Page
-
 |--------------------------------------------------------------------------
-
 | One Blade Design for All Exam Sections and Batches
-
 |--------------------------------------------------------------------------
-
 */
-
 Route::middleware('auth:student')->get(
-
     '/student/exam-section/{section}/{batchId?}',
-
     function ($section, $batchId = null) {
-
         $sections = [
-
             'free-weekly' => 'ফ্রি সাপ্তাহিক মডেল টেস্ট',
-
             'bcs-weekly' => 'বিসিএস সাপ্তাহিক মডেল টেস্ট',
-
             'bank-bcs' => 'ব্যাংক বিসিএস প্রস্তুতি',
-
             'navy-bcs' => 'নৌবাহিনীর বিসিএস প্রস্তুতি',
-
             'preliminary' => 'প্রিলি ও লিখিত প্রস্তুতি',
-
             'subject-course' => 'সাবজেক্ট কোর্স',
-
             'job-solution' => 'জব সল্যুশন',
-
             'bank-job' => 'ব্যাংক নিয়োগ প্রস্তুতি',
-
             'teacher' => 'শিক্ষক নিয়োগ ও নিবন্ধন',
-
             'grade-19-20' => '১৯-২০তম গ্রেড প্রস্তুতি',
-
             'law' => 'বার কাউন্সিল ও বিজেএস',
-
             'nursing' => 'নার্স ও মিডওয়াইফারি',
-
             'special-bcs' => '৪৫তম স্পেশাল বিসিএস'
-
         ];
-
         abort_unless(
-
             array_key_exists($section, $sections),
-
             404
-
         );
-
         $batch = $batchId
-
             ? \App\Models\Batch::findOrFail($batchId)
-
             : null;
-
         $examTitle = $batch
-
             ? $batch->name
-
             : $sections[$section];
-
         return view('student-exams.index', [
-
             'examTitle' => $examTitle,
-
             'section' => $section,
-
             'batch' => $batch
-
         ]);
-
     }
-
 )->name('students.exam.section');
-
 /*
-
 |--------------------------------------------------------------------------
-
 | LEBD Dynamic Course Exam Page
-
 |--------------------------------------------------------------------------
-
 | Course -> Batch -> Department -> Exam Page
-
 | Only Active and Currently Running Batches
-
 |--------------------------------------------------------------------------
-
 */
-
 Route::middleware('auth:student')->group(function () {
-
     /*
-
     |--------------------------------------------------------------------------
-
     | STEP 1: Course Click
-
     |--------------------------------------------------------------------------
-
     */
-
     Route::get('/student/exam-course/{courseId}', function ($courseId) {
-
         $course = \App\Models\Course::findOrFail($courseId);
-
         // Only Admin-selected Active Courses
-
         abort_unless(
-
             $course->status === 'Active' &&
-
             (int) $course->show_in_exam_section === 1,
-
             404
-
         );
-
         // Bangladesh Current Date
-
         $today = \Carbon\Carbon::today('Asia/Dhaka')->toDateString();
-
         // Check whether this Course has any Batch
-
         // Including expired and inactive batches
-
         $hasAnyBatch = $course->batches()->exists();
-
         // Get only Active and Currently Running Batches
-
         $batches = $course->batches()->where('status', 'Active')->whereDate('start_at', '<=', $today)->whereDate('end_at', '>=', $today)->orderBy('id', 'DESC')->get();
-
         // If the Course has Batches, show Batch List
-
         // Even when all batches have expired
-
         if ($hasAnyBatch) {
-
             return view('student-exams.select', [
-
                 'title' => $course->name,
-
                 'mode' => 'batch',
-
                 'items' => $batches,
-
                 'course' => $course,
-
                 'batch' => null
-
             ]);
-
         }
-
         // Course has no Batch at all
-
         // Open Common Exam Page directly
-
         return view('student-exams.index', [
-
             'examTitle' => $course->name,
-
             'section' => 'course',
-
             'course' => $course,
-
             'batch' => null,
-
             'department' => null
-
         ]);
-
     })->name('students.exam.course');
-
     /*
-
     |--------------------------------------------------------------------------
-
     | STEP 2: Batch Click
-
     |--------------------------------------------------------------------------
-
     */
-
     Route::get(
-
         '/student/exam-course/{courseId}/batch/{batchId}',
-
         function ($courseId, $batchId) {
-
             $course = \App\Models\Course::findOrFail($courseId);
-
             // Validate Course
-
             abort_unless(
-
                 $course->status === 'Active' &&
-
                 (int) $course->show_in_exam_section === 1,
-
                 404
-
             );
-
             // Bangladesh Current Date
-
             $today = \Carbon\Carbon::today('Asia/Dhaka')->toDateString();
-
             // Find Batch only if currently running
-
             $batch = $course->batches()
-
                 ->where('id', $batchId)
-
                 ->where('status', 'Active')
-
                 ->whereDate('start_at', '<=', $today)
-
                 ->whereDate('end_at', '>=', $today)
-
                 ->firstOrFail();
-
             // Find Active Departments of this Batch
-
             $departments = $batch->departments()
-
                 ->where('departments.status', 'Active')
-
                 ->orderBy('departments.id', 'ASC')
-
                 ->get();
-
             // If Departments exist, show Department List
-
             if ($departments->isNotEmpty()) {
-
                 return view('student-exams.select', [
-
                     'title' => $batch->name,
-
                     'mode' => 'department',
-
                     'items' => $departments,
-
                     'course' => $course,
-
                     'batch' => $batch
-
                 ]);
-
             }
-
             // No Active Department
-
             // Open Batch Exam Page directly
-
             return view('student-exams.index', [
-
                 'examTitle' => $batch->name,
-
                 'section' => 'course',
-
                 'course' => $course,
-
                 'batch' => $batch,
-
                 'department' => null
-
             ]);
-
         }
-
     )->name('students.exam.batch');
-
     /*
-
     |--------------------------------------------------------------------------
-
     | STEP 3: Department Click
-
     |--------------------------------------------------------------------------
-
     */
-
     Route::get(
-
         '/student/exam-course/{courseId}/batch/{batchId}/department/{departmentId}',
-
         function ($courseId, $batchId, $departmentId) {
-
             $course = \App\Models\Course::findOrFail($courseId);
-
             // Validate Course
-
             abort_unless(
-
                 $course->status === 'Active' &&
-
                 (int) $course->show_in_exam_section === 1,
-
                 404
-
             );
-
             // Bangladesh Current Date
-
             $today = \Carbon\Carbon::today('Asia/Dhaka')->toDateString();
-
             // Validate Batch belongs to this Course
-
             // and is currently running
-
             $batch = $course->batches()
-
                 ->where('id', $batchId)
-
                 ->where('status', 'Active')
-
                 ->whereDate('start_at', '<=', $today)
-
                 ->whereDate('end_at', '>=', $today)
-
                 ->firstOrFail();
-
             // Validate Department belongs to this Batch
-
             $department = $batch->departments()
-
                 ->where('departments.id', $departmentId)
-
                 ->where('departments.status', 'Active')
-
                 ->firstOrFail();
-
             // Open Common Exam Page
-
             return view('student-exams.index', [
-
     'examTitle' => $department->name,
-
     'section' => 'course',
-
     'course' => $course,
-
     'batch' => $batch,
-
     'department' => $department,
-
     // Upcoming Exam Data from Routine + Question Paper
-
     'upcomingExam' => \App\Services\StudentUpcomingExam::get(
-
         (int) $course->id,
-
         (int) $batch->id,
-
         (int) $department->id
-
     ),
-
 ]);
-
         }
-
     )->name('students.exam.department');
-
 });
-
 /*
-
 |--------------------------------------------------------------------------
-
 | STUDENT RESULT DASHBOARD - PREVIEW
-
 |--------------------------------------------------------------------------
-
 */
-
 Route::middleware('auth:student')
-
     ->get('/students/result-design/{paper}/{exam?}', function ($paper, $exam = null) {
-
         $studentId = (int) \Illuminate\Support\Facades\Auth::guard('student')->id();
-
         $data = \App\Services\StudentResultDashboard::build(
-
             (int) $paper,
-
             $studentId,
-
             $exam !== null ? (int) $exam : null
-
         );
-
         // Student must have completed this exam.
-
         abort_unless($data['exam'], 404);
-
         return view('student-panel.student-result-dashboard', $data);
-
     })
-
     ->whereNumber('paper')
-
     ->whereNumber('exam')
-
     ->name('students.result.design');
-
     /*
-
 |--------------------------------------------------------------------------
-
 | LEBD STUDENT ACTIVITY TRACKING
-
 |--------------------------------------------------------------------------
-
 | Student Page Visit, Button Click, Active Time
-
 |--------------------------------------------------------------------------
-
 */
-
 Route::middleware(['auth:student', 'throttle:180,1'])
-
     ->post(
-
         '/students/activity-track',
-
         [\App\Http\Controllers\Students\StudentActivityController::class, 'store']
-
     )
-
     ->name('students.activity.track');
-
     /*
-
 |--------------------------------------------------------------------------
-
 | LEBD - RECENT ACTIVITY DASHBOARD
-
 |--------------------------------------------------------------------------
-
 | Admin Dashboard, Student History & CSV Export
-
 |--------------------------------------------------------------------------
-
 */
-
 Route::middleware(['auth'])->group(function () {
-
     // Recent Activity Dashboard
-
     Route::get(
-
         '/admin/recent-activity',
-
         [\App\Http\Controllers\Admin\RecentActivityDashboardController::class, 'index']
-
     )->name('admin.recent.activity');
-
     // Individual Student Activity History
-
     Route::get(
-
         '/admin/recent-activity/student/{studentId}',
-
         [\App\Http\Controllers\Admin\RecentActivityDashboardController::class, 'student']
-
     )
-
     ->whereNumber('studentId')
-
     ->name('admin.recent.activity.student');
-
     // Export Activity Records
-
     Route::get(
-
         '/admin/recent-activity/export',
-
         [\App\Http\Controllers\Admin\RecentActivityDashboardController::class, 'export']
-
     )->name('admin.recent.activity.export');
-
 });
-
 /* Daily Update Page */
-
 Route::get('/daily-update', function () {
-
     return view('daily-update');
-
 })->name('daily.update');
-
 // LEBD-3 MCQ Job Preparation (standalone module, existing routes preserved)
 require __DIR__ . '/job_preparation.php';
-
 // LEBD-3: Admin MCQ Subscription + universal Student Package catalog.
 // Keep this outside admin/student middleware groups; the included file applies its own guards.
 require_once __DIR__ . '/mcq_subscription.php';
-
-
 // LEBD-3 E-Book Department / Non-Department module.
 require_once __DIR__ . '/ebook.php';
 // Success
 require __DIR__.'/home_success.php';
+require __DIR__.'/exam_mcq.php';
+require __DIR__.'/exam_mcq_bulk_v85.php';
+// LEBD-04 Revision/Model Exam links (do not change existing Routine routes).
+require_once __DIR__.'/routine_derived_exams.php';
+require __DIR__.'/routine_auto_question.php';
+// LEBD-04 Fix45: filtered question exports (admin session required).
+\Illuminate\Support\Facades\Route::post('/admin/question-filtered/export', [\App\Http\Controllers\Admin\QuestionExportController::class, 'export'])
+    ->middleware('auth')->name('question.filtered.export');
+
+// LEBD-04 Fix100: Premium Recorded Classes + Packages (independent module routes).
+require_once __DIR__ . '/premium_class.php';
+
+// LEBD Fix124: Student Advice management (standalone).
+require_once __DIR__ . '/student_advice.php';
+
+// LEBD Fix139 - Independent Examination Section
+require_once __DIR__ . "/exam_section.php";

@@ -166,6 +166,93 @@ if($complains)
             @endif
           </ul>
         </li>
+        {{-- LEBD-3 v84: MCQ for Exam (independent question selection bank) --}}
+        @if(\Illuminate\Support\Facades\Route::has('admin.exam-mcq.index'))
+        @php
+          $examMcqMenuActive = request()->routeIs('admin.exam-mcq.*') || request()->is('admin/mcq-for-exam*');
+          $examMcqKind = request()->route('kind') ?? request()->segment(3);
+        @endphp
+        <li class="treeview {{ $examMcqMenuActive ? 'active menu-open' : '' }}">
+          <a href="#">
+            <i class="fa fa-list-alt"></i> <span>MCQ for Exam</span>
+            <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+          </a>
+          <ul class="treeview-menu" style="{{ $examMcqMenuActive ? 'display:block;' : '' }}">
+            <li class="{{ $examMcqMenuActive && $examMcqKind === 'department' ? 'active' : '' }}">
+              <a href="{{ route('admin.exam-mcq.index', ['kind'=>'department']) }}"><i class="fa fa-building"></i> Department</a>
+            </li>
+            <li class="{{ $examMcqMenuActive && $examMcqKind === 'non-department' ? 'active' : '' }}">
+              <a href="{{ route('admin.exam-mcq.index', ['kind'=>'non-department']) }}"><i class="fa fa-folder-open"></i> Non-Department</a>
+            </li>
+            <li>
+              <a href="{{ route('admin.exam-mcq.index', ['kind'=>'department']) }}" title="Select a category to manage linked questions"><i class="fa fa-question-circle"></i> Question Management</a>
+            </li>
+          </ul>
+        </li>
+        @endif
+
+        {{-- LEBD-04 Fix98B: Premium Recorded Classes (Department / Non-Department / Packages) --}}
+        @php
+            $premiumRecordingMenuActive = request()->routeIs('admin.premium-recordings.*', 'admin.premium-class-packages.*', 'admin.premium-video-complaints.*')
+                || request()->is('admin/premium-recordings*', 'admin/premium-class-packages*', 'admin/premium-video-complaints*');
+            $premiumRecordingRouteReady = \Illuminate\Support\Facades\Route::has('admin.premium-recordings.index');
+            $premiumPackageRouteReady = \Illuminate\Support\Facades\Route::has('admin.premium-class-packages.index');
+            $premiumRecordingGroup = request()->query('premium_group', 'department');
+        @endphp
+        <li class="treeview {{ $premiumRecordingMenuActive ? 'active menu-open' : '' }}">
+          <a href="#">
+            <i class="fa fa-play-circle"></i> <span>Premium Recorded Classes</span>
+            <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+          </a>
+          <ul class="treeview-menu" style="{{ $premiumRecordingMenuActive ? 'display:block;' : '' }}">
+            <li class="{{ request()->routeIs('admin.premium-recordings.*') && $premiumRecordingGroup === 'department' ? 'active' : '' }}">
+              @if($premiumRecordingRouteReady)
+                <a href="{{ route('admin.premium-recordings.index', ['premium_group' => 'department']) }}"><i class="fa fa-building"></i> Department</a>
+              @else
+                <a href="#" onclick="return false;" title="Route integration pending" style="opacity:.65;cursor:not-allowed;"><i class="fa fa-building"></i> Department <small>(Setup pending)</small></a>
+              @endif
+            </li>
+            <li class="{{ request()->routeIs('admin.premium-recordings.*') && $premiumRecordingGroup === 'non-department' ? 'active' : '' }}">
+              @if($premiumRecordingRouteReady)
+                <a href="{{ route('admin.premium-recordings.index', ['premium_group' => 'non-department']) }}"><i class="fa fa-book"></i> Non-Department</a>
+              @else
+                <a href="#" onclick="return false;" title="Route integration pending" style="opacity:.65;cursor:not-allowed;"><i class="fa fa-book"></i> Non-Department <small>(Setup pending)</small></a>
+              @endif
+            </li>
+            <li class="{{ request()->routeIs('admin.premium-class-packages.*') ? 'active' : '' }}">
+              @if($premiumPackageRouteReady)
+                <a href="{{ route('admin.premium-class-packages.index') }}"><i class="fa fa-cubes"></i> Create / Manage Packages</a>
+              @else
+                <a href="#" onclick="return false;" title="Package Management is not built yet" style="opacity:.65;cursor:not-allowed;"><i class="fa fa-cubes"></i> Create / Manage Packages <small>(Coming soon)</small></a>
+              @endif
+            </li>
+            <li class="{{ request()->routeIs('admin.premium-video-complaints.*') ? 'active' : '' }}">
+              @if(\Illuminate\Support\Facades\Route::has('admin.premium-video-complaints.index'))
+                <a href="{{ route('admin.premium-video-complaints.index') }}"><i class="fa fa-commenting-o"></i> Complaints</a>
+              @else
+                <a href="#" onclick="return false;" title="Install Fix116 routes"><i class="fa fa-commenting-o"></i> Complaints (Setup pending)</a>
+              @endif
+            </li>
+          </ul>
+        </li>
+
+        {{-- LEBD Fix139: Separate Examination Section --}}
+        <li class="treeview {{ request()->routeIs('admin.exam-section.*') ? 'active menu-open' : '' }}">
+          <a href="#"><i class="fa fa-file-text"></i><span>Exam Section Student Dashboard</span><span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
+          <ul class="treeview-menu" style="{{ request()->routeIs('admin.exam-section.*') ? 'display:block' : '' }}">
+            <li><a href="{{route('admin.exam-section.categories')}}"><i class="fa fa-folder"></i> Category</a></li>
+            <li><a href="{{route('admin.exam-section.subcategories')}}"><i class="fa fa-sitemap"></i> Sub-category</a></li>
+            <li><a href="{{ route('admin.exam-section.routine-topics') }}"><i class="fa fa-list-alt"></i> Routine Topic Name</a></li>
+            <li><a href="{{route('admin.exam-section.routine')}}"><i class="fa fa-calendar"></i> Routine</a></li>
+            <li><a href="{{route('admin.exam-section.auto-question')}}"><i class="fa fa-magic"></i> Auto Question Create</a></li>
+            <li><a href="{{ route('admin.exam-section.packages') }}"><i class="fa fa-cubes"></i> Package Management</a></li>
+          </ul>
+        </li>
+
+        {{-- LEBD Fix124 — Student Advice Management --}}
+        @if(\Illuminate\Support\Facades\Route::has('admin.student-advice.index'))
+        <li class="{{ request()->routeIs('admin.student-advice.*') ? 'active' : '' }}"><a href="{{ route('admin.student-advice.index') }}"><i class="fa fa-graduation-cap"></i> <span>Student Advice</span></a></li>
+        @endif
         {{-- LEBD-3 E-Book: Department / Non-Department --}}
         @php
           $ebookMenuActive = request()->routeIs('admin.ebook.*') || request()->is('admin/e-book/*');
@@ -253,18 +340,30 @@ if($complains)
             <li><a href="#"><i class="fa fa-play"></i> Video</a></li> --}}
           </ul>
         </li>
-        <li class="treeview">
+        {{-- Question Papers: legacy links + independent Auto Question module --}}
+        @php
+            $autoPaperMenuActive = request()->routeIs('admin.routine-auto-question.*');
+            $paperMenuActive = $autoPaperMenuActive || request()->routeIs('paper.*');
+        @endphp
+        <li class="treeview {{ $paperMenuActive ? 'active menu-open' : '' }}">
           <a href="#">
             <i class="fa fa-file-o"></i>
             <span>Question Papers</span>
-            <span class="pull-right-container">
-              <i class="fa fa-angle-left pull-right"></i>
-            </span>
+            <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
           </a>
-          <ul class="treeview-menu">
-            <li><a href="{{route('paper.create')}}"><i class="fa fa-pencil"></i> Create Question Paper</a></li>
-            <li><a href="{{route('paper.index')}}"><i class="fa fa-list"></i> View Question Papers</a></li>
-</ul>
+          <ul class="treeview-menu" style="{{ $paperMenuActive ? 'display:block;' : '' }}">
+            <li class="{{ request()->routeIs('paper.create') ? 'active' : '' }}">
+              <a href="{{ route('paper.create') }}"><i class="fa fa-pencil"></i> Create Question Paper</a>
+            </li>
+            <li class="{{ request()->routeIs('paper.index') ? 'active' : '' }}">
+              <a href="{{ route('paper.index') }}"><i class="fa fa-list"></i> View Question Papers</a>
+            </li>
+            @if(\Illuminate\Support\Facades\Route::has('admin.routine-auto-question.index'))
+            <li class="{{ $autoPaperMenuActive ? 'active' : '' }}">
+              <a href="{{ route('admin.routine-auto-question.index') }}"><i class="fa fa-magic"></i> Auto Question Papers</a>
+            </li>
+            @endif
+          </ul>
         </li>
         <li class="treeview">
           <a href="#">

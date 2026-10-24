@@ -1,0 +1,87 @@
+/* LEBD Fix127: scoped homepage social gallery. */
+.lebd-social-follow{width:100%;padding:46px 16px 52px;background:radial-gradient(ellipse at 12% 15%,#093e7b 0,transparent 34%),radial-gradient(ellipse at 86% 75%,#0e357d 0,transparent 34%),linear-gradient(145deg,#07112f,#061a42 52%,#08102c);color:#fff!important;overflow:hidden}
+.lebd-social-follow *{box-sizing:border-box}
+.lebd-social-wrap{max-width:1250px;margin:0 auto}
+.lebd-social-heading{text-align:center;max-width:850px;margin:0 auto 27px}
+.lebd-social-kicker{display:inline-block;color:#75dcff;font-weight:800;font-size:11px;letter-spacing:2px;margin-bottom:7px}
+.lebd-social-heading h2{margin:0;font-size:clamp(24px,3.3vw,42px);font-weight:900;line-height:1.4;color:#fff}
+.lebd-social-heading p{margin:7px 0 0;color:#d6e5fb;font-size:clamp(11px,1.2vw,15px);line-height:1.8}
+.lebd-social-platforms{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:24px 0 36px}
+.lebd-social-platform{min-width:0;min-height:82px;padding:12px;display:flex;align-items:center;gap:10px;border:1px solid rgba(121,183,255,.55);border-radius:15px;background:rgba(13,38,89,.75);color:#fff!important;text-decoration:none!important;box-shadow:0 8px 20px rgba(0,0,0,.13)}
+.lebd-social-platform:not(a){opacity:.76}
+.lebd-social-platform-copy{min-width:0;display:flex;flex-direction:column;gap:4px;line-height:1.25}
+.lebd-social-platform-copy strong{font-size:clamp(10px,1vw,13px);font-weight:800;white-space:normal}
+.lebd-social-platform-copy small{font-size:clamp(11px,1vw,14px);font-weight:700;color:#e4f0ff}
+.lebd-social-icon{flex:none;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#1372ec;box-shadow:0 3px 12px rgba(0,0,0,.16);font-size:23px}
+.lebd-social-youtube{border-color:#ec4e68}.lebd-social-youtube .lebd-social-icon{background:#f12737}.lebd-social-instagram{border-color:#ac69ee}.lebd-social-instagram .lebd-social-icon{background:linear-gradient(130deg,#6533e9,#fa3688,#f6a228)}
+.lebd-social-linkedin .lebd-social-icon{background:#0b7cbb}.lebd-social-whatsapp{border-color:#14b88b}.lebd-social-whatsapp .lebd-social-icon{background:#13bc78}
+.lebd-social-go{margin-left:auto;color:#fff}.lebd-social-soon{margin-left:auto;font-size:9px;color:#9bb8d3;white-space:nowrap}
+.lebd-social-platform[href]:hover{transform:translateY(-3px);background:rgba(24,63,127,.9)}
+.lebd-social-app-heading{text-align:center;margin-bottom:20px}.lebd-social-app-heading h3{color:#fff;font-size:clamp(17px,2vw,24px);margin:0 0 5px;font-weight:800}.lebd-social-app-heading p{color:#adcaef;font-size:12px;margin:0}
+.lebd-social-showcase{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;max-width:830px;margin:0 auto;align-items:start}
+.lebd-social-phone{min-width:0;margin:0;text-align:center}.lebd-social-phone img{display:block;width:100%;max-width:245px;height:auto;aspect-ratio:344/650;object-fit:contain;margin:0 auto;filter:drop-shadow(0 15px 18px rgba(0,0,0,.4));border-radius:28px}
+.lebd-social-phone figcaption{color:#e0f0ff;font-size:13px;font-weight:700;margin:10px 0 0}
+.lebd-social-disclaimer{margin:22px auto 0;text-align:center;color:#91a9cb;font-size:10px}
+@media(max-width:1000px){.lebd-social-platforms{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:600px){.lebd-social-follow{padding:28px 10px 30px}.lebd-social-heading{margin-bottom:13px}.lebd-social-platforms{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:14px 0 24px}.lebd-social-platform{min-height:66px;padding:8px 6px;gap:7px;border-radius:10px}.lebd-social-icon{width:32px;height:32px;font-size:16px}.lebd-social-platform-copy strong{font-size:9px}.lebd-social-platform-copy small{font-size:10px}.lebd-social-soon{font-size:8px}.lebd-social-showcase{gap:4px}.lebd-social-phone img{border-radius:11px}.lebd-social-phone figcaption{font-size:9px;line-height:1.3}.lebd-social-app-heading p{font-size:10px}}
+
+/* LEBD Fix128: prevent parent container from making this full-width section tiny.
+   Reset inherited landing-page section dimensions, then use a responsive grid. */
+section.lebd-social-follow {
+  position:relative!important;
+  display:block!important;
+  width:100vw!important;
+  max-width:none!important;
+  height:auto!important;
+  min-height:0!important;
+  margin:0 0 0 calc(50% - 50vw)!important;
+  padding:36px max(18px,calc((100vw - 1280px)/2)) 42px!important;
+  overflow:hidden;
+  text-align:initial;
+}
+.lebd-social-follow .lebd-social-wrap {
+  display:block!important;
+  width:100%!important;
+  max-width:1280px!important;
+  margin:0 auto!important;
+  padding:0!important;
+  transform:none!important;
+  zoom:1!important;
+}
+.lebd-social-follow .lebd-social-heading {max-width:900px!important;margin:0 auto 20px!important}
+.lebd-social-follow .lebd-social-platforms {width:100%!important;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:16px 0 28px!important}
+.lebd-social-follow .lebd-social-platform {min-height:75px!important}
+.lebd-social-follow .lebd-social-showcase {
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,230px))!important;
+  justify-content:center!important;
+  align-items:start!important;
+  width:100%!important;
+  max-width:850px!important;
+  gap:22px!important;
+  margin:0 auto!important;
+}
+.lebd-social-follow .lebd-social-phone {width:100%!important;min-width:0!important;height:auto!important;margin:0!important}
+.lebd-social-follow .lebd-social-phone img {
+  display:block!important;
+  width:100%!important;
+  max-width:230px!important;
+  height:auto!important;
+  max-height:435px!important;
+  object-fit:contain!important;
+  aspect-ratio:auto!important;
+  margin:0 auto!important;
+}
+.lebd-social-follow .lebd-social-phone figcaption {margin:8px 0 0!important}
+.lebd-social-follow .lebd-social-disclaimer {margin:16px auto 0!important}
+@media(max-width:1040px) {
+  .lebd-social-follow .lebd-social-platforms {grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:700px) {
+  section.lebd-social-follow {padding:24px 12px 26px!important}
+  .lebd-social-follow .lebd-social-platforms {grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 0 18px!important}
+  .lebd-social-follow .lebd-social-platform {min-height:66px!important}
+  .lebd-social-follow .lebd-social-showcase {grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:7px!important}
+  .lebd-social-follow .lebd-social-phone img {max-height:255px!important;max-width:100%!important}
+  .lebd-social-follow .lebd-social-phone figcaption {font-size:10px!important}
+}
