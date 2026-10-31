@@ -1,23 +1,14 @@
 @php
-
 use \App\Http\Controllers\SourceCtrl;
-
 $source = new SourceCtrl;
-
 $user = Auth::guard('student')->user();
-
 @endphp
-
 @extends('student')
-
 @section('title', 'Dashboard')
-
 @section('stylesheets')
 <link rel="stylesheet" href="{{ asset('web/css/lebd-dashboard-circular-v61.css') }}?v=61">
 <style>
 /* Main site header is provided by the shared student layout. */
-
-
 /* ==========================================================
    STUDENT DASHBOARD — CONSISTENT RESPONSIVE LAYOUT
    No browser-zoom hacks: works at Chrome 75%, 100% and 125%.
@@ -130,78 +121,42 @@ $user = Auth::guard('student')->user();
     .lebd-student-dashboard .quick-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
     .lebd-student-dashboard .referral-card { width: 104px; }
 }
-
 </style>
 @endsection
-
 @section('content')
-
 {{-- Header is rendered once by resources/views/student.blade.php. --}}
-
 <div class="lebd-student-dashboard" id="lebd-student-dashboard">
-
 <!-- ================= STUDENT PROFILE CARD ================= -->
-
 <section class="student-dashboard">
-
 <div class="container">
-
 <div class="student-profile-card">
-
     <!-- PROFILE LEFT -->
-
     <div class="profile-left">
-
         <div class="profile-avatar">
-
             <i class="fa fa-user"></i>
-
         </div>
-
         <div class="profile-info">
-
             <h4>
-
                 স্বাগতম {{ $user->name }}
-
             </h4>
-
              <p>
-
                 Your ID:
-
              <span>
-
               {{ str_pad($user->id, 6, '0', STR_PAD_LEFT) }}
-
              </span>
-
             </p>
-
             <p class="student-email">
-
         {{ $user->email }}
-
           </p>
-
         </div>
-
     </div>
-
    <!-- Referral Earn Card code-->
-
 <a href="{{ route('students.referral') }}" class="referral-link">
-
     <div class="referral-card">
-
         <div class="referral-content">
-
             <h4>
-
                 Available Balance
-
             </h4>
-
             @php
                 // Match StudentReferralController::index() exactly:
                 // Available Balance = student's wallet balance - pending withdrawal requests.
@@ -213,1693 +168,850 @@ $user = Auth::guard('student')->user();
                 $lebdAvailableBalance = (float) ($user->referral_balance ?? 0) - (float) $lebdPendingWithdraw;
             @endphp
             <h2>৳ {{ number_format($lebdAvailableBalance, 2) }}</h2>
-
             <span class="withdraw-btn">
-
                 Withdraw →
-
             </span>
-
         </div>
-
     </div>
-
 </a>
-
 </div> {{-- /.student-profile-card --}}
 </div> {{-- /.container --}}
 </section>
-
 <style>
-
 /* ================= PROFILE CARD ================= */
-
 .student-profile-card{
-
     display:flex;
-
     justify-content:space-between;
-
     align-items:center;
-
     background:linear-gradient(120deg,#0875e1,#00b37e);
-
     border-radius:22px;
-
     padding:15px 20px;
-
     height:100px;
-
     width:100%;
-
 }
-
 /* LEFT PROFILE */
-
 .profile-left{
-
     display:flex;
-
     align-items:center;
-
     gap:15px;
-
 }
-
 .profile-avatar{
-
     width:65px;
-
     height:65px;
-
     background:white;
-
     border-radius:50%;
-
     display:flex;
-
     align-items:center;
-
     justify-content:center;
-
 }
-
 .profile-avatar i{
-
     font-size:42px;
-
     color:#0875e1;
-
 }
-
 .profile-info h3{
-
     color:white;
-
     font-size:16px;
-
     font-weight:700;
-
     margin:0 0 5px 0;
-
 }
-
 .profile-info p{
-
     color:white;
-
     font-size:12px;
-
     margin:3px 0;
-
 }
-
 .profile-info span{
-
     background:#00c878;
-
     padding:3px 10px;
-
     border-radius:20px;
-
 }
-
 .profile-info small{
-
     color:white;
-
     font-size:10px;
-
 }
-
 /* ================= REFERRAL CARD ================= */
-
 .referral-card{
-
     background:white;
-
     border-radius:20px;
-
     height:80px;
-
     width:260px;
-
     display:flex;
-
     align-items:center;
-
     justify-content:center;
-
     padding:10px;
-
 }
-
 .referral-content{
-
     text-align:center;
-
 }
-
 .referral-content h4{
-
     margin:0;
-
     font-size:15px;
-
     color:#12345b;
-
 }
-
 .referral-content h2{
-
     margin:3px 0;
-
     font-size:24px;
-
     color:#00a878;
-
 }
-
 .withdraw-btn{
-
     background:#0875d1;
-
     color:white;
-
     padding:5px 18px;
-
     border-radius:20px;
-
     font-size:12px;
-
     text-decoration:none;
-
 }
-
 /* ================= PROFILE & REFERRAL ALIGN FIX ================= */
-
 .student-profile-card{
-
     display:flex;
-
     align-items:center;
-
     justify-content:space-between;
-
     gap:10px;
-
 }
-
 /* Left side fixed */
-
 .profile-left{
-
     flex:1;
-
     min-width:0;
-
     display:flex;
-
     align-items:center;
-
     gap:10px;
-
 }
-
 .profile-info{
-
     overflow:hidden;
-
 }
-
 .profile-info h3{
-
     white-space:nowrap;
-
     overflow:hidden;
-
     text-overflow:ellipsis;
-
 }
-
 /* Referral small box */
-
 .referral-card{
-
     width:120px;
-
     height:65px;
-
     flex-shrink:0;
-
     padding:6px;
-
     border-radius:16px;
-
     display:flex;
-
     justify-content:center;
-
     align-items:center;
-
 }
-
 /* Referral text */
-
 .referral-content{
-
     width:100%;
-
     text-align:center;
-
 }
-
 .referral-content h4{
-
     font-size:10px;
-
     margin:0;
-
     white-space:nowrap;
-
 }
-
 .referral-content h2{
-
     font-size:10px;
-
     margin:1px 0;
-
 }
-
 /* Withdraw right side */
-
 .withdraw-btn{
-
     display:flex;
-
     align-items:center;
-
     justify-content:center;
-
     margin-left:auto;
-
     padding:3px 10px;
-
     font-size:9px;
-
     white-space:nowrap;
-
 }
-
 /* Mobile */
-
 @media(max-width:768px){
-
 .student-profile-card{
-
     padding:10px;
-
 }
-
 .profile-avatar{
-
     width:52px;
-
     height:52px;
-
 }
-
 .profile-avatar i{
-
     font-size:28px;
-
 }
-
 .profile-info h3{
-
     font-size:14px;
-
 }
-
 .referral-card{
-
     width:115px;
-
     height:60px;
-
 }
-
 }
-
 /* ================= TODAY EXAM CARD ================= */
-
 .today-exam-card{
-
 background:#eef8ff;
-
 border-radius:18px;
-
 padding:15px;
-
 display:flex;
-
 align-items:center;
-
 justify-content:space-between;
-
 gap:15px;
-
 box-shadow:0 5px 15px rgba(0,0,0,.08);
-
 }
-
 /* LEFT */
-
 .exam-left{
-
 display:flex;
-
 align-items:center;
-
 gap:15px;
-
 }
-
 .exam-icon{
-
 width:65px;
-
 height:65px;
-
 background:white;
-
 border-radius:15px;
-
 display:flex;
-
 align-items:center;
-
 justify-content:center;
-
 }
-
 .exam-icon i{
-
 font-size:35px;
-
 color:#0875e1;
-
 }
-
 .exam-details h3{
-
 margin:0;
-
 font-size:22px;
-
 font-weight:700;
-
 color:#17345d;
-
 }
-
 .exam-details h5{
-
 margin:5px 0;
-
 font-size:18px;
-
 }
-
 .exam-details p{
-
 margin:0;
-
 font-size:14px;
-
 color:#777;
-
 }
-
 /* TIMER */
-
 .exam-timer{
-
 display:flex;
-
 gap:8px;
-
 }
-
 .time-box{
-
 background:white;
-
 width:55px;
-
 height:65px;
-
 border-radius:10px;
-
 display:flex;
-
 flex-direction:column;
-
 justify-content:center;
-
 align-items:center;
-
 box-shadow:0 3px 8px rgba(0,0,0,.08);
-
 }
-
 .time-box strong{
-
 font-size:22px;
-
 color:#0875e1;
-
 }
-
 .time-box span{
-
 font-size:11px;
-
 color:#777;
-
 }
-
 /* BUTTON */
-
 .start-exam-btn{
-
 background:#00ad78;
-
 color:white;
-
 padding:12px 22px;
-
 border-radius:12px;
-
 font-weight:700;
-
 text-decoration:none;
-
 white-space:nowrap;
-
 }
-
 .start-exam-btn i{
-
 margin-right:5px;
-
 }
-
 /* ================= MOBILE ================= */
-
 @media(max-width:768px){
-
 .today-exam-card{
-
 padding:12px;
-
 gap:8px;
-
 }
-
 .exam-left{
-
 gap:8px;
-
 }
-
 .exam-icon{
-
 width:45px;
-
 height:45px;
-
 }
-
 .exam-icon i{
-
 font-size:22px;
-
 }
-
 .exam-details h3{
-
 font-size:16px;
-
 }
-
 .exam-details h5{
-
 font-size:14px;
-
 margin:2px 0;
-
 }
-
 .exam-details p{
-
 font-size:10px;
-
 }
-
 .exam-timer{
-
 gap:5px;
-
 }
-
 .time-box{
-
 width:38px;
-
 height:45px;
-
 }
-
 .time-box strong{
-
 font-size:14px;
-
 }
-
 .time-box span{
-
 font-size:8px;
-
 }
-
 .start-exam-btn{
-
 font-size:11px;
-
 padding:8px 12px;
-
 }
-
 }
-
 /* QUICK ACCESS */
-
 .quick-grid{
-
 display:grid;
-
 grid-template-columns:repeat(4,1fr);
-
 gap:18px;
-
 }
-
 .quick-card{
-
 background:#fff;
-
 padding:18px;
-
 border-radius:18px;
-
 display:flex;
-
 align-items:center;
-
 gap:12px;
-
 text-decoration:none;
-
 box-shadow:0 5px 15px rgba(0,0,0,.08);
-
 color:#222;
-
 }
-
 .quick-icon{
-
 width:45px;
-
 height:45px;
-
 background:#eaf2ff;
-
 border-radius:12px;
-
 display:flex;
-
 align-items:center;
-
 justify-content:center;
-
 }
-
 .quick-icon i{
-
 font-size:22px;
-
 color:#0866d5;
-
 }
-
 .quick-text span{
-
 display:block;
-
 font-size:16px;
-
 font-weight:700;
-
 }
-
 .quick-text small{
-
 font-size:12px;
-
 color:#777;
-
 }
-
 @media(max-width:768px){
-
 .quick-grid{
-
 grid-template-columns:repeat(3,1fr);
-
 gap:8px;
-
 }
-
 .quick-card{
-
 padding:10px;
-
 display:flex;
-
 flex-direction:column;
-
 height:60px;
-
 text-align:center;
-
 }
-
 .quick-icon{
-
 width:35px;
-
 height:20px;
-
 }
-
 .quick-icon i{
-
 font-size:16px;
-
 }
-
 .quick-text span{
-
 font-size:9px;
-
 }
-
 .quick-text small{
-
 display:none;
-
 }
-
 }
-
 /* ================= EXAM SECTION ================= */
-
 .exam-section{
-
     margin-top:25px;
-
     background:#fff;
-
     border-radius:12px;
-
     overflow:hidden;
-
     box-shadow:0 3px 10px rgba(0,0,0,.10);
-
 }
-
 .exam-section-title{
-
     background:#4b4bf5;
-
     color:white;
-
     text-align:center;
-
     font-size:20px;
-
     font-weight:700;
-
     padding:8px;
-
 }
-
 .exam-grid{
-
     display:grid;
-
     grid-template-columns:repeat(2,1fr);
-
     gap:8px;
-
     padding:10px;
-
 }
-
 .exam-grid a{
-
     position:relative;
-
     background:white;
-
     border-radius:12px;
-
     padding:12px 8px;
-
     text-decoration:none;
-
     color:#333;
-
     font-size:14px;
-
     box-shadow:0 2px 8px rgba(0,0,0,.12);
-
     display:flex;
-
     align-items:center;
-
 }
-
 .exam-grid a::after{
-
     content:"";
-
     width:8px;
-
     height:8px;
-
     background:#ff1744;
-
     border-radius:50%;
-
     position:absolute;
-
     right:10px;
-
     top:5px;
-
 }
-
 /* Mobile */
-
 @media(max-width:768px){
-
 .exam-section{
-
     margin-top:18px;
-
 }
-
 .exam-section-title{
-
     font-size:16px;
-
 }
-
 .exam-grid a{
-
     font-size:11px;
-
     padding:10px 6px;
-
 }
-
 }
-
 /* ===== Learning Progress Position Fix ===== */
-
 .progress-grid{
-
     display:grid !important;
-
     grid-template-columns:repeat(2,1fr) !important;
-
     gap:8px !important;
-
 }
-
 .progress-card{
-
     display:flex !important;
-
     flex-direction:row !important;
-
     align-items:center !important;
-
     justify-content:flex-start !important;
-
     height:75px !important;
-
     padding:8px !important;
-
 }
-
 .progress-circle{
-
     flex-shrink:0 !important;
-
     margin-right:8px !important;
-
 }
-
 .progress-info{
-
     display:flex !important;
-
     flex-direction:column !important;
-
     justify-content:center !important;
-
     margin-left:0 !important;
-
 }
-
 .progress-info h4{
-
     margin:0 !important;
-
     font-size:12px !important;
-
 }
-
 .progress-info p{
-
     margin:2px 0 !important;
-
     font-size:8px !important;
-
 }
-
 .section-title{
-
     display:flex !important;
-
     justify-content:space-between !important;
-
     align-items:center !important;
-
 }
-
 .section-title h3{
-
     font-size:16px !important;
-
     margin:0 !important;
-
 }
-
 .section-title a{
-
     font-size:11px !important;
-
 }
-
 /* ===== Progress Card Design Fix ===== */
-
 .progress-card{
-
     background:#ffffff !important;
-
     border-radius:15px !important;
-
     height:75px !important;
-
     padding:10px !important;
-
     display:flex !important;
-
     align-items:center !important;
-
     box-shadow:0 3px 12px rgba(0,0,0,0.08) !important;
-
     border:1px solid #f1f1f1;
-
 }
-
 /* Circle */
-
 .progress-circle{
-
     width:38px !important;
-
     height:38px !important;
-
     min-width:38px !important;
-
     border-radius:50% !important;
-
 }
-
 /* Text */
-
 .progress-info{
-
     margin-left:10px !important;
-
 }
-
 .progress-info h4{
-
     font-size:13px !important;
-
     font-weight:700 !important;
-
     color:#222;
-
 }
-
 .progress-info p{
-
     font-size:8px !important;
-
     color:#777;
-
 }
-
 /* Mobile */
-
 @media(max-width:768px){
-
 .progress-card{
-
     height:70px !important;
-
     border-radius:14px !important;
-
     padding:8px !important;
-
 }
-
 .progress-circle{
-
     width:32px !important;
-
     height:32px !important;
-
     min-width:32px !important;
-
 }
-
 .section-title h3{
-
     font-size:15px !important;
-
 }
-
 .section-title a{
-
     font-size:10px;
-
 }
-
 .progress-circle{
-
     width:32px !important;
-
     height:32px !important;
-
     min-width:32px !important;
-
 }
-
 }
-
 /* ================= EXAM RESULT ================= */
-
 .exam-result-grid{
-
 display:grid;
-
 grid-template-columns:repeat(2,1fr);
-
 gap:18px;
-
 }
-
 .dashboard-box{
-
 background:white;
-
 border-radius:18px;
-
 padding:18px;
-
 box-shadow:0 5px 15px rgba(0,0,0,.08);
-
 }
-
 .box-title{
-
 display:flex;
-
 justify-content:space-between;
-
 align-items:center;
-
 margin-bottom:15px;
-
 }
-
 .box-title h3{
-
 font-size:20px;
-
 margin:0;
-
 }
-
 .box-title a{
-
 color:#0875e1;
-
 text-decoration:none;
-
 }
-
 .exam-item{
-
 display:flex;
-
 gap:15px;
-
 padding:12px 0;
-
 border-bottom:1px solid #eee;
-
 }
-
 .date-box{
-
 width:55px;
-
 height:65px;
-
 background:#eaf2ff;
-
 border-radius:12px;
-
 text-align:center;
-
 padding-top:8px;
-
 }
-
 .date-box strong{
-
 display:block;
-
 font-size:22px;
-
 color:#0875e1;
-
 }
-
 .date-box span{
-
 font-size:12px;
-
 }
-
 .exam-info h4{
-
 margin:0;
-
 font-size:15px;
-
 }
-
 .exam-info p{
-
 font-size:12px;
-
 margin:5px 0;
-
 }
-
 .exam-info small{
-
 color:#777;
-
 }
-
 .result-item{
-
 position:relative;
-
 padding:12px 0;
-
 border-bottom:1px solid #eee;
-
 }
-
 .result-item h4{
-
 font-size:15px;
-
 margin:0;
-
 }
-
 .result-item p{
-
 font-size:12px;
-
 }
-
 .result-item small{
-
 color:#777;
-
 }
-
 .grade{
-
 position:absolute;
-
 right:10px;
-
 top:20px;
-
 padding:6px 10px;
-
 border-radius:50%;
-
 color:white;
-
 font-weight:bold;
-
 }
-
 .green{
-
 background:#00a878;
-
 }
-
 .blue{
-
 background:#0875e1;
-
 }
-
 .orange{
-
 background:#ff9800;
-
 }
-
 @media(max-width:768px){
-
 .exam-result-grid{
-
 grid-template-columns:1fr;
-
 gap:10px;
-
 }
-
 .dashboard-box{
-
 padding:12px;
-
 }
-
 .box-title h3{
-
 font-size:15px;
-
 }
-
 .exam-item{
-
 gap:8px;
-
 }
-
 .exam-info h4{
-
 font-size:12px;
-
 }
-
 .result-item h4{
-
 font-size:12px;
-
 }
-
 }
-
 /* ================= JOB SLIDER ================= */
-
 .job-slider{
-
 display:flex;
-
 gap:15px;
-
 overflow:hidden;
-
 }
-
 .job-card{
-
 min-width:280px;
-
 background:white;
-
 border-radius:18px;
-
 padding:15px;
-
 display:flex;
-
 align-items:center;
-
 gap:15px;
-
 box-shadow:0 5px 15px rgba(0,0,0,.08);
-
 animation:slide 12s infinite;
-
 }
-
 .job-icon{
-
 width:50px;
-
 height:50px;
-
 background:#eaf2ff;
-
 border-radius:15px;
-
 display:flex;
-
 align-items:center;
-
 justify-content:center;
-
 }
-
 .job-icon i{
-
 font-size:25px;
-
 color:#0875e1;
-
 }
-
 .job-card h4{
-
 margin:0;
-
 font-size:16px;
-
 }
-
 .job-card p{
-
 margin:5px 0;
-
 font-size:13px;
-
 color:#666;
-
 }
-
 .job-card span{
-
 font-size:12px;
-
 color:#00a878;
-
 font-weight:bold;
-
 }
-
 @keyframes slide{
-
 0%{
-
 transform:translateX(0);
-
 }
-
 33%{
-
 transform:translateX(-20px);
-
 }
-
 66%{
-
 transform:translateX(-40px);
-
 }
-
 100%{
-
 transform:translateX(0);
-
 }
-
 }
-
 @media(max-width:768px){
-
 .job-slider{
-
 overflow-x:auto;
-
 }
-
 .job-card{
-
 min-width:220px;
-
 padding:10px;
-
 }
-
 .job-card h4{
-
 font-size:13px;
-
 }
-
 .job-card p{
-
 font-size:11px;
-
 }
-
 }
-
 /* JOB DETAILS BUTTON */
-
 .job-details-btn{
-
 display:inline-flex;
-
 align-items:center;
-
 gap:5px;
-
 margin-top:10px;
-
 background:#0875e1;
-
 color:white;
-
 padding:6px 14px;
-
 border-radius:20px;
-
 font-size:12px;
-
 text-decoration:none;
-
 font-weight:600;
-
 }
-
 .job-details-btn:hover{
-
 background:#0056b3;
-
 color:white;
-
 }
-
 @media(max-width:768px){
-
 .job-details-btn{
-
 font-size:10px;
-
 padding:5px 10px;
-
 }
-
 }
-
 /* ================= REFERRAL EARN ================= */
-
 .referral-earn-card{
-
 background:linear-gradient(120deg,#0875e1,#00b37e);
-
 border-radius:22px;
-
 padding:20px 30px;
-
 display:flex;
-
 justify-content:space-between;
-
 align-items:center;
-
 color:white;
-
 }
-
 .referral-left{
-
 display:flex;
-
 align-items:center;
-
 gap:15px;
-
 }
-
 .referral-wallet{
-
 width:65px;
-
 height:65px;
-
 background:white;
-
 border-radius:18px;
-
 display:flex;
-
 align-items:center;
-
 justify-content:center;
-
 }
-
 .referral-wallet i{
-
 font-size:32px;
-
 color:#0875e1;
-
 }
-
 .referral-left h3{
-
 margin:0;
-
 font-size:22px;
-
 }
-
 .referral-left p{
-
 margin:5px 0 0;
-
 font-size:14px;
-
 }
-
 .referral-right{
-
 text-align:center;
-
 background:white;
-
 padding:15px 30px;
-
 border-radius:20px;
-
 }
-
 .referral-right h2{
-
 margin:0 0 10px;
-
 color:#00a878;
-
 font-size:35px;
-
 }
-
 .referral-right .withdraw-btn{
-
 background:#0875e1;
-
 color:white;
-
 padding:8px 25px;
-
 border-radius:25px;
-
 text-decoration:none;
-
 }
-
 @media(max-width:768px){
-
 .referral-earn-card{
-
 padding:12px;
-
 border-radius:18px;
-
 }
-
 .referral-wallet{
-
 width:45px;
-
 height:45px;
-
 }
-
 .referral-wallet i{
-
 font-size:22px;
-
 }
-
 .referral-left h3{
-
 font-size:14px;
-
 }
-
 .referral-left p{
-
 font-size:10px;
-
 }
-
 .referral-right{
-
 padding:8px 12px;
-
 }
-
 .referral-right h2{
-
 font-size:22px;
-
 }
-
 .referral-right .withdraw-btn{
-
 padding:5px 12px;
-
 font-size:10px;
-
 }
-
 }
-
 /* ===== MOBILE OVERFLOW FINAL FIX — only dashboard ===== */
-
 @media(max-width:768px){
-
 .lebd-student-dashboard *{
-
     max-width:100%;
-
 }
-
 .lebd-student-dashboard{
-
     width:100%;
-
     overflow-x:hidden !important;
-
 }
-
 .lebd-student-dashboard .container,
-
 .lebd-student-dashboard .container-fluid{
-
     width:100% !important;
-
     max-width:100% !important;
-
     padding-left:8px !important;
-
     padding-right:8px !important;
-
 }
-
 .lebd-student-dashboard section,
-
 .lebd-student-dashboard div{
-
     max-width:100%;
-
 }
-
 /* Any fixed width remove */
-
 .quick-card,
-
 .progress-card,
-
 .subject-card,
-
 .exam-card,
-
 .result-card{
-
     max-width:100% !important;
-
 }
-
 /* Referral */
-
 .referral-card{
-
     overflow:hidden;
-
 }
-
 }
-
 </style>
-
 <!-- ========= LEBD PREMIUM DASHBOARD SECTIONS: SCOPED ========= -->
 <style>
 .lebd-student-dashboard {
@@ -2191,195 +1303,106 @@ font-size:10px;
     .lebd-student-dashboard .lebd-results-panel .box-title h3 {font-size:10px;}
 }
 </style>
-
 <!-- ================= QUICK ACCESS ================= -->
-
 <div class="container mt-4 lebd-section-panel lebd-quick-panel">
     <div class="lebd-section-head">
         <span class="lebd-head-icon"><i class="fa fa-compass"></i></span>
         <div class="lebd-head-text">
-            <h3>আমার লার্নিং ড্যাশবোর্ড</h3>
-            <p>কোর্স, পরীক্ষা, ফলাফল ও স্টাডি রিসোর্স এক জায়গায়</p>
+            <h3>আমার কেনা কোর্স সমূহ</h3>
+            <p>আপনে যে সকল , ব্যাচ, ভিডিও ক্লাস, ই-বুক , MCS স্টাডি, Exam Section, কিনেছে সেগুলো সকল কিছু এখানে পাবেন।</p>
         </div>
     </div>
 <div class="quick-grid">
-
-<a href="{{route('students.my-course')}}" class="quick-card">
-
+<a href="{{ route('students.referral') }}" class="quick-card">
 <div class="quick-icon">
-
 <i class="fa fa-book"></i>
-
 </div>
-
 <div class="quick-text">
-
-<span>My Courses</span>
-
+<span>All Referral link</span>
 <small></small>
-
 </div>
-
 </a>
-
-<a href="{{route('category.batches','Free Exams')}}" class="quick-card">
-
+<a href="{{ route('students.my-batch.exam-index') }}" class="quick-card">
 <div class="quick-icon">
-
 <i class="fa fa-file"></i>
-
 </div>
-
 <div class="quick-text">
-
-<span>My Exam</span>
-
+<span>My Batch</span>
 <small></small>
-
 </div>
-
 </a>
-
 <a href="{{route('category.result.option')}}" class="quick-card">
-
 <div class="quick-icon">
-
 <i class="fa fa-chart-line"></i>
-
 </div>
-
 <div class="quick-text">
-
 <span>Exam Results</span>
-
 <small></small>
-
 </div>
-
 </a>
-
 <a href="{{route('category.batches',['Exam PDF','Dashboard'])}}" class="quick-card">
-
 <div class="quick-icon">
-
 <i class="fa fa-file-pdf"></i>
-
 </div>
-
 <div class="quick-text">
-
 <span>Exam PDF</span>
-
 <small></small>
-
 </div>
-
 </a>
-
-<a href="#" class="quick-card">
-
+<a href="{{ route('students.premium.video.classes') }}" class="quick-card">
 <div class="quick-icon">
-
 <i class="fa fa-video"></i>
-
 </div>
-
 <div class="quick-text">
-
-<span>Live Class</span>
-
+<span>Video Class</span>
 <small></small>
-
 </div>
-
 </a>
-
-<a href="#" class="quick-card">
-
+<a href="{{ url('/mcq-study/my-purchased') }}" class="quick-card">
 <div class="quick-icon">
-
 <i class="fa fa-clipboard-question"></i>
-
 </div>
-
 <div class="quick-text">
-
-<span>Daily Quiz</span>
-
+<span>MCQ Study</span>
 <small></small>
-
 </div>
-
 </a>
-
 <a href="{{route('category.batches',['Exam Routine','Dashboard'])}}" class="quick-card">
-
 <div class="quick-icon">
-
 <i class="fa fa-calendar"></i>
-
 </div>
-
 <div class="quick-text">
-
-<span>My Routine</span>
-
+<span>Exam Section</span>
 <small></small>
-
 </div>
-
 </a>
-
-<a href="#" class="quick-card">
-
+<a href="{{ \Illuminate\Support\Facades\Route::has('student.ebook.dashboard') ? route('student.ebook.dashboard') : route('student.ebook.categories', ['kind'=>'department']) }}" class="quick-card">
 <div class="quick-icon">
-
 <i class="fa fa-book-open"></i>
-
 </div>
-
 <div class="quick-text">
-
 <span>E-Book</span>
-
 <small></small>
-
 </div>
-
 </a>
-
 <a href="#" class="quick-card">
-
 <div class="quick-icon">
-
 <i class="fa fa-pen-to-square"></i>
-
 </div>
-
 <div class="quick-text">
-
 <span>Free Exam</span>
-
 <small></small>
-
 </div>
-
 </a>
-
 </div>
-
 </div>
-
 <!-- ================= EXAM SECTION: CATEGORY / SUB-CATEGORY ================= -->
 {{-- LEBD Fix211: Keep the Fix210 Available Balance, restore the linked category cards. --}}
 @include('student.partials.exam-section-category-cards')
-
 <!-- ================= LEARNING PROGRESS — LEBD Fix240 ================= -->
 @include('student.partials.lebd-learning-progress')
-
 <!-- ================= EXAM & RESULT (LEBD Fix233) ================= -->
 @include('student.partials.lebd-exam-results-7day')
-
 <style>
 /* Fix213: Batch-style full-width Circular image area; layout never collapses when image is missing. */
 #lebd-dash-circulars .job-slider-card.lebd-circular-card {
@@ -2489,14 +1512,12 @@ font-size:10px;
         <div class="job-slider-dots" id="lebdDashCircularDots"></div>
     </div>
 </section>
-
 <!-- ================= TODAY'S LIVE / UPCOMING EXAMS ================= -->
 @php
     // Published routine & assigned papers; access verified in the service.
     $lebdTodayExams = \App\Services\StudentDashboardTodayExams::forStudent($user);
     $lebdServerNow = \Carbon\Carbon::now('Asia/Dhaka')->getTimestamp() * 1000;
 @endphp
-
 <section class="container mt-4 lebd-section-panel lebd-daily-panel" id="lebd-today-exams">
     <div class="lebd-section-head">
         <span class="lebd-head-icon"><i class="fa fa-calendar-check"></i></span>
@@ -2506,7 +1527,6 @@ font-size:10px;
         </div>
         <span class="lebd-head-tag">TODAY</span>
     </div>
-
     @if(count($lebdTodayExams))
     <div class="lebd-daily-grid" data-server-now="{{ $lebdServerNow }}">
         @foreach($lebdTodayExams as $lebdExam)
@@ -2556,10 +1576,8 @@ font-size:10px;
         </div>
     @endif
 </section>
-
 </div> {{-- /.lebd-student-dashboard --}}
 @endsection
-
 @section('scripts')
 <script defer src="{{ asset('web/js/lebd-dashboard-circular-v61.js') }}?v=61"></script>
 <script>

@@ -1,6 +1,6 @@
 @extends('student')
 
-@section('title', 'আমার কোর্সসমূহ')
+@section('title', 'আমার ব্যাচ সমূহ')
 
 @section('stylesheets')
 <style>
@@ -300,7 +300,7 @@
         <div class="dashboard-top">
             <div class="page-title">
                 <h1>আমার কোর্স ও ব্যাচ</h1>
-                <p>আপনার কেনা ব্যাচ, চলমান ব্যাচ এবং রেফার লিংক</p>
+                <p>শুধু আপনার কেনা অথবা এনরোল করা ব্যাচ এবং সেগুলোর পরীক্ষা</p>
             </div>
             <div class="referral-id">
                 <div class="referral-text">
@@ -320,7 +320,7 @@
                     <span class="section-icon"><i class="fa fa-graduation-cap" aria-hidden="true"></i></span>
                     <div>
                         <h2>আমার কেনা ব্যাচ</h2>
-                        <p>আপনি যে ব্যাচগুলো কিনেছেন সেগুলোর রেফার লিংক শেয়ার করে আয় করুন নগদ অর্থ।</p>
+                        <p>শুধু আপনার কেনা অথবা এনরোল করা ব্যাচ এখানে দেখানো হচ্ছে।</p>
                     </div>
                 </div>
                 <span class="count-box">ব্যাচ সংখ্যা: {{ $purchasedCourses->count() }}</span>
@@ -344,78 +344,12 @@
                                     <i class="fa fa-share-nodes" aria-hidden="true"></i> Share
                                 </button>
                             </div>
+                            <a class="detail-btn" style="display:block;text-align:center;margin-top:12px" href="{{ route('students.batch.purchased-exams', $batch->id) }}"><i class="fa fa-clipboard-list" aria-hidden="true"></i> ব্যাচের পরীক্ষা দেখুন</a>
                         </div>
                     </article>
                 @empty
-                    <div class="empty-box">আপনি এখনো কোনো কোর্স ক্রয় করেননি।</div>
+                    <div class="empty-box">আপনার অ্যাকাউন্টে এখনো কোনো কেনা বা এনরোল করা ব্যাচ নেই।</div>
                 @endforelse
-            </div>
-        </section>
-
-        {{-- ALL RUNNING BATCHES: existing route and query variable preserved --}}
-        <section class="my-section running-section">
-            <div class="section-header">
-                <div class="section-left">
-                    <span class="section-icon"><i class="fa fa-play" aria-hidden="true"></i></span>
-                    <div>
-                        <h2>চলমান সকল ব্যাচ</h2>
-                        <p>আমাদের বর্তমান চলমান সকল কোর্স ও ব্যাচ এখানে দেখুন</p>
-                    </div>
-                </div>
-                <span class="count-box">ব্যাচ: {{ $runningBatches->count() }}</span>
-            </div>
-            <div class="course-grid">
-                @forelse($runningBatches as $batch)
-                    <article class="course-card">
-                        <div class="course-image">
-                            <span class="image-fallback"><i class="fa fa-book-open" aria-hidden="true"></i></span>
-                            <img src="{{ $batch->banner ?? '/img/course.png' }}" alt="{{ $batch->name }}" loading="lazy" onerror="this.style.display='none'">
-                        </div>
-                        <div class="course-info">
-                            <h3 title="{{ $batch->name }}">{{ $batch->name }}</h3>
-                            <p><i class="fa fa-calendar-days" aria-hidden="true"></i> Batch: {{ $batch->subtitle }}</p>
-                            <div class="running-status"><i class="fa fa-gift" aria-hidden="true"></i> Referrer Bonus: ৳{{ $batch->referrer_bonus }}</div>
-                            <a href="{{ route('home.course.show', $batch->id) }}" class="detail-btn">বিস্তারিত দেখুন <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
-                        </div>
-                    </article>
-                @empty
-                    <div class="empty-box">এই মুহূর্তে কোনো চলমান ব্যাচ নেই।</div>
-                @endforelse
-            </div>
-        </section>
-
-        {{-- FREE BATCHES: original four static cards and their # placeholders retained --}}
-        <section class="my-section free-section">
-            <div class="section-header">
-                <div class="section-left">
-                    <span class="section-icon"><i class="fa fa-book" aria-hidden="true"></i></span>
-                    <div>
-                        <h2>সকল ফ্রি ব্যাচ</h2>
-                        <p>আমাদের সকল ফ্রি কোর্স ও ব্যাচ এখানে দেখুন</p>
-                    </div>
-                </div>
-                <span class="count-box">মোট ব্যাচ: 12</span>
-            </div>
-            <div class="course-grid">
-                @foreach([
-                    ['name' => 'HSC 26 বাংলা', 'subtitle' => 'একাডেমিক ব্যাচ'],
-                    ['name' => 'HSC 26 ইংরেজি', 'subtitle' => 'স্পেশাল ব্যাচ'],
-                    ['name' => 'Admission 26', 'subtitle' => 'ফাউন্ডেশন ব্যাচ'],
-                    ['name' => 'BCS কমপ্লিট কোর্স', 'subtitle' => 'নতুন ব্যাচ'],
-                ] as $freeBatch)
-                    <article class="course-card">
-                        <div class="course-image">
-                            <span class="image-fallback"><i class="fa fa-book-open" aria-hidden="true"></i></span>
-                            <img src="/img/course.png" alt="{{ $freeBatch['name'] }}" loading="lazy" onerror="this.style.display='none'">
-                        </div>
-                        <div class="course-info">
-                            <h3>{{ $freeBatch['name'] }}</h3>
-                            <p><i class="fa fa-calendar-days" aria-hidden="true"></i> Batch: {{ $freeBatch['subtitle'] }}</p>
-                            <div class="running-status"><i class="fa fa-gift" aria-hidden="true"></i> ফ্রি ব্যাচ</div>
-                            <a href="#" class="detail-btn">বিস্তারিত দেখুন <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
-                        </div>
-                    </article>
-                @endforeach
             </div>
         </section>
 

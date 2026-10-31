@@ -523,73 +523,7 @@
 
 <body>
 @php
-    /*
-    |--------------------------------------------------------------------------
-    | Routine Design Preview
-    |--------------------------------------------------------------------------
-    | These are sample exams only.
-    | Database integration will be added later.
-    */
-
-    $demoExams = [
-        [
-            'number' => '01',
-            'name' => 'বাংলা ভাষা ও সাহিত্য',
-            'status' => 'upcoming',
-            'status_text' => 'Upcoming',
-            'date' => '15 Oct 2026',
-            'time' => '10:00 AM - 11:00 AM',
-            'subjects' => [
-                [
-                    'name' => 'বাংলা ব্যাকরণ',
-                    'syllabus' => 'সমাস, সন্ধি, কারক ও বিভক্তি'
-                ],
-                [
-                    'name' => 'বাংলা সাহিত্য',
-                    'syllabus' => 'প্রাচীন ও আধুনিক বাংলা সাহিত্য'
-                ],
-            ],
-            'details' => 'MCQ পরীক্ষার ডেমো বিবরণ। পরীক্ষার সময় ও নিয়ম পরে বিদ্যমান রুটিন থেকে আসবে।'
-        ],
-        [
-            'number' => '02',
-            'name' => 'English Grammar & Vocabulary',
-            'status' => 'upcoming',
-            'status_text' => 'Upcoming',
-            'date' => '18 Oct 2026',
-            'time' => '10:00 AM - 11:00 AM',
-            'subjects' => [
-                [
-                    'name' => 'Grammar',
-                    'syllabus' => 'Tense, Voice, Narration, Article'
-                ],
-                [
-                    'name' => 'Vocabulary',
-                    'syllabus' => 'Synonym, Antonym, Idioms'
-                ],
-            ],
-            'details' => 'This is a design-only sample. Official exam information will be connected later.'
-        ],
-        [
-            'number' => '03',
-            'name' => 'সাধারণ জ্ঞান ও গণিত',
-            'status' => 'completed',
-            'status_text' => 'Completed',
-            'date' => '05 Oct 2026',
-            'time' => '09:00 AM - 10:00 AM',
-            'subjects' => [
-                [
-                    'name' => 'বাংলাদেশ বিষয়াবলি',
-                    'syllabus' => 'ইতিহাস, সংবিধান ও মুক্তিযুদ্ধ'
-                ],
-                [
-                    'name' => 'গণিত',
-                    'syllabus' => 'শতকরা, অনুপাত, লাভ-ক্ষতি'
-                ],
-            ],
-            'details' => 'এই পরীক্ষার অবস্থা ডেমো হিসেবে দেখানো হয়েছে; এটি কোনো বাস্তব ফলাফল নয়।'
-        ],
-    ];
+    $demoExams = $routineData ?? [];
 @endphp
 
 <div class="routine-page">
@@ -636,14 +570,11 @@
             {{ $examTitle ?? 'Batch / Department Name' }}
         </p>
 
-        <div class="demo-notice">
-            <i class="fa-solid fa-circle-info"></i>
-            <span>
-                <strong>Design Preview:</strong>
-                নিচের Exam No, Date, Time, Status ও Syllabus নমুনা তথ্য।
-                এগুলো এখনো Routine Database-এর সঙ্গে সংযুক্ত নয়।
-            </span>
-        </div>
+        @if(empty($routineIsConnected))
+        <div class="demo-notice"><i class="fa-solid fa-circle-info"></i><span>এই পেজে Batch Routine নির্বাচন করা হয়নি।</span></div>
+        @elseif(!$routineName)
+        <div class="demo-notice"><i class="fa-solid fa-circle-info"></i><span>এই Batch-এর কোনো Published Routine পাওয়া যায়নি।</span></div>
+        @endif
 
         <div class="toolbar">
             <button class="tool-btn primary"
@@ -661,14 +592,21 @@
             </button>
         </div>
 
+        @if(!empty($routinePdfUrl))
+        <div style="margin:0 0 14px;text-align:center">
+            <a href="{{ $routinePdfUrl }}" target="_blank" rel="noopener noreferrer" class="tool-btn" style="text-decoration:none;display:inline-flex;padding:0 18px">
+                <i class="fa-solid fa-file-pdf"></i> Admin Routine PDF
+            </a>
+        </div>
+        @endif
         <div class="section-row">
             <h2>Exam Schedule</h2>
             <span class="section-count">
-                {{ count($demoExams) }} Exams · Demo
+                {{ count($demoExams) }} Exams
             </span>
         </div>
 
-        @foreach($demoExams as $exam)
+        @forelse($demoExams as $exam)
             <article class="routine-card">
 
                 <div class="card-head">
@@ -744,7 +682,9 @@
                     </p>
                 </details>
             </article>
-        @endforeach
+        @empty
+            <div class="routine-card" style="text-align:center;color:var(--muted)">এই Batch-এর Routine-এ এখনো Exam যোগ করা হয়নি।</div>
+        @endforelse
 
         <div class="bottom-links">
             <a class="bottom-link blue"

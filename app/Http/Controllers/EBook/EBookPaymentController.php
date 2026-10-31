@@ -15,6 +15,7 @@ class EBookPaymentController extends Controller
 {
     public function pay(Request $request, string $kind, int $category, int $package)
     {
+        $request->validate(['agree' => 'accepted']);
         abort_unless(in_array($kind, ['department', 'non-department'], true), 404);
         $student = Auth::guard('student')->user();
         abort_unless($student, 401, 'Please sign in to your student account.');
@@ -58,17 +59,20 @@ class EBookPaymentController extends Controller
             'value_b'=>(string)$p->id,'value_c'=>(string)$category,
         ];
         try {
-            $answer=(new EBookSslCommerz())->makePayment($payload,'checkout','json');
-            $parsed=is_array($answer)?$answer:json_decode((string)$answer,true);
-            $url=$parsed['data']??null;
-            if(is_string($url) && filter_var($url,FILTER_VALIDATE_URL)
-                && str_starts_with(strtolower($url),'https://')
-                && preg_match('/(^|\\.)sslcommerz\\.com$/i',(string)parse_url($url,PHP_URL_HOST))){
-                return redirect()->away($url);
+            $answer = (new EBookSslCommerz())->makePayment($payload, 'checkout', 'json');
+            $parsed = is_array($answer) ? $answer : json_decode((string)$answer, true);
+            $url = is_array($parsed) ? ($parsed['data'] ?? null) : null;
+            // Allow only SSLCommerz HTTPS checkout hosts, never an arbitrary redirect URL.
+            if (is_string($url) && filter_var($url, FILTER_VALIDATE_URL)) {
+                $scheme = strtolower((string)parse_url($url, PHP_URL_SCHEME));
+                $host = strtolower((string)parse_url($url, PHP_URL_HOST));
+                if ($scheme === 'https' && preg_match('/(^|\.)sslcommerz\.com$/i', $host)) {
+                    return redirect()->away($url);
+                }
             }
-            Log::warning('E-Book payment session not created',['transaction_id'=>$trx]);
-        } catch(Throwable $e) {
-            Log::error('E-Book payment start error',['transaction_id'=>$trx,'message'=>$e->getMessage()]);
+            Log::warning('E-Book SSLCommerz checkout URL unavailable or untrusted', ['transaction_id'=>$trx]);
+        } catch (Throwable $e) {
+            Log::error('E-Book payment start error', ['transaction_id'=>$trx,'message'=>$e->getMessage()]);
         }
         DB::table('lebd_ebook_payment_orders')->where('transaction_id',$trx)->where('status','Pending')
             ->update(['status'=>'Failed','updated_at'=>now()]);
@@ -121,7 +125,6 @@ class EBookPaymentController extends Controller
                 case 'years': $end->addYearsNoOverflow((int)$locked->duration_value);break;
                 default: throw new \RuntimeException('Invalid package duration');
             }
-            // Extend existing entitlement rather than creating concurrent overlapping records.
             if($existing){
                 DB::table('lebd_ebook_entitlements')->where('id',$existing->id)->update([
                     'expires_at'=>$end,'package_id'=>$locked->package_id,'updated_at'=>now(),

@@ -236,7 +236,12 @@ $examSectionCourses = Course::where('status', 'Active')
   {
     //
     $batch = Batch::find($id);
-    $departments = $batch->departments()->get();
+    // Show only departments assigned to this batch, each once.
+    // Duplicate rows in batch_department must not create duplicate checkout choices.
+    $departments = $batch->departments()
+        ->get()
+        ->unique('id')
+        ->values();
     return view('student-panel.course-checkout', compact('batch', 'departments'));
   }
 

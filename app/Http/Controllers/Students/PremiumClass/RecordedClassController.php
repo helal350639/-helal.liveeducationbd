@@ -8,6 +8,22 @@ use Illuminate\Support\Facades\Schema;
 class RecordedClassController extends Controller {
  private const TOPICS=['department'=>['civil','electrical','mechanical','computer','electronic','power','rac','architecture','textile','agriculture'], 'non-department'=>['bangla-grammar','bangla-literature','bangladesh','international','english','math','science','others']];
  public function packages(Request $request){
+  // Remember the ORIGINAL page from which the student opened the package catalog.
+  // This is not a gateway callback URL or a newly invented video page.
+  $ref = (string) $request->headers->get('referer', '');
+  if ($ref !== '') {
+   $parts = parse_url($ref);
+   $host = $parts['host'] ?? null;
+   $scheme = $parts['scheme'] ?? null;
+   $path = $parts['path'] ?? '/';
+   $sameHost = is_string($host) && strcasecmp($host, (string)$request->getHost()) === 0;
+   $sameScheme = in_array($scheme, ['http','https'], true);
+   $excluded = str_starts_with($path, '/premium-recordings/packages') || str_starts_with($path, '/premium-recordings/checkout/') || str_starts_with($path, '/premium-recordings/purchased/');
+   if ($sameHost && $sameScheme && !$excluded && str_starts_with($path, '/') && !str_starts_with($path, '//')) {
+    $query = isset($parts['query']) ? '?' . $parts['query'] : '';
+    $request->session()->put('lebd_premium_video_origin', $path . $query);
+   }
+  }
   $group=(string)$request->query('premium_group','department');
   $topic=(string)$request->query('premium_topic','');
   $type=(string)$request->query('type','all');

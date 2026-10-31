@@ -156,9 +156,27 @@ class ExamSectionCheckoutController extends Controller
     public function pay(Request $request, int $package)
     {
         $student = $this->student(); abort_unless($student, 401);
-        $request->validate(['method'=>'required|in:wallet,sslcommerz', 'checkout_token'=>'required|string']);
-        // The browser's session may be regenerated or unavailable between review and confirm.
-        // Never accept the submitted method/token alone: validate and consume a server-held intent.
+        $request->validate(['method'=>'required|in:wallet,sslcommerz']);
+        // SSLCommerz only: recover a missing hidden form token from the checkout
+        // session created by checkoutPage(). Wallet behaviour remains unchanged.
+        // A recovered token is never sufficient by itself: the matching pending
+        // intent is still checked below against student, package, method and expiry.
+        if ($request->input('method') === 'sslcommerz' && !$request->filled('checkout_token')) {
+            $pending = $request->session()->get('exam_section_checkout');
+            if (is_array($pending)
+                && (int)($pending['student_id'] ?? 0) === (int)$student->id
+                && (int)($pending['package_id'] ?? 0) === $package
+                && ($pending['method'] ?? '') === 'sslcommerz'
+                && is_string($pending['token'] ?? null)
+                && $pending['token'] !== ''
+                && (time() - (int)($pending['created_at'] ?? 0)) >= 0
+                && (time() - (int)($pending['created_at'] ?? 0)) <= 900) {
+                $request->merge(['checkout_token' => $pending['token']]);
+            }
+        }
+        $request->validate(['checkout_token'=>'required|string']);
+        // Never accept a submitted or recovered token alone: validate and
+        // consume its server-held pending intent before any order is created.
         $checkoutHash = hash('sha256',(string)$request->input('checkout_token'));
         $intent = DB::table('lebd_exam_section_checkout_intents')
             ->where('token_hash',$checkoutHash)
@@ -240,9 +258,20 @@ class ExamSectionCheckoutController extends Controller
     }
     private function credentials(): array
     {
-        return [(string)config('services.lebd_exam_ssl.store_id',env('LEBD_EXAM_SSL_STORE_ID','')),
-            (string)config('services.lebd_exam_ssl.store_password',env('LEBD_EXAM_SSL_STORE_PASSWORD','')),
-            filter_var(config('services.lebd_exam_ssl.sandbox',env('LEBD_EXAM_SSL_SANDBOX',true)),FILTER_VALIDATE_BOOLEAN)];
+        // Reuse the existing SSLCZ_* .env credentials without storing secrets in source code.
+        // Exam-specific credentials, when configured, take precedence.
+        $store = (string) config('services.lebd_exam_ssl.store_id', '');
+        $secret = (string) config('services.lebd_exam_ssl.store_password', '');
+        if ($store === '') {
+            $store = (string) env('LEBD_EXAM_SSL_STORE_ID', env('SSLCZ_STORE_ID', ''));
+        }
+        if ($secret === '') {
+            $secret = (string) env('LEBD_EXAM_SSL_STORE_PASSWORD', env('SSLCZ_STORE_PASSWORD', ''));
+        }
+        // Live credentials supplied by user: production is the default ONLY when
+        // no sandbox setting already exists; explicit configuration always wins.
+        $sandboxValue = config('services.lebd_exam_ssl.sandbox', env('LEBD_EXAM_SSL_SANDBOX', false));
+        return [$store, $secret, filter_var($sandboxValue, FILTER_VALIDATE_BOOLEAN)];
     }
     private function host(bool $sandbox):string {return $sandbox?'https://sandbox.sslcommerz.com':'https://securepay.sslcommerz.com';}
     private function callback(Request $request,string $event)
@@ -273,7 +302,7 @@ class ExamSectionCheckoutController extends Controller
                 });
             } catch (\Throwable $e) {Log::error('Exam Section payment validation failure',['order'=>$id]);return response('Verification error',502);}
             if ($event==='ipn') return response('OK',200);
-            return redirect()->route('student.exam-section.packages')->with('success','SSLCommerz পেমেন্ট যাচাই হয়েছে। Premium Access চালু হয়েছে।');
+            return redirect()->route('student.exam-section.packages')->with('success','✅ পেমেন্ট সফল! SSLCommerz পেমেন্ট যাচাই সম্পন্ন হয়েছে। আপনার Exam Package-এর Premium Access চালু হয়েছে।');
         }
         DB::table('lebd_exam_section_package_orders')->where('transaction_id',$id)->where('status','pending')->update(['status'=>$event,'updated_at'=>now()]);
         return redirect()->route('student.exam-section.packages')->withErrors(['payment'=>'Payment '.($event==='failed'?'failed':'cancelled')]);

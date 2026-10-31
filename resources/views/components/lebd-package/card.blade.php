@@ -11,6 +11,18 @@ $discount = (float) ($package->discount_amount ?? 0);
 $savePct = $mainPrice > 0 ? ($discount / $mainPrice) * 100 : 0;
 $detailsUrl = route('lebd.packages.details', ['section' => $section, 'package' => $package->id]);
 $description = trim((string) ($package->description ?? ''));
+
+// Only this logged-in student and this package; an expired subscription is not active.
+$mcqStudent = \Illuminate\Support\Facades\Auth::guard('student')->user();
+$mcqAlreadyPurchased = false;
+if ($section === 'mcq' && $mcqStudent) {
+    $mcqAlreadyPurchased = \Illuminate\Support\Facades\DB::table('lebd_mcq_subscriptions')
+        ->where('student_id', $mcqStudent->id)
+        ->where('package_id', $package->id)
+        ->where('starts_at', '<=', now())
+        ->where('ends_at', '>', now())
+        ->exists();
+}
 @endphp
 <article class="up-card" data-kind="{{ $package->access_type }}" data-package-id="{{ (int) $package->id }}">
   <div class="up-left">
@@ -48,6 +60,10 @@ $description = trim((string) ($package->description ?? ''));
         <span class="up-save">Save {{ number_format($savePct, 2) }}%</span>
       @endif
     </div>
-    <a href="{{ route('lebd.packages.checkout', ['section' => $section, 'package' => $package->id]) }}" class="up-action up-buy" style="text-decoration:none;white-space:nowrap;display:flex;align-items:center;justify-content:center;">প্যাকেজ কিনুন</a>
+    @if($mcqAlreadyPurchased)
+      <button type="button" class="up-action up-buy" disabled aria-disabled="true" style="white-space:nowrap;display:flex;align-items:center;justify-content:center;cursor:not-allowed;background:#e2e8f0;color:#475569;opacity:1;">এই প্যাকেজ কিনেছেন</button>
+    @else
+      <a href="{{ route('lebd.packages.checkout', ['section' => $section, 'package' => $package->id]) }}" class="up-action up-buy" style="text-decoration:none;white-space:nowrap;display:flex;align-items:center;justify-content:center;">প্যাকেজ কিনুন</a>
+    @endif
   </div>
 </article>

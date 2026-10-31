@@ -548,7 +548,7 @@ if($complains)
             </span>
           </a>
           <ul class="treeview-menu">
-            <li><a href="{{ route('order.index') }}"><i class="fa fa-circle-o"></i> View Orders</a></li>
+            <li><a href="{{ route('admin.lebd-orders.index') }}"><i class="fa fa-circle-o"></i> View Orders</a></li>
             <li><a href="{{ route('order.referrer-order') }}"><i class="fa fa-circle-o"></i> View Referrers</a></li>
           </ul>
         </li>

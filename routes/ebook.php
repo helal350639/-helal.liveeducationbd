@@ -31,18 +31,23 @@ Route::middleware('auth')->prefix('admin/e-book')->name('admin.ebook.')->group(f
  Route::post('/{kind}/chapters/{chapter}/attach',[EBookController::class,'attachQuestions'])->name('attach');
  Route::get('/{kind}/chapters/{chapter}/preview',[EBookController::class,'adminPreview'])->name('preview');
 });
+
+// STEP-62: exact static route BEFORE /e-books/{kind}. No other E-Book route removed.
+Route::get('e-books/my-library', function () {
+ return view('ebook.dashboard-categories');
+})->middleware('auth:student')->name('student.ebook.dashboard');
+
 Route::prefix('e-books')->name('student.ebook.')->group(function () {
- Route::get('/{kind}/{category}/packages',[EBookPackageController::class,'catalog'])->name('packages');
- Route::get('/{kind}',[StudentPremiumController::class,'categories'])->name('categories');
- Route::get('/{kind}/{category}/full-book',[StudentPremiumController::class,'fullBook'])->name('full-book');
- Route::get('/{kind}/{category}',[StudentPremiumController::class,'chapters'])->name('chapters');
- Route::get('/{kind}/{category}/{chapter}',[StudentPremiumController::class,'read'])->name('read');
+ Route::get('/{kind}/{category}/packages',[EBookPackageController::class,'catalog'])->where('kind','department|non-department')->name('packages');
+ Route::get('/{kind}',[StudentPremiumController::class,'categories'])->where('kind','department|non-department')->name('categories');
+ Route::get('/{kind}/{category}/full-book',[StudentPremiumController::class,'fullBook'])->where('kind','department|non-department')->name('full-book');
+ Route::get('/{kind}/{category}',[StudentPremiumController::class,'chapters'])->where('kind','department|non-department')->name('chapters');
+ Route::get('/{kind}/{category}/{chapter}',[StudentPremiumController::class,'read'])->where('kind','department|non-department')->name('read');
 });
 
-
-// E-Book premium SSLCommerz: isolated from MCQ and old Batch/Course gateway callbacks.
+// E-Book payment routes retained.
 Route::post('e-books/{kind}/{category}/packages/{package}/pay',
- [\App\Http\Controllers\EBook\EBookPaymentController::class,'pay'])
+ [\App\Http\Controllers\EBook\EBookReferralController::class,'startPreview'])
  ->middleware('auth:student')->where(['kind'=>'department|non-department','category'=>'[0-9]+','package'=>'[0-9]+'])
  ->name('lebd.ebook.payment.start');
 foreach(['success','fail','cancel','ipn'] as $event){
@@ -51,3 +56,17 @@ foreach(['success','fail','cancel','ipn'] as $event){
   ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class])
   ->name('lebd.ebook.payment.'.$event);
 }
+Route::get('e-books/{kind}/{category}/packages/{package}/referral-preview',
+ [\App\Http\Controllers\EBook\EBookReferralController::class,'preview'])
+ ->middleware('auth:student')->where(['kind'=>'department|non-department','category'=>'[0-9]+','package'=>'[0-9]+'])
+ ->name('lebd.ebook.referral.preview');
+Route::post('e-books/referral/confirm',
+ [\App\Http\Controllers\EBook\EBookReferralController::class,'confirm'])
+ ->middleware('auth:student')->name('lebd.ebook.referral.confirm');
+Route::post('e-books/{kind}/{category}/packages/{package}/gateway-confirm',
+ [\App\Http\Controllers\EBook\EBookPaymentController::class,'pay'])
+ ->middleware('auth:student')->where(['kind'=>'department|non-department','category'=>'[0-9]+','package'=>'[0-9]+'])
+ ->name('lebd.ebook.payment.gateway-confirm');
+Route::post('e-books/payment-method/review',
+ [\App\Http\Controllers\EBook\EBookReferralController::class,'review'])
+ ->middleware('auth:student')->name('lebd.ebook.payment.review');

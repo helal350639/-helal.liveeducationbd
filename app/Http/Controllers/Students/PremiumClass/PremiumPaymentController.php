@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 class PremiumPaymentController extends Controller {
  private function credentials():array {
-  return [(string)env('LEBD_PREMIUM_SSL_STORE_ID',''),(string)env('LEBD_PREMIUM_SSL_STORE_PASSWORD',''),filter_var(env('LEBD_PREMIUM_SSL_SANDBOX',true),FILTER_VALIDATE_BOOLEAN)];
+  return [(string)config('lebd_premium_ssl.store_id',''),(string)config('lebd_premium_ssl.store_password',''),(bool)config('lebd_premium_ssl.sandbox',true)];
  }
  private function host(bool $sandbox):string{return $sandbox?'https://sandbox.sslcommerz.com':'https://securepay.sslcommerz.com';}
  public function review(Request $r,PremiumClassPackage $package){
@@ -20,12 +20,42 @@ class PremiumPaymentController extends Controller {
   $final=(float)($package->final_price??$package->price);
   $discount=max(0,$main-$final);
   abort_if($final<1 || $final>$main,422,'Package price is invalid. Please contact support.');
-  return view('premium-class.checkout-review',compact('package','main','final','discount'));
+  // Always use the logged-in student's current wallet minus pending withdrawals.
+  // This is display-only: the ReferralPurchaseController rechecks funds under row lock.
+  $referralBalance = null;
+  if (Auth::guard('student')->check()) {
+   $student = Auth::guard('student')->user();
+   $pending = DB::table('withdraw_requests')
+    ->where('student_id', $student->id)->where('status', 'pending')->sum('amount');
+   $referralBalance = max(0, round((float) $student->referral_balance - (float) $pending, 2));
+  }
+  if (Auth::guard('student')->check() && Schema::hasTable('lebd_premium_class_orders')) {
+   $activeOrder = DB::table('lebd_premium_class_orders')->where('student_id', Auth::guard('student')->id())
+      ->where('package_id', $package->id)->where('status', 'paid')
+      ->where('expires_at', '>', now())->orderByDesc('expires_at')->first();
+   if ($activeOrder) {
+     return redirect()->route('premium.payment.purchased.videos', ['order' => $activeOrder->id])
+       ->with('info', 'This package is already active in your account.');
+   }
+  }
+  return view('premium-class.checkout-review',compact('package','main','final','discount','referralBalance'));
  }
  public function checkout(Request $r,PremiumClassPackage $package){
   $student=Auth::guard('student')->user();abort_unless($student,401);
   if(!Schema::hasTable('lebd_premium_class_orders')){Log::error('Premium checkout: orders table missing');return redirect()->route('premium.payment.review',$package)->withErrors(['payment'=>'Premium payment database setup সম্পূর্ণ হয়নি। অনুগ্রহ করে অ্যাডমিনের সঙ্গে যোগাযোগ করুন (Orders table missing)।']);}
   abort_unless($package->is_active,404);
+  // An already-paid and unexpired package must not open another gateway checkout.
+  // Recheck on the server: disabled browser buttons are not payment protection.
+  $activeOrder = DB::table('lebd_premium_class_orders')
+    ->where('student_id', $student->id)
+    ->where('package_id', $package->id)
+    ->where('status', 'paid')
+    ->where('expires_at', '>', now())
+    ->orderByDesc('expires_at')->first();
+  if ($activeOrder) {
+    return redirect()->route('premium.payment.purchased.videos', ['order' => $activeOrder->id])
+      ->with('info', 'This package is already active in your account.');
+  }
   [$store,$secret,$sandbox]=$this->credentials();
   if($store===''||$secret===''){Log::error('Premium checkout: store credentials missing');return redirect()->route('premium.payment.review',$package)->withErrors(['payment'=>'SSLCommerz Payment এখনো Configuration সম্পূর্ণ হয়নি। অ্যাডমিনকে Store ID/Password সেট করতে হবে।']);}
   $amount=round((float)($package->final_price??$package->price),2);
@@ -77,7 +107,7 @@ class PremiumPaymentController extends Controller {
        'expires_at'=>now()->addDays(max(1,(int)$locked->validity_days)), 'updated_at'=>now()]);
     });
     if($event==='ipn')return response('OK',200);
-    return redirect()->route('premium.recordings.packages')->with('success','Payment verified. Premium Access চালু হয়েছে।');
+    return redirect()->route('premium.payment.purchased.success', ['order' => $order->id]);
    }catch(\Throwable $e){Log::warning('Premium payment verification failed',['transaction'=>$id]);return response('Unable to verify payment',502);}
   }
   DB::table('lebd_premium_class_orders')->where('tran_id',$id)->where('status','pending')->update(['status'=>$event,'updated_at'=>now()]);

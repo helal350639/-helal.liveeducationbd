@@ -966,3 +966,14 @@ if (app()->environment('local')) {
         return response()->json($found, 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     })->middleware('auth')->name('lebd.local.result-schema-check');
 }
+
+// LEBD-05: Admin Orders (Batch + Premium Video; other sections coming soon).
+require_once __DIR__ . '/lebd_admin_orders.php';
+
+require __DIR__.'/lebd_payment_preview.php';
+
+require __DIR__.'/lebd_batch_referral.php';
+
+require __DIR__.'/lebd_purchased_batch_exams.php';
+
+require __DIR__.'/lebd_my_batch_exam_index.php';

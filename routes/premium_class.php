@@ -39,11 +39,28 @@ Route::get('/premium-recordings/checkout/{package}/review',[\App\Http\Controller
 // SSLCommerz premium checkout. Student must be logged in on the student guard.
 Route::post('/premium-recordings/checkout/{package}',[\App\Http\Controllers\Students\PremiumClass\PremiumPaymentController::class,'checkout'])
  ->middleware('auth:student')->whereNumber('package')->name('premium.payment.checkout');
+
+// NEW: Referral Wallet checkout, separate from SSLCommerz. Student auth and CSRF stay enabled.
+Route::post('/premium-recordings/checkout/{package}/referral',
+ [\App\Http\Controllers\Students\PremiumClass\ReferralPurchaseController::class,'checkout'])
+ ->middleware(['auth:student','throttle:6,1'])
+ ->whereNumber('package')->name('premium.payment.referral.checkout');
+
 // SSLCommerz posts callbacks, which cannot carry Laravel CSRF tokens. Keep restricted to these 4 exact routes.
 Route::post('/premium-recordings/payment/success',[\App\Http\Controllers\Students\PremiumClass\PremiumPaymentController::class,'success'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class])->name('premium.payment.success');
 Route::post('/premium-recordings/payment/fail',[\App\Http\Controllers\Students\PremiumClass\PremiumPaymentController::class,'fail'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class])->name('premium.payment.fail');
 Route::post('/premium-recordings/payment/cancel',[\App\Http\Controllers\Students\PremiumClass\PremiumPaymentController::class,'cancel'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class])->name('premium.payment.cancel');
 Route::post('/premium-recordings/payment/ipn',[\App\Http\Controllers\Students\PremiumClass\PremiumPaymentController::class,'ipn'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class])->name('premium.payment.ipn');
+
+Route::middleware('auth:student')->group(function () {
+    Route::get('/premium-recordings/purchased/{order}/success',
+        [\App\Http\Controllers\Students\PremiumClass\PremiumPurchaseLandingController::class, 'success'])
+        ->whereNumber('order')->name('premium.payment.purchased.success');
+
+    Route::get('/premium-recordings/purchased/{order}/videos',
+        [\App\Http\Controllers\Students\PremiumClass\PremiumPurchaseLandingController::class, 'videos'])
+        ->whereNumber('order')->name('premium.payment.purchased.videos');
+});
 
 // LEBD Fix116: logged-in student can report a PUBLISHED recorded video, even if premium-locked.
 Route::post('/premium-recordings/video-complaints',
@@ -56,3 +73,19 @@ Route::middleware(['auth',PremiumClassAdminOnly::class])->prefix('admin/premium-
   Route::patch('/{complaint}',[\App\Http\Controllers\Admin\PremiumClass\VideoComplaintController::class,'update'])
    ->whereNumber('complaint')->name('update');
  });
+
+
+// LEBD Video Class: purchased active premium packages, student only.
+Route::get('/students/my-video-classes',
+ [\App\Http\Controllers\Students\PremiumClass\StudentPurchasedVideoController::class,'index'])
+ ->middleware('auth:student')->name('students.premium.video.classes');
+
+// LEBD-05 Purchased Class Navigation. Existing public/catalog/player routes unchanged.
+Route::middleware('auth:student')->prefix('students/video-class')->name('students.premium.video.')->group(function () {
+    $ctrl=\App\Http\Controllers\Students\PremiumClass\StudentPurchasedVideoController::class;
+    Route::get('/purchased/{order}',[$ctrl,'departments'])->whereNumber('order')->name('departments');
+    Route::get('/purchased/{order}/subjects/{group}/{topic}',[$ctrl,'subjects'])->whereNumber('order')->where('group','department|non-department')->name('subjects');
+    Route::get('/purchased/{order}/subject/{subject}/chapters',[$ctrl,'chapters'])->whereNumber('order')->whereNumber('subject')->name('chapters');
+    Route::get('/purchased/{order}/chapter/{chapter}/videos',[$ctrl,'videos'])->whereNumber('order')->whereNumber('chapter')->name('videos');
+    Route::get('/purchased/{order}/watch/{video}',[$ctrl,'watch'])->whereNumber('order')->whereNumber('video')->name('watch');
+});

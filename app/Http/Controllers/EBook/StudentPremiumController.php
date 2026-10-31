@@ -19,8 +19,15 @@ class StudentPremiumController extends Controller
     }
     private function paid(int $category): bool
     {
-        if (!auth()->check()) return false;
-        return DB::table('lebd_ebook_entitlements')->where('user_id',auth()->id())->where('category_id',$category)->where('status','Active')->where('expires_at','>',now())->exists();
+        // E-Book checkout and entitlements use the STUDENT guard, not the default web guard.
+        $studentId = auth('student')->id();
+        if (!$studentId) return false;
+        return DB::table('lebd_ebook_entitlements')
+            ->where('user_id', $studentId)
+            ->where('category_id', $category)
+            ->where('status', 'Active')
+            ->where('expires_at', '>', now('Asia/Dhaka'))
+            ->exists();
     }
     private function content(int $chapter, bool $paid): array
     {

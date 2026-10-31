@@ -245,6 +245,13 @@ $examIsLive = !$isDemo
         false
     );
 
+$examIsCompleted = !$isDemo && $hasUpcoming
+    && data_get($currentUpcoming, 'status') === 'completed';
+$examIsScheduled = $hasUpcoming && !$examIsLive && !$examIsCompleted;
+$examEndAt = data_get($currentUpcoming, 'exam_end_at');
+$examEndIso = $examEndAt
+    ? \Carbon\Carbon::parse($examEndAt, 'Asia/Dhaka')->toIso8601String() : null;
+
 $takeExamUrl = $examIsLive
     ? data_get($currentUpcoming, 'take_url')
     : null;
@@ -273,6 +280,20 @@ $serverTimeMs = \Carbon\Carbon::now(
 */
 
 $progressData = $progress ?? [];
+
+/* STEP-13: Use purchased department's published routine for the existing progress widget.
+   Read-only; other exam cards, menus, links and styling remain unchanged. */
+if (!$isDemo && $currentBatch && $currentDepartment
+    && class_exists(\App\Services\BatchRoutineProgress::class)) {
+    $lebdRoutineProgress = \App\Services\BatchRoutineProgress::get(
+        (int) ($currentCourse?->id ?? $currentBatch->course_id),
+        (int) $currentBatch->id,
+        (int) $currentDepartment->id
+    );
+    if ($lebdRoutineProgress !== null) {
+        $progressData = $lebdRoutineProgress;
+    }
+}
 
 $totalExams = max(
     0,
@@ -309,13 +330,23 @@ $progressPercent = $totalExams > 0
 |--------------------------------------------------------------------------
 */
 
-$routineUrl = route(
-    'students.exam.routine',
-    [
-        'title' => $pageTitle
-    ],
-    false
-);
+$routineUrl = (isset($batch) && $batch && isset($department) && $department)
+    ? route('students.batch.routine-live', ['batchId' => $batch->id, 'department_id' => $department->id])
+    : ((isset($batch) && $batch)
+        ? route('students.batch.routine-live', ['batchId' => $batch->id])
+        : route('students.exam.routine', ['title' => $pageTitle], false));
+
+/*
+|--------------------------------------------------------------------------
+| ALL EXAM PAPER: purchased batch + verified department (server validates)
+|--------------------------------------------------------------------------
+*/
+$allExamPaperUrl = $currentBatch
+    ? route('students.batch.all-exam-papers', array_filter([
+        'batchId' => (int) $currentBatch->id,
+        'department_id' => $currentDepartment?->id,
+    ], static fn ($value) => $value !== null), false)
+    : null;
 
 /*
 |--------------------------------------------------------------------------
@@ -331,17 +362,16 @@ $resultUrl = null;
 
 if ($selectedCourseId) {
 
-    $resultUrl = route(
-        'students.batch-result',
-
-        array_filter([
+    $resultUrl = ($currentBatch && \Illuminate\Support\Facades\Route::has('students.batch.exam-results'))
+        ? route('students.batch.exam-results', array_filter([
+            'batchId' => $currentBatch->id,
+            'department_id' => $currentDepartment?->id,
+        ], static fn ($value) => $value !== null), false)
+        : route('students.batch-result', array_filter([
             'course_id' => $selectedCourseId,
             'batch_id' => $currentBatch?->id,
-            'department_id' => $currentDepartment?->id
-        ], static fn ($value) => $value !== null),
-
-        false
-    );
+            'department_id' => $currentDepartment?->id,
+        ], static fn ($value) => $value !== null), false);
 }
 
 /*
@@ -367,13 +397,18 @@ $menus = [
     [
         'label' => 'All Exam Paper',
         'icon' => 'fa-file-lines',
-        'url' => null
+        'url' => $allExamPaperUrl
     ],
 
     [
         'label' => 'Missing Exam List',
         'icon' => 'fa-calendar-xmark',
-        'url' => null
+        'url' => ($currentBatch && \Illuminate\Support\Facades\Route::has('students.batch.missing-exams'))
+            ? route('students.batch.missing-exams', array_filter([
+                'batchId' => $currentBatch->id,
+                'department_id' => $currentDepartment?->id,
+            ], static fn ($value) => $value !== null), false)
+            : null
     ],
 
     [
@@ -395,9 +430,12 @@ $menus = [
     ],
 
     [
-        'label' => 'Complain',
+        'label' => 'Complain/Suggestion',
         'icon' => 'fa-comment-dots',
-        'url' => route('students.complain')
+        'url' => route('students.complain', array_filter([
+            'batch_id' => $currentBatch?->id,
+            'department_id' => $currentDepartment?->id,
+        ], static fn ($value) => $value !== null))
     ]
 
 ];
@@ -686,6 +724,25 @@ $menus = [
         .status-chip.live {
             color: #086c42;
             background: #ddf9e8;
+            animation: lebdLiveBadgePulse 1.35s ease-in-out infinite;
+            transform-origin: center;
+        }
+
+        /* Visual-only live indicator; no effect on exam status/timer/link. */
+        @keyframes lebdLiveBadgePulse {
+            0%, 100% {
+                background: #ddf9e8;
+                box-shadow: 0 0 0 0 rgba(8, 166, 90, .27);
+                opacity: 1;
+            }
+            50% {
+                background: #b6f1d1;
+                box-shadow: 0 0 0 5px rgba(8, 166, 90, 0);
+                opacity: .68;
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .status-chip.live { animation: none; }
         }
 
         /* =====================================
@@ -837,6 +894,18 @@ $menus = [
             color: var(--primary);
             font-size: 9px;
         }
+
+        /* Routine topic rows: first 3 visible; See More / See Less reveals the rest. */
+        .lebd-topics-toggle {
+            display: flex; align-items: center; justify-content: center;
+            gap: 7px; width: 100%; padding: 9px 12px;
+            border: 0; border-top: 1px solid var(--border);
+            background: var(--surface); color: var(--primary);
+            font: inherit; font-size: 12px; font-weight: 800;
+            cursor: pointer;
+        }
+        .lebd-topics-toggle:hover { background: var(--primary-soft); }
+        .lebd-topics-toggle:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
 
         /* =====================================
            ACTION BUTTONS
@@ -1413,8 +1482,88 @@ $menus = [
         animation: none;
     }
 }
+
+        /* Common Exam: one prominent full-width green action */
+        .exam-actions.lebd-single-exam-action { display: grid; grid-template-columns: minmax(0,1fr) !important; }
+        .lebd-exam-green-button {
+            display: flex; width: 100%; min-height: 60px; border: 0; border-radius: 15px;
+            align-items: center; justify-content: center; gap: 12px;
+            background: linear-gradient(110deg, #009879 0%, #05ba73 55%, #4dea75 100%);
+            box-shadow: 0 10px 19px rgba(0,166,108,.19);
+            color: #fff !important; font-size: 20px; font-weight: 800;
+            cursor: pointer; text-align: center; text-decoration: none;
+            transition: transform .15s ease, filter .15s ease;
+        }
+        .lebd-exam-green-button i { font-size: 16px; }
+        .lebd-exam-green-button:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.035); }
+        .lebd-exam-green-button:disabled { cursor: not-allowed; opacity: .6; }
+        .lebd-exam-not-ready { box-shadow: none; }
+        /* Compact button: standard app touch target, not a tall banner. */
+        .lebd-exam-green-button {
+            min-height: 44px;
+            padding: 10px 14px;
+            border-radius: 11px;
+            gap: 8px;
+            font-size: 14px;
+            line-height: 1.35;
+            box-shadow: 0 4px 10px rgba(0,166,108,.13);
+        }
+        /* Mobile app-like card sizing; only the existing exam UI changes. */
+        @media (max-width: 600px) {
+            .exam-page { width: 100%; max-width: 100%; }
+            .exam-content { padding: 12px 12px 25px; }
+            .upcoming-card { padding: 12px; margin-bottom: 15px; border-radius: 16px; }
+            .upcoming-head { margin-bottom: 9px; }
+            .exam-number-date-bar { margin-bottom: 9px; border-radius: 11px; }
+            .upcoming-syllabus { margin-bottom: 9px; border-radius: 10px; }
+            .lebd-exam-green-button {
+                min-height: 42px; padding: 9px 12px;
+                border-radius: 10px; font-size: 13px; gap: 7px;
+            }
+            .lebd-exam-green-button i { font-size: 15px; }
+            .exam-menu { gap: 9px; }
+            .menu-item { min-height: 65px; border-radius: 12px; }
+            .progress-card { border-radius: 15px; margin-top: 16px; }
+        }
+        @media (max-width: 360px) {
+            .exam-content { padding-left: 10px; padding-right: 10px; }
+            .upcoming-card { padding: 10px; }
+            .lebd-exam-green-button { min-height: 42px; font-size: 12px; }
+        }
+    
+        /* STEP-36: Headerless batch exam page; existing cards remain unchanged. */
+        .lebd-batch-title-row {
+            position: relative; display: flex; align-items: center; gap: 10px;
+            width: 100%; margin: 2px 0 6px;
+        }
+        .lebd-batch-back {
+            width: 38px; height: 38px; flex: 0 0 38px; display: inline-flex;
+            align-items: center; justify-content: center; border-radius: 11px;
+            background: var(--surface); color: var(--primary);
+            border: 1px solid var(--border); text-decoration: none; font-size: 17px;
+        }
+        .lebd-batch-back:hover { background: var(--primary-soft); }
+        .lebd-batch-title-content { min-width: 0; flex: 1; }
+        .lebd-batch-title-row .exam-title { margin: 0; padding-right: 38px; }
+        .exam-content { padding-top: 13px; }
+        @media (max-width: 480px) {
+            .lebd-batch-title-row { gap: 6px; }
+            .lebd-batch-back { width: 32px; height: 32px; flex-basis: 32px; font-size: 15px; }
+            .lebd-batch-title-row .exam-title { padding-right: 32px; font-size: 19px; }
+            .exam-content { padding-top: 10px; }
+        }
+
     </style>
 
+    {{-- Detect routine data updates without changing any exam button, timer or menu logic. --}}
+    <meta name="lebd-routine-card-signature" content="{{ sha1(json_encode([
+        data_get($currentUpcoming, 'exam_no'),
+        data_get($currentUpcoming, 'exam_at'),
+        data_get($currentUpcoming, 'exam_end_at'),
+        data_get($currentUpcoming, 'status'),
+        data_get($currentUpcoming, 'topic_rows'),
+        data_get($currentUpcoming, 'take_url'),
+    ])) }}">
 </head>
 
 <body>
@@ -1422,67 +1571,19 @@ $menus = [
 <div class="exam-page">
 
     <!-- =====================================
-         PAGE HEADER
-    ===================================== -->
-
-    <header class="exam-header">
-
-        <a
-            href="{{ route('students.dashboard') }}"
-            class="icon-btn"
-            id="backButton"
-            aria-label="Back"
-            title="Back"
-        >
-            <i class="fa-solid fa-arrow-left"></i>
-        </a>
-
-        <div class="exam-logo">
-            Live Education BD
-        </div>
-
-        <div class="header-actions">
-
-            <button
-                type="button"
-                class="icon-btn"
-                id="sharePage"
-                aria-label="Share this exam page"
-                title="Share"
-            >
-                <i class="fa-solid fa-share-nodes"></i>
-            </button>
-
-            <button
-                type="button"
-                class="icon-btn"
-                id="themeToggle"
-                aria-label="Toggle dark mode"
-                title="Dark mode"
-            >
-                <i
-                    class="fa-solid fa-moon"
-                    id="themeIcon"
-                ></i>
-            </button>
-
-            <span
-                class="icon-btn"
-                title="Notifications"
-                aria-label="Notifications"
-            >
-                <i class="fa-regular fa-bell"></i>
-            </span>
-
-        </div>
-
-    </header>
-
-    <!-- =====================================
          MAIN CONTENT
     ===================================== -->
 
     <main class="exam-content">
+
+        {{-- STEP-36: Only a back control remains; no site header row. --}}
+        <div class="lebd-batch-title-row">
+            <a href="{{ route('students.my-batch.exam-index') }}"
+               class="lebd-batch-back" id="backButton"
+               aria-label="আগের পেজে ফিরে যান" title="Back">
+                <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+            </a>
+            <div class="lebd-batch-title-content">
 
         <!-- EXAM TITLE -->
 
@@ -1497,6 +1598,9 @@ $menus = [
             ></i>
 
         </h1>
+
+            </div>
+        </div>
 
         <!-- COURSE / BATCH / DEPARTMENT -->
 
@@ -1563,12 +1667,15 @@ $menus = [
                         <i class="fa-regular fa-file-lines"></i>
                     </span>
 
+                    <h2 id="upcomingHeading">
                         @if($examIsLive)
-                         Now Exam Live
+                            Now Exam Live
+                        @elseif($examIsCompleted)
+                            Upcoming Exam
                         @else
-                         Upcoming Exam
+                            Upcoming Exam
                         @endif
-                        </h2>
+                    </h2>
 
                 </div>
 
@@ -1587,6 +1694,10 @@ $menus = [
                         Live Now
                     </span>
 
+                @elseif($examIsCompleted)
+                    <span class="status-chip">
+                        <i class="fa-regular fa-calendar-days"></i> Schedule
+                    </span>
                 @elseif($hasUpcoming && $upcomingDate)
 
                     <span class="status-chip upcoming">
@@ -1671,14 +1782,14 @@ $menus = [
      LIVE EXAM COUNTDOWN
 ===================================== -->
 
-@if($hasUpcoming && !$examIsLive && $upcomingDate)
+@if($hasUpcoming && (($examIsScheduled && $upcomingDate) || ($examIsLive && $examEndIso)))
 
     <div id="examCountdown" class="exam-countdown-inline">
 
         <i class="fa-regular fa-clock"></i>
 
         <span class="countdown-label">
-            Exam Starts In
+            {{ $examIsLive ? 'Exam Ends In' : 'Exam Starts In' }}
         </span>
 
         <span class="countdown-values">
@@ -1701,9 +1812,13 @@ $menus = [
 
     </div>
 
+@elseif($hasUpcoming && $examIsCompleted)
+    <div class="exam-countdown-inline" aria-label="Next exam schedule">
+        <i class="fa-regular fa-calendar-days" aria-hidden="true"></i>
+        <span class="countdown-label">Next Exam</span>
+        <span class="count-item">Schedule not announced</span>
+    </div>
 @endif
-
-                            </span>
 
                         </div>
 
@@ -1729,7 +1844,7 @@ $menus = [
 
                             <tr>
                                 <th>Department / Subject</th>
-                                <th>Topic</th>
+                                <th>{{ $examIsLive ? 'Today Exam Topic' : ($examIsScheduled ? 'Next Exam Topic' : 'Topic') }}</th>
                             </tr>
 
                         </thead>
@@ -1785,6 +1900,20 @@ $menus = [
 
                     </table>
 
+                    {{-- Keep all routine subjects in the DOM; expand the rows after the first three. --}}
+                    @if($hasExtraTopics)
+                        <button
+                            type="button"
+                            class="lebd-topics-toggle"
+                            aria-controls="upcomingSyllabusTable"
+                            aria-expanded="false"
+                            onclick="toggleUpcomingTopics(this)"
+                        >
+                            <span class="see-more-label">See More</span>
+                            <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                        </button>
+                    @endif
+
                 </div>
 
             @else
@@ -1799,125 +1928,35 @@ $menus = [
 
             @endif
 
-           <!-- =====================================
-     EXAM ACTION BUTTONS
-===================================== -->
-
-<div class="exam-actions {{ $examIsLive ? 'only-live' : ($hasExtraTopics ? '' : 'two-actions') }}">
-
-    @if($examIsLive)
-
-        <!-- =====================================
-             LIVE EXAM - ONLY TAKE EXAM
-        ===================================== -->
-
-        @if($takeExamUrl)
-
-            <a
-                href="{{ $takeExamUrl }}"
-                class="exam-action take live-exam-blink"
-            >
-                <i class="fa-solid fa-circle-play"></i>
-
-                <span>পরীক্ষা দিন</span>
-
-                <i class="fa-solid fa-arrow-right"></i>
-            </a>
-
-        @else
-
-            <!-- Live but exam entry not available -->
-
-            <button
-                type="button"
-                id="takeExamButton"
-                data-mode="unavailable"
-                class="exam-action take"
-            >
-                <i class="fa-solid fa-lock"></i>
-
-                <span>পরীক্ষা দিন</span>
-            </button>
-
-        @endif
-
-    @else
-
-        <!-- =====================================
-             UPCOMING EXAM - SEE MORE
-        ===================================== -->
-
-        @if($hasExtraTopics)
-
-            <button
-                type="button"
-                id="upcomingSeeMore"
-                class="exam-action more"
-                aria-expanded="false"
-                aria-controls="upcomingSyllabus"
-                onclick="toggleUpcomingTopics(this)"
-            >
-                <i class="fa-solid fa-book-open"></i>
-
-                <span class="see-more-label">
-                    See More
-                </span>
-
-                <i class="fa-solid fa-chevron-down"></i>
-            </button>
-
-        @endif
-
-        <!-- =====================================
-             UPCOMING EXAM - TAKE EXAM NOTICE
-        ===================================== -->
-
-        @if($hasUpcoming)
-
-            <button
-                type="button"
-                id="takeExamButton"
-                data-mode="upcoming"
-                class="exam-action take"
-            >
-                <i class="fa-solid fa-file-pen"></i>
-
-                <span>পরীক্ষা দিন</span>
-
-                <i class="fa-solid fa-chevron-right"></i>
-            </button>
-
-        @else
-
-            <button
-                type="button"
-                class="exam-action take"
-                disabled
-            >
-                <i class="fa-solid fa-file-pen"></i>
-                পরীক্ষা দিন
-            </button>
-
-        @endif
-
-        <!-- =====================================
-             UPCOMING EXAM - PREPARATION
-        ===================================== -->
-
-        <a
-            href="{{ route('homepage.courses') }}"
-            class="exam-action prepare"
-        >
-            <i class="fa-solid fa-circle-play"></i>
-
-            <span>প্রস্তুতি নিন</span>
-
-            <i class="fa-solid fa-chevron-right"></i>
-        </a>
-
-    @endif
-
-</div>
+           <!-- ONE COMMON EXAM ACTION: no See More or Prepare button -->
+           <div class="exam-actions only-live lebd-single-exam-action">
+               @if($examIsLive && $takeExamUrl)
+                   <a href="{{ $takeExamUrl }}" class="exam-action lebd-exam-green-button" aria-label="পরীক্ষা দিন">
+                       <i class="fa-solid fa-circle-play" aria-hidden="true"></i>
+                       <span>এক্সাম দিন</span>
+                   </a>
+               @elseif($examIsCompleted)
+                   <button type="button" class="exam-action lebd-exam-green-button lebd-exam-not-ready"
+                           disabled aria-label="এই পরীক্ষার সময় শেষ হয়েছে">
+                       <i class="fa-solid fa-lock" aria-hidden="true"></i>
+                       <span>এক্সাম দিন</span>
+                   </button>
+               @elseif($hasUpcoming)
+                   <button type="button" id="takeExamButton"
+                           data-mode="{{ $examIsLive ? 'unavailable' : 'upcoming' }}"
+                           class="exam-action lebd-exam-green-button lebd-exam-not-ready"
+                           aria-label="পরীক্ষা দিন">
+                       <i class="fa-solid {{ $examIsLive ? 'fa-lock' : 'fa-circle-play' }}" aria-hidden="true"></i>
+                       <span>এক্সাম দিন</span>
+                   </button>
+               @else
+                   <button type="button" class="exam-action lebd-exam-green-button lebd-exam-not-ready"
+                           disabled aria-label="পরীক্ষা এখনো নির্ধারিত হয়নি">
+                       <i class="fa-solid fa-lock" aria-hidden="true"></i>
+                       <span>এক্সাম দিন</span>
+                   </button>
+               @endif
+           </div>
 
         </section>
 
@@ -2298,30 +2337,9 @@ function toggleUpcomingTopics(button) {
     |--------------------------------------------------------------------------
     */
 
-    if (backButton) {
-
-        backButton.addEventListener(
-            'click',
-            function (event) {
-
-                try {
-
-                    if (
-                        document.referrer &&
-                        new URL(document.referrer).origin === location.origin
-                    ) {
-
-                        event.preventDefault();
-
-                        history.back();
-                    }
-
-                } catch (error) {
-                    // Dashboard link remains the fallback.
-                }
-            }
-        );
-    }
+    // STEP-39: Use the explicit parent route. Browser history navigation can
+    // loop between two exam pages when they link to each other.
+    // The anchor href is the only navigation mechanism; do not intercept clicks.
 
     /*
     |--------------------------------------------------------------------------
@@ -2485,12 +2503,11 @@ function toggleUpcomingTopics(button) {
 
     // Exam start date with Bangladesh timezone.
     const examStart = @json(
-        $upcomingDate
-            ? \Carbon\Carbon::parse(
-                $upcomingDate,
-                'Asia/Dhaka'
-              )->toIso8601String()
-            : null
+        $examIsLive ? $examEndIso : (
+            $upcomingDate
+                ? \Carbon\Carbon::parse($upcomingDate, 'Asia/Dhaka')->toIso8601String()
+                : null
+        )
     );
 
     // Server time when page was generated.
@@ -2677,5 +2694,27 @@ function toggleUpcomingTopics(button) {
 })();
 </script>
 
+<script>
+/* STEP-18: read-only live check for admin routine edits. No exam attempt page is affected. */
+(function () {
+    'use strict';
+    var tag = document.querySelector('meta[name="lebd-routine-card-signature"]');
+    if (!tag || !window.fetch) return;
+    var checking = false;
+    window.setInterval(function () {
+        if (document.hidden || checking) return;
+        checking = true;
+        fetch(window.location.href, {credentials:'same-origin', cache:'no-store', headers:{'X-LEBD-Routine-Check':'1'}})
+            .then(function (response) {if (!response.ok) return null; return response.text();})
+            .then(function (html) {
+                if (!html) return;
+                var match = html.match(/<meta\s+name="lebd-routine-card-signature"\s+content="([a-f0-9]{40})"\s*\/?\s*>/i);
+                if (match && match[1] !== tag.content) window.location.reload();
+            })
+            .catch(function () { /* Network failure: leave the current page working. */ })
+            .finally(function () { checking = false; });
+    }, 20000);
+})();
+</script>
 </body>
 </html>

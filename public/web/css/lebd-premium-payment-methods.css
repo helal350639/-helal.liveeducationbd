@@ -1,0 +1,16 @@
+.lebdpm-panel{margin-top:18px;padding:20px;background:#fff;border:1px solid #d0e1fa;border-radius:17px;box-shadow:0 10px 24px rgba(16,48,100,.05);color:#062959}
+.lebdpm-panel h2{text-align:center;font-size:24px;font-weight:800;margin:0 0 15px;color:#052552}
+.lebdpm-method{display:flex;align-items:center;gap:11px;margin:12px 0;padding:15px;border:1px solid #a5d8ff;background:#f0f9ff;border-radius:14px;cursor:pointer;min-height:88px}
+.lebdpm-method input{flex:none;width:17px;height:17px;accent-color:#0875ed}
+.lebdpm-method-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.lebdpm-method-body strong{font-size:15px;font-weight:800;line-height:1.45}
+.lebdpm-method-body small{font-size:12px;color:#39709e}
+.lebdpm-balance{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:none;border-radius:21px;padding:10px 14px;min-width:126px;background:#fff;box-shadow:0 4px 14px rgba(20,57,106,.07)}
+.lebdpm-balance strong{color:#007d75;font-size:18px}.lebdpm-balance small{font-size:11px;color:#4c7098;font-weight:600}
+.lebdpm-gateway{border:1px solid #2738b6;background:#eaf3ff;min-height:105px}
+.lebdpm-chips{display:flex;gap:6px;flex-wrap:wrap}.lebdpm-chips span{background:#fff;border:1px solid #d0e0f8;border-radius:5px;font-size:11px;padding:7px 9px;color:#092b5b}
+.lebdpm-warning{margin-top:15px;padding:16px 15px;background:#1d1469;border-radius:12px;color:#fff}.lebdpm-warning strong{font-size:16px}.lebdpm-warning p{margin:8px 0 0;font-size:13px;line-height:1.8}
+.lebdpm-terms{display:flex;align-items:center;gap:10px;margin:16px 0 12px;padding:16px;background:#fff;border:1px solid #d0e1fa;border-radius:14px;font-size:13px;cursor:pointer}.lebdpm-terms input{width:16px;height:16px;flex:none}
+.lebdpm-hint{color:#8b4a13;font-size:12px;margin:-4px 5px 8px}
+.lebdpm-unavailable{opacity:.7;cursor:not-allowed}.lebdpm-pay{display:block;width:100%;text-align:center;cursor:pointer}.lebdpm-login{margin-top:15px}
+@media(max-width:600px){.lebdpm-panel{padding:13px}.lebdpm-panel h2{font-size:20px}.lebdpm-method{padding:11px;gap:8px}.lebdpm-method-body strong{font-size:12px}.lebdpm-balance{min-width:91px;padding:9px 6px;border-radius:13px}.lebdpm-balance strong{font-size:14px}.lebdpm-balance small{font-size:9px}.lebdpm-chips span{font-size:10px;padding:5px}.lebdpm-warning p{font-size:12px}}

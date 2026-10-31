@@ -790,6 +790,16 @@ $course_price = $price - $value->fee;
 
 }
 
+
+.lebd-batch-referral {display:flex;align-items:center;gap:12px;cursor:pointer;border:1px solid #abd9ff;border-radius:12px;background:#eef8ff;padding:15px;margin-bottom:11px;color:#092b68}
+.lebd-batch-referral input {accent-color:#0875df;width:18px;height:18px;flex-shrink:0}
+.lebd-batch-referral-label {flex:1;display:flex;flex-direction:column;gap:4px}
+.lebd-batch-referral-label small,.lebd-batch-referral-amount small{font-size:11px;color:#5076a0}
+.lebd-batch-referral-amount{display:flex;flex-direction:column;text-align:center;background:white;border-radius:10px;padding:9px 12px;font-weight:800;color:#008b55}
+.lebd-batch-referral input:disabled{opacity:.45}
+.lebd-batch-referral:has(input:disabled){opacity:.65;cursor:not-allowed}
+.lebd-batch-referral-help{font-size:12px;color:#a14f18;margin:3px 0 12px}
+@media(max-width:600px){.lebd-batch-referral{padding:10px;gap:7px}.lebd-batch-referral-amount{padding:7px;font-size:12px}}
 </style>
 
 
@@ -1101,6 +1111,22 @@ $course_price = $price - $value->fee;
                             আমাদের পেমেন্ট সিস্টেমে অন্তরভুক্ত আছে
                         </h3>
 
+                        @php
+                            $lebdAvailableBalance = max(0, (float)($student->referral_balance ?? 0)
+                                - (float)\App\Models\WithdrawRequest::where('student_id', $user->id)
+                                    ->where('status', 'pending')->sum('amount'));
+                        @endphp
+                        <label class="lebd-batch-referral">
+                            <input type="radio" name="lebd_payment_choice" value="referral" id="lebd-batch-referral-choice"
+                                {{ $lebdAvailableBalance + 0.00001 < $selling_price ? 'disabled' : '' }}>
+                            <span class="lebd-batch-referral-label"><strong>Use Your Referral Balance</strong>
+                                <small>Available Balance দিয়ে ব্যাচ কিনুন</small></span>
+                            <span class="lebd-batch-referral-amount">৳{{ number_format($lebdAvailableBalance, 2) }}<small>Available Balance</small></span>
+                        </label>
+                        @if($lebdAvailableBalance + 0.00001 < $selling_price)
+                            <p class="lebd-batch-referral-help">এই ব্যাচ কেনার জন্য পর্যাপ্ত Available Referral Balance নেই। SSLCommerz ব্যবহার করুন।</p>
+                        @endif
+                        <input type="hidden" name="lebd_referral_form" value="0" id="lebd_referral_form">
                         <div class="payment-method-box">
 
                             <div class="payment-method-content">
@@ -1109,15 +1135,14 @@ $course_price = $price - $value->fee;
 
                                     <input
                                         type="radio"
-                                        name="payment_method_display"
+                                        name="lebd_payment_choice"
                                         value="online"
                                         class="payment-radio"
                                         checked
-                                        disabled
                                     >
 
                                     <span class="payment-method-name">
-                                        Online Payment Gateway
+                                        Online Payment Gateway — SSLCommerz
                                     </span>
 
                                 </label>
@@ -1275,7 +1300,7 @@ $course_price = $price - $value->fee;
 
                             <i class="fa-solid fa-lock"></i>
 
-                            Proceed To Payment
+                            Payment Preview →
 
                             <i class="fa-solid fa-arrow-right"></i>
 
@@ -1472,6 +1497,19 @@ document.addEventListener(
     }
 );
 
+
+// Referral sends the existing batch and department selection to a safe preview route.
+// The legacy SSLCommerz course apply/confirm route remains unchanged.
+document.addEventListener('DOMContentLoaded', function(){
+ const form=document.getElementById('courseCheckoutForm');if(!form)return;
+ const original=form.getAttribute('action');
+ const url=@json(route('students.batch.referral.preview'));
+ form.addEventListener('submit',function(event){
+   const selected=form.querySelector('input[name="lebd_payment_choice"]:checked');
+   if (!selected || selected.disabled) { event.preventDefault(); return; }
+   form.action=selected.value==='referral'?url:original;
+ });
+});
 </script>
 
 @endsection
