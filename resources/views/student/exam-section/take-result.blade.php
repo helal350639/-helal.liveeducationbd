@@ -38,7 +38,7 @@ body:has(.lebd-r26) #footer{display:none!important}
 @section('content')
 @php
     // Preserve admin visibility rules: an attempt is never sufficient on its own to reveal scores.
-    $canShowResult = (bool) $visible && (bool) $ended;
+    $canShowResult = (bool) $visible; // Controller enforces Admin Yes OR scheduled exam end.
     $student = \Illuminate\Support\Facades\Auth::guard('student')->user();
     $categoryId = (int) ($row->category_id ?? 0);
     $subcategoryId = $row->subcategory_id ?? null;
@@ -95,7 +95,7 @@ body:has(.lebd-r26) #footer{display:none!important}
   @else
     <div class="lebd-r26-wait">আপনার পরীক্ষার Attempt সংরক্ষিত আছে। ফলাফল প্রকাশের অনুমতি পাওয়া গেলে নম্বর ও বিস্তারিত সারাংশ এখানে দেখানো হবে।</div>
   @endif
-  <div class="lebd-r26-actions"><span class="lebd-r26-btn disabled" aria-disabled="true">🏅 Merit List (Soon)</span><span class="lebd-r26-btn disabled" aria-disabled="true">📊 Summary</span></div>
+  <div class="lebd-r26-actions"><span class="lebd-r26-btn disabled" aria-disabled="true">🏅 Merit List (Soon)</span><a class="lebd-r26-btn" href="{{ route('student.exam-section.take.result', ['item' => $row->id, 'summary' => 1]) }}">📊 Summary</a></div>
   <div class="lebd-r26-actions"><a class="lebd-r26-btn primary" href="{{ $dashboardUrl }}">▤ Exam Dashboard</a><a class="lebd-r26-btn" href="{{ $examListUrl }}">← All Exam Paper</a></div>
   <p class="lebd-r26-footer">Live Education BD · Exam Section Result</p>
 </div></div>

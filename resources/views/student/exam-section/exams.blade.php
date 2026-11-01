@@ -439,7 +439,7 @@ body:has(.lebd-exam-scope) #footer { display:none !important; }
   </section>
 </div>
 @elseif(in_array(request()->query('paper'), ['1', 'result'], true))
-@php $lebd05ResultPage = request()->query('paper') === 'result'; $lebd05SubmittedTotal = $attemptStatuses->filter(fn($status) => in_array($status, ['started', 'submitted'], true))->count(); @endphp
+@php $lebd05ResultPage = request()->query('paper') === 'result'; $lebd05SubmittedTotal = $attemptStatuses->filter(fn($status) => $status === 'submitted')->count(); @endphp
 <div class="lebd-paper-page">
   <div class="lebd-paper-nav"><a class="lebd-paper-back" href="{{ route('student.exam-section.browse-exams',['category'=>$cat->id,'subcategory_id'=>$sub?->id]) }}">← Exam Dashboard</a><small>{{ $total }} Exams</small></div>
   <div class="lebd-paper-title"><h1>{{ $lebd05ResultPage ? '▣ Exam Result' : '▤ All Exam Paper' }}</h1><p>{{ $cat->name }} @if($sub) — {{ $sub->name }} @endif</p></div>
@@ -458,10 +458,6 @@ body:has(.lebd-exam-scope) #footer { display:none !important; }
       $lateOpen=$entry['end'] && $lastEnd && $now->gte($entry['end']->copy()->addHours(24)) && $now->lt($lastEnd);
       $attemptStatus=$attemptStatuses->get($paperItem->id);
       $alreadySubmitted=$attemptStatus==='submitted';
-      // A started attempt also counts as participation after the original exam ends;
-      // the result endpoint will finalize it only after its own allowed duration.
-      $hasAttempt = $attemptStatus !== null;
-      $eligibleResultAttempt = $hasAttempt && $entry['end'] && $now->gte($entry['end']);
       // Use the same schedule flags as the four summary counters above.
       // A future exam must never be labelled Completed simply because an attempt exists.
       $isFuture = !$entry['start'] || $now->lt($entry['start']);
@@ -469,7 +465,7 @@ body:has(.lebd-exam-scope) #footer { display:none !important; }
       $isEndedOriginal = !$isFuture && $entry['ended'];
       $isLateEligible = $isEndedOriginal && $lateOpen && !$attemptStatus;
       $mayStart = $currentStudent && !$isFuture && !$alreadySubmitted && !$attemptStatus && ($isLiveOriginal || $isLateEligible);
-      $mayViewResult = $eligibleResultAttempt && $canViewPaperResult;
+      $mayViewResult = $alreadySubmitted && ($canViewPaperResult || $isEndedOriginal);
       // Result page: preserve the same cards/colors, show attempt-based result status.
       if ($lebd05ResultPage) {
           if ($alreadySubmitted) {
@@ -523,21 +519,23 @@ body:has(.lebd-exam-scope) #footer { display:none !important; }
       {{-- Schedule-first labels: future exams are always Pending, regardless of attempts. --}}
       @if($lebd05ResultPage)
       {{-- Result page intentionally hides schedule badges (Live / Completed / Pending). --}}
-      <div class="lebd-paper-status-box"><span class="lebd-paper-status-caption">@if($hasAttempt)আপনি পরীক্ষায় অংশ নিয়েছেন@endif</span></div>
+      <div class="lebd-paper-status-box"><span class="lebd-paper-status-caption">@if($alreadySubmitted)আপনি পরীক্ষায় অংশ নিয়েছেন@endif</span></div>
       @else
       <div class="lebd-paper-status-box"><span class="lebd-paper-status {{ $paperStatusClass }}">{{ $paperStatusLabel }}</span>@if($alreadySubmitted)<span class="lebd-paper-status-caption">আপনি পরীক্ষায় অংশ নিয়েছেন</span>@elseif($isEndedOriginal)<span class="lebd-paper-status-caption">পরীক্ষার নির্ধারিত সময়সীমা শেষ</span>@endif</div>
       @endif
       <div class="lebd-paper-action-box">
         @if($lebd05ResultPage)
-          @if($isEndedOriginal && $hasAttempt)
-            {{-- The result endpoint finalizes an expired started attempt; admin permission controls score visibility there. --}}
+          @if($mayViewResult)
             <a class="lebd-paper-action" href="{{ route('student.exam-section.take.result', ['item' => $paperItem->id]) }}">▣ ফলাফল দেখুন</a>
+          @elseif($isEndedOriginal && $alreadySubmitted)
+            {{-- Requested visual-only result button; access remains controlled by admin settings. --}}
+            <span class="lebd-paper-action lebd-paper-result-preview" role="text" title="ফলাফল প্রকাশ হলে সংযোগ কার্যকর হবে">▣ ফলাফল দেখুন</span>
           @elseif($isEndedOriginal)
             <span class="lebd-paper-action off">এই এক্সামে আপনি অংশগ্রহণ করেন নাই</span>
           @else
             <span class="lebd-paper-action off">ফলাফল পরীক্ষার সময় শেষ হলে দেখাবে</span>
           @endif
-        @elseif($isEndedOriginal && $hasAttempt)
+        @elseif($mayViewResult)
           <a class="lebd-paper-action" href="{{ route('student.exam-section.take.result', ['item' => $paperItem->id]) }}">▣ ফলাফল দেখুন</a>
         @elseif($mayStart)
           <a class="lebd-paper-action" href="{{ route('student.exam-section.take', ['item' => $paperItem->id]) }}">▣ পরীক্ষা দিন</a>

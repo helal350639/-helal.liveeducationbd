@@ -104,7 +104,7 @@ class StudentRoutineExamController extends Controller
 
         $settings = $settingsRow ? (json_decode($settingsRow->settings_json, true) ?: []) : [];
 
-        $resultAllowed = filter_var($settings['student_view_result'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        $resultAllowed = in_array(strtolower((string) ($settings['student_view_result'] ?? 'no')), ['yes', '1', 'true'], true);
 
         $now = now('Asia/Dhaka');
 
@@ -124,7 +124,7 @@ class StudentRoutineExamController extends Controller
 
                 'live' => $start && $end && $now->gte($start) && $now->lt($end),
 
-                'result_visible' => $attempt && $attempt->status === 'submitted' && $end && $now->gte($end) && $resultAllowed];
+                'result_visible' => $attempt && $attempt->status === 'submitted' && ($resultAllowed || ($end && $now->gte($end)))];
 
         });
 
@@ -510,6 +510,115 @@ class StudentRoutineExamController extends Controller
             ]);
     }
 
+
+    /** Read-only marks summary for the authenticated student's single saved attempt. */
+    private function subjectSummary(object $row, array $settings, object $attempt): array
+    {
+        $ids = $this->questionIds($row, $settings);
+        // Zero-question exams still list subjects from the saved Routine Item.
+
+        $generated = DB::table('lebd_exam_section_generated_questions')
+            ->where('routine_id', $row->routine_id)->where('exam_name', $row->exam_name)
+            ->whereIn('question_id', $ids)->orderBy('position')->orderBy('id')
+            ->get(['question_id','topic_key']);
+        $keys = [];
+        foreach ($generated as $g) {
+            $qid = (int) $g->question_id;
+            if (!isset($keys[$qid])) $keys[$qid] = (string) $g->topic_key;
+        }
+        $chapterIds=[]; $subjectIds=[]; $deptIds=[];
+        foreach ($keys as $key) {
+            if (!preg_match('/^(department|subject|chapter):(\d+)$/', $key, $m)) continue;
+            if ($m[1]==='chapter') $chapterIds[]=(int)$m[2];
+            elseif ($m[1]==='subject') $subjectIds[]=(int)$m[2];
+            else $deptIds[]=(int)$m[2];
+        }
+        $chapters = $chapterIds ? DB::table('lebd_exam_routine_chapters')->whereIn('id', array_unique($chapterIds))->get(['id','subject_id'])->keyBy('id') : collect();
+        foreach ($chapters as $chapter) $subjectIds[]=(int)$chapter->subject_id;
+        $subjects = $subjectIds ? DB::table('lebd_exam_routine_subjects')->whereIn('id',array_unique($subjectIds))->get(['id','name','department_id'])->keyBy('id') : collect();
+        foreach ($subjects as $subject) $deptIds[]=(int)$subject->department_id;
+        $depts = $deptIds ? DB::table('lebd_exam_routine_departments')->whereIn('id',array_unique($deptIds))->get(['id','name'])->keyBy('id') : collect();
+
+        $answers = json_decode((string)($attempt->answers_json ?? '{}'), true);
+        if (!is_array($answers)) $answers=[];
+        $options = DB::table('mcq_items')->whereIn('question_id', $ids)->get(['id','question_id','correct_answer'])->groupBy('question_id');
+        $positive=(float)($settings['correct_mark'] ?? 1);
+        $negative=(float)($settings['wrong_deduction'] ?? $settings['negative_mark'] ?? 0);
+        $rows=[];
+        foreach ($ids as $qid) {
+            $key=$keys[(int)$qid] ?? '';
+            $label='Unmapped subject';
+            $groupKey='unmapped';
+            if (preg_match('/^(department|subject|chapter):(\d+)$/', $key, $m)) {
+                $id=(int)$m[2]; $sid=null;
+                if ($m[1]==='chapter') $sid=$chapters->get($id)?->subject_id;
+                if ($m[1]==='subject') $sid=$id;
+                if ($sid && $subjects->has((int)$sid)) {
+                    $subject=$subjects->get((int)$sid);
+                    $label=(string)$subject->name;
+                    $groupKey='subject:'.$subject->id;
+                } elseif ($m[1]==='department' && $depts->has($id)) {
+                    $label=(string)$depts->get($id)->name;
+                    $groupKey='department:'.$id;
+                }
+            }
+            if (!isset($rows[$groupKey])) $rows[$groupKey]=['subject'=>$label,'questions'=>0,'correct'=>0,'wrong'=>0,'unanswered'=>0,'marks'=>0.0,'possible'=>0.0];
+            $r=&$rows[$groupKey]; $r['questions']++; $r['possible']+=$positive;
+            $chosenId=$answers[(string)$qid] ?? null;
+            if ($chosenId===null || $chosenId==='') { $r['unanswered']++; }
+            else {
+                $chosen=($options->get((int)$qid) ?? collect())->first(fn($option)=>(string)$option->id === (string)$chosenId);
+                if (!$chosen) $r['unanswered']++;
+                elseif (in_array(strtolower(trim((string)$chosen->correct_answer)),['1','yes','true','correct'],true)) { $r['correct']++; $r['marks']+=$positive; }
+                else { $r['wrong']++; $r['marks']-=$negative; }
+            }
+            unset($r);
+        }
+        // Include every subject/department selected in the original Routine Item,
+        // even when question generation produced zero questions for that selection.
+        $savedTopics = DB::table('lebd_exam_section_routine_item_topics')
+            ->where('item_id', $row->id)->get(['topic_key']);
+        $routineChapterIds=[]; $routineSubjectIds=[]; $routineDeptIds=[];
+        foreach ($savedTopics as $topic) {
+            if (!preg_match('/^(department|subject|chapter):(\d+)$/', (string)$topic->topic_key, $m)) continue;
+            if ($m[1] === 'chapter') $routineChapterIds[]=(int)$m[2];
+            elseif ($m[1] === 'subject') $routineSubjectIds[]=(int)$m[2];
+            else $routineDeptIds[]=(int)$m[2];
+        }
+        $routineChapters = $routineChapterIds ? DB::table('lebd_exam_routine_chapters')->whereIn('id', array_unique($routineChapterIds))->get(['id','subject_id']) : collect();
+        foreach ($routineChapters as $chapter) $routineSubjectIds[]=(int)$chapter->subject_id;
+        $routineSubjects = $routineSubjectIds ? DB::table('lebd_exam_routine_subjects')->whereIn('id', array_unique($routineSubjectIds))->get(['id','name','department_id']) : collect();
+        foreach ($routineSubjects as $subject) {
+            $key='subject:'.$subject->id;
+            if (!isset($rows[$key])) $rows[$key]=['subject'=>$subject->name,'questions'=>0,'correct'=>0,'wrong'=>0,'unanswered'=>0,'marks'=>0.0,'possible'=>0.0];
+        }
+        // A separately selected department gets a row only if no more-specific
+        // subject in that department already accounts for it.
+        $specificDepartments=[];
+        foreach ($routineSubjects as $subject) $specificDepartments[(int)$subject->department_id]=true;
+        $routineDepts = $routineDeptIds ? DB::table('lebd_exam_routine_departments')->whereIn('id', array_unique($routineDeptIds))->get(['id','name']) : collect();
+        foreach ($routineDepts as $department) {
+            if (isset($specificDepartments[(int)$department->id])) continue;
+            $key='department:'.$department->id;
+            if (!isset($rows[$key])) $rows[$key]=['subject'=>$department->name,'questions'=>0,'correct'=>0,'wrong'=>0,'unanswered'=>0,'marks'=>0.0,'possible'=>0.0];
+        }
+        $subjectPass=(float)($settings['subject_pass_percent'] ?? 80);
+        $overallPass=(float)($settings['overall_pass_percent'] ?? 75);
+        $rows=array_values(array_map(function($r) use($subjectPass) {
+            $r['percent']=$r['possible']>0 ? ($r['marks']/$r['possible']*100) : 0;
+            $r['passed']=$r['possible']>0 && $r['percent'] >= $subjectPass;
+            return $r;
+        },$rows));
+        $possible=array_sum(array_column($rows,'possible'));
+        $earned=array_sum(array_column($rows,'marks'));
+        $percent=$possible>0 ? $earned/$possible*100 : 0;
+        return compact('rows','possible','earned','percent','subjectPass','overallPass') + [
+            'total'=>count($ids),
+            'overallPassed'=>$possible>0 && $percent >= $overallPass,
+            'allSubjectsPassed'=>count($rows)>0 && count(array_filter($rows,fn($r)=>!$r['passed']))===0,
+        ];
+    }
+
 public function result(int $item)
 
     {
@@ -527,10 +636,36 @@ public function result(int $item)
 
         abort_unless($attempt,404);
 
-        $visible=filter_var($settings['student_view_result'] ?? false,FILTER_VALIDATE_BOOLEAN);
+        // Admin Yes: own submitted result is visible immediately.
+        // Admin No: own result becomes visible automatically at this exam's end time.
+        // Do not update Admin settings or expose another student's attempt.
+        $adminAllowsImmediate = in_array(strtolower((string) ($settings['student_view_result'] ?? 'no')), ['yes', '1', 'true'], true);
+        $ended = $row->exam_end_at && now('Asia/Dhaka')->gte(Carbon::parse($row->exam_end_at, 'Asia/Dhaka'));
+        $visible = $adminAllowsImmediate || $ended;
 
-        $ended=$row->exam_end_at && now('Asia/Dhaka')->gte(Carbon::parse($row->exam_end_at,'Asia/Dhaka'));
+        if (request()->boolean('summary')) {
+            $history = collect();
+            if ($visible) {
+                // The history is limited to this student and category/sub-category.
+                // Exam results are included only after their scheduled end time.
+                $history = DB::table('lebd_exam_section_student_attempts as a')
+                    ->join('lebd_exam_section_routine_items as i','i.id','=','a.routine_item_id')
+                    ->join('lebd_exam_section_routines as r','r.id','=','i.routine_id')
+                    ->where('a.student_id',$student->id)
+                    ->where('a.status','submitted')
+                    ->where('r.category_id',$row->category_id)
+                    ->where('r.subcategory_id',$row->subcategory_id)
+                    ->whereNotNull('i.exam_end_at')
+                    ->where('i.exam_end_at','<=',now('Asia/Dhaka')->format('Y-m-d H:i:s'))
+                    ->orderByDesc('a.submitted_at')->orderByDesc('a.id')
+                    ->limit(10)
+                    ->get(['a.id','a.score','a.correct_count','a.wrong_count','i.exam_name'])
+                    ->reverse()->values();
+            }
 
+            $summary = $visible ? $this->subjectSummary($row, $settings, $attempt) : null;
+            return view('student.exam-section.take-summary', compact('row','attempt','visible','ended','summary','history'));
+        }
         return view('student.exam-section.take-result',compact('row','attempt','visible','ended'));
 
     }
