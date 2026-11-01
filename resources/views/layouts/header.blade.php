@@ -145,6 +145,22 @@ if($complains)
                 </li>
             </ul>
         </li>
+        {{-- LEBD-05 Extra Student independent admin module --}}
+        @php $extraStudentMenuActive = request()->routeIs('admin.extra-students.*'); @endphp
+        <li class="treeview {{ $extraStudentMenuActive ? 'active menu-open' : '' }}">
+          <a href="#"><i class="fa fa-user-plus"></i> <span>Extra Student</span>
+            <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+          </a>
+          <ul class="treeview-menu" style="{{ $extraStudentMenuActive ? 'display:block;' : '' }}">
+            <li class="{{ request()->routeIs('admin.extra-students.create') ? 'active' : '' }}">
+              <a href="{{ \Illuminate\Support\Facades\Route::has('admin.extra-students.create') ? route('admin.extra-students.create') : '#' }}"><i class="fa fa-user-plus"></i> Add Student</a>
+            </li>
+            <li class="{{ request()->routeIs('admin.extra-students.index') ? 'active' : '' }}">
+              <a href="{{ \Illuminate\Support\Facades\Route::has('admin.extra-students.index') ? route('admin.extra-students.index') : '#' }}"><i class="fa fa-list"></i> View Student</a>
+            </li>
+          </ul>
+        </li>
+
         {{-- LEBD-3 MCQ Job Preparation --}}
         @php $jpActive = request()->routeIs('admin.job-preparation.*', 'admin.mcq-subscription.*') || request()->is('admin/mcq-subscription*'); @endphp
         <li class="treeview {{ $jpActive ? 'active menu-open' : '' }}">
@@ -491,6 +507,7 @@ if($complains)
             </li>
           </ul>
         </li>
+
         <li class="treeview">
           <a href="#">
             <i class="fa fa-users"></i>

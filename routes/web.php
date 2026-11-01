@@ -977,3 +977,4 @@ require __DIR__.'/lebd_batch_referral.php';
 require __DIR__.'/lebd_purchased_batch_exams.php';
 
 require __DIR__.'/lebd_my_batch_exam_index.php';
+require __DIR__ . '/lebd_extra_students.php';

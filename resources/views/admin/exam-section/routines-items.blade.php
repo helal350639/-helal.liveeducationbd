@@ -33,8 +33,37 @@
 .ex165 .ex169-topic-box .ex167-topic .ex169-tools{display:flex;flex-wrap:wrap;gap:5px}
 .ex165 .ex169-topic-box .ex167-topic .ex169-tools button{min-height:32px}
 @media(max-width:800px){.ex165 .ex169-exam-row{grid-template-columns:1fr}.ex165 .ex169-select-card .ex167-picker>div{grid-template-columns:1fr}.ex165 .ex169-topic-box .ex167-topic{grid-template-columns:1fr 1fr}}
+/* Scoped breadcrumb and date editor affordance; no table data or calculations altered. */
+.ex165 .lebd-routine-path{display:flex;flex-wrap:wrap;align-items:center;gap:7px;background:#fff;border:1px solid #d5e0ed;border-radius:4px;padding:11px 12px;margin:0 0 12px;font-size:13px}
+.ex165 .lebd-routine-path a{color:#176baf;text-decoration:underline}
+.ex165 .lebd-routine-path .separator{color:#76899e}
+.ex165 .lebd-routine-path strong{color:#123f69}
+.ex165 td.lebd-date-edit{cursor:pointer;color:#135f9d;text-decoration:underline;text-underline-offset:3px}
+.ex165 td.lebd-date-edit:hover,.ex165 td.lebd-date-edit:focus{background:#e7f3ff;outline:2px solid #85bdeb;outline-offset:-2px}
+
+/* Inline date-time editor: only Start/End cells, preserving other actions. */
+.ex165 td.lebd-date-edit{color:inherit;text-decoration:none;cursor:pointer}
+.ex165 td.lebd-date-edit .lebd-inline-hint{display:block;color:#8a9aaf;font-size:11px;margin-top:5px}
+.ex165 td.lebd-date-edit .lebd-inline-controls{display:flex;justify-content:center;gap:6px;margin-top:5px}
+.ex165 td.lebd-date-edit .lebd-inline-input{width:100%;min-width:185px;max-width:245px;font-size:12px;padding:7px 5px}
+.ex165 td.lebd-date-edit .lebd-inline-controls button{font-size:15px;padding:5px 10px;min-width:33px}
+.ex165 td.lebd-date-edit.lebd-editing{background:#f4faff}
 </style>
 <div class="ex165">
+<div class="lebd-routine-path" aria-label="Routine location">
+ <span>Routine Path:</span>
+ <a href="{{ route('admin.exam-section.routine') }}">Category</a>
+ <span class="separator">›</span>
+ <a href="{{ route('admin.exam-section.routine.category', ['category' => $cat->id]) }}">{{ $cat->name }}</a>
+ <span class="separator">›</span>
+ @if($sub)
+ <a href="{{ route('admin.exam-section.routine.list', ['category' => $cat->id, 'subcategory_id' => $sub->id]) }}">{{ $sub->name }}</a>
+ @else
+ <span>Without Sub-category</span>
+ @endif
+ <span class="separator">›</span>
+ <strong>{{ $routine->name }}</strong>
+</div>
 <div class="nav"><div class="nav-label">◉ Routine Navigation</div><div class="bar">
 <a class="btn gray" href="{{route('admin.exam-section.routine.list',['category'=>$routine->category_id,'subcategory_id'=>$routine->subcategory_id])}}">☷ Routine List</a>
 <a class="btn gray" href="{{route('admin.exam-section.routine')}}">⊕ New Routine</a>
@@ -70,7 +99,7 @@ $topicCols=collect($savedTopics)->flatMap(fn($rows)=>$rows->pluck('topic_key'))-
 @if($i->type!=='exam')<small>{{ucfirst($i->type)}} Exam</small>@endif
 </td>
 @endforeach
-<td class="date">{{ $i->exam_start_at??'—' }}</td><td class="date">{{ $i->exam_end_at??'—' }}</td><td class="date">{{ $i->pdf_create_at??'—' }}</td><td class="date">{{ $i->question_create_at??'—' }}</td>
+<td class="date lebd-date-edit" role="button" tabindex="0" data-edit-date="exam_start_at" title="Click to edit Exam Date &amp; Time">{{ $i->exam_start_at??'—' }}</td><td class="date lebd-date-edit" role="button" tabindex="0" data-edit-date="exam_end_at" title="Click to edit Exam End">{{ $i->exam_end_at??'—' }}</td><td class="date">{{ $i->pdf_create_at??'—' }}</td><td class="date">{{ $i->question_create_at??'—' }}</td>
 <td class="action"><div class="actions"><button type="button" class="ex157-edit orange" data-item='@json($i)' data-topics='@json(($savedTopics->get($i->id)??collect())->values())'>✎</button><form method="POST" action="{{route('admin.exam-section.routine.items.delete',[$routine->id,$i->id])}}" onsubmit="return confirm('Delete this routine item?')">@csrf @method('DELETE')<button class="red">▣</button></form></div></td></tr>
 @empty<tr><td colspan="{{count($topicCols)+7}}" style="text-align:center;padding:25px">No routine items added yet. Use Add Exam to begin.</td></tr>@endforelse
 </tbody></table></div></div>
@@ -107,7 +136,7 @@ $topicCols=collect($savedTopics)->flatMap(fn($rows)=>$rows->pluck('topic_key'))-
  const editor=document.getElementById('ex165-editor'),form=document.getElementById('ex157-form'),type=document.getElementById('ex157-type'),sources=document.getElementById('ex157-source');
  const saveUrl=@json(route('admin.exam-section.routine.items.store',$routine->id));
  const updateBase=@json(url('/admin/exam-section/routine/'.$routine->id.'/items'));
- function openEditor(kind,item,topics){
+ function openEditor(kind,item,topics,silent=false){
    form.reset();list.replaceChildren();indexTopics();setExamOptions(kind,item?.exam_name||'');form.action=item?updateBase+'/'+item.id:saveUrl;
    let method=form.querySelector('input[name="_method"]');if(method)method.remove();
    if(item){method=document.createElement('input');method.type='hidden';method.name='_method';method.value='PUT';form.appendChild(method);}
@@ -119,7 +148,7 @@ $topicCols=collect($savedTopics)->flatMap(fn($rows)=>$rows->pluck('topic_key'))-
      (topics||[]).forEach(t=>{if(names[t.topic_key])drawTopic(t.topic_key,t.question_start||'',t.question_end||'');});
    }
    refreshAutoDates();
-   editor.hidden=false;editor.scrollIntoView({behavior:'smooth',block:'start'});
+   if (!silent) { editor.hidden=false;editor.scrollIntoView({behavior:'smooth',block:'start'}); }
  }
  document.querySelectorAll('[data-type]').forEach(b=>b.addEventListener('click',()=>openEditor(b.dataset.type,null,[])));
  document.querySelectorAll('.ex157-edit').forEach(b=>b.addEventListener('click',()=>{let item=JSON.parse(b.dataset.item),topics=JSON.parse(b.dataset.topics||'[]');openEditor(item.type,item,topics)}));
@@ -172,6 +201,69 @@ $topicCols=collect($savedTopics)->flatMap(fn($rows)=>$rows->pluck('topic_key'))-
    el.innerHTML='<option value="">Select Exam No</option>'+data.map(s=>'<option value="'+htmlEscape(s)+'">'+htmlEscape(s)+'</option>').join('');el.value=selected||'';
  }
  departments();
+
+ // Cell-level editing as requested: no scrolling or opening the large editor.
+ let inlineCell=null, inlineOriginal=null;
+ function closeInline(){
+   if(inlineCell && inlineOriginal){inlineCell.replaceChildren(...inlineOriginal);inlineCell.classList.remove('lebd-editing');}
+   inlineCell=null;inlineOriginal=null;
+ }
+ function showInline(cell){
+   if(inlineCell===cell)return;
+   closeInline();
+   const editButton=cell.closest('tr')?.querySelector('button.ex157-edit');
+   if(!editButton)return;
+   let item,topics;
+   try{item=JSON.parse(editButton.dataset.item);topics=JSON.parse(editButton.dataset.topics||'[]');}
+   catch(error){console.error('Routine row data invalid',error);return;}
+   const field=cell.dataset.editDate;
+   if(field!=='exam_start_at' && field!=='exam_end_at')return;
+   inlineCell=cell;
+   inlineOriginal=Array.from(cell.childNodes);
+   // The established form holds the item, selected topics, source exams, CSRF and PUT.
+   openEditor(item.type,item,topics,true);
+   editor.hidden=true;
+   const wrap=document.createElement('div');
+   const input=document.createElement('input');
+   input.type='datetime-local';input.step='60';input.className='lebd-inline-input';
+   input.value=dateLocal(item[field]);input.setAttribute('aria-label',field==='exam_start_at'?'Exam Start Date and Time':'Exam End Date and Time');
+   const controls=document.createElement('div');controls.className='lebd-inline-controls';
+   const yes=document.createElement('button');yes.type='button';yes.className='green';yes.textContent='✓';yes.title='Save date';
+   const no=document.createElement('button');no.type='button';no.className='red';no.textContent='✕';no.title='Cancel edit';
+   controls.append(yes,no);wrap.append(input,controls);
+   cell.replaceChildren(wrap);cell.classList.add('lebd-editing');
+   no.addEventListener('click',event=>{event.stopPropagation();closeInline();});
+   yes.addEventListener('click',event=>{
+     event.stopPropagation();
+     if(!input.value){input.reportValidity();return;}
+     form.elements[field].value=input.value;
+     const start=form.elements['exam_start_at'].value,end=form.elements['exam_end_at'].value;
+     if(!start || !end || end<=start){alert('Exam End must be later than Exam Start.');return;}
+     if(!list.children.length){alert('Saved topics could not be loaded. Use the orange Edit button to inspect this item.');return;}
+     if(!form.checkValidity()){
+       // Do not silently lose validation feedback: expose the original full edit form.
+       closeInline();editor.hidden=false;editor.scrollIntoView({behavior:'smooth',block:'start'});
+       form.reportValidity();return;
+     }
+     yes.disabled=true;
+     // Existing server-side PUT validation & transaction still handles the update.
+     form.requestSubmit();
+   });
+   input.addEventListener('keydown',event=>{
+      if(event.key==='Escape'){event.preventDefault();closeInline();}
+      if(event.key==='Enter'){event.preventDefault();yes.click();}
+   });
+   input.focus({preventScroll:true});
+ }
+ document.querySelectorAll('#ex165-table td[data-edit-date]').forEach(cell=>{
+   cell.removeAttribute('role');cell.removeAttribute('tabindex');
+   const hint=document.createElement('small');hint.className='lebd-inline-hint';hint.textContent='✎ Click to edit';cell.append(hint);
+   cell.addEventListener('click',event=>{
+     if(inlineCell===cell || event.target.closest('input,button'))return;
+     showInline(cell);
+   });
+ });
+
  form.addEventListener('submit',e=>{if(!list.children.length){e.preventDefault();alert('Add at least one Department / Subject / Chapter topic.');}});
  document.getElementById('ex166-cancel').onclick=()=>{editor.hidden=true};
  @if($errors->any()) editor.hidden=false; @endif
