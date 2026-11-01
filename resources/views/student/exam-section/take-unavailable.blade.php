@@ -6,4 +6,23 @@
     </a>
 </div>
 
-<main style="max-width:550px;margin:60px auto;background:white;padding:28px;border-radius:15px;text-align:center"><h2>{{ $message }}</h2><p><a href="{{ route('student.exam-section.categories') }}">পরীক্ষা বিভাগে ফিরুন</a></p></main></body></html>
+{{-- Only the return destination changes. Resolve the exact exam's category/subcategory read-only. --}}
+@php
+    $examDashboardUrl = route('student.exam-section.categories');
+    $examItemId = (int) request()->route('item');
+    if ($examItemId > 0) {
+        $examScope = \Illuminate\Support\Facades\DB::table('lebd_exam_section_routine_items as i')
+            ->join('lebd_exam_section_routines as r', 'r.id', '=', 'i.routine_id')
+            ->where('i.id', $examItemId)
+            ->where('i.type', 'exam')
+            ->first(['r.category_id', 'r.subcategory_id']);
+        if ($examScope && $examScope->category_id) {
+            $dashboardParams = ['category' => (int) $examScope->category_id];
+            if ($examScope->subcategory_id !== null) {
+                $dashboardParams['subcategory_id'] = (int) $examScope->subcategory_id;
+            }
+            $examDashboardUrl = route('student.exam-section.browse-exams', $dashboardParams);
+        }
+    }
+@endphp
+<main style="max-width:550px;margin:60px auto;background:white;padding:28px;border-radius:15px;text-align:center"><h2>{{ $message }}</h2><p><a href="{{ $examDashboardUrl }}">পরীক্ষার ড্যাশবোর্ডে ফিরুন</a></p></main></body></html>
