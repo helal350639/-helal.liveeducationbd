@@ -52,7 +52,8 @@ class CircularCtrl extends Controller
             'pdf_link' => 'nullable|url|max:2048',
             'details' => 'nullable|string',
             'status' => 'nullable|string',
-            'image' => 'nullable|mimes:jpeg,jpg,png|max:10000',
+            'image' => 'nullable|array',
+            'image.*' => 'required|file|mimes:jpeg,jpg,png|max:10000',
             'pdf' => 'nullable|mimes:pdf|max:10000',
         ]);
         if ($validator->fails()) {
@@ -130,7 +131,8 @@ class CircularCtrl extends Controller
           'pdf_link' => 'nullable|url|max:2048',
           'details' => 'nullable|string',
           'status' => 'nullable|string',
-          'image' => 'nullable|mimes:jpeg,jpg,png|max:10000',
+          'image' => 'nullable|array',
+          'image.*' => 'required|file|mimes:jpeg,jpg,png|max:10000',
           'pdf' => 'nullable|mimes:pdf|max:10000',
       ]);
       if ($validator->fails()) {
