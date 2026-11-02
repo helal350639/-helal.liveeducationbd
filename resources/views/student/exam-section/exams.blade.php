@@ -438,6 +438,42 @@ body:has(.lebd-exam-scope) #footer { display:none !important; }
     </table>
   </section>
 </div>
+@elseif(request()->query('missing') === '1')
+{{-- LEBD05: student-specific missing exams; only original end time and absence of an attempt. --}}
+@auth('student')
+@php
+    $lebd05MissingRows = $examRows->filter(function ($entry) use ($attemptStatuses) {
+        return $entry['end'] !== null
+            && $entry['ended']
+            && !$attemptStatuses->has($entry['exam']->id);
+    })->values();
+@endphp
+<div class="lebd-paper-page" id="lebd05-missing-exams">
+  <div class="lebd-paper-nav"><a class="lebd-paper-back" href="{{ route('student.exam-section.browse-exams', ['category'=>$cat->id, 'subcategory_id'=>$sub?->id]) }}">← Exam Dashboard</a><small>{{ $lebd05MissingRows->count() }} Missing Exams</small></div>
+  <div class="lebd-paper-title"><h1>▧ Missing Exam List</h1><p>{{ $cat->name }} @if($sub) — {{ $sub->name }} @endif</p></div>
+  <div class="se26-panel" style="padding:14px 17px;margin-bottom:17px;background:#fff8e9;color:#76510f;border-color:#f6dc9f;font-size:13px;line-height:1.7">
+    এই Category / Sub-category-এর যে পরীক্ষাগুলোর নির্ধারিত End Time পার হয়েছে এবং আপনি একবারও পরীক্ষা শুরু করেননি, শুধু সেগুলো এখানে দেখাবে।
+  </div>
+  @forelse($lebd05MissingRows as $entry)
+  @php $missingItem = $entry['exam']; @endphp
+  <article class="lebd-paper-card">
+    <div class="lebd-paper-main">
+      <div class="lebd-paper-number">{{ str_pad((string)$loop->iteration, 2, '0', STR_PAD_LEFT) }}</div>
+      <div class="lebd-paper-name"><small>Missed Exam</small>{{ $missingItem->exam_name }}</div>
+      <div class="lebd-paper-time date"><span class="lebd-paper-time-icon" aria-hidden="true">▦</span><div><small>শুরুর তারিখ</small><strong>{{ $entry['start']?->format('d M Y') ?? '—' }}</strong></div></div>
+      <div class="lebd-paper-time time"><span class="lebd-paper-time-icon clock" aria-hidden="true">◷</span><div><small>পরীক্ষার সময়</small><strong>{{ $entry['start']?->format('h:i A') ?? '—' }} — {{ $entry['end']->format('d M Y, h:i A') }}</strong></div></div>
+      <div class="lebd-paper-status-box"><span class="lebd-paper-status" style="background:#fff0ec;color:#bd4937">✕ Not Participated</span></div>
+      <div class="lebd-paper-action-box"><span class="lebd-paper-action off">পরীক্ষার সময় শেষ</span></div>
+    </div>
+    <details class="lebd-paper-more"><summary>▹ See More</summary><div class="lebd-paper-detail">Routine: {{ $missingItem->routine_name ?? '—' }} @if(!empty($missingItem->notes)) — {{ $missingItem->notes }} @endif</div></details>
+  </article>
+  @empty
+    <div class="se26-empty" style="text-align:center;padding:30px">এই Category / Sub-category-তে আপনার কোনো Missing Exam নেই।</div>
+  @endforelse
+</div>
+@else
+<div class="lebd-paper-page" style="text-align:center"><div class="se26-panel"><h2>Missing Exam List</h2><p>নিজের Missing Exam দেখতে Student Account-এ লগইন করুন।</p><a class="lebd-paper-back" href="{{ url('/student/login') }}">Student Login →</a></div></div>
+@endauth
 @elseif(in_array(request()->query('paper'), ['1', 'result'], true))
 @php $lebd05ResultPage = request()->query('paper') === 'result'; $lebd05SubmittedTotal = $attemptStatuses->filter(fn($status) => $status === 'submitted')->count(); @endphp
 <div class="lebd-paper-page">
@@ -645,6 +681,8 @@ body:has(.lebd-exam-scope) #footer { display:none !important; }
 <a class="se26-menu-item" href="{{ route('student.exam-section.browse-exams', ['category'=>$cat->id, 'subcategory_id'=>$sub?->id, 'paper'=>'result']) }}"><span>{{ $symbol }}</span><span>{{ $name }}<small>সকল পরীক্ষার ফলাফল দেখুন</small></span></a>
 @elseif($name === 'All Exam Paper')
 <a class="se26-menu-item" href="{{ route('student.exam-section.browse-exams', ['category'=>$cat->id, 'subcategory_id'=>$sub?->id, 'paper'=>1]) }}"><span>{{ $symbol }}</span><span>{{ $name }}<small>সকল পরীক্ষার তালিকা দেখুন ({{ $total }})</small></span></a>
+@elseif($name === 'Missing Exam List')
+<a class="se26-menu-item" href="{{ route('student.exam-section.browse-exams', ['category'=>$cat->id, 'subcategory_id'=>$sub?->id, 'missing'=>1]) }}"><span>{{ $symbol }}</span><span>{{ $name }}<small>সময়সীমা শেষ, অংশ নেননি এমন পরীক্ষার তালিকা</small></span></a>
 @elseif($link)<a class="se26-menu-item" href="{{ $link }}"><span>{{ $symbol }}</span><span>{{ $name }}</span></a>
 @else<div class="se26-menu-item"><span>{{ $symbol }}</span><span>{{ $name }}<small>Coming soon</small></span></div>@endif
 @endforeach
