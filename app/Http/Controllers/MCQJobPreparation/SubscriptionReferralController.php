@@ -1,8 +1,10 @@
 <?php
-
 namespace App\Http\Controllers\MCQJobPreparation;
 
 use App\Http\Controllers\Controller;
+use App\Services\MCQSubscription\ActivePackageAccess;
+use App\Services\MCQSubscription\ReferralQuote;
+use App\Services\MCQSubscription\MCQPaymentSms;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -10,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-/** Referral-wallet MCQ purchases only; SSLCommerz belongs in SubscriptionPaymentController. */
+/** Referral-balance checkout. Existing order, wallet nonce, entitlement and dashboard remain. */
 class SubscriptionReferralController extends Controller
 {
     public function pay(Request $request, string $section, int $package)
@@ -26,83 +28,89 @@ class SubscriptionReferralController extends Controller
         }
         $trx = 'MCQR'.strtoupper(substr(hash('sha256', $student->id.':'.$package.':'.$expected), 0, 24));
         try {
-            $wasAlreadyPaid = DB::transaction(function () use ($student, $package, $trx) {
+            $already = DB::transaction(function () use ($student, $package, $trx, $request) {
                 $wallet = DB::table('students')->where('id', $student->id)->lockForUpdate()->first();
                 if (!$wallet) throw new \RuntimeException('Student account not found.');
                 $prior = DB::table('lebd_mcq_payment_orders')->where('transaction_id', $trx)->first();
                 if ($prior) {
-                    if ($prior->student_id == $student->id && $prior->status === 'Complete') return true;
+                    if ((int)$prior->student_id === (int)$student->id && $prior->status === 'Complete') return true;
                     throw new \RuntimeException('This checkout was previously attempted. Please start a new preview.');
                 }
                 $plan = DB::table('mcq_subscription_packages')->where('id', $package)->where('status', 'Active')->first();
                 if (!$plan) throw new \RuntimeException('এই প্যাকেজটি বর্তমানে Active নেই।');
-                if (!in_array($plan->duration_unit, ['days', 'months', 'years'], true) || (int) $plan->duration_value < 1) {
+                if (!in_array($plan->duration_unit, ['days', 'months', 'years'], true) || (int)$plan->duration_value < 1) {
                     throw new \RuntimeException('Package duration is not valid.');
                 }
-                $priceCents = (int) round(((float) $plan->price) * 100);
+                if (ActivePackageAccess::rows((int)$student->id)->contains(fn($row) => (int)$row->package_id === $package)) {
+                    throw new \RuntimeException('আপনি ইতিমধ্যে এই প্যাকেজে যুক্ত আছেন।');
+                }
+                $quote = ReferralQuote::forBuyer($plan, $student, $request->session()->get('mcq_referrer_code_'.$package));
+                $expectedCents = $request->session()->get('mcq_quote_cents_'.$package);
+                if ($expectedCents !== null && (int)$expectedCents !== $quote['payable_cents']) {
+                    throw new \RuntimeException('Referral Discount বা প্যাকেজ মূল্য বদলেছে। Order Review থেকে নতুন করে Preview করুন।');
+                }
+                if ($quote['referrer_id'] && $expectedCents === null) {
+                    throw new \RuntimeException('Referral Checkout যাচাই হয়নি। Order Review থেকে আবার চেষ্টা করুন।');
+                }
+                $priceCents = $quote['payable_cents'];
                 if ($priceCents <= 0) throw new \RuntimeException('প্যাকেজের মূল্য সঠিক নয়।');
-                $pending = (float) DB::table('withdraw_requests')->where('student_id', $student->id)
+                $pending = (float)DB::table('withdraw_requests')->where('student_id', $student->id)
                     ->where('status', 'pending')->sum('amount');
-                $balanceCents = (int) round(((float) $wallet->referral_balance - $pending) * 100);
+                $balanceCents = (int)round(((float)$wallet->referral_balance - $pending)*100);
                 if ($balanceCents < $priceCents) throw new \RuntimeException('পর্যাপ্ত Available Referral Balance নেই।');
                 $now = Carbon::now('Asia/Dhaka');
                 $orderId = DB::table('lebd_mcq_payment_orders')->insertGetId([
-                    'student_id' => $student->id, 'package_id' => $package,
-                    'transaction_id' => $trx, 'package_name' => $plan->name,
-                    'amount' => round($priceCents / 100, 2), 'currency' => 'BDT',
-                    'duration_value' => $plan->duration_value, 'duration_unit' => $plan->duration_unit,
-                    'status' => 'Complete', 'paid_at' => $now,
-                    'created_at' => $now, 'updated_at' => $now,
+                    'student_id'=>$student->id, 'package_id'=>$package,
+                    'transaction_id'=>$trx, 'package_name'=>$plan->name,
+                    'amount'=>number_format($priceCents/100,2,'.',''), 'currency'=>'BDT',
+                    'duration_value'=>$plan->duration_value, 'duration_unit'=>$plan->duration_unit,
+                    'status'=>'Complete', 'paid_at'=>$now, 'created_at'=>$now, 'updated_at'=>$now,
                 ]);
+                ReferralQuote::record($orderId, (int)$student->id, $package, $quote);
                 DB::table('students')->where('id', $student->id)->update([
-                    'referral_balance' => round(((float) $wallet->referral_balance) - $priceCents / 100, 2),
+                    'referral_balance'=>number_format(((int)round((float)$wallet->referral_balance*100)-$priceCents)/100,2,'.',''),
                 ]);
                 $existing = DB::table('lebd_mcq_subscriptions')
                     ->where('student_id', $student->id)->where('package_id', $package)->lockForUpdate()->first();
                 $start = $now->copy();
-                if ($existing && Carbon::parse($existing->ends_at)->greaterThan($start)) {
-                    $start = Carbon::parse($existing->ends_at);
-                }
+                if ($existing && Carbon::parse($existing->ends_at)->greaterThan($start)) $start = Carbon::parse($existing->ends_at);
                 $end = $start->copy();
                 switch ($plan->duration_unit) {
-                    case 'days': $end->addDays((int) $plan->duration_value); break;
-                    case 'months': $end->addMonthsNoOverflow((int) $plan->duration_value); break;
-                    case 'years': $end->addYearsNoOverflow((int) $plan->duration_value); break;
+                    case 'days': $end->addDays((int)$plan->duration_value); break;
+                    case 'months': $end->addMonthsNoOverflow((int)$plan->duration_value); break;
+                    case 'years': $end->addYearsNoOverflow((int)$plan->duration_value); break;
                 }
                 if ($existing) {
                     DB::table('lebd_mcq_subscriptions')->where('id', $existing->id)->update([
-                        'ends_at' => $end, 'last_order_id' => $orderId, 'updated_at' => $now,
+                        'ends_at'=>$end, 'last_order_id'=>$orderId, 'updated_at'=>$now,
                     ]);
                 } else {
                     DB::table('lebd_mcq_subscriptions')->insert([
-                        'student_id' => $student->id, 'package_id' => $package,
-                        'starts_at' => $now, 'ends_at' => $end, 'last_order_id' => $orderId,
-                        'created_at' => $now, 'updated_at' => $now,
+                        'student_id'=>$student->id,'package_id'=>$package,
+                        'starts_at'=>$now,'ends_at'=>$end,'last_order_id'=>$orderId,
+                        'created_at'=>$now,'updated_at'=>$now,
                     ]);
                 }
+                // Under the same SQL transaction: bonus to link owner, never buyer.
+                ReferralQuote::credit($orderId);
                 return false;
             }, 3);
         } catch (Throwable $e) {
             Log::warning('MCQ referral payment rejected', [
-                'student_id' => $student->id, 'package_id' => $package, 'message' => $e->getMessage(),
+                'student_id'=>$student->id,'package_id'=>$package,'message'=>$e->getMessage(),
             ]);
             return back()->with('error', $e instanceof \RuntimeException
                 ? $e->getMessage() : 'পেমেন্ট সম্পন্ন হয়নি। কোনো টাকা কাটা হলে Account History যাচাই করুন।');
         }
-        $request->session()->forget($nonceKey);
-        // Show a confirmation only after the committed / previously successful purchase.
-        // The standalone notice then redirects to the existing Student Dashboard.
-        $notice = $wasAlreadyPaid
-            ? 'এই প্যাকেজের পেমেন্ট ইতিমধ্যে সফল হয়েছে।'
+        $order = DB::table('lebd_mcq_payment_orders')->where('transaction_id',$trx)->first();
+        if ($order) MCQPaymentSms::notify((int)$order->id);
+        $request->session()->forget([$nonceKey, 'mcq_referrer_code_'.$package, 'mcq_quote_cents_'.$package]);
+        $notice = $already ? 'এই প্যাকেজের পেমেন্ট ইতিমধ্যে সফল হয়েছে।'
             : 'Payment Successful! আপনার MCQ Study Package Access চালু হয়েছে।';
-
         $request->session()->flash('success', $notice);
         $request->session()->flash('mcq_purchase_success', $notice);
-
-        return response()->view('mcq-study.referral-purchase-success', [
-            'notice' => $notice,
-            'dashboardUrl' => route('students.dashboard'),
-        ]);
+        // Successful wallet payment goes straight to the student's purchased MCQ packages.
+        return redirect()->route('student.mcq.purchased')->with('success', $notice);
     }
 
     public function orders()
@@ -111,11 +119,11 @@ class SubscriptionReferralController extends Controller
         abort_unless($student, 403);
         $orders = DB::table('lebd_mcq_payment_orders as o')
             ->leftJoin('lebd_mcq_subscriptions as s', function ($join) {
-                $join->on('s.student_id', '=', 'o.student_id')->on('s.package_id', '=', 'o.package_id');
+                $join->on('s.student_id','=','o.student_id')->on('s.package_id','=','o.package_id');
             })
             ->where('o.student_id', $student->id)
-            ->select('o.id', 'o.transaction_id', 'o.package_name', 'o.amount', 'o.status', 'o.paid_at', 'o.created_at', 's.ends_at')
+            ->select('o.id','o.transaction_id','o.package_name','o.amount','o.status','o.paid_at','o.created_at','s.ends_at')
             ->orderByDesc('o.id')->paginate(15);
-        return view('student.mcq-orders.index', compact('orders'));
+        return view('student.mcq-orders.index',compact('orders'));
     }
 }

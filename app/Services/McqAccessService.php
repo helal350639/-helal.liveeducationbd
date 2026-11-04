@@ -3,6 +3,7 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Carbon;
 
 /** Server-side MCQ entitlement and quota accounting (Bangladesh timezone). */
@@ -22,10 +23,18 @@ class McqAccessService
             ->join('mcq_subscription_packages as p','p.id','=','s.package_id')
             ->join('mcq_subscription_package_categories as pc',function($j)use($categoryId){$j->on('pc.package_id','=','p.id')->where('pc.category_id',$categoryId);})
             ->where('s.student_id',$studentId)->where('s.starts_at','<=',$now)->where('s.ends_at','>',$now)
-            ->orderByDesc('s.ends_at')
             ->select('s.package_id','p.reading_limit','p.quiz_limit')->get();
+        if (Schema::hasTable('lebd_mcq_manual_grants')) {
+            $manual=DB::table('lebd_mcq_manual_grants as g')
+                ->join('mcq_subscription_packages as p','p.id','=','g.package_id')
+                ->join('mcq_subscription_package_categories as pc',function($j)use($categoryId){$j->on('pc.package_id','=','p.id')->where('pc.category_id',$categoryId);})
+                ->where('g.student_id',$studentId)->where('g.status','Active')
+                ->where('g.starts_at','<=',$now)->where('g.ends_at','>',$now)
+                ->select('g.package_id','p.reading_limit','p.quiz_limit')->get();
+            $subs=$subs->concat($manual);
+        }
         if($subs->isEmpty()) return $free;
-        // Select a single subscribed package for a category, favoring unlimited quotas.
+        // Select a single eligible package per category, favoring unlimited reading quota.
         $chosen=$subs->sort(function($a,$b){$ar=is_null($a->reading_limit)?PHP_INT_MAX:(int)$a->reading_limit;
             $br=is_null($b->reading_limit)?PHP_INT_MAX:(int)$b->reading_limit;
             return $br <=> $ar;})->first();
@@ -51,7 +60,6 @@ class McqAccessService
         $studentId=$this->studentId(); if(!$studentId) return [];
         $day=$this->date();$now=now();$allowed=[];
         DB::transaction(function()use($studentId,$questionIds,$categoryId,$access,$day,$now,&$allowed){
-            // Serialize simultaneous tabs for this student; quota cannot be bypassed by parallel loads.
             DB::table('students')->where('id',$studentId)->lockForUpdate()->first();
             $query=DB::table('lebd_mcq_read_events')->where('student_id',$studentId)->where('read_date',$day);
             if($access['paid'])$query->where('package_id',$access['package_id']);else $query->whereNull('package_id');

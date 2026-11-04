@@ -1,9 +1,10 @@
 <?php
-
 namespace App\Http\Controllers\MCQJobPreparation;
-
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
+use App\Services\MCQSubscription\ReferralQuote;
+use App\Services\MCQSubscription\MCQPaymentSms;
+use App\Services\MCQSubscription\ActivePackageAccess;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -11,7 +12,6 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Throwable;
-
 /** MCQ subscription checkout via SSLCommerz hosted payment. No referral-wallet code here. */
 class SubscriptionPaymentController extends Controller
 {
@@ -23,18 +23,15 @@ class SubscriptionPaymentController extends Controller
             'test' => filter_var(config('services.sslcommerz.testmode', env('SSLCZ_TESTMODE', true)), FILTER_VALIDATE_BOOLEAN),
         ];
     }
-
     private function gatewayRoot(): string
     {
         return $this->credentials()['test'] ? 'https://sandbox.sslcommerz.com' : 'https://securepay.sslcommerz.com';
     }
-
     private function callbackUrl(string $name): string
     {
         // These three routes must exist; see ROUTE_INTEGRATION_REQUIRED.txt.
         return route('student.mcq.ssl.'.$name);
     }
-
     public function pay(Request $request, string $section, int $package)
     {
         abort_unless($section === 'mcq', 404);
@@ -49,19 +46,33 @@ class SubscriptionPaymentController extends Controller
         if (!$plan || !in_array($plan->duration_unit, ['days', 'months', 'years'], true) || (int) $plan->duration_value < 1) {
             return back()->with('error', 'এই প্যাকেজটি বর্তমানে কেনা যাচ্ছে না।');
         }
-        $amount = round((float) $plan->price, 2);
+        if (ActivePackageAccess::rows((int)$student->id)->contains(fn($r) => (int)$r->package_id === $package)) {
+            return redirect()->route('student.mcq.purchased')->with('success','আপনি ইতিমধ্যে এই প্যাকেজে যুক্ত আছেন।');
+        }
+        $quote = ReferralQuote::forBuyer($plan, $student, $request->session()->get('mcq_referrer_code_'.$package));
+        $expectedCents = $request->session()->get('mcq_quote_cents_'.$package);
+        if ($expectedCents !== null && (int)$expectedCents !== $quote['payable_cents']) {
+            return back()->with('error', 'Referral Discount বা প্যাকেজ মূল্য বদলেছে। Order Review থেকে নতুন করে Preview করুন।');
+        }
+        if ($quote['referrer_id'] && $expectedCents === null) {
+            return back()->with('error', 'Referral Checkout যাচাই হয়নি। Order Review থেকে আবার চেষ্টা করুন।');
+        }
+        $amount = $quote['payable_cents'] / 100;
         if ($amount < 10 || $amount > 500000) return back()->with('error', 'SSLCommerz-এ প্যাকেজের মূল্য ১০–৫০০০০০ টাকা হতে হবে।');
         // Gateway transaction ids are <=30 characters.
         $trx = 'MCQS'.strtoupper(Str::random(24));
         $now = Carbon::now('Asia/Dhaka');
         try {
-            DB::table('lebd_mcq_payment_orders')->insert([
-                'student_id' => $student->id, 'package_id' => $package,
-                'transaction_id' => $trx, 'package_name' => $plan->name,
-                'amount' => $amount, 'currency' => 'BDT',
-                'duration_value' => $plan->duration_value, 'duration_unit' => $plan->duration_unit,
-                'status' => 'Pending', 'created_at' => $now, 'updated_at' => $now,
-            ]);
+            DB::transaction(function () use ($student, $package, $trx, $plan, $amount, $now, $quote) {
+                $orderId = DB::table('lebd_mcq_payment_orders')->insertGetId([
+                    'student_id' => $student->id, 'package_id' => $package,
+                    'transaction_id' => $trx, 'package_name' => $plan->name,
+                    'amount' => $amount, 'currency' => 'BDT',
+                    'duration_value' => $plan->duration_value, 'duration_unit' => $plan->duration_unit,
+                    'status' => 'Pending', 'created_at' => $now, 'updated_at' => $now,
+                ]);
+                ReferralQuote::record($orderId, (int)$student->id, $package, $quote);
+            });
             $name = trim((string) ($student->name ?? 'Student')) ?: 'Student';
             $email = trim((string) ($student->email ?? '')) ?: 'student@example.com';
             $phone = trim((string) ($student->phone ?? $student->mobile ?? $student->contact ?? ''));
@@ -106,28 +117,23 @@ class SubscriptionPaymentController extends Controller
             return back()->with('error', 'পেমেন্ট চালু করা যায়নি। সিস্টেম লগ পরীক্ষা করুন।');
         }
     }
-
     /** Keep the existing checkout route action compatible. */
     public function start(Request $request, string $section, int $package)
     {
         return $this->pay($request, $section, $package);
     }
-
     public function initiate(Request $request, string $section, int $package)
     {
         return $this->pay($request, $section, $package);
     }
-
     public function success(Request $request)
     {
         return $this->validatePayment($request, false);
     }
-
     public function ipn(Request $request)
     {
         return $this->validatePayment($request, true);
     }
-
     private function validatePayment(Request $request, bool $ipn)
     {
         $trx = (string) $request->input('tran_id', '');
@@ -135,7 +141,10 @@ class SubscriptionPaymentController extends Controller
         if ($trx === '' || $valId === '') return $ipn ? response('Missing transaction details', 400) : redirect()->route('student.mcq.orders')->with('error', 'Payment verification details missing.');
         $order = DB::table('lebd_mcq_payment_orders')->where('transaction_id', $trx)->first();
         if (!$order) return $ipn ? response('Unknown transaction', 404) : redirect()->route('student.mcq.orders')->with('error', 'Order not found.');
-        if ($order->status === 'Complete') return $ipn ? response('OK', 200) : redirect()->route('student.mcq.orders')->with('success', 'পেমেন্ট ইতিমধ্যে সম্পন্ন হয়েছে।');
+        if ($order->status === 'Complete') {
+            MCQPaymentSms::notify((int)$order->id);
+            return $ipn ? response('OK', 200) : redirect()->route('student.mcq.purchased')->with('success', 'পেমেন্ট ইতিমধ্যে সম্পন্ন হয়েছে।');
+        }
         $creds = $this->credentials();
         try {
             $response = Http::timeout(25)->get($this->gatewayRoot().'/validator/api/validationserverAPI.php', [
@@ -181,24 +190,24 @@ class SubscriptionPaymentController extends Controller
                         'created_at' => $now, 'updated_at' => $now,
                     ]);
                 }
+                ReferralQuote::credit((int)$current->id);
             }, 3);
-            return $ipn ? response('OK', 200) : redirect()->route('student.mcq.orders')->with('success', 'SSLCommerz Payment Successful! MCQ Package Access চালু হয়েছে।');
+            // Notify only after the verified payment transaction has committed.
+            MCQPaymentSms::notify((int)$order->id);
+            return $ipn ? response('OK', 200) : redirect()->route('student.mcq.purchased')->with('success', 'SSLCommerz Payment Successful! MCQ Package Access চালু হয়েছে।');
         } catch (Throwable $e) {
             Log::error('MCQ SSLCommerz validation failed', ['transaction_id' => $trx, 'message' => $e->getMessage()]);
             return $ipn ? response('Retry later', 503) : redirect()->route('student.mcq.orders')->with('error', 'Payment verification pending. Support-এ Transaction ID জানান।');
         }
     }
-
     public function fail(Request $request)
     {
         return $this->terminal($request, 'Failed');
     }
-
     public function cancel(Request $request)
     {
         return $this->terminal($request, 'Cancelled');
     }
-
     private function terminal(Request $request, string $status)
     {
         $trx = (string) $request->input('tran_id', '');

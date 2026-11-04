@@ -1313,7 +1313,7 @@ font-size:10px;
         </div>
     </div>
 <div class="quick-grid">
-<a href="{{ route('students.referral') }}" class="quick-card">
+<a href="{{ route('student.all-referral-links') }}" class="quick-card">
 <div class="quick-icon">
 <i class="fa fa-book"></i>
 </div>

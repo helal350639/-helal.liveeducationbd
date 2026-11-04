@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\MCQSubscription;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
 
 class PackageController extends Controller
@@ -64,6 +65,10 @@ class PackageController extends Controller
             'quiz_limit' => ['nullable', 'integer', 'min:1', 'max:1000000'],
             'status' => ['required', Rule::in(['Active','Inactive'])],
             'sort_order' => ['required', 'integer', 'min:0', 'max:999999'],
+            'referral_discount' => ['nullable', 'numeric', 'min:0', 'max:9999999.99'],
+            'referrer_bonus' => ['nullable', 'numeric', 'min:0', 'max:9999999.99'],
+            'extra_fee' => ['nullable', 'numeric', 'min:0', 'max:9999999.99'],
+            'extra_fee_note' => ['nullable', 'string', 'max:500'],
         ], [
             'category_ids.required' => 'কমপক্ষে একটি Category নির্বাচন করো।',
             'category_ids.min' => 'কমপক্ষে একটি Category নির্বাচন করো।',
@@ -74,6 +79,10 @@ class PackageController extends Controller
             throw \Illuminate\Validation\ValidationException::withMessages(['discount_amount' => 'Discount কখনো Main Price-এর বেশি হতে পারে না।']);
         }
         $validated['price'] = number_format(($mainCents - $discountCents) / 100, 2, '.', '');
+        $referralCents = (int) round((float)($validated['referral_discount'] ?? 0) * 100);
+        if ($referralCents > $mainCents - $discountCents) {
+            throw \Illuminate\Validation\ValidationException::withMessages(['referral_discount' => 'Referral Discount কখনো Final Package Price-এর বেশি হতে পারে না।']);
+        }
         $ids = array_map('intval', $validated['category_ids']);
         $categories = DB::table('job_prep_categories')->whereIn('id', $ids)->pluck('kind')->unique()->values()->all();
         if ($validated['access_type'] === 'department' && $categories !== ['department']) {
@@ -86,9 +95,21 @@ class PackageController extends Controller
         return $validated;
     }
 
+    /** Guard against false "Success" when the additive pricing columns are not installed. */
+    private function assertPricingColumns(): void
+    {
+        $required = ['referral_discount', 'referrer_bonus', 'extra_fee', 'extra_fee_note'];
+        $missing = array_values(array_filter($required, fn ($column) => !Schema::hasColumn('mcq_subscription_packages', $column)));
+        if ($missing) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'referral_discount' => 'MCQ Package Referral settings save হয়নি: Database-এ প্রয়োজনীয় Column নেই (' . implode(', ', $missing) . '). প্রথমে সংযুক্ত ADDITIVE SQL প্রয়োগ করুন।',
+            ]);
+        }
+    }
+
     private function payload(array $v): array
     {
-        return [
+        $payload = [
             'name' => $v['name'],
             'description' => $v['description'] ?? null,
             'duration_value' => $v['duration_value'],
@@ -103,6 +124,12 @@ class PackageController extends Controller
             'sort_order' => $v['sort_order'],
             'updated_at' => now(),
         ];
+        // All referral fields must persist together. Never silently ignore missing columns.
+        foreach (['referral_discount', 'referrer_bonus', 'extra_fee'] as $field) {
+            $payload[$field] = number_format((float)($v[$field] ?? 0), 2, '.', '');
+        }
+        $payload['extra_fee_note'] = $v['extra_fee_note'] ?? null;
+        return $payload;
     }
 
     private function attach(int $id, array $ids): void
@@ -115,6 +142,7 @@ class PackageController extends Controller
     public function store(Request $request)
     {
         $v = $this->validated($request);
+        $this->assertPricingColumns();
         DB::transaction(function () use ($v) {
             $id = DB::table('mcq_subscription_packages')->insertGetId($this->payload($v) + ['created_at' => now()]);
             $this->attach($id, $v['category_ids']);
@@ -126,6 +154,7 @@ class PackageController extends Controller
     {
         abort_unless($this->baseQuery()->where('id', $package)->exists(), 404);
         $v = $this->validated($request);
+        $this->assertPricingColumns();
         DB::transaction(function () use ($package, $v) {
             $this->baseQuery()->where('id', $package)->update($this->payload($v));
             $this->attach($package, $v['category_ids']);

@@ -25,5 +25,38 @@
       <p class="lebd-help-note"><i class="fa-solid fa-circle-info" aria-hidden="true"></i> WhatsApp ও Messenger এখনই ব্যবহার করতে পারবেন। লাইভ চ্যাটটি পরবর্তীতে Admin Panel-এর সঙ্গে যুক্ত হবে।</p>
     </div>
   </section>
-  <button type="button" class="lebd-help-trigger" id="lebdHelpToggle" aria-expanded="false" aria-controls="lebdHelpPanel" aria-label="সাপোর্ট চ্যাট খুলুন"><i class="fa-solid fa-comments" aria-hidden="true"></i><span>সাপোর্ট</span><i class="fa-solid fa-chevron-up lebd-help-chevron" aria-hidden="true"></i></button>
+
+  {{-- Icon-only trigger: original IDs and JS hooks preserved. --}}
+  <button type="button" class="lebd-help-trigger" id="lebdHelpToggle" aria-expanded="false" aria-controls="lebdHelpPanel" aria-label="সাপোর্ট চ্যাট খুলুন">
+    <i class="fa-solid fa-comments" aria-hidden="true"></i>
+  </button>
 </div>
+
+<style id="lebd-support-icon-only-fix">
+/* Scopes ONLY to the homepage floating support toggle; no change to the panel. */
+#lebdHelp #lebdHelpToggle,
+#lebdHelp #lebdHelpToggle:hover,
+#lebdHelp #lebdHelpToggle:focus,
+#lebdHelp #lebdHelpToggle:active {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    outline: 0 !important;
+    border-radius: 0 !important;
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    font-size: 28px !important;
+    color: #075bc4 !important;
+}
+#lebdHelp #lebdHelpToggle i.fa-comments { color: #075bc4 !important; font-size: 28px !important; }
+#lebdHelp #lebdHelpToggle:focus-visible { outline: 2px solid #075bc4 !important; outline-offset: 3px !important; }
+</style>
