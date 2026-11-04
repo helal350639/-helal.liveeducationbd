@@ -4,6 +4,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\ExamSection\ExamSectionController;
 use App\Http\Controllers\Admin\ExamSection\ExamRoutineController;
 use App\Http\Controllers\Admin\ExamSection\ExamPackageController;
+use App\Http\Controllers\Admin\ExamSection\ExamExtraStudentPickerController;
+use App\Http\Controllers\Admin\ExamSection\ExamExtraStudentGroupController;
+
 Route::middleware(['auth'])->prefix('admin/exam-section')->name('admin.exam-section.')->group(function () {
  Route::get('/categories',[ExamSectionController::class,'category'])->name('categories');
  Route::post('/categories',[ExamSectionController::class,'storeCategory'])->name('categories.store');
@@ -52,6 +55,20 @@ Route::middleware(['auth'])->prefix('admin/exam-section')->name('admin.exam-sect
  Route::get('/routine-topics/{level}/{id}/questions',[\App\Http\Controllers\Admin\ExamSection\RoutineTopicController::class,'picker'])->where('level','department|subject|chapter')->name('routine-topic.questions');
  Route::post('/routine-topics/{level}/{id}/questions',[\App\Http\Controllers\Admin\ExamSection\RoutineTopicController::class,'attach'])->where('level','department|subject|chapter')->name('routine-topic.questions.attach');
  Route::delete('/routine-topics/{level}/{id}/questions/{questionId}',[\App\Http\Controllers\Admin\ExamSection\RoutineTopicController::class,'detach'])->where('level','department|subject|chapter')->name('routine-topic.questions.detach');
+
+ // LEBD-05 Extra Student picker: scoped to existing Exam Section admin routes.
+ Route::get('/extra-student-picker/{category}',[ExamExtraStudentPickerController::class,'index'])->whereNumber('category')->name('extra-students.index');
+ Route::post('/extra-student-picker/{category}',[ExamExtraStudentPickerController::class,'store'])->whereNumber('category')->name('extra-students.store');
+ Route::delete('/extra-student-picker/{category}/{pick}',[ExamExtraStudentPickerController::class,'remove'])->whereNumber('category')->whereNumber('pick')->name('extra-students.remove');
+ // Extra Student group management. Scoped to the SAME existing admin middleware.
+ Route::get('/extra-student-picker/{category}/groups',[ExamExtraStudentGroupController::class,'index'])->whereNumber('category')->name('extra-student-groups.index');
+ Route::post('/extra-student-picker/{category}/groups',[ExamExtraStudentGroupController::class,'store'])->whereNumber('category')->name('extra-student-groups.store');
+ Route::put('/extra-student-picker/{category}/groups/{group}',[ExamExtraStudentGroupController::class,'update'])->whereNumber('category')->whereNumber('group')->name('extra-student-groups.update');
+ Route::delete('/extra-student-picker/{category}/groups/{group}',[ExamExtraStudentGroupController::class,'destroy'])->whereNumber('category')->whereNumber('group')->name('extra-student-groups.destroy');
+ Route::get('/extra-student-picker/{category}/groups/{group}/view',[ExamExtraStudentGroupController::class,'viewMembers'])->whereNumber('category')->whereNumber('group')->name('extra-student-groups.view');
+ Route::get('/extra-student-picker/{category}/groups/{group}/students',[ExamExtraStudentGroupController::class,'students'])->whereNumber('category')->whereNumber('group')->name('extra-student-groups.students');
+ Route::post('/extra-student-picker/{category}/groups/{group}/students',[ExamExtraStudentGroupController::class,'addStudents'])->whereNumber('category')->whereNumber('group')->name('extra-student-groups.students.add');
+ Route::post('/extra-student-picker/{category}/groups/assign',[ExamExtraStudentGroupController::class,'assign'])->whereNumber('category')->name('extra-student-groups.assign');
 });
 
 // Register student exam browsing routes after the admin exam-section routes.

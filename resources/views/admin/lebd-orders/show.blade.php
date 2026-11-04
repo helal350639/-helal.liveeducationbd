@@ -1,4 +1,4 @@
-@extends('homepage')
+@extends('dashboard')
 @section('title', 'MCQ Study Order Details')
 @section('content')
 @include('admin.lebd-orders._style')

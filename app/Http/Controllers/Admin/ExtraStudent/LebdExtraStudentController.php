@@ -76,7 +76,8 @@ class LebdExtraStudentController extends Controller
                   ->orWhere('es.contact', 'like', '%' . $search . '%');
             });
         }
-        $students = $query->paginate(20)->withQueryString();
+        // Server-side maximum 25 per page; retain existing department and search filters.
+        $students = $query->paginate(25)->withQueryString();
         $departmentCounts = DB::table('lebd_extra_students')->select('department', DB::raw('COUNT(*) as total'))->groupBy('department')->pluck('total','department')->all();
         return view('admin.extra-students.index', compact('students', 'departments', 'selectedDepartment', 'departmentCounts'));
     }
@@ -123,5 +124,33 @@ class LebdExtraStudentController extends Controller
             throw $e;
         }
         return redirect()->route('admin.extra-students.index', ['department' => $data['department']])->with('success', 'Extra Student added successfully.');
+    }
+
+    // Added: status-only admin edit. Does not change credentials, public IDs or exam selections.
+    public function edit(int $student)
+    {
+        $this->authorizeAdmin();
+        $this->ensureTable();
+        $this->ensureDepartmentColumn();
+        $extraStudent = DB::table('lebd_extra_students')->where('id', $student)->first();
+        abort_unless($extraStudent, 404);
+        $departments = $this->departments();
+        return view('admin.extra-students.edit', compact('extraStudent', 'departments'));
+    }
+
+    public function update(Request $request, int $student)
+    {
+        $this->authorizeAdmin();
+        $this->ensureTable();
+        $this->ensureDepartmentColumn();
+        $data = $request->validate(['status' => ['required', Rule::in(['Active', 'Inactive'])]]);
+        $existing = DB::table('lebd_extra_students')->where('id', $student)->first(['id','department']);
+        abort_unless($existing, 404);
+        DB::table('lebd_extra_students')->where('id', $student)->update([
+            'status' => $data['status'],
+            'updated_at' => now(),
+        ]);
+        return redirect()->route('admin.extra-students.index', ['department' => $existing->department])
+            ->with('success', 'Extra Student status updated successfully.');
     }
 }
