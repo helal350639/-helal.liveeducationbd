@@ -38,14 +38,23 @@ Route::post('/packages/{section}/{package}/pay', [SubscriptionPaymentController:
     ->middleware('auth:student')->where(['section'=>'mcq','package'=>'[0-9]+'])
     ->name('lebd.subscription.payment.start');
 
-// Existing SSLCommerz callbacks; retain URLs, middleware and route names.
+// SSLCommerz posts callbacks without a Laravel CSRF token.
+// Exempt ONLY these eight external callback endpoints. Laravel 11 apps may
+// register VerifyCsrfToken rather than its ValidateCsrfToken subclass.
+// The rest of the web group (including session) stays intact.
 foreach (['success', 'fail', 'cancel', 'ipn'] as $event) {
     Route::post('/payments/mcq/'.$event, [SubscriptionPaymentController::class, $event])
-        ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class])
+        ->withoutMiddleware([
+            \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
+            \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
+        ])
         ->name('lebd.subscription.payment.'.$event);
 
     Route::post('/payments/mcq/ssl/'.$event, [SubscriptionPaymentController::class, $event])
-        ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class])
+        ->withoutMiddleware([
+            \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
+            \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
+        ])
         ->name('student.mcq.ssl.'.$event);
 }
 
@@ -53,7 +62,7 @@ foreach (['success', 'fail', 'cancel', 'ipn'] as $event) {
 Route::post('/packages/{section}/{package}/pay-referral', [SubscriptionReferralController::class, 'pay'])
     ->middleware('auth:student')->where(['section'=>'mcq','package'=>'[0-9]+'])
     ->name('lebd.subscription.payment.referral');
-Route::get('/student/mcq-orders', [SubscriptionReferralController::class, 'orders'])
+Route::get('/mcq-study/orders', [SubscriptionReferralController::class, 'orders'])
     ->middleware('auth:student')->name('student.mcq.orders');
 
 Route::get('/mcq-study/my-categories', [\App\Http\Controllers\MCQJobPreparation\PurchasedMcqCategoriesController::class, 'index'])

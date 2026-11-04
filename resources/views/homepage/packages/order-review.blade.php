@@ -94,7 +94,7 @@
 
 
 
-        $mcqWalletToken = session('mcq_wallet_nonce\_'.$package->id);
+        $mcqWalletToken = session('mcq_wallet_nonce_'.$package->id);
 
 
 
@@ -106,7 +106,7 @@
 
 
 
-            session(['mcq_wallet_nonce\_'.$package->id => $mcqWalletToken]);
+            session(['mcq_wallet_nonce_'.$package->id => $mcqWalletToken]);
 
 
 

@@ -1,7 +1,6 @@
 <?php
 namespace App\Services\MCQSubscription;
 
-use App\Http\Controllers\SourceCtrl;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
@@ -45,6 +44,46 @@ final class MCQPaymentSms
         }
     }
 
+    /**
+     * The existing SourceCtrl::sms_send() has no connection/total timeout.
+     * Keep its same BulkSMS endpoint and env credentials without changing that
+     * global helper or the payment transaction. Never block purchase redirects
+     * indefinitely when the SMS gateway is unavailable.
+     */
+    private static function sendBulkSmsWithTimeout(string $phone, string $message)
+    {
+        $ch = curl_init();
+        if ($ch === false) {
+            throw new \RuntimeException('SMS cURL initialization failed.');
+        }
+        try {
+            curl_setopt_array($ch, [
+                CURLOPT_URL => 'http://bulksmsbd.net/api/smsapi',
+                CURLOPT_POST => true,
+                CURLOPT_POSTFIELDS => [
+                    'api_key' => (string) env('SMS_API_KEY', ''),
+                    'senderid' => (string) env('SMS_ID', ''),
+                    'number' => $phone,
+                    'message' => $message,
+                ],
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_CONNECTTIMEOUT => 2,
+                CURLOPT_TIMEOUT => 5,
+            ]);
+            $response = curl_exec($ch);
+            if ($response === false) {
+                throw new \RuntimeException('BulkSMS network request failed.');
+            }
+            $httpCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            if ($httpCode < 200 || $httpCode >= 300) {
+                throw new \RuntimeException('BulkSMS HTTP response failed ('.$httpCode.').');
+            }
+            return $response;
+        } finally {
+            curl_close($ch);
+        }
+    }
+
     private static function dispatch(int $orderId, string $recipient, ?string $rawPhone, string $message): void
     {
         $phone = preg_replace('/[\s-]+/', '', (string)$rawPhone);
@@ -66,7 +105,7 @@ final class MCQPaymentSms
         if (!$inserted) return;
         try {
             // Reuse the existing BulkSMS BD integration. Do not modify SourceCtrl or .env.
-            $response = (new SourceCtrl())->sms_send($phone, $message);
+            $response = self::sendBulkSmsWithTimeout($phone, $message);
             $status = $response === false || $response === null || trim((string)$response) === ''
                 ? 'unknown' : 'submitted';
             DB::table('lebd_mcq_payment_sms')->where('order_id',$orderId)

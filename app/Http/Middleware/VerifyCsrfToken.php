@@ -19,6 +19,17 @@ class VerifyCsrfToken extends Middleware
      * @var array
      */
     protected $except = [
-        '/students/pay-via-ajax', '/students/success','/students/cancel','/students/fail','/students/ipn'
+        '/students/pay-via-ajax', '/students/success','/students/cancel','/students/fail','/students/ipn',
+
+        // LEBD-05: Third-party SSLCommerz POST callbacks only.
+        // Checkout/pay/pay-referral remain CSRF-protected.
+        'payments/mcq/success',
+        'payments/mcq/fail',
+        'payments/mcq/cancel',
+        'payments/mcq/ipn',
+        'payments/mcq/ssl/success',
+        'payments/mcq/ssl/fail',
+        'payments/mcq/ssl/cancel',
+        'payments/mcq/ssl/ipn',
     ];
 }
