@@ -388,6 +388,17 @@ class StudentCtrl extends Controller
 
     public function addStudentObject(Request $request)
     {
+        // LEBD-05 Exam Section picker: reuse existing Student Accounts checkboxes.
+        if (Session::has('_lebd_exam_package_picker')) {
+            return app(\App\Http\Controllers\Admin\ExamSection\ExamPackageStudentsPickerController::class)->select($request);
+        }
+        if (Session::has('_lebd_ebook_picker')) {
+            return app(\App\Http\Controllers\EBook\EBookPackageStudentsController::class)->select($request);
+        }
+        // LEBD-05 Premium picker only. Legacy Group/Batch/Department selection is untouched.
+        if (Session::has('_lebd_premium_picker')) {
+            return app(\App\Http\Controllers\Admin\PremiumClass\PremiumManualStudentController::class)->select($request);
+        }
         $this->validate($request, [
             'id' => 'required|numeric',
             'action' => 'required|string',
@@ -452,6 +463,17 @@ class StudentCtrl extends Controller
 
     public function addStudentComplete()
     {
+        // LEBD-05 Exam Section Done: commit selected students to existing package access.
+        if (Session::has('_lebd_exam_package_picker')) {
+            return app(\App\Http\Controllers\Admin\ExamSection\ExamPackageStudentsPickerController::class)->complete();
+        }
+        if (Session::has('_lebd_ebook_picker')) {
+            return app(\App\Http\Controllers\EBook\EBookPackageStudentsController::class)->complete();
+        }
+        // LEBD-05 Premium picker Done. Other existing Done flows stay unchanged.
+        if (Session::has('_lebd_premium_picker')) {
+            return app(\App\Http\Controllers\Admin\PremiumClass\PremiumManualStudentController::class)->complete();
+        }
         if(!is_null(Session::get('_object')))
         {
             $object = Session::get('_object');

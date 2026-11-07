@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use App\Services\EBook\EBookReferralSettlement;
 
 class EBookReferralController extends Controller
 {
@@ -31,6 +32,18 @@ class EBookReferralController extends Controller
         return [$cat, $p, $amount];
     }
 
+    private function assertNotOwned(int $studentId, int $packageId): void
+    {
+        $active = DB::table('lebd_ebook_entitlements')
+            ->where('user_id', $studentId)->where('package_id', $packageId)
+            ->where('status', 'Active')->where('expires_at', '>', now('Asia/Dhaka'))->exists();
+        if ($active) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'payment' => 'এই প্যাকেজ কিনেছেন। মেয়াদ শেষ না হওয়া পর্যন্ত আবার কেনার প্রয়োজন নেই।',
+            ]);
+        }
+    }
+
     private function available(object $student): int
     {
         $pending = DB::table('withdraw_requests')->where('student_id', $student->id)
@@ -43,6 +56,7 @@ class EBookReferralController extends Controller
     {
         abort_unless(Auth::guard('student')->check(), 401);
         $this->selection($kind, $category, $package);
+        $this->assertNotOwned((int) Auth::guard('student')->id(), $package);
         return redirect()->route('lebd.ebook.referral.preview', compact('kind', 'category', 'package'));
     }
 
@@ -50,14 +64,21 @@ class EBookReferralController extends Controller
     {
         $student = Auth::guard('student')->user();
         abort_unless($student, 401);
+        // A normal catalog/checkout visit must never inherit a previous referral landing.
+        if (!$request->boolean('referral_purchase')) {
+            $request->session()->forget(EBookReferralSettlement::SESSION_KEY);
+        }
         [$cat, $p, $amount] = $this->selection($kind, $category, $package);
+        $this->assertNotOwned((int) $student->id, $package);
+        $quote = app(EBookReferralSettlement::class)->sessionQuote($p,(int)$student->id,$request->session());
+        $amount = $quote['total'];
         $available = $this->available($student);
         $token = (string) Str::uuid();
         $request->session()->put('lebd_ebook_referral_preview', [
             'student_id' => (int) $student->id, 'kind' => $kind,
             'category_id' => $category, 'package_id' => $package, 'token' => $token,
         ]);
-        return view('ebook.payment-method', compact('cat','p','kind','category','package','amount','available','token'));
+        return view('ebook.payment-method', compact('cat','p','kind','category','package','amount','available','token','quote'));
     }
 
     // Step 2: Summary and confirmation are on a separate page, never on method selection.
@@ -73,10 +94,13 @@ class EBookReferralController extends Controller
         $category = (int)$ctx['category_id'];
         $package = (int)$ctx['package_id'];
         [$cat, $p, $amount] = $this->selection($kind, $category, $package);
+        $this->assertNotOwned((int) $student->id, $package);
+        $quote = app(EBookReferralSettlement::class)->sessionQuote($p,(int)$student->id,$request->session());
+        $amount = $quote['total'];
         $available = $this->available($student);
         $token = (string)$ctx['token'];
         $method = (string)$request->input('method');
-        return view('ebook.referral-preview', compact('cat','p','kind','category','package','amount','available','token','method'));
+        return view('ebook.referral-preview', compact('cat','p','kind','category','package','amount','available','token','method','quote'));
     }
 
     public function confirm(Request $request)
@@ -93,12 +117,18 @@ class EBookReferralController extends Controller
         $kind = (string)$ctx['kind'];
         $category = (int)$ctx['category_id'];
         $package = (int)$ctx['package_id'];
-        $receipt = DB::transaction(function () use ($studentId, $kind, $category, $package) {
+        $attribution = $request->session()->get(EBookReferralSettlement::SESSION_KEY, []);
+        $receipt = DB::transaction(function () use ($studentId, $kind, $category, $package, $attribution) {
             // Lock student: serializes simultaneous wallet purchases, withdrawal reservations and credits
             // only when those writers also lock the same student record.
             $student = DB::table('students')->where('id', $studentId)->lockForUpdate()->first();
             abort_unless($student, 401);
             [$cat, $p, $amount] = $this->selection($kind, $category, $package);
+            $this->assertNotOwned((int) $studentId, $package);
+            $code = is_array($attribution) && (int)($attribution['package_id']??0)===$package
+                ? (string)($attribution['ref']??'') : '';
+            $quote = app(EBookReferralSettlement::class)->quote($p,$code,$studentId);
+            $amount = $quote['total'];
             abort_if($this->available($student) < $amount, 422, 'পর্যাপ্ত Available Referral Balance নেই।');
             $now = Carbon::now('Asia/Dhaka');
             $existing = DB::table('lebd_ebook_entitlements')->where('user_id', $studentId)
@@ -112,7 +142,7 @@ class EBookReferralController extends Controller
                 case 'years': $end->addYearsNoOverflow((int)$p->duration_value); break;
             }
             $trx = 'EBK'.strtoupper(Str::random(20));
-            DB::table('lebd_ebook_payment_orders')->insert([
+            $orderId = DB::table('lebd_ebook_payment_orders')->insertGetId([
                 'student_id' => $studentId, 'category_id' => $category, 'package_id' => $p->id,
                 'transaction_id' => $trx, 'package_name' => $p->name,
                 'amount' => number_format($amount / 100, 2, '.', ''), 'currency' => 'BDT',
@@ -120,6 +150,7 @@ class EBookReferralController extends Controller
                 'status' => 'Complete', 'gateway_validation_id' => 'REFERRAL_BALANCE',
                 'paid_at' => now(), 'created_at' => now(), 'updated_at' => now(),
             ]);
+            app(EBookReferralSettlement::class)->addAttribution($orderId,$studentId,$package,$quote);
             DB::table('students')->where('id', $studentId)->update([
                 'referral_balance' => number_format(((int)round((float)$student->referral_balance*100)-$amount)/100,2,'.',''),
             ]);
@@ -134,8 +165,10 @@ class EBookReferralController extends Controller
                     'created_at' => now(), 'updated_at' => now(),
                 ]);
             }
+            app(EBookReferralSettlement::class)->credit($orderId);
             return ['trx' => $trx, 'phone' => (string)($student->contact ?? ''), 'kind' => $kind, 'category' => $category];
         }, 3);
+        $request->session()->forget(EBookReferralSettlement::SESSION_KEY);
         // Send only after committed successful purchase. An SMS provider failure never rolls back a purchase.
         if (config('lebd_payments.sms_enabled', true) && !app()->environment('local') && $receipt['phone'] !== '') {
             try {

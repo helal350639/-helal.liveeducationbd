@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use App\Services\ExamSection\ExamReferralSettlement;
 
 /** Exam Section only. Separate ledger, never rewrites legacy course/payment orders. */
 class ExamSectionCheckoutController extends Controller
@@ -40,8 +41,12 @@ class ExamSectionCheckoutController extends Controller
     }
     private function amount(object $package): int
     {
-        // integer paisa, never trust a submitted or browser-rendered amount.
+        // Legacy normal-price helper; referred checkout uses server-verified quote.
         return (int) round(((float) $package->final_price) * 100);
+    }
+    private function referral(): ExamReferralSettlement
+    {
+        return app(ExamReferralSettlement::class);
     }
     private function durationEnds(object $package, Carbon $from): Carbon
     {
@@ -66,12 +71,25 @@ class ExamSectionCheckoutController extends Controller
         $student = $this->student(); abort_unless($student, 401);
         $plan = $this->package($package);
         if ($owned = $this->alreadyOwned((int)$student->id, (int)$plan->id)) return $owned;
+        if (request()->has('ref')) {
+            $code = trim((string)request()->query('ref'));
+            // Referral validation precedes session persistence; a bad link fails closed.
+            $this->referral()->quote($plan,(int)$student->id,$code);
+            request()->session()->put(ExamReferralSettlement::SESSION,[
+                'package_id'=>(int)$plan->id,'buyer_id'=>(int)$student->id,
+                'code'=>$code,'at'=>time(),
+            ]);
+        } else {
+            // Ordinary catalogue visits must always show the ordinary price.
+            request()->session()->forget(ExamReferralSettlement::SESSION);
+        }
+        $quote=$this->referral()->sessionQuote($plan,(int)$student->id,request()->session());
         $scopes = DB::table('lebd_exam_section_package_scopes as s')
             ->leftJoin('lebd_exam_section_categories as c', 'c.id', '=', 's.category_id')
             ->leftJoin('lebd_exam_section_subcategories as sub', 'sub.id', '=', 's.subcategory_id')
             ->where('s.package_id', $plan->id)->select('c.name as category_name', 'sub.name as subcategory_name')->get();
         $available = $this->available($student) / 100;
-        return view('student.exam-section.package-review', compact('plan','scopes','student','available'));
+        return view('student.exam-section.package-review', compact('plan','scopes','student','available','quote'));
     }
     /** Safe refresh/bookmark of the checkout confirmation URL. Never initiates payment. */
     public function checkoutResume(Request $request, int $package)
@@ -96,7 +114,12 @@ class ExamSectionCheckoutController extends Controller
         $method = $pending['method'];
         $token = $pending['token'];
         $available = $this->available($student) / 100;
-        return view('student.exam-section.package-checkout-confirm', compact('plan', 'method', 'available', 'token'));
+        $quote=$this->referral()->sessionQuote($plan,(int)$student->id,$request->session());
+        if ((int)($pending['quote_cents']??-1)!==$quote['payable']) {
+            return redirect()->route('student.exam-section.package.review',$package)
+                ->withErrors(['payment'=>'Referral price changed. Please review the updated price.']);
+        }
+        return view('student.exam-section.package-checkout-confirm', compact('plan', 'method', 'available', 'token','quote'));
     }
 
     /** Review selection only. NO debit and NO external payment happens here. */
@@ -106,7 +129,8 @@ class ExamSectionCheckoutController extends Controller
         $data = $request->validate(['method' => 'required|in:wallet,sslcommerz', 'terms' => 'accepted']);
         $plan = $this->package($package);
         if ($owned = $this->alreadyOwned((int)$student->id, (int)$plan->id)) return $owned;
-        $amount = $this->amount($plan);
+        $quote=$this->referral()->sessionQuote($plan,(int)$student->id,$request->session());
+        $amount = $quote['payable'];
         $available = $this->available($student) / 100;
         if ($amount < 100) return redirect()->route('student.exam-section.package.review',$package)
             ->withErrors(['payment'=>'Package price is invalid.']);
@@ -125,18 +149,19 @@ class ExamSectionCheckoutController extends Controller
         ]);
         $request->session()->put('exam_section_checkout', [
             'package_id'=>(int)$plan->id,'method'=>$method,'token'=>$token,
-            'student_id'=>(int)$student->id,'created_at'=>time(),
+            'student_id'=>(int)$student->id,'created_at'=>time(),'quote_cents'=>$amount,
         ]);
-        return view('student.exam-section.package-checkout-confirm',compact('plan','method','available','token'));
+        return view('student.exam-section.package-checkout-confirm',compact('plan','method','available','token','quote'));
     }
-    private function createOrder(object $plan, int $studentId, string $method): string
+    private function createOrder(object $plan, int $studentId, string $method, array $quote): string
     {
         $id = 'LEBDE'.strtoupper(Str::random(20));
         DB::table('lebd_exam_section_package_orders')->insert([
             'student_id'=>$studentId, 'package_id'=>$plan->id, 'transaction_id'=>$id,
-            'amount'=>number_format($this->amount($plan)/100,2,'.',''), 'method'=>$method,
+            'amount'=>number_format($quote['payable']/100,2,'.',''), 'method'=>$method,
             'status'=>'pending', 'created_at'=>now(), 'updated_at'=>now(),
         ]);
+        $this->referral()->attach($id,$studentId,(int)$plan->id,$quote);
         return $id;
     }
     private function grant(object $order, string $reference): void
@@ -198,20 +223,28 @@ class ExamSectionCheckoutController extends Controller
             return redirect()->route('student.exam-section.package.review',$package)
                 ->withErrors(['payment'=>'এই Checkout আগে থেকেই Process করা হয়েছে।']);
         }
-        $request->session()->forget('exam_section_checkout');
+        $pendingCheckout=$request->session()->get('exam_section_checkout',[]);
         $plan = $this->package($package);
         if ($owned = $this->alreadyOwned((int)$student->id, (int)$plan->id)) return $owned;
-        $price = $this->amount($plan);
+        $quote=$this->referral()->sessionQuote($plan,(int)$student->id,$request->session());
+        if ((int)($pendingCheckout['quote_cents']??-1)!==$quote['payable']) {
+            DB::table('lebd_exam_section_checkout_intents')->where('id',$intent->id)->update(['status'=>'failed','updated_at'=>now()]);
+            return redirect()->route('student.exam-section.package.review',$package)
+                ->withErrors(['payment'=>'Price changed. Please review the final amount again.']);
+        }
+        $request->session()->forget('exam_section_checkout');
+        $request->session()->forget(ExamReferralSettlement::SESSION);
+        $price = $quote['payable'];
         if ($price < 100) return back()->withErrors(['payment'=>'Package price must be at least ৳1.00.']);
         if ($request->input('method') === 'wallet') {
             try {
-                DB::transaction(function () use ($student, $plan, $price) {
+                DB::transaction(function () use ($student, $plan, $price, $quote) {
                     // A locked student row serializes concurrent wallet purchases.
                     $locked = DB::table('students')->where('id', $student->id)->lockForUpdate()->first();
                     if (!$locked) throw new \DomainException('Student not found');
                     if ($this->activeAccess((int)$student->id,(int)$plan->id)) throw new \DomainException('এই প্যাকেজটি ইতিমধ্যে সক্রিয় আছে। মেয়াদ শেষ হলে কিনুন।');
                     if ($this->available($locked) < $price) throw new \DomainException('Available Referral Balance যথেষ্ট নয়।');
-                    $reference=$this->createOrder($plan,(int)$student->id,'wallet');
+                    $reference=$this->createOrder($plan,(int)$student->id,'wallet',$quote);
                     $old=(int)round((float)$locked->referral_balance*100);
                     DB::table('students')->where('id',$student->id)->update(['referral_balance'=>number_format(($old-$price)/100,2,'.',''),'updated_at'=>now()]);
                     DB::table('lebd_exam_section_wallet_debits')->insert([
@@ -222,6 +255,7 @@ class ExamSectionCheckoutController extends Controller
                     $order=DB::table('lebd_exam_section_package_orders')->where('transaction_id',$reference)->lockForUpdate()->first();
                     $this->grant($order,$reference);
                     DB::table('lebd_exam_section_package_orders')->where('transaction_id',$reference)->update(['status'=>'paid','paid_at'=>now(),'updated_at'=>now()]);
+                    $this->referral()->credit($reference);
                 },3);
             } catch (\DomainException $e) { DB::table('lebd_exam_section_checkout_intents')->where('id',$intent->id)->update(['status'=>'failed','updated_at'=>now()]); return redirect()->route('student.exam-section.package.review',$package)->withErrors(['payment'=>$e->getMessage()]); } catch (\Throwable $e) { DB::table('lebd_exam_section_checkout_intents')->where('id',$intent->id)->update(['status'=>'failed','updated_at'=>now()]); Log::error('Exam package wallet transaction failed',['student_id'=>$student->id, 'package_id'=>$package]); return redirect()->route('student.exam-section.package.review',$package)->withErrors(['payment'=>'পেমেন্ট সম্পন্ন হয়নি। আবার চেষ্টা করুন।']); }
             DB::table('lebd_exam_section_checkout_intents')->where('id',$intent->id)->update(['status'=>'completed','updated_at'=>now()]);
@@ -232,7 +266,7 @@ class ExamSectionCheckoutController extends Controller
             DB::table('lebd_exam_section_checkout_intents')->where('id',$intent->id)->update(['status'=>'failed','updated_at'=>now()]);
             return redirect()->route('student.exam-section.package.review',$package)->withErrors(['payment'=>'SSLCommerz Credentials এখনো Configure করা হয়নি।']);
         }
-        $reference=$this->createOrder($plan,(int)$student->id,'sslcommerz');
+        $reference=DB::transaction(fn()=>$this->createOrder($plan,(int)$student->id,'sslcommerz',$quote));
         $payload=[
             'store_id'=>$store,'store_passwd'=>$secret,'total_amount'=>number_format($price/100,2,'.',''),
             'currency'=>'BDT','tran_id'=>$reference,'success_url'=>route('student.exam-section.payment.success'),
@@ -299,6 +333,7 @@ class ExamSectionCheckoutController extends Controller
                     DB::table('students')->where('id',$locked->student_id)->lockForUpdate()->first();
                     $this->grant($locked,$id);
                     DB::table('lebd_exam_section_package_orders')->where('id',$locked->id)->update(['status'=>'paid','gateway_validation_id'=>$val,'paid_at'=>now(),'updated_at'=>now()]);
+                    $this->referral()->credit($id);
                 });
             } catch (\Throwable $e) {Log::error('Exam Section payment validation failure',['order'=>$id]);return response('Verification error',502);}
             if ($event==='ipn') return response('OK',200);

@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Admin\ExamSection;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 
 class ExamPackageController extends Controller
@@ -21,8 +24,11 @@ class ExamPackageController extends Controller
     public function index()
     {
         $packages = DB::table(self::PACKAGES)->orderBy('sort_order')->orderByDesc('id')->paginate(25);
-        $counts = DB::table(self::SELECTIONS)->select('package_id')->selectRaw('COUNT(*) AS total')->groupBy('package_id')->pluck('total','package_id');
-        return view('admin.exam-section.packages', compact('packages','counts'));
+        $counts = DB::table(self::SELECTIONS)->select('package_id')->selectRaw('COUNT(*) AS total')
+            ->groupBy('package_id')->pluck('total','package_id');
+        $studentReport = app(\App\Services\ExamSection\ExamPackageStudentReport::class);
+        $studentStats = $studentReport->summary($packages->pluck('id')->all());
+        return view('admin.exam-section.packages', compact('packages','counts','studentStats'));
     }
     public function create()
     {
@@ -45,6 +51,8 @@ class ExamPackageController extends Controller
             'main_price'=>'required|numeric|min:0|max:99999999',
             'discount_amount'=>'required|numeric|min:0|max:99999999',
             'sort_order'=>'required|integer|min:0|max:999999',
+            'referral_discount'=>'nullable|numeric|min:0|max:9999999',
+            'referrer_bonus'=>'nullable|numeric|min:0|max:9999999',
             'status'=>['required',Rule::in(['Active','Inactive'])],
             'scopes'=>'required|array|min:1', 'scopes.*'=>'required|string|regex:/^[cs]:[0-9]+$/',
         ]);
@@ -64,6 +72,14 @@ class ExamPackageController extends Controller
         $rows = array_map(fn($k)=>$valid[$k], $selected);
         unset($data['scopes']);
         $data['final_price'] = round((float)$data['main_price']-(float)$data['discount_amount'],2);
+        $data['referral_discount']=round((float)($data['referral_discount']??0),2);
+        $data['referrer_bonus']=round((float)($data['referrer_bonus']??0),2);
+        if ($data['referral_discount'] > max(0,$data['final_price']-1)) {
+            throw \Illuminate\Validation\ValidationException::withMessages(['referral_discount'=>'Referral discount must leave at least BDT 1 payable.']);
+        }
+        if (!Schema::hasColumn(self::PACKAGES,'referral_discount') || !Schema::hasColumn(self::PACKAGES,'referrer_bonus')) {
+            throw \Illuminate\Validation\ValidationException::withMessages(['referral_discount'=>'Import the Exam Section MANUAL SQL before saving packages.']);
+        }
         return [$data,$rows];
     }
     public function store(Request $request)
@@ -89,7 +105,87 @@ class ExamPackageController extends Controller
     public function destroy(int $package)
     {
         abort_unless(DB::table(self::PACKAGES)->where('id',$package)->exists(),404);
-        DB::transaction(function() use($package){DB::table(self::SELECTIONS)->where('package_id',$package)->delete();DB::table(self::PACKAGES)->where('id',$package)->delete();});
-        return back()->with('success','Package deleted.');
+        DB::table(self::PACKAGES)->where('id',$package)->update(['status'=>'Inactive','updated_at'=>now()]);
+        return back()->with('success','Package disabled. Historic orders and access preserved.');
+    }
+
+    private function adminOnly(): void
+    {
+        $user=Auth::user();
+        abort_unless($user && method_exists($user,'AuthorizeRoles') && $user->AuthorizeRoles(['SuperAdmin','Admin']),403);
+    }
+    public function students(Request $request, int $package)
+    {
+        $this->adminOnly();
+        $plan=DB::table(self::PACKAGES)->find($package); abort_unless($plan,404);
+        $report=app(\App\Services\ExamSection\ExamPackageStudentReport::class);
+        $stats=$report->summary([$package])[$package] ?? $report->blank();
+        $rows=$report->students($package,trim((string)$request->query('q','')));
+        return view('admin.exam-section.package-students',compact('plan','rows','stats'));
+    }
+    /** Grant one student without creating a payment order or touching wallet balance. */
+    public function grantStudentId(int $package, int $studentId): bool
+    {
+        $this->adminOnly();
+        abort_unless(Schema::hasTable('lebd_exam_section_manual_grants'),503,'Import Exam Section manual SQL first.');
+        $plan=DB::table(self::PACKAGES)->where('id',$package)->where('status','Active')->firstOrFail();
+        abort_unless(DB::table('students')->where('id',$studentId)->exists(),422,'Student not found.');
+        return DB::transaction(function()use($plan,$studentId) {
+            DB::table('students')->where('id',$studentId)->lockForUpdate()->first();
+            $now=Carbon::now('Asia/Dhaka');
+            $active=DB::table('lebd_exam_section_student_package_access')->where('student_id',$studentId)
+                ->where('package_id',$plan->id)->where('status','active')
+                ->where('starts_at','<=',$now->toDateTimeString())->where('ends_at','>',$now->toDateTimeString())->exists();
+            if($active) return false;
+            $end=$now->copy();
+            $qty=max(1,(int)$plan->duration);
+            switch(strtolower($plan->duration_unit)) {
+                case 'days': $end->addDays($qty); break;
+                case 'weeks': $end->addWeeks($qty); break;
+                case 'years': $end->addYearsNoOverflow($qty); break;
+                default: $end->addMonthsNoOverflow($qty);
+            }
+            $accessId=DB::table('lebd_exam_section_student_package_access')->insertGetId([
+                'student_id'=>$studentId,'package_id'=>$plan->id,'status'=>'active',
+                'starts_at'=>$now->toDateTimeString(),'ends_at'=>$end->toDateTimeString(),
+                'payment_reference'=>'MANUAL-EXAM-'.Auth::id().'-'.\Illuminate\Support\Str::random(20),
+                'created_at'=>now()
+            ]);
+            DB::table('lebd_exam_section_manual_grants')->insert([
+                'student_id'=>$studentId,'package_id'=>$plan->id,'access_id'=>$accessId,
+                'added_by'=>Auth::id(),'starts_at'=>$now->toDateTimeString(),
+                'ends_at'=>$end->toDateTimeString(),'status'=>'active','created_at'=>now(),'updated_at'=>now(),
+            ]);
+            return true;
+        },3);
+    }
+    public function addStudent(Request $request,int $package)
+    {
+        $this->adminOnly();
+        $data=$request->validate(['student_id'=>'required|integer|exists:students,id']);
+        $added=$this->grantStudentId($package,(int)$data['student_id']);
+        return back()->with($added ? 'success' : 'info',
+            $added ? 'Manual student access granted.' : 'Student already has active access to this package.');
+    }
+    public function removeStudent(Request $request,int $package,int $grant)
+    {
+        $this->adminOnly();
+        $request->validate(['confirm_remove'=>'required|accepted']);
+        abort_unless(Schema::hasTable('lebd_exam_section_manual_grants'),503);
+        DB::transaction(function()use($package,$grant){
+            $row=DB::table('lebd_exam_section_manual_grants')->where('id',$grant)
+                ->where('package_id',$package)->lockForUpdate()->first();abort_unless($row,404);
+            DB::table('students')->where('id',$row->student_id)->lockForUpdate()->first();
+            if($row->status!=='active') return;
+            // Only the access row CREATED by this manual grant may be revoked.
+            DB::table('lebd_exam_section_student_package_access')->where('id',$row->access_id)
+                ->where('student_id',$row->student_id)->where('package_id',$package)
+                ->where('status','active')->where('payment_reference','LIKE','MANUAL-EXAM-%')
+                ->update(['status'=>'revoked']);
+            DB::table('lebd_exam_section_manual_grants')->where('id',$grant)->update([
+                'status'=>'removed','removed_by'=>Auth::id(),'removed_at'=>now(),'updated_at'=>now(),
+            ]);
+        },3);
+        return back()->with('success','Manual grant removed. Paid orders and other access remain unchanged.');
     }
 }

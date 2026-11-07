@@ -32,7 +32,7 @@
 </style>
 <main class="lebd-eb54">
 <section class="shell">
-<a class="back" href="{{route('lebd.ebook.referral.preview',['kind'=>$kind,'category'=>$category,'package'=>$package])}}">← প্যাকেজে ফিরে যান</a>
+<a class="back" href="{{route('lebd.ebook.referral.preview',['kind'=>$kind,'category'=>$category,'package'=>$package,'referral_purchase'=>!empty($quote['owner'])?1:0])}}">← প্যাকেজে ফিরে যান</a>
 <div class="heading"><span class="head-icon">🛒</span><div><h1>Payment Preview</h1><div class="subtitle">{{ $method==='referral' ? 'Referral Balance থেকে টাকা কাটার আগে যাচাই করুন।' : 'SSLCommerz Gateway-তে যাওয়ার আগে তথ্য যাচাই করুন।' }}</div></div></div>
 <div class="book">
 @if(!empty($cat->front_cover))
@@ -44,7 +44,11 @@
 </div>
 <div class="summary">
 <h2>পেমেন্টের সারসংক্ষেপ</h2>
-<div class="line"><span>ব্যাচের মোট মূল্য</span><b>৳{{number_format($amount/100,2)}}</b></div>
+@if($quote['owner'])<div class="line"><span>Referred By (Student)</span><b>{{ $quote['owner']->name }}</b></div>@endif
+<div class="line"><span>মূল Package Price</span><b>৳{{number_format($quote['base']/100,2)}}</b></div>
+@if($quote['fee']>0)<div class="line"><span>Extra Fee</span><b>৳{{number_format($quote['fee']/100,2)}}</b></div>@endif
+@if($quote['owner'])<div class="line"><span>Referral Discount</span><b>− ৳{{number_format($quote['discount']/100,2)}}</b></div>@endif
+<div class="line"><span>সর্বমোট পরিশোধযোগ্য</span><b>৳{{number_format($amount/100,2)}}</b></div>
 @if($method==='referral')
 <div class="line"><span>আপনার Available Referral Balance</span><b>৳{{number_format($available/100,2)}}</b></div>
 <div class="line"><span>Referral Balance থেকে কাটা হবে</span><b style="color:#bc2222">৳{{number_format($amount/100,2)}}</b></div>
@@ -60,10 +64,10 @@
 @csrf
 <input type="hidden" name="token" value="{{$token}}">
 <label class="agree"><input type="checkbox" name="agree" value="1" required> Terms & Conditions, Privacy Policy এবং Refund Policy-তে সম্মত।</label>
-<div class="buttons"><button class="submit" type="submit" @if($available<$amount) disabled @endif>✓ কনফার্ম পেমেন্ট</button><a class="cancel" href="{{route('lebd.ebook.referral.preview',['kind'=>$kind,'category'=>$category,'package'=>$package])}}">← বাতিল করুন</a></div>
+<div class="buttons"><button class="submit" type="submit" @if($available<$amount) disabled @endif>✓ কনফার্ম পেমেন্ট</button><a class="cancel" href="{{route('lebd.ebook.referral.preview',['kind'=>$kind,'category'=>$category,'package'=>$package,'referral_purchase'=>!empty($quote['owner'])?1:0])}}">← বাতিল করুন</a></div>
 </form>
 @else
-<form method="POST" action="{{route('lebd.ebook.payment.gateway-confirm',['kind'=>$kind,'category'=>$category,'package'=>$package])}}" class="eb54-form">
+<form method="POST" action="{{route('lebd.ebook.payment.gateway-confirm',['kind'=>$kind,'category'=>$category,'package'=>$package,'referral_purchase'=>!empty($quote['owner'])?1:0])}}" class="eb54-form">
 @csrf
 <label class="agree"><input type="checkbox" name="agree" value="1" required> Terms & Conditions, Privacy Policy এবং Refund Policy-তে সম্মত।</label>
 <div class="buttons"><button class="submit" type="submit">Payment Now</button></div>

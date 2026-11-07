@@ -39,6 +39,8 @@
 <div><label class="caption">Sort Order *</label><input class="text" type="number" name="sort_order" min="0" required value="{{ old('sort_order',$package->sort_order ?? 0) }}"></div>
 <div><label class="caption">Discount Amount (BDT) *</label><input class="text" id="discountPrice" type="number" name="discount_amount" min="0" step="0.01" required value="{{ old('discount_amount',$package->discount_amount ?? 0) }}"></div>
 <div><label class="caption">Final Package Price (BDT)</label><input class="text total" id="finalPrice" readonly value="0.00"><div class="help">Main Price − Discount</div></div>
+<div><label class="caption">Referral Discount (BDT)</label><input class="text" name="referral_discount" type="number" min="0" step="0.01" value="{{ old('referral_discount',$package->referral_discount ?? 0) }}"><div class="help">Applies only to verified referral-link purchases after checkout integration.</div></div>
+<div><label class="caption">Referrer Bonus (BDT)</label><input class="text" name="referrer_bonus" type="number" min="0" step="0.01" value="{{ old('referrer_bonus',$package->referrer_bonus ?? 0) }}"><div class="help">Credited only after verified purchase; NOT yet activated in payment workflow.</div></div>
 <div><label class="caption">Student Saving</label><input class="text" id="savingPrice" readonly value="0.00%"><div class="help">Discount ÷ Main Price × 100</div></div>
 </div>
 </form>

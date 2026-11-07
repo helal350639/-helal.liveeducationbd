@@ -11,8 +11,10 @@
 <div class="line"><span>প্যাকেজ</span><b>{{$p->name}}</b></div>
 <div class="line"><span>মেয়াদ</span><b>{{$p->duration_value}} {{['days'=>'দিন','months'=>'মাস','years'=>'বছর'][$p->duration_unit]??'দিন'}}</b></div>
 <div class="line"><span>কোর্সের মূল্য</span><b>৳{{number_format((float)$p->main_price,2)}}</b></div>
-<div class="line"><span>অন্যান্য ফি (+)</span><b>৳0.00</b></div>
-<div class="line"><span>ডিসকাউন্ট (-)</span><b>− ৳{{number_format(max(0,(float)$p->main_price-$amount/100),2)}}</b></div>
+@if($quote['owner'])<div class="line"><span>Referred By (Student)</span><b>{{ $quote['owner']->name }}</b></div>@endif
+<div class="line"><span>অন্যান্য ফি (+)</span><b>৳{{number_format($quote['fee']/100,2)}}</b></div>
+<div class="line"><span>ডিসকাউন্ট (-)</span><b>− ৳{{number_format(max(0,(float)$p->main_price-$quote['base']/100),2)}}</b></div>
+@if($quote['owner'])<div class="line"><span>Referral Discount (-)</span><b>− ৳{{number_format($quote['discount']/100,2)}}</b></div>@endif
 <div class="total"><span>মোট =</span><b>৳{{number_format($amount/100,2)}}</b></div></div>
 <form action="{{route('lebd.ebook.payment.review')}}" method="POST" class="card50" id="eb51-method-form">@csrf
 <input type="hidden" name="token" value="{{$token}}">

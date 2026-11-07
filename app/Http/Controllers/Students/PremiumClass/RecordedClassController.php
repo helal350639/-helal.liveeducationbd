@@ -50,7 +50,7 @@ class RecordedClassController extends Controller {
   }
   if (!$isFree) {
     $student=\Illuminate\Support\Facades\Auth::guard('student')->user();
-    if (!$student || !\App\Services\PremiumClass\PremiumAccess::hasAccess((int)$student->id,(string)$video->premium_group,(string)$video->premium_topic)) {
+    if (!$student || (!\App\Services\PremiumClass\PremiumAccess::hasAccess((int)$student->id,(string)$video->premium_group,(string)$video->premium_topic) && !\App\Services\PremiumClass\PremiumManualAccess::hasCategory((int)$student->id,(string)$video->premium_group,(string)$video->premium_topic))) {
       return redirect()->route('premium.recordings.packages',['premium_group'=>$video->premium_group,'premium_topic'=>$video->premium_topic]);
     }
   }

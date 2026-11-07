@@ -1367,7 +1367,7 @@ font-size:10px;
 <small></small>
 </div>
 </a>
-<a href="{{route('category.batches',['Exam Routine','Dashboard'])}}" class="quick-card">
+<a href="{{ route('student.exam-section.categories') }}" class="quick-card">
 <div class="quick-icon">
 <i class="fa fa-calendar"></i>
 </div>

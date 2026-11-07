@@ -47,7 +47,52 @@ html,body{margin:0;min-height:100%;background:#f3f7fe;color:#0b2a5c}
   <nav class="mobile-tabs" aria-label="Referral sections">
     <a href="#lebd-ref-batch">Batch</a><a href="#lebd-ref-exam">Exam</a><a href="#lebd-ref-mcq">MCQ Study</a><a href="#lebd-ref-video">Video</a><a href="#lebd-ref-ebook">E-Book</a>
   </nav>
-  <div class="notice" role="status">MCQ Study-এর লিংকটি Referral Code-সহ পাঠানো হয়। যোগ্য Student কেনাকাটা করলে Referral Discount প্রযোজ্য হবে এবং সফল পেমেন্টের পরে লিংকের মালিক Bonus পাবেন। Exam/Video-এর লিংকগুলো এখনো সাধারণ Catalog Link।</div>
+  <div class="notice" role="status">MCQ-এর বৈধ Referral Link-এ নির্ধারিত Discount প্রযোজ্য হয়। E-Book-এর Referral Link নির্দিষ্ট একটি Package দেখাবে; E-Book Referral Discount Checkout ও Bonus Credit এখনো সম্পন্ন হয়নি। MCQ-এর বিদ্যমান Checkout অপরিবর্তিত রয়েছে।</div>
+  @php
+    // E-Book section bridge: manual grants + paid package orders, DISPLAY ONLY.
+    // No new checkout link is generated until E-Book referral settlement is verified.
+    $ebookViewer = \Illuminate\Support\Facades\Auth::guard('student')->user();
+    if ($ebookViewer && isset($sections['ebook']) && \Illuminate\Support\Facades\Schema::hasTable('lebd_ebook_packages')
+        && \Illuminate\Support\Facades\Schema::hasTable('lebd_ebook_package_categories')
+        && \Illuminate\Support\Facades\Schema::hasTable('lebd_ebook_entitlements')) {
+        $ebookIds = collect();
+        if (\Illuminate\Support\Facades\Schema::hasTable('lebd_ebook_manual_grants')) {
+            $ebookIds = $ebookIds->merge(\Illuminate\Support\Facades\DB::table('lebd_ebook_manual_grants')
+                ->where('student_id',$ebookViewer->id)->where('starts_at','<=',now())->where('ends_at','>',now())->pluck('package_id'));
+        }
+        if (\Illuminate\Support\Facades\Schema::hasTable('lebd_ebook_payment_orders')) {
+            $ebookIds = $ebookIds->merge(\Illuminate\Support\Facades\DB::table('lebd_ebook_payment_orders')
+                ->where('student_id',$ebookViewer->id)->where('status','Complete')->pluck('package_id'));
+        }
+        $ebookIds = $ebookIds->filter()->unique()->values();
+        if ($ebookIds->isNotEmpty()) {
+            $ebookRecords = \Illuminate\Support\Facades\DB::table('lebd_ebook_packages as p')
+                ->join('lebd_ebook_package_categories as pc','pc.package_id','=','p.id')
+                ->join('lebd_ebook_categories as c','c.id','=','pc.category_id')
+                ->join('lebd_ebook_entitlements as e',function($j)use($ebookViewer){
+                    $j->on('e.category_id','=','c.id')->where('e.user_id','=',$ebookViewer->id);
+                })
+                ->whereIn('p.id',$ebookIds)->where('e.status','Active')->where('e.expires_at','>',now())
+                ->where('c.status','Active')
+                ->select('p.id','p.name','p.referral_discount','p.referrer_bonus','c.id as category_id','c.kind')
+                ->orderBy('p.id')->orderBy('c.id')->get()->unique('id');
+            $ebookRows = [];
+            foreach ($ebookRecords as $ep) {
+                $ebookRows[] = [
+                    'id'=>(int)$ep->id,'name'=>(string)$ep->name,
+                    'discount'=>(float)($ep->referral_discount ?? 0),'bonus'=>(float)($ep->referrer_bonus ?? 0),
+                    'url'=>!empty($ebookViewer->referral_id) ? route('lebd.ebook.referral.package',['package'=>$ep->id,'ref'=>$ebookViewer->referral_id]) : null,
+                    'ready'=>!empty($ebookViewer->referral_id),'source'=>'Active E-Book package',
+                ];
+            }
+            // Retain any already-supplied E-Book items, avoid duplicate package rows.
+            $existingEbookIds = array_map('intval', array_column($sections['ebook']['items'] ?? [], 'id'));
+            foreach ($ebookRows as $ebookRow) {
+                if (!in_array($ebookRow['id'],$existingEbookIds,true)) $sections['ebook']['items'][]=$ebookRow;
+            }
+        }
+    }
+  @endphp
   @foreach($sections as $key => $section)
   <section class="section" id="lebd-ref-{{ $key }}" aria-labelledby="lebd-ref-title-{{ $key }}">
     <div class="section-label"><span class="tile-icon"><i class="fa {{ $section['icon'] }}" aria-hidden="true"></i></span><div><h2 id="lebd-ref-title-{{ $key }}">{{ $section['title'] }}</h2><p>শুধু Active Package-এর তথ্য এখানে দেখানো হয়।</p></div></div>
@@ -57,20 +102,25 @@ html,body{margin:0;min-height:100%;background:#f3f7fe;color:#0b2a5c}
         <div><div class="entry-title">{{ $item['name'] }}</div><span class="tag"><i class="fa fa-check-circle" aria-hidden="true"></i> Active</span></div>
         <div class="metadata">@if($item['discount'] !== null) Referral Discount: <strong>৳{{ number_format($item['discount'],2) }}</strong><br>Referrer Bonus: <strong>৳{{ number_format($item['bonus'],2) }}</strong>@else Referral Bonus: সংযোগ বাকি @endif</div>
         <div class="actions">
-          @if($item['url'])
-            {{-- MCQ gets a referral-attributed package URL; other sections remain catalog URLs. --}}
-            <button type="button" class="action primary" data-ref-copy data-link="{{ $item['url'] }}" aria-label="{{ $item['name'] }} প্যাকেজ লিংক কপি করুন"><i class="fa fa-copy" aria-hidden="true"></i> {{ $key === 'mcq' ? 'Copy Referral Link' : 'Copy Package Link' }}</button>
-            <button type="button" class="action" data-ref-share data-link="{{ $item['url'] }}" data-title="{{ $item['name'] }}" aria-label="{{ $item['name'] }} প্যাকেজ লিংক শেয়ার করুন"><i class="fa fa-share-nodes" aria-hidden="true"></i> {{ $key === 'mcq' ? 'Share Referral Link' : 'Share Package Link' }}</button>
+          @if(!empty($item['url']))
+            @php
+              // Only label links as referrals when the existing URL is explicitly referral-attributed.
+              // A plain catalog URL must NEVER be represented as discount-bearing.
+              $lebdIsReferral = $key === 'mcq' || ($key === 'batch' && !empty($item['ready']) && str_contains((string)$item['url'], '/batch-reference/student/')) || ($key === 'video' && str_contains((string)$item['url'], '/premium-recordings/referral/') && str_contains((string)$item['url'], 'ref=')) || ($key === 'ebook' && !empty($item['ready']) && str_contains((string)$item['url'], '/e-books/referral-package/') && str_contains((string)$item['url'], 'ref='));
+              $lebdLinkLabel = $lebdIsReferral ? 'Referral Link' : 'Package Link';
+            @endphp
+            <button type="button" class="action primary" data-ref-copy data-link="{{ $item['url'] }}" aria-label="{{ $item['name'] }} লিংক কপি করুন"><i class="fa fa-copy" aria-hidden="true"></i> Copy {{ $lebdLinkLabel }}</button>
+            <button type="button" class="action" data-ref-share data-link="{{ $item['url'] }}" data-title="{{ $item['name'] }}" aria-label="{{ $item['name'] }} লিংক শেয়ার করুন"><i class="fa fa-share-nodes" aria-hidden="true"></i> Share {{ $lebdLinkLabel }}</button>
             <a class="action" href="{{ $item['url'] }}"><i class="fa fa-external-link" aria-hidden="true"></i> View Package</a>
           @else
-            <button type="button" class="action primary" disabled title="এই সেকশনের প্যাকেজ URL যাচাই বাকি">Copy Package Link</button>
-            <button type="button" class="action" disabled title="এই সেকশনের প্যাকেজ URL যাচাই বাকি">Share Package Link</button>
-            <button class="action" type="button" disabled>Open</button>
+            <button type="button" class="action primary" disabled>Copy Package Link</button>
+            <button type="button" class="action" disabled>Share Package Link</button>
+            <button type="button" class="action" disabled>View Package</button>
           @endif
         </div>
       </article>
       @empty
-      <div class="empty"><i class="fa fa-folder-open" aria-hidden="true"></i><br>এই সেকশনে কোনো যাচাইকৃত Active Package পাওয়া যায়নি।<br><small>@if(in_array($key,['batch','ebook'],true))এই সেকশনের Access Mapping যাচাই সাপেক্ষ।@else Active Package থাকলে এখানে দেখাবে।@endif</small></div>
+      <div class="empty"><i class="fa fa-folder-open" aria-hidden="true"></i><br>এই সেকশনে কোনো যাচাইকৃত Active Package পাওয়া যায়নি।<br><small>@if($key === 'ebook')এই সেকশনের Access Mapping যাচাই সাপেক্ষ।@else Active Package থাকলে এখানে দেখাবে।@endif</small></div>
       @endforelse
     </div>
   </section>
@@ -79,47 +129,50 @@ html,body{margin:0;min-height:100%;background:#f3f7fe;color:#0b2a5c}
 </main>
 <script>
 (function(){
-'use strict';
-const root=document.querySelector('.lebd-refhub');
-if(!root) return;
-const toast=root.querySelector('#lebdRefToast');
-let toastTimer;
-function notice(message){
- if(!toast) return;
- toast.textContent=message;
- toast.hidden=false;
- clearTimeout(toastTimer);
- toastTimer=setTimeout(()=>{toast.hidden=true;},3200);
-}
-async function copyText(value){
- if(navigator.clipboard && window.isSecureContext){await navigator.clipboard.writeText(value);return true;}
- const el=document.createElement('textarea');
- el.value=value;el.style.position='fixed';el.style.left='-9999px';
- document.body.appendChild(el);el.focus();el.select();
- let ok=false;
- try{ok=document.execCommand('copy');}finally{el.remove();}
- if(!ok) throw new Error('Clipboard unavailable');
- return true;
-}
-root.addEventListener('click', async function(event){
- const btn=event.target.closest('button[data-ref-copy],button[data-ref-share]');
- if(!btn || btn.disabled) return;
- const link=btn.getAttribute('data-link');
- if(!link || !/^https?:\/\//i.test(link)){notice('এই প্যাকেজের লিংক পাওয়া যায়নি।');return;}
- if(btn.hasAttribute('data-ref-copy')){
-  try{await copyText(link);notice('প্যাকেজের লিংক কপি হয়েছে!');}
-  catch(e){notice('লিংক কপি করা যায়নি। View Package থেকে লিংক কপি করুন।');}
-  return;
- }
- const title=btn.getAttribute('data-title')||'Package';
- if(navigator.share){
-  try{await navigator.share({title:title,text:title+' — Live Education BD',url:link});notice('Share সম্পন্ন হয়েছে।');}
-  catch(e){if(e.name!=='AbortError')notice('শেয়ার করা যায়নি। আবার চেষ্টা করুন।');}
- }else{
-  try{await copyText(link);notice('Share অপশন নেই, তাই লিংক কপি হয়েছে। এখন WhatsApp/Messenger-এ পেস্ট করুন।');}
-  catch(e){notice('Share সাপোর্ট নেই। View Package থেকে লিংক কপি করুন।');}
- }
-});
+  'use strict';
+  const root=document.querySelector('.lebd-refhub');
+  if(!root) return;
+  const toast=root.querySelector('#lebdRefToast');
+  let toastTimer;
+  function notice(message){
+    if(!toast) return;
+    toast.textContent=message;
+    toast.hidden=false;
+    clearTimeout(toastTimer);
+    toastTimer=setTimeout(()=>{toast.hidden=true;},3200);
+  }
+  async function copyText(value){
+    if(navigator.clipboard && window.isSecureContext){
+      await navigator.clipboard.writeText(value); return;
+    }
+    const el=document.createElement('textarea');
+    el.value=value;el.style.position='fixed';el.style.left='-9999px';
+    document.body.appendChild(el);el.focus();el.select();
+    let ok=false;
+    try{ok=document.execCommand('copy');}finally{el.remove();}
+    if(!ok) throw new Error('Clipboard unavailable');
+  }
+  root.addEventListener('click', async function(event){
+    const btn=event.target.closest('button[data-ref-copy],button[data-ref-share]');
+    if(!btn || btn.disabled) return;
+    const link=btn.getAttribute('data-link');
+    if(!link || !/^https?:\/\//i.test(link)){
+      notice('এই প্যাকেজের লিংক পাওয়া যায়নি।'); return;
+    }
+    if(btn.hasAttribute('data-ref-copy')){
+      try{await copyText(link);notice('প্যাকেজের লিংক কপি হয়েছে!');}
+      catch(e){notice('কপি করা যায়নি। View Package থেকে লিংক কপি করুন।');}
+      return;
+    }
+    const title=btn.getAttribute('data-title')||'Package';
+    if(navigator.share){
+      try{await navigator.share({title,text:title+' — Live Education BD',url:link});}
+      catch(e){if(e.name!=='AbortError')notice('শেয়ার করা যায়নি। আবার চেষ্টা করুন।');}
+    }else{
+      try{await copyText(link);notice('Share সাপোর্ট নেই; লিংক কপি হয়েছে। এখন পেস্ট করুন।');}
+      catch(e){notice('Share সাপোর্ট নেই। View Package থেকে লিংক কপি করুন।');}
+    }
+  });
 })();
 </script>
 </body>

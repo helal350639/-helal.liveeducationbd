@@ -28,7 +28,10 @@
  <div class="price-row"><span>কোর্সের মূল্য</span><strong>৳ {{ number_format((float)$plan->main_price,2) }}</strong></div>
  <div class="price-row"><span>অন্যান্য ফি (+)</span><strong>৳ 0.00</strong></div>
  <div class="price-row"><span>ডিসকাউন্ট (-)</span><strong style="color:#c93434">− ৳ {{ number_format((float)$plan->discount_amount,2) }}</strong></div>
- <div class="price-row total"><span>মোট =</span><strong>৳ {{ number_format((float)$plan->final_price,2) }}</strong></div>
+ @if($quote['referrer_id'])
+ <div class="price-row"><span>Referral Link Discount (-)</span><strong style="color:#07884e">− ৳ {{ number_format($quote['discount']/100,2) }}</strong></div>
+ @endif
+ <div class="price-row total"><span>মোট =</span><strong>৳ {{ number_format($quote['payable']/100,2) }}</strong></div>
 </section>
 {{-- Preview must POST checkout.review (token creator), never checkout (token consumer). --}}
 <form method="POST" action="{{ route('student.exam-section.package.checkout.review',$plan->id) }}" id="mcq-package-review-form">
@@ -36,7 +39,7 @@
 <section class="card"><h2 class="heading">আমাদের পেমেন্ট সিস্টেমে অন্তর্ভুক্ত আছে</h2>
 <div class="methods">
  <label class="option" id="mcq-wallet-option"><input type="radio" name="method" value="wallet" {{ old('method')==='wallet'?'checked':'' }} required><span class="option-text"><b>Use Your Referral Balance</b><small>Available Balance দিয়ে প্যাকেজ কিনুন</small></span><span class="balance">৳{{ number_format((float)$available,2) }}<small>Available Balance</small></span></label>
- @if(round((float)$available*100)<round((float)$plan->final_price*100))<div class="insufficient">Referral Balance দিয়ে পুরো মূল্য পরিশোধের জন্য পর্যাপ্ত টাকা নেই। SSLCommerz নির্বাচন করতে পারেন।</div>@endif
+ @if(round((float)$available*100)<$quote['payable'])<div class="insufficient">Referral Balance দিয়ে পুরো মূল্য পরিশোধের জন্য পর্যাপ্ত টাকা নেই। SSLCommerz নির্বাচন করতে পারেন।</div>@endif
  <label class="option" id="mcq-ssl-option"><input type="radio" name="method" value="sslcommerz" {{ old('method','sslcommerz')==='sslcommerz'?'checked':'' }} required><span class="option-text"><b>Online Payment Gateway — SSLCommerz</b><span class="pills"><span>Card</span><span>Mobile Banking</span><span>Internet Banking</span><span>Wallet</span></span></span></label>
 </div></section>
 <div class="notice"><strong>⚠ সতর্কতা</strong><div>পেমেন্ট গেটওয়েতে প্রবেশ করে আপনার পেমেন্ট সম্পন্ন হওয়ার পর অনুগ্রহ করে নিশ্চিতকরণের জন্য ৫–৬ সেকেন্ড অপেক্ষা করুন। নিশ্চিতকরণ না আসা পর্যন্ত পেজটি বন্ধ করবেন না বা ত্যাগ করবেন না। Referral Balance নির্বাচন করলে পর্যাপ্ত Balance থেকে মূল্য কাটা হবে।</div></div>

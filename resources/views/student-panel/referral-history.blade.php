@@ -30,9 +30,28 @@
 
 
 
-    <!-- REFERRAL TRANSACTION -->
 
-    <div class="history-card">
+    {{-- LEBD-05: UI-only tabs; the existing transaction collections remain unchanged. --}}
+    <div class="lebd-history-tabs" role="tablist" aria-label="Transaction history type">
+        <button type="button" class="lebd-history-tab is-active"
+                id="lebd-tab-referral" role="tab" aria-selected="true"
+                aria-controls="lebd-panel-referral" tabindex="0"
+                data-history-tab="referral">
+            <i class="fa-solid fa-hand-holding-dollar" aria-hidden="true"></i>
+            Referral Income History
+        </button>
+        <button type="button" class="lebd-history-tab"
+                id="lebd-tab-withdraw" role="tab" aria-selected="false"
+                aria-controls="lebd-panel-withdraw" tabindex="-1"
+                data-history-tab="withdraw">
+            <i class="fa-solid fa-money-bill-transfer" aria-hidden="true"></i>
+            Withdraw History
+        </button>
+    </div>
+
+        <!-- REFERRAL TRANSACTION -->
+
+    <div class="history-card" id="lebd-panel-referral" role="tabpanel" aria-labelledby="lebd-tab-referral">
 
 
         <h3>
@@ -121,7 +140,7 @@
     <!-- WITHDRAW HISTORY -->
 
 
-    <div class="history-card">
+    <div class="history-card" id="lebd-panel-withdraw" role="tabpanel" aria-labelledby="lebd-tab-withdraw" hidden>
 
 
         <h3>
@@ -220,6 +239,57 @@
 
 
 
+
+
+{{-- LEBD-05: Presentational switching only; does not change financial history queries. --}}
+<script>
+(function () {
+    'use strict';
+    function bootHistoryTabs() {
+        var buttons = Array.from(document.querySelectorAll('[data-history-tab]'));
+        var panels = {
+            referral: document.getElementById('lebd-panel-referral'),
+            withdraw: document.getElementById('lebd-panel-withdraw')
+        };
+        if (buttons.length !== 2 || !panels.referral || !panels.withdraw) return;
+
+        function activate(which, updateHash) {
+            if (!panels[which]) return;
+            buttons.forEach(function (button) {
+                var chosen = button.dataset.historyTab === which;
+                button.classList.toggle('is-active', chosen);
+                button.setAttribute('aria-selected', chosen ? 'true' : 'false');
+                button.tabIndex = chosen ? 0 : -1;
+            });
+            Object.keys(panels).forEach(function (key) {
+                panels[key].hidden = (key !== which);
+            });
+            if (updateHash && window.history && window.history.replaceState) {
+                window.history.replaceState(null, '', '#' + (which === 'withdraw' ? 'withdraw-history' : 'referral-income-history'));
+            }
+        }
+
+        buttons.forEach(function (button, index) {
+            button.addEventListener('click', function () {
+                activate(button.dataset.historyTab, true);
+            });
+            button.addEventListener('keydown', function (event) {
+                if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+                event.preventDefault();
+                var next = buttons[(index + (event.key === 'ArrowRight' ? 1 : buttons.length - 1)) % buttons.length];
+                next.focus();
+                activate(next.dataset.historyTab, true);
+            });
+        });
+        activate(window.location.hash === '#withdraw-history' ? 'withdraw' : 'referral', false);
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bootHistoryTabs);
+    } else {
+        bootHistoryTabs();
+    }
+})();
+</script>
 
 @endsection
 
@@ -503,6 +573,46 @@ body{
 
 
 }
+
+/* LEBD-05 — Transaction History tabs only */
+.lebd-history-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 16px;
+}
+.lebd-history-tabs .lebd-history-tab {
+    min-width: 0;
+    padding: 13px 14px;
+    border-radius: 12px;
+    border: 1px solid #bfd6f6;
+    background: #ffffff;
+    color: #174575;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background-color .2s, box-shadow .2s, color .2s;
+}
+.lebd-history-tabs .lebd-history-tab.is-active {
+    background: #0863d8;
+    border-color: #0863d8;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(8,99,216,.18);
+}
+.lebd-history-tabs .lebd-history-tab:focus-visible {
+    outline: 3px solid #f59e0b;
+    outline-offset: 2px;
+}
+.referral-page .history-card[hidden] { display: none !important; }
+@media (max-width: 520px) {
+    .lebd-history-tabs { gap: 7px; }
+    .lebd-history-tabs .lebd-history-tab { padding: 11px 7px; font-size: 12px; }
+}
+
 </style>
 
 

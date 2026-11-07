@@ -46,4 +46,7 @@
     <div class="le191-empty">বর্তমানে কোনো Active Exam Category নেই।</div>
   @endforelse
   </div>
+  @if(!empty($lebdShowOwnedExamPackages))
+    @include('student.partials.exam-section-owned-packages')
+  @endif
 </section>

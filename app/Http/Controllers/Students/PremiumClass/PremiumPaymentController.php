@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use App\Services\PremiumClass\PremiumReferralQuote;
 class PremiumPaymentController extends Controller {
  private function credentials():array {
   return [(string)config('lebd_premium_ssl.store_id',''),(string)config('lebd_premium_ssl.store_password',''),(bool)config('lebd_premium_ssl.sandbox',true)];
@@ -16,10 +17,14 @@ class PremiumPaymentController extends Controller {
  private function host(bool $sandbox):string{return $sandbox?'https://sandbox.sslcommerz.com':'https://securepay.sslcommerz.com';}
  public function review(Request $r,PremiumClassPackage $package){
   abort_unless($package->is_active,404);
-  $main=(float)$package->price;
-  $final=(float)($package->final_price??$package->price);
-  $discount=max(0,$main-$final);
-  abort_if($final<1 || $final>$main,422,'Package price is invalid. Please contact support.');
+   PremiumReferralQuote::capture($r, (int)$package->id);
+   $quote=PremiumReferralQuote::quote($package, Auth::guard('student')->id(), $r->session()->get('premium_ref_code_'.$package->id));
+   if (Auth::guard('student')->check() && \App\Services\PremiumClass\PremiumManualAccess::active((int)Auth::guard('student')->id(),(int)$package->id))
+     return redirect()->route('students.premium.all-access')->with('info','এই প্যাকেজ কিনেছেন / Already active.');
+   $main=(float)$package->price;
+   $final=$quote['payable_cents']/100;
+  $discount=max(0,$main-$quote['base_cents']/100);
+   abort_if($final<1,422,'Package price is invalid. Please contact support.');
   // Always use the logged-in student's current wallet minus pending withdrawals.
   // This is display-only: the ReferralPurchaseController rechecks funds under row lock.
   $referralBalance = null;
@@ -38,13 +43,15 @@ class PremiumPaymentController extends Controller {
        ->with('info', 'This package is already active in your account.');
    }
   }
-  return view('premium-class.checkout-review',compact('package','main','final','discount','referralBalance'));
+   return view('premium-class.checkout-review',compact('package','main','final','discount','referralBalance','quote'));
  }
  public function checkout(Request $r,PremiumClassPackage $package){
   $student=Auth::guard('student')->user();abort_unless($student,401);
   if(!Schema::hasTable('lebd_premium_class_orders')){Log::error('Premium checkout: orders table missing');return redirect()->route('premium.payment.review',$package)->withErrors(['payment'=>'Premium payment database setup সম্পূর্ণ হয়নি। অনুগ্রহ করে অ্যাডমিনের সঙ্গে যোগাযোগ করুন (Orders table missing)।']);}
   abort_unless($package->is_active,404);
-  // An already-paid and unexpired package must not open another gateway checkout.
+   if (\App\Services\PremiumClass\PremiumManualAccess::active((int)$student->id,(int)$package->id))
+      return redirect()->route('students.premium.all-access')->with('info','এই প্যাকেজ কিনেছেন / Already active.');
+   // An already-paid and unexpired package must not open another gateway checkout.
   // Recheck on the server: disabled browser buttons are not payment protection.
   $activeOrder = DB::table('lebd_premium_class_orders')
     ->where('student_id', $student->id)
@@ -58,14 +65,18 @@ class PremiumPaymentController extends Controller {
   }
   [$store,$secret,$sandbox]=$this->credentials();
   if($store===''||$secret===''){Log::error('Premium checkout: store credentials missing');return redirect()->route('premium.payment.review',$package)->withErrors(['payment'=>'SSLCommerz Payment এখনো Configuration সম্পূর্ণ হয়নি। অ্যাডমিনকে Store ID/Password সেট করতে হবে।']);}
-  $amount=round((float)($package->final_price??$package->price),2);
+   $quote=PremiumReferralQuote::checked($r, $package, (int)$student->id);
+   $amount=$quote['payable_cents']/100;
   abort_if($amount<1,422,'Zero-price package needs a separate grant workflow.');
   $id='LEBDP'.strtoupper(Str::random(20));
   $days=max(1,(int)$package->validity_days);
   $row=['student_id'=>$student->id,'package_id'=>$package->id,'tran_id'=>$id,'amount'=>$amount,'currency'=>'BDT','status'=>'pending',
    'package_type'=>$package->package_type,'department_categories'=>json_encode($package->department_categories?:[]),
    'non_department_categories'=>json_encode($package->non_department_categories?:[]),'validity_days'=>$days,'created_at'=>now(),'updated_at'=>now()];
-  DB::table('lebd_premium_class_orders')->insert($row);
+   DB::transaction(function () use ($row, $student, $package, $quote) {
+    $orderId = DB::table('lebd_premium_class_orders')->insertGetId($row);
+    PremiumReferralQuote::record($orderId, (int)$student->id, (int)$package->id, $quote);
+   });
   $callback=['success_url'=>route('premium.payment.success'),'fail_url'=>route('premium.payment.fail'),'cancel_url'=>route('premium.payment.cancel'),'ipn_url'=>route('premium.payment.ipn')];
   $payload=array_merge($callback,['store_id'=>$store,'store_passwd'=>$secret,'total_amount'=>number_format($amount,2,'.',''),
    'currency'=>'BDT','tran_id'=>$id,'product_category'=>'Education','product_name'=>substr($package->name,0,100),
@@ -105,6 +116,7 @@ class PremiumPaymentController extends Controller {
       DB::table('lebd_premium_class_orders')->where('id',$locked->id)->update([
        'status'=>'paid','val_id'=>$val,'paid_at'=>now(),
        'expires_at'=>now()->addDays(max(1,(int)$locked->validity_days)), 'updated_at'=>now()]);
+       PremiumReferralQuote::credit((int)$locked->id);
     });
     if($event==='ipn')return response('OK',200);
     return redirect()->route('premium.payment.purchased.success', ['order' => $order->id]);

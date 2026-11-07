@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use App\Services\PremiumClass\PremiumReferralQuote;
 
 class ReferralPurchaseController extends Controller
 {
@@ -18,18 +19,21 @@ class ReferralPurchaseController extends Controller
         $studentId = auth('student')->id();
         abort_unless($studentId, 401);
         abort_unless($package->is_active, 404);
+        if (\App\Services\PremiumClass\PremiumManualAccess::active((int)$studentId,(int)$package->id))
+            throw ValidationException::withMessages(['payment'=>'এই প্যাকেজ কিনেছেন — Active manual package access already exists.']);
         if (!Schema::hasTable('lebd_premium_class_orders') || !Schema::hasTable('lebd_referral_purchase_ledger')) {
             return back()->withErrors(['payment' => 'Purchase database setup is incomplete.']);
         }
         try {
-            $orderId = DB::transaction(function () use ($studentId, $package, $wallet) {
+            $orderId = DB::transaction(function () use ($studentId, $package, $wallet, $request) {
                 // Lock the student BEFORE reading pending withdrawals or checking funds.
                 $student = DB::table('students')->where('id', $studentId)->lockForUpdate()->first();
                 abort_unless($student, 401);
                 $fresh = PremiumClassPackage::query()->whereKey($package->id)->where('is_active', true)->firstOrFail();
                 $base = $wallet->paisa($fresh->price);
-                $price = $wallet->paisa($fresh->final_price ?? $fresh->price);
-                if ($price < 100 || $base < $price) {
+                $quote = PremiumReferralQuote::checked($request, $fresh, (int)$studentId);
+                $price = $quote['payable_cents'];
+                if ($price < 100) {
                     throw ValidationException::withMessages(['payment' => 'Package price is invalid.']);
                 }
                 // One active entitlement per student/package: avoid unintended repeat charges.
@@ -39,6 +43,8 @@ class ReferralPurchaseController extends Controller
                 if ($existing) {
                     throw ValidationException::withMessages(['payment' => 'This package is already active in your account.']);
                 }
+                if (\App\Services\PremiumClass\PremiumManualAccess::active((int)$studentId,(int)$fresh->id))
+                    throw ValidationException::withMessages(['payment'=>'এই প্যাকেজ কিনেছেন — Active manual package access already exists.']);
                 $wallet->debitLockedStudent($student, $price);
                 $tranId = 'LEBDR'.strtoupper(Str::random(20));
                 $now = now();
@@ -54,6 +60,8 @@ class ReferralPurchaseController extends Controller
                     'expires_at' => $now->copy()->addDays($days),
                     'created_at' => $now, 'updated_at' => $now,
                 ]);
+                PremiumReferralQuote::record($orderId, (int)$studentId, (int)$fresh->id, $quote);
+                PremiumReferralQuote::credit($orderId);
                 DB::table('lebd_referral_purchase_ledger')->insert([
                     'student_id' => $studentId, 'order_id' => $orderId,
                     'tran_id' => $tranId, 'amount' => number_format($price / 100, 2, '.', ''),

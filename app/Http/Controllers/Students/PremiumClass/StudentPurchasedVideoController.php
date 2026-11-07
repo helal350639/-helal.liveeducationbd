@@ -12,6 +12,13 @@ class StudentPurchasedVideoController extends Controller
     private function order(int $id)
     {
         abort_unless(auth('student')->check(), 403);
+        // A manual grant is never a payment order. It is exposed through a virtual
+        // navigation ID so existing chapter/subject/player routes keep working.
+        if ($id >= \App\Services\PremiumClass\PremiumManualAccess::ORDER_OFFSET) {
+            $manual=\App\Services\PremiumClass\PremiumManualAccess::virtualOrder((int)auth('student')->id(),$id);
+            abort_unless($manual,403,'Manual premium access not active.');
+            return $manual;
+        }
         abort_unless(Schema::hasTable('lebd_premium_class_orders'),404);
         $row=DB::table('lebd_premium_class_orders as o')
           ->leftJoin('lebd_premium_class_packages as p','p.id','=','o.package_id')
@@ -40,7 +47,9 @@ class StudentPurchasedVideoController extends Controller
     public function index(Request $request)
     {
         abort_unless(auth('student')->check(),403);
-        return view('student-panel.purchased-video-classes');
+        // V16: keep this established URL, but display both verified paid orders and
+        // separate active admin grants. Never fabricate payment orders for manual access.
+        return app(\App\Http\Controllers\Students\PremiumClass\PremiumManualAccessController::class)->index();
     }
     public function departments(int $order)
     {

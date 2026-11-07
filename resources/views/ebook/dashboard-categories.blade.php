@@ -18,6 +18,35 @@
             ->orderBy('c.name')
             ->get();
     }
+
+    // E-Book package-level visibility: show paid OR manually assigned active packages.
+    // This is DISPLAY ONLY; actual reading permissions remain controlled by entitlements.
+    $lebdEbookMyPackages = collect();
+    if ($lebdStudent && \Illuminate\Support\Facades\Schema::hasTable('lebd_ebook_packages')) {
+        $lebdPackageIds = collect();
+        if (\Illuminate\Support\Facades\Schema::hasTable('lebd_ebook_manual_grants')) {
+            $lebdPackageIds = $lebdPackageIds->merge(\Illuminate\Support\Facades\DB::table('lebd_ebook_manual_grants')
+                ->where('student_id', $lebdStudent->id)->where('starts_at','<=',now())
+                ->where('ends_at','>',now())->pluck('package_id'));
+        }
+        if (\Illuminate\Support\Facades\Schema::hasTable('lebd_ebook_payment_orders')) {
+            $lebdPackageIds = $lebdPackageIds->merge(\Illuminate\Support\Facades\DB::table('lebd_ebook_payment_orders')
+                ->where('student_id', $lebdStudent->id)->where('status','Complete')->pluck('package_id'));
+        }
+        $lebdPackageIds = $lebdPackageIds->filter()->unique()->values();
+        if ($lebdPackageIds->isNotEmpty()) {
+            // Never show a historical order as active without current package/category reading access.
+            $lebdEbookMyPackages = \Illuminate\Support\Facades\DB::table('lebd_ebook_packages as p')
+                ->join('lebd_ebook_package_categories as pc','pc.package_id','=','p.id')
+                ->join('lebd_ebook_entitlements as e',function($j)use($lebdStudent){
+                    $j->on('e.category_id','=','pc.category_id')->where('e.user_id','=',$lebdStudent->id);
+                })
+                ->whereIn('p.id',$lebdPackageIds)->where('e.status','Active')->where('e.expires_at','>',now())
+                ->select('p.id','p.name',\Illuminate\Support\Facades\DB::raw('MAX(e.expires_at) as access_expires_at'))
+                ->groupBy('p.id','p.name')->orderBy('p.name')->get();
+        }
+    }
+
     $lebdEbookGroups = [
         ['kind'=>'department','title'=>'E-Book / PDF (Diploma)','description'=>'আপনার কেনা ডিপ্লোমা ও ডিপার্টমেন্টভিত্তিক বই','class'=>'diploma'],
         ['kind'=>'non-department','title'=>'E-Book / PDF (General)','description'=>'আপনার কেনা জেনারেল ই-বুক','class'=>'general'],
@@ -47,6 +76,12 @@
 .lebd-eb63 .empty{margin:11px;padding:22px 12px;text-align:center;color:#667e9c;background:#f6f9ff;border:1px dashed #c6daf8;border-radius:9px;font-size:12px}
 @media(max-width:700px){.lebd-eb63{padding:0 10px 40px!important;min-height:calc(100vh - 220px)}.lebd-eb63 .grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;padding:8px}.lebd-eb63 .head strong{font-size:12px}.lebd-eb63 .intro h1{font-size:19px}}
 @media(max-width:365px){.lebd-eb63 .grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.lebd-eb63 .packages{margin:0 0 16px;background:#fff;border:1px solid #cbdff6;border-radius:11px;padding:13px}
+.lebd-eb63 .packages h2{font-size:16px;margin:0 0 9px;font-weight:800}
+.lebd-eb63 .package-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:9px}
+.lebd-eb63 .package-card{border:1px solid #d4e4fb;background:#f3f8ff;border-radius:9px;padding:11px}
+.lebd-eb63 .package-card strong{display:block;font-size:13px}.lebd-eb63 .package-card small{display:block;font-size:11px;color:#197347;margin-top:4px}
 </style>
 <main class="lebd-eb63">
 <a class="back" href="{{route('students.dashboard')}}">← Student Dashboard-এ ফিরুন</a>
@@ -54,6 +89,19 @@
   <h1>আমার কেনা E-Book / PDF</h1>
   <p>শুধু আপনার সক্রিয় ও মেয়াদ থাকা Premium E-Book এখানে দেখাবে।</p>
 </div>
+@if($lebdEbookMyPackages->isNotEmpty())
+<section class="packages" aria-label="My active E-Book packages">
+  <h2>আমার সক্রিয় E-Book প্যাকেজ</h2>
+  <div class="package-list">
+    @foreach($lebdEbookMyPackages as $lebdPackage)
+      <div class="package-card">
+        <strong>{{ $lebdPackage->name }}</strong>
+        <small>✓ Active · মেয়াদ: {{ \Carbon\Carbon::parse($lebdPackage->access_expires_at)->format('d/m/Y') }}</small>
+      </div>
+    @endforeach
+  </div>
+</section>
+@endif
 @foreach($lebdEbookGroups as $lebdGroup)
     @php $lebdItems=$lebdPurchasedBooks->where('kind',$lebdGroup['kind']); @endphp
     <section class="group {{ $lebdGroup['class'] }}">

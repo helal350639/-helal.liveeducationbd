@@ -22,6 +22,14 @@ Route::middleware(['auth',PremiumClassAdminOnly::class])->prefix('admin')->group
     Route::prefix('premium-class-packages')->name('admin.premium-class-packages.')->group(function () {
         Route::get('/',[PackageController::class,'index'])->name('index');
         Route::get('/create',[PackageController::class,'create'])->name('create');
+        // Read-only package student list, filter by manual/wallet/SSL; keep existing manual picker route.
+        Route::get('/{package}/student-report', [\App\Http\Controllers\Admin\PremiumClass\PremiumPackageStudentsReportController::class, 'index'])
+            ->whereNumber('package')->name('students.report');
+        // Manual premium entitlement: admin only; no payment/order side effects.
+        Route::get('/{package}/students', [\App\Http\Controllers\Admin\PremiumClass\PremiumManualStudentController::class, 'index'])
+            ->whereNumber('package')->name('manual.index');
+        Route::post('/{package}/students', [\App\Http\Controllers\Admin\PremiumClass\PremiumManualStudentController::class, 'store'])
+            ->whereNumber('package')->name('manual.store');
         Route::get('/{package}/edit',[PackageController::class,'edit'])->whereNumber('package')->name('edit');
         Route::post('/',[PackageController::class,'store'])->name('store');
         Route::put('/{package}',[PackageController::class,'update'])->name('update');
@@ -47,10 +55,10 @@ Route::post('/premium-recordings/checkout/{package}/referral',
  ->whereNumber('package')->name('premium.payment.referral.checkout');
 
 // SSLCommerz posts callbacks, which cannot carry Laravel CSRF tokens. Keep restricted to these 4 exact routes.
-Route::post('/premium-recordings/payment/success',[\App\Http\Controllers\Students\PremiumClass\PremiumPaymentController::class,'success'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class])->name('premium.payment.success');
-Route::post('/premium-recordings/payment/fail',[\App\Http\Controllers\Students\PremiumClass\PremiumPaymentController::class,'fail'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class])->name('premium.payment.fail');
-Route::post('/premium-recordings/payment/cancel',[\App\Http\Controllers\Students\PremiumClass\PremiumPaymentController::class,'cancel'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class])->name('premium.payment.cancel');
-Route::post('/premium-recordings/payment/ipn',[\App\Http\Controllers\Students\PremiumClass\PremiumPaymentController::class,'ipn'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class])->name('premium.payment.ipn');
+Route::post('/premium-recordings/payment/success',[\App\Http\Controllers\Students\PremiumClass\PremiumPaymentController::class,'success'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class, \App\Http\Middleware\VerifyCsrfToken::class])->name('premium.payment.success');
+Route::post('/premium-recordings/payment/fail',[\App\Http\Controllers\Students\PremiumClass\PremiumPaymentController::class,'fail'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class, \App\Http\Middleware\VerifyCsrfToken::class])->name('premium.payment.fail');
+Route::post('/premium-recordings/payment/cancel',[\App\Http\Controllers\Students\PremiumClass\PremiumPaymentController::class,'cancel'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class, \App\Http\Middleware\VerifyCsrfToken::class])->name('premium.payment.cancel');
+Route::post('/premium-recordings/payment/ipn',[\App\Http\Controllers\Students\PremiumClass\PremiumPaymentController::class,'ipn'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class, \App\Http\Middleware\VerifyCsrfToken::class])->name('premium.payment.ipn');
 
 Route::middleware('auth:student')->group(function () {
     Route::get('/premium-recordings/purchased/{order}/success',
@@ -89,3 +97,17 @@ Route::middleware('auth:student')->prefix('students/video-class')->name('student
     Route::get('/purchased/{order}/chapter/{chapter}/videos',[$ctrl,'videos'])->whereNumber('order')->whereNumber('chapter')->name('videos');
     Route::get('/purchased/{order}/watch/{video}',[$ctrl,'watch'])->whereNumber('order')->whereNumber('video')->name('watch');
 });
+
+// LEBD-05: share links for existing active paid package owners only.
+Route::get('/premium-recordings/my-referral-links',
+ [\App\Http\Controllers\Students\PremiumClass\PremiumReferralLinksController::class,'index'])
+ ->middleware('auth:student')->name('premium.referral.links');
+
+// Public, package-scoped referral landing page: only the linked package is displayed.
+Route::get('/premium-recordings/referral/{package}',
+ [\App\Http\Controllers\Students\PremiumClass\PremiumReferralLinksController::class,'show'])
+ ->whereNumber('package')->name('premium.referral.package');
+
+// Manual and paid access overview for student; existing student dashboard routes remain intact.
+Route::get('/students/my-premium-access', [\App\Http\Controllers\Students\PremiumClass\PremiumManualAccessController::class,'index'])
+    ->middleware('auth:student')->name('students.premium.all-access');

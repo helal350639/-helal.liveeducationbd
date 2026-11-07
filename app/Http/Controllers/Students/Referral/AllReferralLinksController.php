@@ -23,6 +23,45 @@ final class AllReferralLinksController extends Controller
             'video' => ['title'=>'Video Section Referral Link','icon'=>'fa-video','items'=>[]],
             'ebook' => ['title'=>'E-Book Referral Link','icon'=>'fa-book','items'=>[]],
         ];
+        // Batch: all three enrollment paths converge on the original batch_student pivot:
+        //  - Admin manual addition, - Referral Wallet checkout, - verified SSLCommerz purchase.
+        // Only an enrolled student may create a batch referral link. Do not grant access here.
+        // Respect the Batch status and optional scheduled date range.
+        if (Schema::hasTable('batch_student') && Schema::hasTable('batches')) {
+            $today = now('Asia/Dhaka')->toDateString();
+            $batchRows = DB::table('batch_student as bs')
+                ->join('batches as b', 'b.id', '=', 'bs.batch_id')
+                ->where('bs.student_id', $id)
+                ->where('b.status', 'Active')
+                ->where(function ($q) use ($today) {
+                    $q->whereNull('b.start_at')->orWhereDate('b.start_at', '<=', $today);
+                })
+                ->where(function ($q) use ($today) {
+                    $q->whereNull('b.end_at')->orWhereDate('b.end_at', '>=', $today);
+                })
+                ->select('b.id', 'b.name', 'b.reference_discount', 'b.referrer_bonus')
+                ->distinct()->orderBy('b.name')->get();
+            foreach ($batchRows as $batch) {
+                // Uses the EXISTING batchReference endpoint, which verifies that
+                // this referrer is enrolled in the given batch before storing referral.
+                $link = Route::has('student.batch-reference')
+                    ? route('student.batch-reference', [
+                        'type' => 'student',
+                        'batch' => (int)$batch->id,
+                        'referrer' => $id,
+                    ]) : null;
+                $sections['batch']['items'][] = [
+                    'id' => (int)$batch->id,
+                    'name' => (string)$batch->name,
+                    'discount' => (float)($batch->reference_discount ?? 0),
+                    'bonus' => (float)($batch->referrer_bonus ?? 0),
+                    'url' => $link,
+                    'ready' => $link !== null,
+                    'source' => 'Active Batch enrollment',
+                ];
+            }
+        }
+
         // Merge paid and manually granted MCQ entitlements; unique by package ID.
         $mcqIds = [];
         if (Schema::hasTable('lebd_mcq_subscriptions')) {
@@ -67,10 +106,14 @@ final class AllReferralLinksController extends Controller
                 ->join('lebd_exam_section_packages as p','p.id','=','a.package_id')
                 ->where('a.student_id',$id)->where('a.status','active')
                 ->where('a.starts_at','<=',$now)->where('a.ends_at','>',$now)
-                ->select('p.id','p.name')->distinct()->orderBy('p.name')->get();
+                ->where('p.status','Active')
+                ->select('p.id','p.name','p.referral_discount','p.referrer_bonus')->distinct()->orderBy('p.name')->get();
             foreach ($records as $p) $sections['exam']['items'][] = [
-                'name'=>$p->name,'id'=>(int)$p->id,'discount'=>null,'bonus'=>null,
-                'url'=>$examCatalogUrl,'ready'=>false,'source'=>'Active package catalog',
+                'name'=>$p->name,'id'=>(int)$p->id,
+                'discount'=>(float)$p->referral_discount,'bonus'=>(float)$p->referrer_bonus,
+                'url'=>!empty($student->referral_id) && Route::has('student.exam-section.package.review')
+                    ? route('student.exam-section.package.review',['package'=>$p->id,'ref'=>$student->referral_id]) : null,
+                'ready'=>!empty($student->referral_id),'source'=>'Active Exam package referral',
             ];
         }
         if (Schema::hasTable('lebd_premium_class_orders') && Schema::hasTable('lebd_premium_class_packages')) {
@@ -83,7 +126,7 @@ final class AllReferralLinksController extends Controller
                 'url'=>$videoCatalogUrl,'ready'=>false,'source'=>'Active package catalog',
             ];
         }
-        // Batch/E-Book have intentionally no inferred entitlement: route/schema must be verified.
+        // E-Book continues to be populated by the pre-existing Blade bridge.
         return view('student.referral.all-links', [
             'sections'=>$sections,
             'referralCode'=>(string)($student->referral_id ?? ''),

@@ -217,7 +217,7 @@ if($complains)
         @endphp
         <li class="treeview {{ $premiumRecordingMenuActive ? 'active menu-open' : '' }}">
           <a href="#">
-            <i class="fa fa-play-circle"></i> <span>Premium Recorded Classes</span>
+            <i class="fa fa-play-circle"></i> <span>Premium Classes</span>
             <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
           </a>
           <ul class="treeview-menu" style="{{ $premiumRecordingMenuActive ? 'display:block;' : '' }}">
@@ -254,7 +254,7 @@ if($complains)
 
         {{-- LEBD Fix139: Separate Examination Section --}}
         <li class="treeview {{ request()->routeIs('admin.exam-section.*') ? 'active menu-open' : '' }}">
-          <a href="#"><i class="fa fa-file-text"></i><span>Exam Section Student Dashboard</span><span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
+          <a href="#"><i class="fa fa-file-text"></i><span>Exam Section Dashboard</span><span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
           <ul class="treeview-menu" style="{{ request()->routeIs('admin.exam-section.*') ? 'display:block' : '' }}">
             <li><a href="{{route('admin.exam-section.categories')}}"><i class="fa fa-folder"></i> Category</a></li>
             <li><a href="{{route('admin.exam-section.subcategories')}}"><i class="fa fa-sitemap"></i> Sub-category</a></li>
@@ -679,6 +679,47 @@ if($complains)
           </ul>
         </li>
 </ul>
+      {{-- LEBD-05: Sort admin sidebar top-level items only; leave routes, children, authorization untouched. --}}
+      <script>
+      (function () {
+          'use strict';
+          var sidebar = document.querySelector('aside.main-sidebar > section.sidebar > ul.sidebar-menu');
+          if (!sidebar) return;
+          var items = Array.prototype.filter.call(sidebar.children, function (node) {
+              return node.tagName === 'LI';
+          });
+          function label(item) {
+              var anchor = null;
+              for (var i = 0; i < item.children.length; i++) {
+                  if (item.children[i].tagName === 'A') { anchor = item.children[i]; break; }
+              }
+              if (!anchor) return '';
+              var span = anchor.querySelector(':scope > span:not(.pull-right-container)');
+              if (span) return (span.textContent || '').trim();
+              // Direct anchor text only; never include submenu labels in sorting.
+              return Array.prototype.filter.call(anchor.childNodes, function (node) {
+                  return node.nodeType === 3;
+              }).map(function (node) { return node.textContent; }).join(' ').trim();
+          }
+          function rank(text) {
+              if (text === 'Dashboard') return 0;
+              if (text === 'Homepage Settings') return 2;
+              if (text === 'Settings') return 3;
+              return 1;
+          }
+          var indexed = items.map(function (item, index) {
+              return { item: item, index: index, text: label(item) };
+          });
+          indexed.sort(function (a, b) {
+              var delta = rank(a.text) - rank(b.text);
+              if (delta !== 0) return delta;
+              if (rank(a.text) !== 1) return a.index - b.index;
+              var cmp = a.text.toLowerCase().localeCompare(b.text.toLowerCase(), 'en');
+              return cmp || (a.index - b.index);
+          });
+          indexed.forEach(function (entry) { sidebar.appendChild(entry.item); });
+      })();
+      </script>
     </section> <!-- /.sidebar -->
   </aside>
   <div class="alert-section" style="">

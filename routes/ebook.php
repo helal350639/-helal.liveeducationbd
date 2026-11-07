@@ -70,3 +70,14 @@ Route::post('e-books/{kind}/{category}/packages/{package}/gateway-confirm',
 Route::post('e-books/payment-method/review',
  [\App\Http\Controllers\EBook\EBookReferralController::class,'review'])
  ->middleware('auth:student')->name('lebd.ebook.payment.review');
+
+// LEBD-05 E-Book Admin Package Student Picker and Report — isolated from existing E-Book routes.
+\Illuminate\Support\Facades\Route::middleware('auth')->prefix('admin/e-book/packages')->name('admin.ebook-packages.')->group(function(){
+    \Illuminate\Support\Facades\Route::get('/{package}/students-add', [\App\Http\Controllers\EBook\EBookPackageStudentsController::class,'start'])->whereNumber('package')->name('students.add');
+    \Illuminate\Support\Facades\Route::get('/{package}/student-report', [\App\Http\Controllers\EBook\EBookPackageStudentsController::class,'report'])->whereNumber('package')->name('students.report');
+    \Illuminate\Support\Facades\Route::post('/{package}/student-report/{student}/remove-manual', [\App\Http\Controllers\EBook\EBookPackageStudentsController::class,'removeManual'])->whereNumber('package')->whereNumber('student')->name('students.manual.remove');
+});
+// LEBD-05 V9: read-only, one-package referral landing; existing purchase routes unchanged.
+\Illuminate\Support\Facades\Route::get('e-books/referral-package/{package}',
+ [\App\Http\Controllers\EBook\EBookReferralPackageLandingController::class,'show'])
+ ->whereNumber('package')->name('lebd.ebook.referral.package');

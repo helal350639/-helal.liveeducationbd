@@ -11,6 +11,7 @@
 @section('content')
 <div class="lebd-exam-scope">
 <main class="le185-main">
+@php $lebdShowOwnedExamPackages = true; @endphp
 @include('student.partials.exam-section-category-cards')
 </main><footer class="le185-footer">Live Education BD · Exam Section</footer>
 <script>

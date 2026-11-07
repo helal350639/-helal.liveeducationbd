@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Throwable;
+use App\Services\EBook\EBookReferralSettlement;
 
 class EBookPaymentController extends Controller
 {
@@ -27,9 +28,18 @@ class EBookPaymentController extends Controller
             ->where('p.id', $package)->where('pc.category_id', $category)
             ->where('p.status', 'Active')->select('p.*')->first();
         abort_unless($p, 404);
+        // Stop repeat gateway charges for a package already active for this student.
+        // The existing per-category entitlements are authoritative for E-Book access.
+        $samePackageActive = DB::table('lebd_ebook_entitlements')
+            ->where('user_id', $student->id)->where('package_id', $package)
+            ->where('status', 'Active')->where('expires_at', '>', now('Asia/Dhaka'))->exists();
+        if ($samePackageActive) {
+            return back()->with('error','এই প্যাকেজ কিনেছেন। আবার পেমেন্ট প্রয়োজন নেই।');
+        }
         $now = Carbon::now('Asia/Dhaka');
         $offerActive = !$p->offer_ends_at || Carbon::parse($p->offer_ends_at, 'Asia/Dhaka')->endOfDay()->gte($now);
-        $amount = round((float)($offerActive ? $p->price : $p->main_price), 2);
+        $quote = app(EBookReferralSettlement::class)->sessionQuote($p,(int)$student->id,$request->session());
+        $amount = $quote['total'] / 100;
         if ($amount < 10 || $amount > 500000) {
             return back()->with('error', 'প্যাকেজের মূল্য Gateway গ্রহণযোগ্য সীমায় নেই।');
         }
@@ -42,12 +52,15 @@ class EBookPaymentController extends Controller
             return back()->with('error', 'Payment-এর আগে Student Profile-এ সঠিক ফোন ও ইমেইল যোগ করুন।');
         }
         $trx = 'EBK'.strtoupper(Str::random(20));
-        DB::table('lebd_ebook_payment_orders')->insert([
+        DB::transaction(function () use ($student,$category,$p,$trx,$amount,$quote) {
+        $orderId = DB::table('lebd_ebook_payment_orders')->insertGetId([
             'student_id'=>$student->id,'category_id'=>$category,'package_id'=>$p->id,
             'transaction_id'=>$trx,'package_name'=>$p->name,'amount'=>$amount,'currency'=>'BDT',
             'duration_value'=>$p->duration_value,'duration_unit'=>$p->duration_unit,
             'status'=>'Pending','created_at'=>now(),'updated_at'=>now(),
         ]);
+        app(EBookReferralSettlement::class)->addAttribution($orderId,(int)$student->id,(int)$p->id,$quote);
+        },3);
         $payload = [
             'total_amount'=>number_format($amount,2,'.',''),'currency'=>'BDT','tran_id'=>$trx,
             'cus_name'=>mb_substr((string)($student->name ?: 'Student'),0,50),
@@ -140,6 +153,7 @@ class EBookPaymentController extends Controller
                 'status'=>'Complete','gateway_validation_id'=>mb_substr($valId,0,100),
                 'paid_at'=>now(),'updated_at'=>now(),
             ]);
+            app(EBookReferralSettlement::class)->credit((int)$locked->id);
         });
         return $this->result($order->id,'success',$event!=='ipn');
     }

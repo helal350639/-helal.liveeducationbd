@@ -7,15 +7,6 @@
     $refCode = trim((string) ($refStudent->referral_id ?? ''));
     $mainReferralUrl = $refCode !== '' ? url('/register') . '?' . http_build_query(['ref' => $refCode]) : '';
 
-    /*
-     | Prefer the controller's paid/purchased collection whenever it is supplied.
-     | Fallback: this student's existing batch memberships (never a global batch list).
-     | If paid purchases differ from enrolled batches in your project, pass the exact
-     | $purchasedCourses collection from the controller to this view.
-     */
-    $referralPurchasedBatches = isset($purchasedCourses)
-        ? collect($purchasedCourses)
-        : ($refStudent ? $refStudent->batches()->get() : collect());
 
     // Show an approval notice ONLY for a genuinely approved withdrawal of this student.
     // Never infer approval from available balance or referrals.
@@ -223,6 +214,44 @@
     .lebd-referral .lr-scroll {scroll-behavior:auto;}
     .lebd-referral .lr-toast {transition:none;}
 }
+
+/* LEBD-05: single referral destination CTA; scoped to this page only. */
+.lebd-referral .lr-referral-cta-wrap { margin: 0 0 17px; }
+.lebd-referral .lr-referral-cta {
+    position:relative; isolation:isolate; overflow:hidden;
+    display:flex; align-items:center; gap:16px; min-height:112px;
+    padding:22px 24px; border-radius:19px; text-decoration:none;
+    background:linear-gradient(112deg,#0956c9 0%,#0876eb 49%,#08a991 100%);
+    box-shadow:0 12px 28px rgba(12,90,190,.20); color:#fff;
+    border:1px solid rgba(255,255,255,.24); transition:transform .2s ease,box-shadow .2s ease;
+}
+.lebd-referral .lr-referral-cta:hover { color:#fff; transform:translateY(-2px); box-shadow:0 16px 32px rgba(12,90,190,.26); }
+.lebd-referral .lr-referral-cta:focus-visible { outline:3px solid #ffce50; outline-offset:3px; }
+.lebd-referral .lr-referral-cta-icon {
+    width:58px;height:58px; flex:0 0 58px; border-radius:16px;
+    display:grid;place-items:center;background:rgba(255,255,255,.18);font-size:26px;
+}
+.lebd-referral .lr-referral-cta-copy { display:flex; flex-direction:column; gap:5px; flex:1;min-width:0; }
+.lebd-referral .lr-referral-cta-copy strong { color:#fff; font-size:25px;line-height:1.3;font-weight:850; }
+.lebd-referral .lr-referral-cta-copy small { color:#e9f7ff;font-size:13px;line-height:1.5; }
+.lebd-referral .lr-referral-cta-go {
+    display:inline-flex;align-items:center;justify-content:center;gap:9px;
+    flex:0 0 auto;min-width:132px;padding:12px 16px;border-radius:12px;
+    background:#fff;color:#075cce;font-size:14px;font-weight:850;
+    box-shadow:0 3px 14px rgba(0,0,0,.12);
+    animation:lrClickNowGlow 1.35s ease-in-out infinite;
+}
+@keyframes lrClickNowGlow { 0%,100% { opacity:1;box-shadow:0 3px 14px rgba(0,0,0,.12); } 50% { opacity:.55;box-shadow:0 3px 24px rgba(255,255,255,.65); } }
+@media(max-width:600px) {
+    .lebd-referral .lr-referral-cta { flex-wrap:wrap;padding:17px;gap:11px; }
+    .lebd-referral .lr-referral-cta-icon { width:44px;height:44px;flex-basis:44px;font-size:20px; }
+    .lebd-referral .lr-referral-cta-copy strong { font-size:20px; }
+    .lebd-referral .lr-referral-cta-copy small { font-size:11px; }
+    .lebd-referral .lr-referral-cta-go { width:100%; }
+}
+@media(prefers-reduced-motion:reduce){
+    .lebd-referral .lr-referral-cta, .lebd-referral .lr-referral-cta-go {animation:none;transition:none;}
+}
 </style>
 @endsection
 
@@ -237,61 +266,18 @@
       </div>
     </div>
 
-    <section class="lr-panel" aria-labelledby="lr-purchased-heading">
-      <div class="lr-panel-head">
-        <div class="lr-heading">
-          <span class="lr-heading-icon"><i class="fa-solid fa-graduation-cap"></i></span>
-          <div>
-            <h2 id="lr-purchased-heading">My Purchased Courses</h2>
-            <p>আপনার যুক্ত থাকা ব্যাচ থেকে Referral Link শেয়ার করুন · {{ $referralPurchasedBatches->count() }} টি</p>
-          </div>
-        </div>
-        <div class="lr-head-links">
-          @if($referralPurchasedBatches->count() > 1)
-            <button type="button" class="lr-nav" data-lr-prev aria-label="Previous course"><i class="fa-solid fa-chevron-left"></i></button>
-            <button type="button" class="lr-nav" data-lr-next aria-label="Next course"><i class="fa-solid fa-chevron-right"></i></button>
-          @endif
-          <a class="lr-more" href="{{ route('students.my-course') }}">See More <i class="fa-solid fa-arrow-right"></i></a>
-        </div>
-      </div>
-      @if($referralPurchasedBatches->isNotEmpty())
-        <div class="lr-scroll" id="lrPurchasedSlider" role="region" aria-label="Purchased course slider" tabindex="0">
-          @foreach($referralPurchasedBatches as $batch)
-            @php
-              $batchShareUrl = $refCode !== ''
-                ? url('/register') . '?' . http_build_query(['ref' => $refCode, 'batch' => $batch->id])
-                : '';
-              $batchBanner = trim((string) ($batch->banner ?? ''));
-            @endphp
-            <article class="lr-course">
-              <div class="lr-cover">
-                <i class="fa-solid fa-book-open" aria-hidden="true"></i>
-                @if($batchBanner !== '')
-                  <img src="{{ $batchBanner }}" alt="{{ $batch->name }}" loading="lazy" onerror="this.style.display='none'">
-                @endif
-              </div>
-              <div class="lr-course-body">
-                <h3>{{ $batch->name }}</h3>
-                <p>{{ $batch->subtitle ?? 'Enrolled Batch' }}</p>
-                <div class="lr-bonus">
-                  <span>Referral Bonus</span>
-                  <strong>৳ {{ number_format((float) ($batch->referrer_bonus ?? 0), 2) }}</strong>
-                </div>
-                <div class="lr-action-row">
-                  <button type="button" class="lr-action" data-lr-copy="{{ $batchShareUrl }}" {{ $batchShareUrl === '' ? 'disabled' : '' }}>
-                    <i class="fa-solid fa-copy"></i> Copy Link
-                  </button>
-                  <button type="button" class="lr-action lr-action-share" data-lr-share="{{ $batchShareUrl }}" {{ $batchShareUrl === '' ? 'disabled' : '' }}>
-                    <i class="fa-solid fa-share-nodes"></i> Share
-                  </button>
-                </div>
-              </div>
-            </article>
-          @endforeach
-        </div>
-      @else
-        <div class="lr-empty"><i class="fa-solid fa-box-open"></i> এখানে এখনো কোনো কেনা ব্যাচ পাওয়া যায়নি। <a href="{{ route('students.my-course') }}">My Courses দেখুন</a></div>
-      @endif
+    {{-- LEBD-05: one direct, prominent entry to the existing All Referral Link page.
+         The previous purchased-course carousel is intentionally removed here only. --}}
+    <section class="lr-referral-cta-wrap" aria-labelledby="lr-referral-cta-title">
+      <a class="lr-referral-cta" href="{{ route('student.all-referral-links') }}"
+         aria-label="রেফার করে আয় করুন — All Referral Link পেজ খুলুন">
+        <span class="lr-referral-cta-icon" aria-hidden="true"><i class="fa-solid fa-hand-holding-dollar"></i></span>
+        <span class="lr-referral-cta-copy">
+          <strong id="lr-referral-cta-title">রেফার করে আয় করুন</strong>
+          <small>আপনার Active Package-এর Referral Link কপি ও শেয়ার করুন</small>
+        </span>
+        <span class="lr-referral-cta-go" aria-hidden="true">Click Now <i class="fa-solid fa-arrow-right"></i></span>
+      </a>
     </section>
 
     <div class="lr-details-grid">
@@ -327,6 +313,62 @@
         </div>
       </section>
     </div>
+
+    {{-- LEBD-05: Independent five-section referral earnings overview.
+         Only credited, attributable transactions count as earned income. --}}
+    @php
+      // Keep this existing referral page usable even before the optional service is installed.
+      // Missing income data is explicitly unverified, never shown as a fabricated zero.
+      $lebdReferralBySection = [
+          ['label' => 'Batch / Course', 'icon' => 'fa-graduation-cap', 'verified' => false, 'earned' => 0, 'count' => '—'],
+          ['label' => 'Exam Section', 'icon' => 'fa-calendar-check', 'verified' => false, 'earned' => 0, 'count' => '—'],
+          ['label' => 'MCQ Study', 'icon' => 'fa-list-check', 'verified' => false, 'earned' => 0, 'count' => '—'],
+          ['label' => 'Video Class', 'icon' => 'fa-video', 'verified' => false, 'earned' => 0, 'count' => '—'],
+          ['label' => 'E-Book', 'icon' => 'fa-book', 'verified' => false, 'earned' => 0, 'count' => '—'],
+      ];
+      // Resolve the verified service via Composer first; support an already deployed
+      // new file when Composer's optimized classmap was not refreshed yet.
+      $lebdEarningsClass = \App\Services\Referral\FiveSectionReferralEarnings::class;
+      $lebdEarningsPath = app_path('Services/Referral/FiveSectionReferralEarnings.php');
+      if (!class_exists($lebdEarningsClass) && is_file($lebdEarningsPath)) {
+          require_once $lebdEarningsPath;
+      }
+      if (class_exists($lebdEarningsClass)) {
+          try {
+              $lebdReferralBySection = (new $lebdEarningsClass())
+                  ->forStudent((int) ($refStudent->id ?? 0));
+          } catch (\Throwable $lebdReferralError) {
+              \Illuminate\Support\Facades\Log::error('LEBD My Referral earnings query failed', [
+                  'message' => $lebdReferralError->getMessage(),
+              ]);
+          }
+      } else {
+          \Illuminate\Support\Facades\Log::error('LEBD My Referral earnings service file missing', [
+              'expected_path' => $lebdEarningsPath,
+          ]);
+      }
+    @endphp
+    <section class="lr-panel" aria-labelledby="lebd-ref-earnings-heading">
+      <div class="lr-panel-head"><div class="lr-heading">
+        <span class="lr-heading-icon"><i class="fa-solid fa-chart-column"></i></span>
+        <div><h2 id="lebd-ref-earnings-heading">Referral Income by Section</h2>
+          <p>কোন Section-এর Referral থেকে কত টাকা আয় হয়েছে</p></div>
+      </div></div>
+      <div class="lr-earning-grid" aria-label="Five referral sections">
+        @foreach($lebdReferralBySection as $section)
+          <div class="lr-earning-cell" style="min-width:0;">
+            <small><i class="fa-solid {{ $section['icon'] }}" aria-hidden="true"></i> {{ $section['label'] }}</small>
+            @if($section['verified'])
+              <strong>৳ {{ number_format($section['earned'],2) }}</strong>
+            @else
+              <strong style="font-size:12px">হিসাব যাচাই প্রয়োজন</strong>
+            @endif
+            <small>{{ $section['count'] }}টি সক্রিয় প্যাকেজ</small>
+          </div>
+        @endforeach
+      </div>
+      <p style="margin:10px 0 0;color:#60758e;font-size:11px;">শুধু শনাক্তযোগ্য সফল Referral Bonus-ই আয়ে যোগ হয়েছে। প্যাকেজের Bonus Rate বা Wallet Balance-কে আয় হিসেবে ধরা হয়নি।</p>
+    </section>
 
     <div class="lr-balance-grid">
       <section class="lr-balance"><small>Lifetime Earn</small><strong>৳ {{ number_format((float) ($lifetimeEarn ?? 0), 2) }}</strong></section>
