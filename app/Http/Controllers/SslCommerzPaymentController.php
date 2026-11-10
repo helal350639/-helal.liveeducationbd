@@ -212,6 +212,7 @@ class SslCommerzPaymentController extends Controller
         $currency = $request->input('currency');
 
         $sslc = new SslCommerzNotification();
+        dd($request->all());
 
         #Check order status in order tabel against the transaction id or order id.
         $order_details = DB::table('orders')
@@ -282,6 +283,7 @@ class SslCommerzPaymentController extends Controller
             Session::forget('batch-referrer');
           }
         }
+       
 
         if ($order_details->status == 'Pending') {
           $validation = $sslc->orderValidate($request->all(), $tran_id, $amount, $currency);
@@ -319,6 +321,7 @@ class SslCommerzPaymentController extends Controller
 
     public function fail(Request $request)
     {
+        dd($request->all()); 
         $redirect_url = route('students.my-course');
         $redirect_script = "<script> setTimeout('window.location.href=\"".$redirect_url."\"', 5000);</script>";
         

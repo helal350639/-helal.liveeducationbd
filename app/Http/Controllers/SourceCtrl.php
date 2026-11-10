@@ -125,6 +125,32 @@ class SourceCtrl extends Controller
     //   $message->from($data['email_from'], $data['from_name']);
     // });
 
+    // If one or more managed sender accounts are selected, distribute recipients
+    // across those SMTP accounts. Legacy .env SMTP remains the fallback.
+    $senderIds = isset($data['sender_account_ids']) && is_array($data['sender_account_ids'])
+      ? array_values(array_unique(array_map('intval', $data['sender_account_ids']))) : [];
+    if ($senderIds && \Illuminate\Support\Facades\Schema::hasTable('email_sender_accounts')) {
+      $accounts = \Illuminate\Support\Facades\DB::table('email_sender_accounts')
+        ->whereIn('id', $senderIds)->where('is_active', 1)->orderBy('id')->get();
+      $recipients = array_values(array_filter((array)($data['email_bcc'] ?? [])));
+      if ($accounts->isEmpty()) throw new \RuntimeException('No active sender email account selected.');
+      $chunks = array_fill(0, $accounts->count(), []);
+      foreach ($recipients as $i => $recipient) $chunks[$i % $accounts->count()][] = $recipient;
+      foreach ($accounts->values() as $i => $account) {
+        if (empty($chunks[$i])) continue;
+        $transport = new \Swift_SmtpTransport($account->host, (int)$account->port, $account->encryption === 'none' ? null : $account->encryption);
+        $transport->setUsername($account->username)->setPassword(\Illuminate\Support\Facades\Crypt::decrypt($account->password_encrypted));
+        $mailer = new \Swift_Mailer($transport);
+        $message = (new \Swift_Message($data['subject']))
+          ->setFrom([$account->email => $account->from_name])
+          ->setTo($account->email)
+          ->setBcc($chunks[$i])
+          ->setBody(view('mail.default', $data)->render(), 'text/html');
+        $mailer->send($message);
+      }
+      return true;
+    }
+
     try {
       Mail::send('mail.default', $data, function($message) use ($data) {
           $message->to($data['email_to']);

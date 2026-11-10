@@ -145,6 +145,31 @@ if($complains)
                 </li>
             </ul>
         </li>
+        {{-- LEBD-05 Admin Balance module: isolated parent menu with three child pages --}}
+        @php
+            $adminBalanceMenuActive = request()->routeIs('admin.balance.*');
+        @endphp
+        <li class="treeview {{ $adminBalanceMenuActive ? 'active menu-open' : '' }}">
+            <a href="#">
+                <i class="fa fa-money"></i>
+                <span>Admin Balance</span>
+                <span class="pull-right-container">
+                    <i class="fa fa-angle-left pull-right"></i>
+                </span>
+            </a>
+            <ul class="treeview-menu" style="{{ $adminBalanceMenuActive ? 'display:block;' : 'display:none;' }}">
+                <li class="{{ request()->routeIs('admin.balance.income') ? 'active' : '' }}">
+                    <a href="{{ route('admin.balance.income') }}"><i class="fa fa-arrow-up text-green"></i> Income</a>
+                </li>
+                <li class="{{ request()->routeIs('admin.balance.cost') ? 'active' : '' }}">
+                    <a href="{{ route('admin.balance.cost') }}"><i class="fa fa-arrow-down text-red"></i> Cost</a>
+                </li>
+                <li class="{{ request()->routeIs('admin.balance.summary') ? 'active' : '' }}">
+                    <a href="{{ route('admin.balance.summary') }}"><i class="fa fa-bar-chart"></i> Summary</a>
+                </li>
+            </ul>
+        </li>
+
         {{-- LEBD-05 Extra Student independent admin module --}}
         @php $extraStudentMenuActive = request()->routeIs('admin.extra-students.*'); @endphp
         <li class="treeview {{ $extraStudentMenuActive ? 'active menu-open' : '' }}">
@@ -190,7 +215,7 @@ if($complains)
         @endphp
         <li class="treeview {{ $examMcqMenuActive ? 'active menu-open' : '' }}">
           <a href="#">
-            <i class="fa fa-list-alt"></i> <span>MCQ for Exam</span>
+            <i class="fa fa-list-alt"></i> <span>MCQ Add for Exam</span>
             <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
           </a>
           <ul class="treeview-menu" style="{{ $examMcqMenuActive ? 'display:block;' : '' }}">
@@ -254,7 +279,7 @@ if($complains)
 
         {{-- LEBD Fix139: Separate Examination Section --}}
         <li class="treeview {{ request()->routeIs('admin.exam-section.*') ? 'active menu-open' : '' }}">
-          <a href="#"><i class="fa fa-file-text"></i><span>Exam Section Dashboard</span><span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
+          <a href="#"><i class="fa fa-file-text"></i><span>Exam Section S.Dashboard</span><span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
           <ul class="treeview-menu" style="{{ request()->routeIs('admin.exam-section.*') ? 'display:block' : '' }}">
             <li><a href="{{route('admin.exam-section.categories')}}"><i class="fa fa-folder"></i> Category</a></li>
             <li><a href="{{route('admin.exam-section.subcategories')}}"><i class="fa fa-sitemap"></i> Sub-category</a></li>
@@ -305,27 +330,33 @@ if($complains)
             </span>
           </a>
           <ul class="treeview-menu">
-            <li><a href="{{route('email.create')}}"><i class="fa fa-pencil"></i> Compose Email</a></li>
-            <li><a href="{{route('email.index')}}"><i class="fa fa-list"></i> View Emails</a></li>
+            <li class="{{ request()->routeIs('email.accounts.*') ? 'active' : '' }}"><a href="{{ route('email.accounts.index') }}"><i class="fa fa-envelope-o"></i> Manage Email Accounts</a></li>
+            <li class="{{ request()->routeIs('email.batch-name.*') ? 'active' : '' }}"><a href="{{ route('email.batch-name.index') }}"><i class="fa fa-paper-plane"></i> Create Batch Name</a></li>
+            <li class="{{ request()->routeIs('email.index') ? 'active' : '' }}"><a href="{{ route('email.index') }}"><i class="fa fa-list"></i> View Batch Email</a></li>
           </ul>
         </li>
-        <li class="treeview">
+        @php
+          $createBatchNameMenuActive = request()->routeIs('sms.batch-name.*') || request()->routeIs('sms.index');
+        @endphp
+        <li class="treeview {{ $createBatchNameMenuActive ? 'active menu-open' : '' }}">
           <a href="#">
             <i class="fa fa-envelope"></i>
             <span>SMS</span>
-            <span class="pull-right-container">
-              <i class="fa fa-angle-left pull-right"></i>
-            </span>
+            <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
           </a>
-          <ul class="treeview-menu">
-            <li><a href="{{route('sms.create')}}"><i class="fa fa-send"></i> Send SMS</a></li>
-            <li><a href="{{route('sms.index')}}"><i class="fa fa-list"></i> View SMS</a></li>
+          <ul class="treeview-menu" style="{{ $createBatchNameMenuActive ? 'display:block;' : '' }}">
+            <li class="{{ request()->routeIs('sms.batch-name.*') ? 'active' : '' }}">
+              <a href="{{ route('sms.batch-name.index') }}"><i class="fa fa-paper-plane"></i> Create Batch Name</a>
+            </li>
+            <li class="{{ request()->routeIs('sms.index') ? 'active' : '' }}">
+              <a href="{{ route('sms.index') }}"><i class="fa fa-list"></i> View Batch SMS</a>
+            </li>
           </ul>
         </li>
         <li class="treeview">
           <a href="#">
             <i class="fa fa-pencil"></i>
-            <span>Exams</span>
+            <span>live Exams Check</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>
@@ -342,7 +373,7 @@ if($complains)
         <li class="treeview">
           <a href="#">
             <i class="fa fa-question"></i>
-            <span>Questions</span>
+            <span>Main Questions Database</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>
@@ -424,7 +455,7 @@ if($complains)
               <a href="{{ route('admin.daily-update.create') }}"><i class="fa fa-plus-square"></i> Add New Update</a>
             </li>
             <li class="{{ request()->routeIs('admin.daily-update.categories') ? 'active' : '' }}">
-              <a href="{{ route('admin.daily-update.categories') }}"><i class="fa fa-folder-open"></i> Categories</a>
+              <a href="{{ route('admin.daily-update.categories') }}"><i class="fa fa-folder-open"></i> All Categories</a>
             </li>
             <li class="{{ request()->routeIs('admin.daily-update.comments') ? 'active' : '' }}">
               <a href="{{ route('admin.daily-update.comments') }}"><i class="fa fa-comments"></i> Comments</a>
@@ -447,7 +478,7 @@ if($complains)
         <li class="treeview">
           <a href="#">
             <i class="fa fa-th"></i>
-            <span>Batches</span>
+            <span>Batches MCQ Exam</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>
@@ -536,7 +567,7 @@ if($complains)
         </li>
         <li class="treeview">
           <a href="#">
-            <i class="fa fa-sliders"></i> <span>Filters</span>
+            <i class="fa fa-sliders"></i> <span>Main Filters</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>
@@ -548,7 +579,7 @@ if($complains)
         </li>
         <li class="treeview">
           <a href="#">
-            <i class="fa fa-commenting"></i> <span>Complains</span>
+            <i class="fa fa-commenting"></i> <span>Complains from Student</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>
@@ -559,7 +590,7 @@ if($complains)
         </li>
         <li class="treeview">
           <a href="#">
-            <i class="fa fa-shopping-cart"></i> <span>Orders</span>
+            <i class="fa fa-shopping-cart"></i> <span>All Orders list</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>
@@ -604,7 +635,7 @@ if($complains)
 <li class="treeview">
     <a href="#">
         <i class="fa fa-money"></i>
-        <span>Withdraw</span>
+        <span>Referral Withdraw Request</span>
         <span class="pull-right-container">
             <i class="fa fa-angle-left pull-right"></i>
         </span>

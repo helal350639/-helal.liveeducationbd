@@ -28,7 +28,9 @@ class ScheduleCtrl extends Controller
     $now = $past->format('Y-m-d H:i:s');
 
     $smses = Sms::where('status', 'Scheduled')
+    ->where('is_active', 1)
     ->whereRaw('datetime <= ?', [$now])
+    ->orderBy('datetime', 'ASC')
     ->get();
 
     if($smses->count() > 0)

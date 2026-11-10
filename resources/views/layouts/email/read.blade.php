@@ -24,7 +24,7 @@ $value = $email;
     <section class="content-header">
       <h1>Email Details</h1>
       <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Emails</a></li>
+        <li><a href="#"><i class="fa fa-dashboard"></i> Emailes</a></li>
         <li class="active">Details</li>
       </ol>    
     </section>
@@ -40,11 +40,7 @@ $value = $email;
           <div class="box-body">
             <div class="col-md-12 text-right toolbar-icon">
               <a href="{{route('email.create')}}" title="Add New" class="label label-info"><i class="fa fa-plus"></i></a>
-              <a href="{{route('email.edit', $email->id)}}" class="label label-warning" title="Edit this"><i class="fa fa-edit"></i></a>
-              <a href="{{route('email.index')}}" class="label label-success" title="View"><i class="fa fa-list"></i></a>
-              @if($email->status == 'Scheduled')
-              <a href="{{route('schedule.send-email', $email->id)}}" class="label label-primary" title="Send Email"><i class="fa fa-send"></i></a>
-              @endif
+              <a href="{{route('email.edit', $value->id)}}" class="label label-warning" title="Edit this"><i class="fa fa-edit"></i></a>
             </div>
             <div class="col-md-12">
               <table class="table">

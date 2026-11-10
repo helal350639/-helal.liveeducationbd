@@ -134,6 +134,9 @@ Route::controller(ForgotPasswordController::class)->group(function()
 });
 Route::controller(SslCommerzPaymentController::class)->group(function()
 {
+  Route::get('/sslpayment-test',function(){
+    return view("student-panel.sslpaymenttest");
+  }); 
     // SSLCOMMERZ Start
     Route::get('/example1', 'exampleEasyCheckout');
     Route::get('/payment-proceed', 'exampleHostedCheckout');
@@ -289,6 +292,50 @@ Route::middleware('auth:student')->get('/students/exam-info/{paper}', function (
     ->name('students.exam.info');
 Route::middleware(['auth'])->group(function()
 {
+  // LEBD-05 Admin Balance: isolated routes for Income, Cost and Summary.
+  Route::prefix('admin-balance')->name('admin.balance.')->group(function () {
+      // Income ledger mirrors the Cost module; data and categories are stored separately.
+      Route::get('/income', [\App\Http\Controllers\Admin\IncomeController::class, 'index'])
+          ->name('income');
+      Route::get('/income/archive', [\App\Http\Controllers\Admin\IncomeController::class, 'archive'])
+          ->name('income.archive');
+      Route::post('/income', [\App\Http\Controllers\Admin\IncomeController::class, 'store'])
+          ->name('income.store');
+      Route::post('/income/categories', [\App\Http\Controllers\Admin\IncomeController::class, 'storeCategory'])
+          ->name('income.categories.store');
+      Route::get('/income/{id}/edit', [\App\Http\Controllers\Admin\IncomeController::class, 'edit'])
+          ->whereNumber('id')->name('income.edit');
+      Route::put('/income/{id}', [\App\Http\Controllers\Admin\IncomeController::class, 'update'])
+          ->whereNumber('id')->name('income.update');
+      Route::delete('/income/{id}', [\App\Http\Controllers\Admin\IncomeController::class, 'destroy'])
+          ->whereNumber('id')->name('income.destroy');
+
+      // Cost ledger: dedicated controller; Income and Summary routes remain isolated.
+      Route::get('/cost', [\App\Http\Controllers\Admin\CostController::class, 'index'])
+          ->name('cost');
+      Route::get('/cost/archive', [\App\Http\Controllers\Admin\CostController::class, 'archive'])
+          ->name('cost.archive');
+      Route::post('/cost', [\App\Http\Controllers\Admin\CostController::class, 'store'])
+          ->name('cost.store');
+      Route::post('/cost/categories', [\App\Http\Controllers\Admin\CostController::class, 'storeCategory'])
+          ->name('cost.categories.store');
+      Route::get('/cost/{id}/edit', [\App\Http\Controllers\Admin\CostController::class, 'edit'])
+          ->whereNumber('id')->name('cost.edit');
+      Route::put('/cost/{id}', [\App\Http\Controllers\Admin\CostController::class, 'update'])
+          ->whereNumber('id')->name('cost.update');
+      Route::delete('/cost/{id}', [\App\Http\Controllers\Admin\CostController::class, 'destroy'])
+          ->whereNumber('id')->name('cost.destroy');
+
+      Route::get('/summary', [\App\Http\Controllers\Admin\SummaryController::class, 'index'])
+          ->name('summary');
+      Route::get('/summary/income', [\App\Http\Controllers\Admin\SummaryController::class, 'income'])
+          ->name('summary.income');
+      Route::get('/summary/cost', [\App\Http\Controllers\Admin\SummaryController::class, 'cost'])
+          ->name('summary.cost');
+      Route::get('/summary/combine', [\App\Http\Controllers\Admin\SummaryController::class, 'combine'])
+          ->name('summary.combine');
+  });
+
   Route::controller(HomeCtrl::class)->group(function(){
     Route::get('/home', 'index')->name('home');
     /*
@@ -474,7 +521,33 @@ Route::get('daily-exam/{id}',
   Route::get('routine/{id}/copy', 'RoutineCtrl@copy')->name('routine.copy');
   Route::post('/routine/item/update-exam-at/{id}',[RoutineItemCtrl::class, 'updateExamAt'])->name('routine.item.update-exam-at');
   Route::post('/routine/item/update-exam-end/{id}',[RoutineItemCtrl::class,'updateExamEnd'])->name('routine.item.update.date');
+    // Create Batch Name selectors: read-only links to existing Batch/Course/Exam Section data.
+    Route::get('sms/create-batch-name', [\App\Http\Controllers\Admin\SmsBatchNameController::class, 'index'])->name('sms.batch-name.index');
+    Route::post('sms/create-batch-name', [\App\Http\Controllers\Admin\SmsBatchNameController::class, 'store'])->name('sms.batch-name.store');
+    Route::get('sms/create-batch-name/data/courses', [\App\Http\Controllers\Admin\SmsBatchNameController::class, 'courses'])->name('sms.batch-name.courses');
+    Route::get('sms/create-batch-name/data/courses/{course}/batches', [\App\Http\Controllers\Admin\SmsBatchNameController::class, 'batches'])->whereNumber('course')->name('sms.batch-name.batches');
+    Route::get('sms/create-batch-name/data/exam-categories', [\App\Http\Controllers\Admin\SmsBatchNameController::class, 'examCategories'])->name('sms.batch-name.exam-categories');
+    Route::get('sms/create-batch-name/data/exam-categories/{category}/subcategories', [\App\Http\Controllers\Admin\SmsBatchNameController::class, 'examSubcategories'])->whereNumber('category')->name('sms.batch-name.exam-subcategories');
+    Route::get('sms/batch/{batchId}/{type}', 'SmsCtrl@batchSmsList')->whereNumber('batchId')->name('sms.batch.list');
     Route::resource('sms', 'SmsCtrl');
+    Route::get('sms/routines/select', 'SmsCtrl@selectRoutines')->name('sms.routines.select');
+    Route::post('sms/routines/done', 'SmsCtrl@doneSelectingRoutines')->name('sms.routines.done');
+    Route::patch('sms/{id}/active', 'SmsCtrl@toggleActive')->name('sms.active');
+    Route::get('email/accounts', [\App\Http\Controllers\Admin\EmailAccountController::class, 'index'])->name('email.accounts.index');
+    Route::post('email/accounts', [\App\Http\Controllers\Admin\EmailAccountController::class, 'store'])->name('email.accounts.store');
+    Route::put('email/accounts/{id}', [\App\Http\Controllers\Admin\EmailAccountController::class, 'update'])->whereNumber('id')->name('email.accounts.update');
+    Route::post('email/accounts/{id}/test', [\App\Http\Controllers\Admin\EmailAccountController::class, 'test'])->whereNumber('id')->name('email.accounts.test');
+    Route::delete('email/accounts/{id}', [\App\Http\Controllers\Admin\EmailAccountController::class, 'destroy'])->whereNumber('id')->name('email.accounts.delete');
+    Route::get('email/create-batch-name', [\App\Http\Controllers\Admin\EmailBatchNameController::class, 'index'])->name('email.batch-name.index');
+    Route::post('email/create-batch-name', [\App\Http\Controllers\Admin\EmailBatchNameController::class, 'store'])->name('email.batch-name.store');
+    Route::get('email/create-batch-name/data/courses', [\App\Http\Controllers\Admin\EmailBatchNameController::class, 'courses'])->name('email.batch-name.courses');
+    Route::get('email/create-batch-name/data/courses/{course}/batches', [\App\Http\Controllers\Admin\EmailBatchNameController::class, 'batches'])->whereNumber('course')->name('email.batch-name.batches');
+    Route::get('email/create-batch-name/data/exam-categories', [\App\Http\Controllers\Admin\EmailBatchNameController::class, 'examCategories'])->name('email.batch-name.exam-categories');
+    Route::get('email/create-batch-name/data/exam-categories/{category}/subcategories', [\App\Http\Controllers\Admin\EmailBatchNameController::class, 'examSubcategories'])->whereNumber('category')->name('email.batch-name.exam-subcategories');
+    Route::get('email/batch/{batchId}/{type}', 'EmailCtrl@batchSmsList')->whereNumber('batchId')->name('email.batch.list');
+    Route::get('email/routines/select', 'EmailCtrl@selectRoutines')->name('email.routines.select');
+    Route::post('email/routines/done', 'EmailCtrl@doneSelectingRoutines')->name('email.routines.done');
+    Route::patch('email/{id}/active', 'EmailCtrl@toggleActive')->name('email.active');
     Route::resource('email', 'EmailCtrl');
     Route::resource('circular-type', 'CircularTypeCtrl');
     Route::resource('circular', 'CircularCtrl');

@@ -42,11 +42,28 @@ $user = Auth::guard('student')->user();
         main { width: 100%; }
         @media (max-width: 768px) { body { overflow-x: hidden; } }
     </style>
+    {{-- LEBD-05 Mobile header/content separation: limited to this shared student layout. --}}
+    <style>
+      @media (max-width: 768px) {
+        #lebd-student-main {
+          display: flow-root; /* prevent first child's collapsed top margin sliding under the header */
+          min-width: 0;
+          max-width: 100%;
+          padding-top: var(--lebd-student-mobile-header-offset, 0px);
+          scroll-margin-top: 75px;
+        }
+        #lebd-student-main > * { max-width: 100%; }
+        #lebd-student-main img, #lebd-student-main video, #lebd-student-main iframe {
+          max-width: 100%;
+        }
+        #lebd-student-main .table-responsive { max-width: 100%; overflow-x: auto; }
+      }
+    </style>
 </head>
 <body>
     <!-- Existing shared homepage header. Keep unchanged. -->
     @include('homepage.partials.global-header')
-    <main>
+    <main id="lebd-student-main">
         @yield('content')
     </main>
     <footer id="Footer"></footer>
@@ -62,5 +79,60 @@ $user = Auth::guard('student')->user();
     @endif
     <script src="{{ asset('web/js/lebd-support-chat-v60.js') }}?v=60" defer></script>
     <script src="{{ asset('web/js/lebd-global-night-mode-v62.js') }}?v=62" defer></script>
+    {{-- Header may be fixed only at mobile widths; reserve space only when it overlays main. --}}
+    <script>
+    (function () {
+      'use strict';
+      var main = document.getElementById('lebd-student-main');
+      if (!main) return;
+      var query = window.matchMedia('(max-width: 768px)');
+      var scheduled = false;
+      function isFixed(el) {
+        if (!el || el.nodeType !== 1) return false;
+        var position = window.getComputedStyle(el).position;
+        return position === 'fixed';
+      }
+      function syncOffset() {
+        scheduled = false;
+        main.style.removeProperty('--lebd-student-mobile-header-offset');
+        if (!query.matches) return;
+        var header = document.getElementById('Header') || document.querySelector('header');
+        if (!header) return;
+        var candidates = [header];
+        header.querySelectorAll('nav, .navbar, .mobile-header, .mobile-nav, .header-main, .header-sticky').forEach(function (el) {
+          candidates.push(el);
+        });
+        var bottom = 0;
+        candidates.forEach(function (el) {
+          if (!isFixed(el)) return;
+          var rect = el.getBoundingClientRect();
+          // Exclude off-screen drawers, floating controls and overlays not crossing the top edge.
+          if (rect.top <= 2 && rect.bottom > 0 && rect.height <= 200 && rect.width >= window.innerWidth * .5) {
+            bottom = Math.max(bottom, rect.bottom);
+          }
+        });
+        if (!bottom) return;
+        var mainTop = main.getBoundingClientRect().top;
+        if (mainTop < bottom) {
+          main.style.setProperty('--lebd-student-mobile-header-offset', Math.ceil(bottom - mainTop + 6) + 'px');
+        }
+      }
+      function schedule() {
+        if (scheduled) return;
+        scheduled = true;
+        window.requestAnimationFrame(syncOffset);
+      }
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', schedule);
+      else schedule();
+      window.addEventListener('load', schedule);
+      window.addEventListener('resize', schedule, {passive:true});
+      window.addEventListener('orientationchange', schedule);
+      if (query.addEventListener) query.addEventListener('change', schedule);
+      var header = document.getElementById('Header') || document.querySelector('header');
+      if (header && window.ResizeObserver) {
+        new ResizeObserver(schedule).observe(header);
+      }
+    })();
+    </script>
 </body>
 </html>

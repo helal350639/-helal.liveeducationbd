@@ -19,31 +19,96 @@ function check_student($id, $student)
 @extends('dashboard')
 @section('title', 'Edit Email')
 @section('content')
-<link href="/assets/summernote/summernote.min.css" rel="stylesheet">
 <section class="content-header">
   <h1>Edit Email</h1>
   <ol class="breadcrumb">
-    <li><a href="#"><i class="fa fa-dashboard"></i> Emails</a></li>
+    <li><a href="#"><i class="fa fa-dashboard"></i> Emailes</a></li>
     <li class="active">Edit Email</li>
 </ol>
 </section>
 
 <!-- Main content -->
 <section class="content">
+@if($email->email_workflow === 'mcq' && $email->email_type === 'Exam Alert')
+  <div class="box box-primary" style="border-top:3px solid #2474d2;border-radius:6px">
+    <div class="box-header with-border" style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+      <h3 class="box-title" style="color:#800">Edit Exam Alert Email</h3>
+      <a href="{{ route('email.index') }}" class="btn btn-default btn-sm"><i class="fa fa-arrow-left"></i> Back</a>
+    </div>
+    <form action="{{ route('email.update', $email->id) }}" method="POST">
+      @csrf
+      @method('PUT')
+      <div class="box-body">
+        @if($errors->any())
+          <div class="alert alert-danger">{{ $errors->first() }}</div>
+        @endif
+        <div class="row">
+          <div class="col-md-12">
+            <div class="form-group">
+              <label>Email Title</label>
+              <input type="text" name="title" class="form-control" maxlength="255" required value="{{ old('title', $email->title) }}">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group"><label>Batch</label><input type="text" class="form-control" readonly value="{{ implode(', ', array_map(function($id){ return optional(\App\Models\Batch::find($id))->name; }, json_decode($email->batch_id, true) ?: [])) }}"></div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group"><label>Routine / Exam</label><input type="text" class="form-control" readonly value="{{ ($examInfo->routine_name ?? 'Routine') . ' — ' . ($examInfo->paper_name ?? 'Exam') }}"></div>
+          </div>
+          <div class="col-md-12">
+            <div class="form-group">
+              <label>Email Details</label>
+              <textarea name="details" id="examDraftDetails" class="form-control" rows="6" maxlength="10000" required oninput="updateExamDraftCount()">{{ old('details', $email->details) }}</textarea>
+              <p class="text-danger">Email body | Character Count: <b><span id="examDraftCount">0</span>/150</b></p>
+            </div>
+          </div>
+          <div class="col-md-12">
+            <div class="alert alert-info" style="margin-bottom:10px">
+              <i class="fa fa-clock-o"></i>
+              @if($email->status === 'Draft')
+                এটি Draft হিসেবে সংরক্ষিত। Confirm & Schedule করলে Routine-এর Exam Time থেকে ১২ ঘণ্টা বিয়োগ করে Email Schedule হবে।
+              @else
+                বর্তমান অবস্থা: <strong>{{ $email->status }}</strong>। Routine-এর সময় অনুযায়ী পুনরায় Schedule করতে পারবেন।
+              @endif
+              @if($examInfo && $examInfo->exam_at)
+                <br>Exam Time: <strong>{{ \Carbon\Carbon::parse($examInfo->exam_at)->timezone('Asia/Dhaka')->format('d-m-Y h:i A') }}</strong>
+              @endif
+            </div>
+          </div>
+          <div class="col-md-12">
+            <input type="hidden" name="is_active" value="0">
+            <label style="display:flex;align-items:center;gap:8px"><input type="checkbox" name="is_active" value="1" {{ old('is_active', $email->is_active) ? 'checked' : '' }}> Active রাখুন</label>
+          </div>
+        </div>
+      </div>
+      <div class="box-footer" style="display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap">
+        <button type="submit" name="exam_action" value="save_draft" class="btn btn-default"><i class="fa fa-floppy-o"></i> Save Changes as Draft</button>
+        <button type="submit" name="exam_action" value="confirm_schedule" class="btn btn-success" onclick="return confirm('এই Exam Alert আপডেট করে Routine-এর সময় অনুযায়ী ১২ ঘণ্টা আগে Schedule করবেন?')"><i class="fa fa-calendar-check-o"></i> Confirm &amp; Schedule</button>
+      </div>
+    </form>
+  </div>
+  <script>
+    function updateExamDraftCount(){
+      var field=document.getElementById('examDraftDetails');
+      document.getElementById('examDraftCount').textContent=Array.from(field.value).length;
+    }
+    updateExamDraftCount();
+  </script>
+@else
   <div class="row"> <!-- left column -->
-    <div class="col-md-9"> <!-- general form elements -->
+    <div class="col-md-8"> <!-- general form elements -->
       <div class="box box-primary">
         <div class="box-header with-border">
             <h3 style="color: #800" class="box-title">Email Details</h3>
         </div>
-        <form action="{{route('email.update', $email)}}" method="POST" enctype="multipart/form-data">
+        <form action="{{route('email.update', $email)}}" method="POST">
             @csrf
             @method('PUT')
             <div class="box-body">
               <div class="col-md-12">
                   <div class="form-group">
-                      <label for="title">Title/Subject</label>
-                      <input type="text" class="form-control" name="title" id="title" required value="{{$email->title}}" />
+                      <label for="title">Title</label>
+                      <input type="text" class="form-control" name="title" id="title" value="{{$email->title}}"/>
                   </div>
               </div>
               <div class="col-md-12">
@@ -61,17 +126,52 @@ function check_student($id, $student)
                   <div class="form-group">
                       <label for="name">Student Name</label>
                       <select class="form-control select2" name="student_id[]" id="student_id" multiple>
-                        @foreach($students as $student)
-                          <option value="{{$student->id}}" {{check_student($student->id, $student_ids) ? 'selected' : ''}}>{{$student->name}}</option>
-                        @endforeach
+
+                      @foreach($students as $student)
+                        <option value="{{$student->id}}" {{check_student($student->id, $student_ids) ? 'selected' : ''}}>{{$student->name}}</option>
+                      @endforeach
+
                       </select>
                   </div>
               </div>
               <div class="clearfix"></div>
               <div class="col-md-12">
                   <div class="form-group">
+                      <label for="details">Suggested Text</label>
+                      <select id="suggested_text" class="form-control" onchange="suggested(this)">
+                        <option value="">Select One</option>
+                        <option value="This is first selected text">This is first selected text</option>
+                        <option value="This is second selected text">This is second selected text</option>
+                        <option value="This is third selected text">This is third selected text</option>
+                      </select>
+                  </div>
+              </div>
+              <div class="col-md-12">
+                  <div class="form-group">
                       <label for="details">Email Details</label>
-                      <textarea class="form-control editor" name="details" id="details" rows="10" required> {{$email->details}} </textarea>
+                      <textarea class="form-control" name="details" id="details" rows="5" required onkeyup="charCount(this)">{{$email->details}}</textarea>
+                      <p style="color: red">160 Characters = 1 Email | <b>Character Count: <span id="char_count">160</span></b> | Email Count: <span id="email_count">1</span></p>
+                  </div>
+              </div>
+              <div class="col-md-6">
+                  <div class="form-group">
+                      <label for="start_date">Start Date</label>
+                      <input type="date" class="form-control" name="start_date" id="start_date" value="{{ old('start_date', $email->start_date ? \Carbon\Carbon::parse($email->start_date)->format('Y-m-d') : '') }}">
+                  </div>
+              </div>
+              <div class="col-md-6">
+                  <div class="form-group">
+                      <label for="end_date">End Date</label>
+                      <input type="date" class="form-control" name="end_date" id="end_date" value="{{ old('end_date', $email->end_date ? \Carbon\Carbon::parse($email->end_date)->format('Y-m-d') : '') }}">
+                  </div>
+              </div>
+              <div class="col-md-12">
+                  <div class="form-group">
+                      <input type="hidden" name="is_active" value="0">
+                      <label style="display:flex;align-items:center;gap:9px">
+                          <input type="checkbox" name="is_active" value="1" {{ old('is_active', $email->is_active) ? 'checked' : '' }}>
+                          Active রাখুন
+                      </label>
                   </div>
               </div>
               <div class="col-md-6">
@@ -92,21 +192,36 @@ function check_student($id, $student)
               </div>
             </div>
           </div> <!-- /.box body -->
-            <div class="box-footer">
-                <button type="submit" class="btn btn-primary pull-right" id="sentBtn"><i class="fa fa-save"></i> Save</button>
-            </div>
+          <div class="box-footer">
+              <button type="submit" class="btn btn-primary pull-right" id="sentBtn"><i class="fa fa-save"></i> Save</button>
+          </div>
         </form>
     </div> <!-- /.box -->
     </div> <!--/.col (left) -->
 </div> <!-- /.row -->
+@endif
 </section> <!-- /.content -->
-
 @endsection
 @section('scripts')
-
-<script src="/assets/summernote/summernote.min.js"></script>
-
 <script>
+  function suggested(e)
+  {
+    const details = document.getElementById('details');
+    // console.log(details);
+    details.innerHTML = e.options[e.selectedIndex].value;
+  }
+  
+  function charCount(e)
+  {
+      let char_count = document.getElementById('char_count');
+      let email_count = document.getElementById('email_count');
+      
+      char_count.innerHTML = e.value.length;
+
+      emailCount = Math.ceil(e.value.length / 160);
+      email_count.innerHTML = emailCount;
+  }
+    
   const datatime = document.getElementById('datetime')
   const sentBtn = document.getElementById('sentBtn')
   function checkStatus(e)
@@ -130,6 +245,7 @@ function check_student($id, $student)
       datetime.removeAttribute('required');
     }
   }
+
     function getStudents(e)
     {
       const selectedIds = '{{implode(",", $student_ids)}}';
@@ -145,8 +261,6 @@ function check_student($id, $student)
 
         let ids = Array.from(e.selectedOptions).map(({value}) => value);
 
-        // console.log(ids);
-
         if(ids.length > 0)
         {
             $.ajaxSetup({
@@ -157,7 +271,7 @@ function check_student($id, $student)
 
             $.ajax({
                 type: 'GET', //THIS NEEDS TO BE GET
-                url: '{{route("sms.batch.student", "")}}/' + ids,
+                url: '{{route("email.batch.student", "")}}/' + ids,
                 success: function (data) {
 
                     var obj = JSON.parse(JSON.stringify(data));
@@ -184,11 +298,5 @@ function check_student($id, $student)
 
     //select 2
     $(function (){ $('.select2').select2() });
-    //this script for text editor
-    $(document).ready(function() {
-        $('.editor').summernote({
-            height: 200
-        });
-    });
 </script>
 @endsection
