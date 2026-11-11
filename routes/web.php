@@ -294,6 +294,20 @@ Route::middleware(['auth'])->group(function()
 {
   // LEBD-05 Admin Balance: isolated routes for Income, Cost and Summary.
   Route::prefix('admin-balance')->name('admin.balance.')->group(function () {
+      // Admin Invest: separate company investment ledger for Helal, Pranto and Juel Mia.
+      Route::get('/invest', [\App\Http\Controllers\Admin\InvestController::class, 'index'])
+          ->name('invest');
+      Route::post('/invest', [\App\Http\Controllers\Admin\InvestController::class, 'store'])
+          ->name('invest.store');
+      Route::get('/invest/{id}/edit', [\App\Http\Controllers\Admin\InvestController::class, 'edit'])
+          ->whereNumber('id')->name('invest.edit');
+      Route::put('/invest/{id}', [\App\Http\Controllers\Admin\InvestController::class, 'update'])
+          ->whereNumber('id')->name('invest.update');
+      Route::delete('/invest/{id}', [\App\Http\Controllers\Admin\InvestController::class, 'destroy'])
+          ->whereNumber('id')->name('invest.destroy');
+      Route::get('/invest/report/{investor}', [\App\Http\Controllers\Admin\InvestController::class, 'report'])
+          ->where('investor', 'helal|pranto|juel_mia')->name('invest.report');
+
       // Income ledger mirrors the Cost module; data and categories are stored separately.
       Route::get('/income', [\App\Http\Controllers\Admin\IncomeController::class, 'index'])
           ->name('income');
@@ -528,6 +542,9 @@ Route::get('daily-exam/{id}',
     Route::get('sms/create-batch-name/data/courses/{course}/batches', [\App\Http\Controllers\Admin\SmsBatchNameController::class, 'batches'])->whereNumber('course')->name('sms.batch-name.batches');
     Route::get('sms/create-batch-name/data/exam-categories', [\App\Http\Controllers\Admin\SmsBatchNameController::class, 'examCategories'])->name('sms.batch-name.exam-categories');
     Route::get('sms/create-batch-name/data/exam-categories/{category}/subcategories', [\App\Http\Controllers\Admin\SmsBatchNameController::class, 'examSubcategories'])->whereNumber('category')->name('sms.batch-name.exam-subcategories');
+    // Single SMS: select recipients directly from the main students database.
+    Route::get('sms/single', [\App\Http\Controllers\Admin\SingleSmsController::class, 'index'])->name('sms.single.index');
+    Route::post('sms/single/send', [\App\Http\Controllers\Admin\SingleSmsController::class, 'send'])->name('sms.single.send');
     Route::get('sms/batch/{batchId}/{type}', 'SmsCtrl@batchSmsList')->whereNumber('batchId')->name('sms.batch.list');
     Route::resource('sms', 'SmsCtrl');
     Route::get('sms/routines/select', 'SmsCtrl@selectRoutines')->name('sms.routines.select');

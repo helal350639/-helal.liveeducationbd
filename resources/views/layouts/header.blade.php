@@ -158,6 +158,9 @@ if($complains)
                 </span>
             </a>
             <ul class="treeview-menu" style="{{ $adminBalanceMenuActive ? 'display:block;' : 'display:none;' }}">
+                <li class="{{ request()->routeIs('admin.balance.invest*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.balance.invest') }}"><i class="fa fa-handshake-o text-green"></i> Admin Invest</a>
+                </li>
                 <li class="{{ request()->routeIs('admin.balance.income') ? 'active' : '' }}">
                     <a href="{{ route('admin.balance.income') }}"><i class="fa fa-arrow-up text-green"></i> Income</a>
                 </li>
@@ -215,7 +218,7 @@ if($complains)
         @endphp
         <li class="treeview {{ $examMcqMenuActive ? 'active menu-open' : '' }}">
           <a href="#">
-            <i class="fa fa-list-alt"></i> <span>MCQ Add for Exam</span>
+            <i class="fa fa-list-alt"></i> <span>MCQ for Exam</span>
             <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
           </a>
           <ul class="treeview-menu" style="{{ $examMcqMenuActive ? 'display:block;' : '' }}">
@@ -279,7 +282,7 @@ if($complains)
 
         {{-- LEBD Fix139: Separate Examination Section --}}
         <li class="treeview {{ request()->routeIs('admin.exam-section.*') ? 'active menu-open' : '' }}">
-          <a href="#"><i class="fa fa-file-text"></i><span>Exam Section S.Dashboard</span><span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
+          <a href="#"><i class="fa fa-file-text"></i><span>Exam Section Dashboard</span><span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
           <ul class="treeview-menu" style="{{ request()->routeIs('admin.exam-section.*') ? 'display:block' : '' }}">
             <li><a href="{{route('admin.exam-section.categories')}}"><i class="fa fa-folder"></i> Category</a></li>
             <li><a href="{{route('admin.exam-section.subcategories')}}"><i class="fa fa-sitemap"></i> Sub-category</a></li>
@@ -336,7 +339,7 @@ if($complains)
           </ul>
         </li>
         @php
-          $createBatchNameMenuActive = request()->routeIs('sms.batch-name.*') || request()->routeIs('sms.index');
+          $createBatchNameMenuActive = request()->routeIs('sms.batch-name.*') || request()->routeIs('sms.index') || request()->routeIs('sms.single.*');
         @endphp
         <li class="treeview {{ $createBatchNameMenuActive ? 'active menu-open' : '' }}">
           <a href="#">
@@ -345,6 +348,9 @@ if($complains)
             <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
           </a>
           <ul class="treeview-menu" style="{{ $createBatchNameMenuActive ? 'display:block;' : '' }}">
+            <li class="{{ request()->routeIs('sms.single.*') ? 'active' : '' }}">
+              <a href="{{ route('sms.single.index') }}"><i class="fa fa-user"></i> Single SMS</a>
+            </li>
             <li class="{{ request()->routeIs('sms.batch-name.*') ? 'active' : '' }}">
               <a href="{{ route('sms.batch-name.index') }}"><i class="fa fa-paper-plane"></i> Create Batch Name</a>
             </li>
@@ -356,7 +362,7 @@ if($complains)
         <li class="treeview">
           <a href="#">
             <i class="fa fa-pencil"></i>
-            <span>live Exams Check</span>
+            <span>Exams</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>
@@ -373,7 +379,7 @@ if($complains)
         <li class="treeview">
           <a href="#">
             <i class="fa fa-question"></i>
-            <span>Main Questions Database</span>
+            <span>Questions</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>
@@ -478,7 +484,7 @@ if($complains)
         <li class="treeview">
           <a href="#">
             <i class="fa fa-th"></i>
-            <span>Batches MCQ Exam</span>
+            <span>Batches</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>
@@ -567,7 +573,7 @@ if($complains)
         </li>
         <li class="treeview">
           <a href="#">
-            <i class="fa fa-sliders"></i> <span>Main Filters</span>
+            <i class="fa fa-sliders"></i> <span>Filters</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>
@@ -579,7 +585,7 @@ if($complains)
         </li>
         <li class="treeview">
           <a href="#">
-            <i class="fa fa-commenting"></i> <span>Complains from Student</span>
+            <i class="fa fa-commenting"></i> <span>Complains</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>
@@ -590,7 +596,7 @@ if($complains)
         </li>
         <li class="treeview">
           <a href="#">
-            <i class="fa fa-shopping-cart"></i> <span>All Orders list</span>
+            <i class="fa fa-shopping-cart"></i> <span>Orders</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-left pull-right"></i>
             </span>
@@ -635,7 +641,7 @@ if($complains)
 <li class="treeview">
     <a href="#">
         <i class="fa fa-money"></i>
-        <span>Referral Withdraw Request</span>
+        <span>Withdraw</span>
         <span class="pull-right-container">
             <i class="fa fa-angle-left pull-right"></i>
         </span>
@@ -710,45 +716,81 @@ if($complains)
           </ul>
         </li>
 </ul>
-      {{-- LEBD-05: Sort admin sidebar top-level items only; leave routes, children, authorization untouched. --}}
+      {{-- LEBD: Keep the admin sidebar in the approved order; do not alter routes or submenu items. --}}
       <script>
       (function () {
           'use strict';
           var sidebar = document.querySelector('aside.main-sidebar > section.sidebar > ul.sidebar-menu');
           if (!sidebar) return;
-          var items = Array.prototype.filter.call(sidebar.children, function (node) {
-              return node.tagName === 'LI';
-          });
-          function label(item) {
+
+          var order = [
+              'Dashboard',
+              'Admin Balance',
+              'Orders',
+              'Batches',
+              'Exam Section Dashboard',
+              'E-Book',
+              'MCQ Job Preparation',
+              'Premium Classes',
+              'Extra Student',
+              'Categories',
+              'Filters',
+              'MCQ for Exam',
+              'Emails',
+              'SMS',
+              'Question Papers',
+              'Routines',
+              'Syllabuses',
+              'Questions',
+              'Students',
+              'Teachers',
+              'Exams',
+              'Daily Exam',
+              'Daily Update',
+              'Complains',
+              'Student Advice',
+              'Withdraw',
+              'Homepage Settings',
+              'Settings',
+              'Admins'
+          ];
+
+          function getTopLevelLabel(item) {
               var anchor = null;
               for (var i = 0; i < item.children.length; i++) {
-                  if (item.children[i].tagName === 'A') { anchor = item.children[i]; break; }
+                  if (item.children[i].tagName === 'A') {
+                      anchor = item.children[i];
+                      break;
+                  }
               }
               if (!anchor) return '';
-              var span = anchor.querySelector(':scope > span:not(.pull-right-container)');
-              if (span) return (span.textContent || '').trim();
-              // Direct anchor text only; never include submenu labels in sorting.
+              var spans = anchor.querySelectorAll(':scope > span');
+              for (var j = 0; j < spans.length; j++) {
+                  if (!spans[j].classList.contains('pull-right-container')) {
+                      return (spans[j].textContent || '').trim();
+                  }
+              }
               return Array.prototype.filter.call(anchor.childNodes, function (node) {
                   return node.nodeType === 3;
               }).map(function (node) { return node.textContent; }).join(' ').trim();
           }
-          function rank(text) {
-              if (text === 'Dashboard') return 0;
-              if (text === 'Homepage Settings') return 2;
-              if (text === 'Settings') return 3;
-              return 1;
-          }
-          var indexed = items.map(function (item, index) {
-              return { item: item, index: index, text: label(item) };
+
+          var rank = {};
+          order.forEach(function (label, index) { rank[label] = index; });
+
+          var items = Array.prototype.filter.call(sidebar.children, function (node) {
+              return node.tagName === 'LI';
           });
-          indexed.sort(function (a, b) {
-              var delta = rank(a.text) - rank(b.text);
-              if (delta !== 0) return delta;
-              if (rank(a.text) !== 1) return a.index - b.index;
-              var cmp = a.text.toLowerCase().localeCompare(b.text.toLowerCase(), 'en');
-              return cmp || (a.index - b.index);
+
+          items.map(function (item, index) {
+              return { item: item, index: index, label: getTopLevelLabel(item) };
+          }).sort(function (a, b) {
+              var aRank = Object.prototype.hasOwnProperty.call(rank, a.label) ? rank[a.label] : order.length;
+              var bRank = Object.prototype.hasOwnProperty.call(rank, b.label) ? rank[b.label] : order.length;
+              return aRank === bRank ? a.index - b.index : aRank - bRank;
+          }).forEach(function (entry) {
+              sidebar.appendChild(entry.item);
           });
-          indexed.forEach(function (entry) { sidebar.appendChild(entry.item); });
       })();
       </script>
     </section> <!-- /.sidebar -->
