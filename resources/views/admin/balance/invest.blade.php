@@ -11,10 +11,10 @@
 <section class="content ai-wrap">
 @if(session('success'))<div class="ai-alert ai-success"><i class="fa fa-check-circle"></i> {{ session('success') }}</div>@endif
 @if($errors->any())<div class="ai-alert ai-error"><strong>তথ্য সংরক্ষণ করা যায়নি:</strong><ul style="margin:6px 0 0 18px;">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
-<div class="ai-head"><div><h1><i class="fa fa-handshake-o" style="color:#168b60"></i> Company Investment Dashboard</h1><div style="color:#8492a6;font-size:12px">Helal, Pranto ও Juel Mia-এর বিনিয়োগের পৃথক ও সম্মিলিত হিসাব</div></div><div><a class="ai-btn ai-outline" href="{{ route('admin.balance.invest') }}"><i class="fa fa-refresh"></i> Refresh</a></div></div>
+<div class="ai-head"><div><h1><i class="fa fa-handshake-o" style="color:#168b60"></i> Company Investment Dashboard</h1><div style="color:#8492a6;font-size:12px">Md.Helal Hossain,Moniruzzaman Pranto ও Md.Juel Mia-এর বিনিয়োগের পৃথক ও সম্মিলিত হিসাব</div></div><div><a class="ai-btn ai-outline" href="{{ route('admin.balance.invest') }}"><i class="fa fa-refresh"></i> Refresh</a></div></div>
 <div class="ai-grid" style="margin-bottom:16px">
 @foreach($investors as $key => $name)
-<div class="ai-stat"><small><i class="fa fa-user"></i> {{ $name }}-এর মোট বিনিয়োগ</small><strong>৳ {{ number_format($totals[$key],2) }}</strong><div style="margin-top:10px"><a class="ai-btn ai-outline" href="{{ route('admin.balance.invest.report',$key) }}"><i class="fa fa-file-pdf-o"></i> A4 Report</a></div></div>
+<div class="ai-stat"><small><i class="fa fa-user"></i> {{ $name }}-এর মোট বিনিয়োগ</small><strong>৳ {{ number_format($totals[$key],2) }}</strong><div style="margin-top:10px"><a class="ai-btn ai-outline" href="{{ route('admin.balance.invest.report',$key) }}"><i class="fa fa-file-pdf-o"></i> View Details</a></div></div>
 @endforeach
 </div>
 <div class="ai-stat total" style="margin-bottom:16px"><small><i class="fa fa-line-chart"></i> তিনজনের সম্মিলিত মোট বিনিয়োগ</small><strong>৳ {{ number_format($grandTotal,2) }}</strong></div>
