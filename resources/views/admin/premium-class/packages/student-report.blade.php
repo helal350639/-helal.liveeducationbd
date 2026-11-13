@@ -13,6 +13,7 @@
 .pms-report .pms-search{display:flex;gap:8px;flex-wrap:wrap}
 .pms-report .pms-search input{min-width:200px;padding:8px;border:1px solid #c4d6e9;border-radius:5px}
 .pms-report .pms-btn{display:inline-block;padding:7px 12px;background:#0874dc;color:#fff;border:0;border-radius:5px;text-decoration:none}
+.pms-report .pms-remove{display:inline-block;padding:7px 10px;background:#d94b42;color:#fff;border:0;border-radius:5px;cursor:pointer;font-size:12px}
 .pms-report .pms-active{color:#087a3e;font-weight:700}
 .pms-report .pms-expired{color:#b04c24;font-weight:700}
 @media(max-width:680px){.pms-report{padding:0 7px}.pms-report .panel{padding:10px}}
@@ -20,7 +21,7 @@
 <div class="pms-report">
  <a href="{{route('admin.premium-class-packages.index')}}">← Premium Package List</a>
  <h2>{{ $package->name }} — Students</h2>
- <p>একজন Student একাধিক পদ্ধতিতে Access পেলে Total-এ একবার গণনা হয়। Counts-এ মেয়াদোত্তীর্ণ Student-ও অন্তর্ভুক্ত; Active আলাদাভাবে দেখানো হয়েছে।</p>
+ <p>একজন Student একাধিক পদ্ধতিতে Access পেলে Total-এ একবার গণনা হয়। মেয়াদোত্তীর্ণ Student গণনায় থাকে; কিন্তু Remove Access করা Student এই Package-এর তালিকা ও সব Count থেকে বাদ থাকে। Active আলাদাভাবে দেখানো হয়েছে।</p>
  <section class="panel">
   <div class="pms-filters">
   @foreach(['all'=>'Total','manual'=>'Manual','wallet'=>'Referral Wallet','ssl'=>'SSLCommerz','other'=>'Other Paid'] as $key=>$label)
@@ -56,9 +57,14 @@
         <span style="display:inline-block;padding:2px 6px;margin:2px;background:#e9f2ff;border-radius:4px">{{ \App\Services\PremiumClass\PremiumPackageStudentReport::METHODS[$key] }}</span>
        @endforeach
       </td>
-      <td class="{{ $row['active']?'pms-active':'pms-expired' }}">{{ $row['active']?'Active':'Expired' }}</td>
+      <td class="{{ $row['active']?'pms-active':'pms-expired' }}">{{ !empty($row['revoked'])?'Access Removed':($row['active']?'Active':'Expired') }}</td>
       <td>{{ $row['latest_expires']?:'—' }}</td>
-      <td>@if($s)<a class="pms-btn" href="{{route('student.show',$row['id'])}}">View Student</a>@endif</td>
+      <td style="display:flex;gap:6px;align-items:center">
+        @if($s)<a class="pms-btn" href="{{route('student.show',$row['id'])}}">View Student</a>@endif
+        @if(empty($row['revoked']))
+         <form method="POST" action="{{route('admin.premium-class-packages.students.revoke',['package'=>$package->id,'student'=>$row['id']])}}" onsubmit="return confirm('এই Student-এর এই Package-এর সব Premium Video Access বন্ধ করবেন?')">@csrf<button class="pms-remove" type="submit">Remove Access</button></form>
+        @else <span style="font-size:11px;color:#b34b3f;font-weight:700">Removed</span> @endif
+       </td>
      </tr>
     @empty
      <tr><td colspan="11">এই Filter-এর জন্য Student পাওয়া যায়নি।</td></tr>

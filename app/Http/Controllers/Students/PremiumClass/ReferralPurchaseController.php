@@ -39,12 +39,20 @@ class ReferralPurchaseController extends Controller
                 // One active entitlement per student/package: avoid unintended repeat charges.
                 $existing = DB::table('lebd_premium_class_orders')->where('student_id', $studentId)
                     ->where('package_id', $fresh->id)->where('status', 'paid')
-                    ->where('expires_at', '>', now())->first();
+                    ->where('expires_at', '>', now())
+                    ->when(\App\Services\PremiumClass\PremiumPackageAccessRevocation::available(), function($q) use ($studentId) {
+                        $q->whereNotExists(function($sub) use ($studentId) {
+                            $sub->selectRaw('1')->from('lebd_premium_package_access_revocations as rv')
+                                ->whereColumn('rv.package_id','lebd_premium_class_orders.package_id')
+                                ->where('rv.student_id',$studentId)->whereNotNull('rv.revoked_at');
+                        });
+                    })->first();
                 if ($existing) {
                     throw ValidationException::withMessages(['payment' => 'This package is already active in your account.']);
                 }
                 if (\App\Services\PremiumClass\PremiumManualAccess::active((int)$studentId,(int)$fresh->id))
                     throw ValidationException::withMessages(['payment'=>'এই প্যাকেজ কিনেছেন — Active manual package access already exists.']);
+                \App\Services\PremiumClass\PremiumPackageAccessRevocation::restore((int)$studentId,(int)$fresh->id);
                 $wallet->debitLockedStudent($student, $price);
                 $tranId = 'LEBDR'.strtoupper(Str::random(20));
                 $now = now();
@@ -74,6 +82,8 @@ class ReferralPurchaseController extends Controller
         }
         // SMS is optional and must not roll back a confirmed purchase.
         $sms->notifyPremiumOrder($orderId);
-        return redirect()->route('premium.payment.purchased.success', ['order' => $orderId]);
+        return redirect()->route('students.premium.video.classes')
+            ->with('success', 'অভিনন্দন! Referral Balance দিয়ে আপনার Premium Video Package সফলভাবে কেনা হয়েছে। Premium Class Access চালু হয়েছে.')
+            ->with('purchased_package_name', $package->name);
     }
 }

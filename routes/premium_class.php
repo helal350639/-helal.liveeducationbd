@@ -25,6 +25,8 @@ Route::middleware(['auth',PremiumClassAdminOnly::class])->prefix('admin')->group
         // Read-only package student list, filter by manual/wallet/SSL; keep existing manual picker route.
         Route::get('/{package}/student-report', [\App\Http\Controllers\Admin\PremiumClass\PremiumPackageStudentsReportController::class, 'index'])
             ->whereNumber('package')->name('students.report');
+        Route::post('/{package}/student-report/{student}/revoke', [\App\Http\Controllers\Admin\PremiumClass\PremiumPackageStudentsReportController::class, 'revoke'])
+            ->whereNumber('package')->whereNumber('student')->name('students.revoke');
         // Manual premium entitlement: admin only; no payment/order side effects.
         Route::get('/{package}/students', [\App\Http\Controllers\Admin\PremiumClass\PremiumManualStudentController::class, 'index'])
             ->whereNumber('package')->name('manual.index');

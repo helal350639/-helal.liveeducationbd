@@ -1330,7 +1330,7 @@ font-size:10px;
 <span>My Batch</span>
 <small></small>
 </div>
-</a>
+<!-- </a>
 <a href="{{route('category.result.option')}}" class="quick-card">
 <div class="quick-icon">
 <i class="fa fa-chart-line"></i>
@@ -1338,8 +1338,8 @@ font-size:10px;
 <div class="quick-text">
 <span>Exam Results</span>
 <small></small>
-</div>
-</a>
+</div> -->
+<!-- </a>
 <a href="{{route('category.batches',['Exam PDF','Dashboard'])}}" class="quick-card">
 <div class="quick-icon">
 <i class="fa fa-file-pdf"></i>
@@ -1347,7 +1347,7 @@ font-size:10px;
 <div class="quick-text">
 <span>Exam PDF</span>
 <small></small>
-</div>
+</div> -->
 </a>
 <a href="{{ route('students.premium.video.classes') }}" class="quick-card">
 <div class="quick-icon">
@@ -1384,7 +1384,7 @@ font-size:10px;
 <span>E-Book</span>
 <small></small>
 </div>
-</a>
+<!-- </a>
 <a href="#" class="quick-card">
 <div class="quick-icon">
 <i class="fa fa-pen-to-square"></i>
@@ -1392,7 +1392,7 @@ font-size:10px;
 <div class="quick-text">
 <span>Free Exam</span>
 <small></small>
-</div>
+</div> -->
 </a>
 </div>
 </div>

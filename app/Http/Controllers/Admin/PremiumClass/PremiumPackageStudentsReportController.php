@@ -7,6 +7,8 @@ use App\Services\PremiumClass\PremiumPackageStudentReport;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use App\Services\PremiumClass\PremiumPackageAccessRevocation;
 
 class PremiumPackageStudentsReportController extends Controller
 {
@@ -37,4 +39,14 @@ class PremiumPackageStudentsReportController extends Controller
         $counts=PremiumPackageStudentReport::summaries([(int)$package->id])[(int)$package->id];
         return view('admin.premium-class.packages.student-report',compact('package','students','counts','method','search'));
     }
+    public function revoke(Request $request, PremiumClassPackage $package, int $student)
+    {
+        abort_unless(Auth::user() && Auth::user()->AuthorizeRoles(['SuperAdmin','Admin']), 403);
+        abort_unless(DB::table('students')->where('id',$student)->exists(),404);
+        abort_unless(PremiumPackageAccessRevocation::available(),503,'Premium package revocation SQL is not installed.');
+        PremiumPackageAccessRevocation::revoke($student,(int)$package->id,(int)Auth::id());
+        return redirect()->route('admin.premium-class-packages.students.report',['package'=>$package->id])
+            ->with('success','Student-এর এই Premium Package-এর সব Access বন্ধ করা হয়েছে।');
+    }
+
 }

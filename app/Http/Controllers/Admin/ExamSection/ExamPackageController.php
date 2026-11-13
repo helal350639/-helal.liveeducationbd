@@ -167,6 +167,48 @@ class ExamPackageController extends Controller
         return back()->with($added ? 'success' : 'info',
             $added ? 'Manual student access granted.' : 'Student already has active access to this package.');
     }
+
+    /**
+     * Revoke every current access source for one student/package pair.
+     * Payment orders and referral-wallet financial history are deliberately preserved.
+     */
+    public function revokeStudentAccess(Request $request, int $package, int $student)
+    {
+        $this->adminOnly();
+        $request->validate(['confirm_remove'=>'required|accepted']);
+        abort_unless(Schema::hasTable('lebd_exam_section_student_package_access'),503,'Exam package access table missing.');
+        abort_unless(DB::table(self::PACKAGES)->where('id',$package)->exists(),404);
+        abort_unless(DB::table('students')->where('id',$student)->exists(),404);
+
+        DB::transaction(function () use ($package, $student) {
+            DB::table('students')->where('id',$student)->lockForUpdate()->first();
+
+            // Revoke ALL access rows for this student and package, regardless of
+            // whether the original grant came from SSLCommerz, Referral Wallet,
+            // or Admin Manual Add. Keep orders and ledger entries untouched.
+            DB::table('lebd_exam_section_student_package_access')
+                ->where('student_id',$student)
+                ->where('package_id',$package)
+                ->where('status','<>','revoked')
+                ->update(['status'=>'revoked']);
+
+            if (Schema::hasTable('lebd_exam_section_manual_grants')) {
+                DB::table('lebd_exam_section_manual_grants')
+                    ->where('student_id',$student)
+                    ->where('package_id',$package)
+                    ->where('status','active')
+                    ->update([
+                        'status'=>'removed',
+                        'removed_by'=>Auth::id(),
+                        'removed_at'=>now(),
+                        'updated_at'=>now(),
+                    ]);
+            }
+        },3);
+
+        return back()->with('success','All access for this student has been removed from this package. Payment history was preserved.');
+    }
+
     public function removeStudent(Request $request,int $package,int $grant)
     {
         $this->adminOnly();

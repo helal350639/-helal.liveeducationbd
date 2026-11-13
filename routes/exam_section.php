@@ -51,6 +51,7 @@ Route::middleware(['auth'])->prefix('admin/exam-section')->name('admin.exam-sect
  Route::get('/packages/{package}/students-add',[\App\Http\Controllers\Admin\ExamSection\ExamPackageStudentsPickerController::class,'start'])->whereNumber('package')->name('packages.students.picker');
  Route::post('/packages/{package}/students',[ExamPackageController::class,'addStudent'])->name('packages.students.add');
  Route::post('/packages/{package}/students/{grant}/remove',[ExamPackageController::class,'removeStudent'])->name('packages.students.remove');
+ Route::post('/packages/{package}/students/{student}/revoke-access',[ExamPackageController::class,'revokeStudentAccess'])->whereNumber('package')->whereNumber('student')->name('packages.students.revoke');
  // Fix143: standalone Department > Subject > Chapter topic management and main Question IDs.
  Route::get('/routine-topics/{level}',[\App\Http\Controllers\Admin\ExamSection\RoutineTopicController::class,'index'])->where('level','department|subject|chapter')->name('routine-topic.index');
  Route::post('/routine-topics/{level}',[\App\Http\Controllers\Admin\ExamSection\RoutineTopicController::class,'store'])->where('level','department|subject|chapter')->name('routine-topic.store');

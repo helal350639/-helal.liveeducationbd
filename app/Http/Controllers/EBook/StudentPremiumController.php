@@ -19,15 +19,11 @@ class StudentPremiumController extends Controller
     }
     private function paid(int $category): bool
     {
-        // E-Book checkout and entitlements use the STUDENT guard, not the default web guard.
-        $studentId = auth('student')->id();
-        if (!$studentId) return false;
-        return DB::table('lebd_ebook_entitlements')
-            ->where('user_id', $studentId)
-            ->where('category_id', $category)
-            ->where('status', 'Active')
-            ->where('expires_at', '>', now('Asia/Dhaka'))
-            ->exists();
+        // Use the same access rules as package cards and checkout. This includes
+        // both verified purchases and active administrator manual assignments.
+        $studentId = (int) auth('student')->id();
+        return $studentId > 0
+            && app(\App\Services\EBook\EBookAccess::class)->categoryAccess($studentId, $category) !== null;
     }
     private function content(int $chapter, bool $paid): array
     {

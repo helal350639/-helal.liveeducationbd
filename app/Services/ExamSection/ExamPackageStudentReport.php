@@ -19,6 +19,7 @@ class ExamPackageStudentReport
         if(!$ids || !Schema::hasTable(self::ACCESS)) return $out;
         $now=now('Asia/Dhaka')->toDateTimeString();
         $rows=DB::table(self::ACCESS.' as a')->whereIn('a.package_id',$ids)
+            ->where('a.status','<>','revoked')
             ->select('a.package_id','a.student_id')->selectRaw('MAX(CASE WHEN a.status = ? AND a.starts_at <= ? AND a.ends_at > ? THEN 1 ELSE 0 END) as is_active',['active',$now,$now])
             ->groupBy('a.package_id','a.student_id')->get();
         foreach($rows as $row){$id=(int)$row->package_id;$out[$id]['total']++;$out[$id]['active']+=(int)$row->is_active;}
@@ -46,6 +47,7 @@ class ExamPackageStudentReport
         $now=now('Asia/Dhaka')->toDateTimeString();
         $q=DB::table(self::ACCESS.' as a')->join('students as s','s.id','=','a.student_id')
             ->where('a.package_id',$packageId)
+            ->where('a.status','<>','revoked')
             ->select('s.id as student_id','s.name as student_name','s.email as student_email','s.contact as student_contact','s.studying','s.status as student_status')
             ->selectRaw('MAX(a.ends_at) as expiry')
             ->selectRaw('MAX(CASE WHEN a.status = ? AND a.starts_at <= ? AND a.ends_at > ? THEN 1 ELSE 0 END) as active',['active',$now,$now]);

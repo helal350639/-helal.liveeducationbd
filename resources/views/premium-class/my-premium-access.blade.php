@@ -51,6 +51,8 @@
 .lebd-v16-cat{margin:6px 0;font-size:13px;overflow-wrap:anywhere;color:#31587d}
 .lebd-v16-watch{display:block;text-align:center;background:#0875df;color:#fff!important;text-decoration:none!important;font-weight:700;border-radius:8px;padding:11px 15px;margin-top:16px}
 .lebd-v16-empty{border:1px dashed #bed6ef;padding:20px;border-radius:12px;background:#fff}
+.lebd-v16-success{display:flex;flex-direction:column;gap:4px;margin:0 0 16px;padding:13px 16px;border:1px solid #9cddb5;border-left:5px solid #159653;border-radius:10px;background:#eaf9ef;color:#145b37;font-size:13px;line-height:1.55}
+.lebd-v16-success strong{font-size:15px;color:#10663b}
 @media(max-width:640px){.lebd-v16-page{padding:12px 12px 32px}.lebd-v16-hero{padding:18px 15px}.lebd-v16-hero h1{font-size:20px}.lebd-v16-grid{grid-template-columns:1fr}.lebd-v16-card{padding:15px}.lebd-v16-top{gap:10px}.lebd-v16-new{padding:9px 12px;font-size:13px}}
 </style>
 <main class="lebd-v16-page">
@@ -62,6 +64,13 @@
   <h1>Video Class — আমার কেনা প্যাকেজ</h1>
   <p>SSLCommerz, Referral Wallet ও Admin-এর দেওয়া সক্রিয় Premium Video Package সমূহ</p>
  </header>
+ @if(session('success'))
+  <div class="lebd-v16-success" role="status" aria-live="polite">
+   <strong>✓ প্যাকেজ কেনা সফল হয়েছে!</strong>
+   <span>{{session('success')}}</span>
+   @if(session('purchased_package_name'))<b>{{session('purchased_package_name')}}</b>@endif
+  </div>
+ @endif
  @if(session('info'))<p>{{session('info')}}</p>@endif
  @if($visiblePackages->isEmpty())
    <div class="lebd-v16-empty">আপনার কোনো সক্রিয় Premium Video Package নেই।</div>

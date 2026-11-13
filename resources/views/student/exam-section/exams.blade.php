@@ -683,6 +683,8 @@ body:has(.lebd-exam-scope) #footer { display:none !important; }
 <a class="se26-menu-item" href="{{ route('student.exam-section.browse-exams', ['category'=>$cat->id, 'subcategory_id'=>$sub?->id, 'paper'=>1]) }}"><span>{{ $symbol }}</span><span>{{ $name }}<small>সকল পরীক্ষার তালিকা দেখুন ({{ $total }})</small></span></a>
 @elseif($name === 'Missing Exam List')
 <a class="se26-menu-item" href="{{ route('student.exam-section.browse-exams', ['category'=>$cat->id, 'subcategory_id'=>$sub?->id, 'missing'=>1]) }}"><span>{{ $symbol }}</span><span>{{ $name }}<small>সময়সীমা শেষ, অংশ নেননি এমন পরীক্ষার তালিকা</small></span></a>
+@elseif($name === 'Exam PDF')
+<a class="se26-menu-item" href="{{ route('student.exam-section.exam-pdf', ['category'=>$cat->id, 'subcategory_id'=>$sub?->id]) }}"><span>{{ $symbol }}</span><span>{{ $name }}<small>Routine অনুযায়ী প্রকাশিত পরীক্ষার PDF দেখুন</small></span></a>
 @elseif($link)<a class="se26-menu-item" href="{{ $link }}"><span>{{ $symbol }}</span><span>{{ $name }}</span></a>
 @else<div class="se26-menu-item"><span>{{ $symbol }}</span><span>{{ $name }}<small>Coming soon</small></span></div>@endif
 @endforeach

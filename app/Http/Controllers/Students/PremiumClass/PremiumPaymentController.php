@@ -37,7 +37,15 @@ class PremiumPaymentController extends Controller {
   if (Auth::guard('student')->check() && Schema::hasTable('lebd_premium_class_orders')) {
    $activeOrder = DB::table('lebd_premium_class_orders')->where('student_id', Auth::guard('student')->id())
       ->where('package_id', $package->id)->where('status', 'paid')
-      ->where('expires_at', '>', now())->orderByDesc('expires_at')->first();
+      ->where('expires_at', '>', now())
+      ->when(\App\Services\PremiumClass\PremiumPackageAccessRevocation::available(), function($q) {
+       $sid=(int)Auth::guard('student')->id();
+       $q->whereNotExists(function($sub) use ($sid) {
+        $sub->selectRaw('1')->from('lebd_premium_package_access_revocations as rv')
+         ->whereColumn('rv.package_id','lebd_premium_class_orders.package_id')
+         ->where('rv.student_id',$sid)->whereNotNull('rv.revoked_at');
+       });
+      })->orderByDesc('expires_at')->first();
    if ($activeOrder) {
      return redirect()->route('premium.payment.purchased.videos', ['order' => $activeOrder->id])
        ->with('info', 'This package is already active in your account.');
@@ -58,7 +66,13 @@ class PremiumPaymentController extends Controller {
     ->where('package_id', $package->id)
     ->where('status', 'paid')
     ->where('expires_at', '>', now())
-    ->orderByDesc('expires_at')->first();
+    ->when(\App\Services\PremiumClass\PremiumPackageAccessRevocation::available(), function($q) use ($student) {
+      $q->whereNotExists(function($sub) use ($student) {
+       $sub->selectRaw('1')->from('lebd_premium_package_access_revocations as rv')
+        ->whereColumn('rv.package_id','lebd_premium_class_orders.package_id')
+        ->where('rv.student_id',$student->id)->whereNotNull('rv.revoked_at');
+      });
+    })->orderByDesc('expires_at')->first();
   if ($activeOrder) {
     return redirect()->route('premium.payment.purchased.videos', ['order' => $activeOrder->id])
       ->with('info', 'This package is already active in your account.');
@@ -113,6 +127,7 @@ class PremiumPaymentController extends Controller {
       $locked=DB::table('lebd_premium_class_orders')->where('tran_id',$id)->lockForUpdate()->first();
       if(!$locked || $locked->status==='paid')return;
       if($locked->status!=='pending')return;
+      \App\Services\PremiumClass\PremiumPackageAccessRevocation::restore((int)$locked->student_id,(int)$locked->package_id);
       DB::table('lebd_premium_class_orders')->where('id',$locked->id)->update([
        'status'=>'paid','val_id'=>$val,'paid_at'=>now(),
        'expires_at'=>now()->addDays(max(1,(int)$locked->validity_days)), 'updated_at'=>now()]);

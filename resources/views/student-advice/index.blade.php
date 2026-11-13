@@ -1,14 +1,204 @@
-<link rel="stylesheet" href="{{ asset('web/css/lebd-student-advice-fix125.css') }}?v=125">
-@extends('homepage')
-@section('title','সফল শিক্ষার্থীদের পরামর্শ')
-@section('content')
-<section class="success-students-section" style="padding:35px 20px"><div class="success-container">
-<div class="success-heading"><h2>সফল শিক্ষার্থীদের <span>পরামর্শ</span></h2></div>
-<div class="success-grid">
-@foreach($items as $item)
-<article class="success-card"><div class="student-top"><div class="student-image">@if($item->photo_path)<img src="{{asset($item->photo_path)}}" alt="{{$item->name}}" style="width:100%;height:100%;object-fit:cover">@endif</div><div class="student-info"><h3>{{$item->name}}</h3><p>BB ID: {{$item->bb_id}}</p><p>{{$item->university}}</p></div></div><div class="student-content"><div class="student-position"><div class="position-icon"><i class="fas fa-building"></i></div><div><h4>{{$item->position}}</h4><p>{{$item->organization}}</p></div></div><div class="advice-title"><span></span><strong>পরামর্শ</strong><span></span></div><div class="lebd-advice-expand"><p class="advice-text lebd-advice-copy" id="lebd-advice-{{ $item->id }}">{{$item->advice}}</p><button type="button" class="lebd-advice-toggle" aria-expanded="false" aria-controls="lebd-advice-{{ $item->id }}" hidden>See More <i class="fas fa-chevron-down" aria-hidden="true"></i></button></div></div></article>
-@endforeach
-</div><div style="margin-top:20px">{{$items->links()}}</div></div></section>
-@endsection
+@php
+use \App\Http\Controllers\SourceCtrl;
+$source = New SourceCtrl;
+function check($id)
+{
+  $xids = [];
+  if(!is_null(Session::get('_object'))){
+    $xids = Session::get('_object')['xids'];
+  }
+  if(in_array($id, $xids))
+  {
+    return 'checked';
+  }
+}
+@endphp
 
-<script src="{{ asset('web/js/lebd-student-advice-fix125.js') }}?v=125" defer></script>
+@extends('dashboard')
+@section('title', 'View All Students')
+@section('content')
+
+<style>
+  .object{position: fixed;right: 0; bottom: 0; max-width: 300px}
+  .add_checkbox{width:20px;height: 20px;}
+</style>
+
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <h1>Students Accounts</h1>
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i> Students</a></li>
+      {{-- <li><a href="#">Tables</a></li> --}}
+      <li class="active">Students Accounts</li>
+    </ol>
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="box">
+          <div class="box-header">
+            <h3 class="box-title">List of Students</h3>
+            <div class="box-tools">
+              <form action="{{route('student.search')}}" method="post" style="width: 250px; float:left">
+                @csrf
+                <div class="input-group input-group-sm">
+                  <input type="text" name="value" class="form-control pull-right" placeholder="Search" required>
+  
+                  <div class="input-group-btn">
+                    <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
+                  </div>
+                </div>
+              </form>
+              <a href="{{route('student.create')}}" class="btn btn-sm btn-info" style="margin-left:15px"><i class="fa fa-plus"></i> Add</a>
+              <a href="{{route('student.index')}}" class="btn btn-sm btn-success" style=""><i class="fa fa-list"></i> All</a>
+            </div>
+          </div>
+          <!-- /.box-header -->
+          <div class="box-body table-responsive no-padding">
+            <table id="example1" class="table table-bordered table-hover">
+              <thead>
+                <tr>
+                  <th style="width:32px">#</th>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Contact</th>
+                  <th>Studying</th>
+                  <th>Status</th>
+                  <th>Created By</th>
+                  <th>Created On</th>
+                  <th width="180">Action</th>
+                </tr>
+              </thead>
+
+              @foreach($students as $value)
+
+              <tr>
+                <td>
+                  <input class="add_checkbox" type="checkbox" onchange="check(this)" value="{{$value->id}}" {{check($value->id)}}/>
+                </td>
+                <td>{{$value->id}}</td>
+                <td>{{$value->name}}</td>
+                <td>{{$value->email}}</td>
+                <td>{{$value->contact}}</td>
+                <td>{{$value->studying}}</td>
+                <td>
+                  @if($value->status == "Active")
+                  <span class="label label-success">{{$value->status}}</span>
+                  @else
+                  <span class="label label-warning">{{$value->status}}</span>
+                  @endif
+                </td>
+                <td>{{ $value->admin_name }}</td>
+                <td>{{ $source->dtformat($value->created_at) }}</td>
+                <td>
+                  <a href="{{route('student.show', $value->id)}}" class="btn btn-info" title="User Details"><i class="fa fa-file-text"></i></a>
+                  <a href="{{route('student.edit', $value->id)}}" class="btn btn-warning" title="Edit this User"><i class="fa fa-edit"></i></a>
+                  @if(Auth::user()->AuthorizeRoles(['SuperAdmin', 'Admin']))
+                  <a href="{{route('student.login-by-id', $value->id)}}" class="btn btn-success" title="Login to this account" target="_blank"><i class="fa fa-user"></i></a>
+                  @endif
+                  @if($value->status == 'Inactive')
+                  <a href="{{route('send.verify.email', $value->id)}}" class="btn btn-default" onclick="return confirm('Are you sure you want to resend email verification to this student?')" title="Resend verification email."><i class="fa fa-envelope-o"></i></a>
+                  @endif
+                  @if($value->status == 3)
+                  {{-- <a href="/admin/user/{{$value->id}}/restore" class="label label-success" title="Restore the account" onclick="return confirm('Are you sure you want to restore the account?')"><i class="fa fa-undo"></i></a> --}}
+                  @endif
+                </td>
+              </tr>
+
+              @endforeach
+            </table>
+          </div>
+          <!-- /.box-body -->
+          <div class="box-footer clearfix">
+            <div class="pagination-sm no-margin pull-right">
+              {{$students->links()}}
+            </div>
+          </div>
+        </div> <!-- /.box -->
+      </div>
+    </div>
+  </section> <!-- /.content -->
+  @if(!is_null(Session::get('_object')))
+  @php
+  $object = Session::get('_object');
+  @endphp
+  <div class="panel object">
+    @if(($object['type'] ?? '') === 'EBookPackage')
+      <div class="alert alert-info" style="margin:0 0 5px;padding:7px 10px;font-size:11px">
+        Checked Student = এই Package-এর Manual Access থাকবে। Uncheck করে Done দিলে শুধু এই Package-এর Manual Access বাতিল হবে; Paid Access অক্ষত থাকবে।
+      </div>
+    @endif
+    <div class="panel-primary">
+      <div class="panel-heading input-group">
+        <label class="">{{$object['name']}}</label>
+        <span class="input-group-addon" id="counter">{{$object['counter']}}</span>
+        <a class="btn btn-info input-group-addon" href="{{route('students.add.complete')}}"><i class="fa fa-check"></i> {{($object['type'] ?? '') === 'EBookPackage' ? 'Done — Save Changes' : 'Done'}}</a>
+      </div>
+    </div>
+  </div>
+  @endif
+@endsection
+@section('scripts')
+  <script>
+    // $(function () {
+    //   $('#example1').DataTable()
+    //   $('#example2').DataTable({
+    //     'paging'      : true,
+    //     'lengthChange': false,
+    //     'searching'   : false,
+    //     'ordering'    : true,
+    //     'info'        : true,
+    //     'autoWidth'   : false
+    //   })
+    // })
+
+    function check(e)
+    {
+      const counter = document.getElementById('counter');
+      const previousState = !e.checked;
+      e.disabled = true;
+
+      const formData = new FormData();
+      formData.append('id', e.value);
+      formData.append('action', e.checked ? 'add' : 'remove');
+
+      $.ajaxSetup({
+        headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+      });
+
+      $.ajax({
+        url: '{{route("students.add.object")}}',
+        type: 'POST',
+        data: formData,
+        cache: false,
+        contentType: false,
+        processData: false,
+        success: function(data) {
+          if (data && data.success === true) {
+            if (counter && typeof data.counter !== 'undefined') {
+              counter.textContent = data.counter;
+            }
+          } else {
+            e.checked = previousState;
+            window.alert('Student selection update হয়নি। আবার চেষ্টা করুন।');
+          }
+        },
+        error: function(xhr) {
+          e.checked = previousState;
+          const message = xhr.responseJSON && xhr.responseJSON.message
+            ? xhr.responseJSON.message
+            : 'Student selection update হয়নি। পেজ Refresh করে আবার চেষ্টা করুন।';
+          window.alert(message);
+        },
+        complete: function() {
+          e.disabled = false;
+        }
+      });
+    }
+  </script>
+@endsection

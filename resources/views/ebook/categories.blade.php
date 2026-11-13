@@ -3,6 +3,7 @@
 @section('content')
 <link rel="stylesheet" href="{{ asset('web/css/lebd-ebook-student-v22.css') }}">
 <main class="leb-v23-library">
+
   <nav class="leb-v23-breadcrumb"><a href="{{ url('/') }}">হোম</a><span>›</span><span>E-Book / PDF</span><span>›</span><b>{{ $kind === 'department' ? 'Department' : 'General' }}</b></nav>
   <section class="leb-v23-heading"><div class="leb-v23-heading-icon"><i class="fa-solid fa-book-open"></i></div><div><small>LIVE EDUCATION BD • DIGITAL LIBRARY</small><h1>{{ $kind === 'department' ? 'E-Book / PDF (Diploma)' : 'E-Book / PDF (General)' }}</h1><p>পছন্দের বই বেছে নিন, সূচিপত্র দেখুন এবং ফ্রি অধ্যায় পড়ে দেখুন।</p></div></section>
   <div class="leb-v23-toolbar"><h2>সকল {{ $kind === 'department' ? 'ডিপার্টমেন্ট' : 'জেনারেল' }} বই <span>({{ $categories->count() }})</span></h2><div class="leb-v23-switch"><a @class(['active'=>$kind==='department']) href="{{ route('student.ebook.categories',['kind'=>'department']) }}">Department</a><a @class(['active'=>$kind==='non-department']) href="{{ route('student.ebook.categories',['kind'=>'non-department']) }}">General</a></div></div>

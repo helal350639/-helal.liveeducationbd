@@ -23,7 +23,14 @@ final class PremiumReferralQuote
                 // Only buyers with an active PURCHASE of this exact package may share a link.
                 $active = DB::table('lebd_premium_class_orders')
                     ->where('student_id', $owner->id)->where('package_id', $package->id)
-                    ->where('status', 'paid')->where('expires_at', '>', now())->exists();
+                    ->where('status', 'paid')->where('expires_at', '>', now())
+                    ->when(PremiumPackageAccessRevocation::available(), function($q) use ($owner) {
+                        $q->whereNotExists(function($sub) use ($owner) {
+                            $sub->selectRaw('1')->from('lebd_premium_package_access_revocations as rv')
+                                ->whereColumn('rv.package_id','lebd_premium_class_orders.package_id')
+                                ->where('rv.student_id',$owner->id)->whereNotNull('rv.revoked_at');
+                        });
+                    })->exists();
                 if ($active) {
                     $ownerId = (int) $owner->id;
                     $ownerName = trim((string) ($owner->name ?? '')) ?: 'Premium Student';

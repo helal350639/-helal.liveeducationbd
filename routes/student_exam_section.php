@@ -7,6 +7,15 @@ Route::get('/lebd-exam-browse/category/{category}', [StudentExamCategoryControll
     ->whereNumber('category')->name('student.exam-section.browse-category');
 Route::get('/lebd-exam-browse/category/{category}/exams', [StudentExamCategoryController::class, 'exams'])
     ->whereNumber('category')->name('student.exam-section.browse-exams');
+// Exam PDF: one generated question paper per scheduled Routine exam.
+Route::get('/lebd-exam-browse/category/{category}/exam-pdf', [\App\Http\Controllers\Students\ExamSection\ExamPdfController::class, 'index'])
+    ->whereNumber('category')->name('student.exam-section.exam-pdf');
+Route::middleware('auth:student')->group(function () {
+    Route::get('/lebd-exam-pdf/{item}/view', [\App\Http\Controllers\Students\ExamSection\ExamPdfController::class, 'view'])
+        ->whereNumber('item')->name('student.exam-section.exam-pdf.view');
+    Route::get('/lebd-exam-pdf/{item}/download', [\App\Http\Controllers\Students\ExamSection\ExamPdfController::class, 'download'])
+        ->whereNumber('item')->name('student.exam-section.exam-pdf.download');
+});
 Route::prefix('lebd-student-exams')->name('student.exam-section.')->group(function () {
     Route::get('/', [StudentExamCategoryController::class, 'categories'])->name('categories');
     Route::get('/category/{category}', [StudentExamCategoryController::class, 'category'])->whereNumber('category')->name('category');

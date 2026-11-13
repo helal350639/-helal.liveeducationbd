@@ -24,7 +24,13 @@ class StudentPurchasedVideoController extends Controller
           ->leftJoin('lebd_premium_class_packages as p','p.id','=','o.package_id')
           ->where('o.id',$id)->where('o.student_id',auth('student')->id())
           ->where('o.status','paid')->where('o.expires_at','>',now())
-          ->select('o.*','p.name as package_name')->first();
+          ->when(\App\Services\PremiumClass\PremiumPackageAccessRevocation::available(), function($q) {
+            $sid=(int)auth('student')->id();
+            $q->whereNotExists(function($sub) use ($sid) {
+              $sub->selectRaw('1')->from('lebd_premium_package_access_revocations as rv')
+                ->whereColumn('rv.package_id','o.package_id')->where('rv.student_id',$sid)->whereNotNull('rv.revoked_at');
+            });
+          })->select('o.*','p.name as package_name')->first();
         abort_unless($row,403,'Premium package not active.');
         return $row;
     }

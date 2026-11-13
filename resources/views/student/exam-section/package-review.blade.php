@@ -19,6 +19,7 @@
 <main class="mcq-pay">
 <a class="back" href="{{ route('student.exam-section.packages') }}">← প্যাকেজ তালিকায় ফিরুন</a>
 @if($errors->any())<div class="error" role="alert">{{ $errors->first() }}</div>@endif
+@if(session('checkout_notice'))<div style="padding:12px;border-radius:9px;background:#fff7df;color:#805d12;margin:10px 0;font-size:12px" role="status">{{ session('checkout_notice') }}</div>@endif
 <section class="card" aria-label="পেমেন্টের বিবরণ">
  <div class="card-title">পেমেন্টের বিবরণ</div>
  <div class="details"><b>{{ $plan->name }}</b><div class="subtle">মেয়াদ: {{ $plan->duration }} {{ $plan->duration_unit }}</div>
@@ -28,10 +29,10 @@
  <div class="price-row"><span>কোর্সের মূল্য</span><strong>৳ {{ number_format((float)$plan->main_price,2) }}</strong></div>
  <div class="price-row"><span>অন্যান্য ফি (+)</span><strong>৳ 0.00</strong></div>
  <div class="price-row"><span>ডিসকাউন্ট (-)</span><strong style="color:#c93434">− ৳ {{ number_format((float)$plan->discount_amount,2) }}</strong></div>
- @if($quote['referrer_id'])
- <div class="price-row"><span>Referral Link Discount (-)</span><strong style="color:#07884e">− ৳ {{ number_format($quote['discount']/100,2) }}</strong></div>
+ @if(!empty($quote['referrer_id'] ?? null))
+ <div class="price-row"><span>Referral Link Discount (-)</span><strong style="color:#07884e">− ৳ {{ number_format(((int)($quote['discount'] ?? 0))/100,2) }}</strong></div>
  @endif
- <div class="price-row total"><span>মোট =</span><strong>৳ {{ number_format($quote['payable']/100,2) }}</strong></div>
+ <div class="price-row total"><span>মোট =</span><strong>৳ {{ number_format(((int)($quote['payable'] ?? 0))/100,2) }}</strong></div>
 </section>
 {{-- Preview must POST checkout.review (token creator), never checkout (token consumer). --}}
 <form method="POST" action="{{ route('student.exam-section.package.checkout.review',$plan->id) }}" id="mcq-package-review-form">

@@ -4,6 +4,8 @@ use App\Http\Controllers\Controller;
 use App\Models\PremiumClass\LebdRecordedVideo;
 use App\Models\PremiumClass\PremiumClassPackage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 class RecordedClassController extends Controller {
  private const TOPICS=['department'=>['civil','electrical','mechanical','computer','electronic','power','rac','architecture','textile','agriculture'], 'non-department'=>['bangla-grammar','bangla-literature','bangladesh','international','english','math','science','others']];
@@ -36,7 +38,45 @@ class RecordedClassController extends Controller {
     if($kind==='combine')$kind='combined';
     return in_array($kind,['combined','department','non_department'],true) && ($type==='all'||$type===$kind);
    });
-  return view('premium-class.packages',compact('packages','group','topic','type'));
+  // Owned state includes both verified purchases and current admin/manual grants.
+  // Explicitly revoked package access is never shown as owned.
+  $ownedPackages = [];
+  $studentId = (int) Auth::guard('student')->id();
+  if ($studentId > 0) {
+   if (Schema::hasTable('lebd_premium_class_orders')) {
+    $orders = DB::table('lebd_premium_class_orders')->where('student_id',$studentId)
+     ->where('status','paid')->where('expires_at','>',now())
+     ->when(\App\Services\PremiumClass\PremiumPackageAccessRevocation::available(), function($q) use ($studentId) {
+      $q->whereNotExists(function($sub) use ($studentId) {
+       $sub->selectRaw('1')->from('lebd_premium_package_access_revocations as rv')
+        ->whereColumn('rv.package_id','lebd_premium_class_orders.package_id')
+        ->where('rv.student_id',$studentId)->whereNotNull('rv.revoked_at');
+      });
+     })->orderByDesc('expires_at')->get(['id','package_id']);
+    foreach ($orders as $order) {
+     if (!isset($ownedPackages[(int)$order->package_id])) $ownedPackages[(int)$order->package_id] = [
+      'method'=>'purchase','order_id'=>(int)$order->id
+     ];
+    }
+   }
+   if (Schema::hasTable('lebd_premium_manual_grants')) {
+    $grants = DB::table('lebd_premium_manual_grants')->where('student_id',$studentId)
+     ->where('starts_at','<=',now())->where('ends_at','>',now())
+     ->when(\App\Services\PremiumClass\PremiumPackageAccessRevocation::available(), function($q) use ($studentId) {
+      $q->whereNotExists(function($sub) use ($studentId) {
+       $sub->selectRaw('1')->from('lebd_premium_package_access_revocations as rv')
+        ->whereColumn('rv.package_id','lebd_premium_manual_grants.package_id')
+        ->where('rv.student_id',$studentId)->whereNotNull('rv.revoked_at');
+      });
+     })->orderByDesc('ends_at')->get(['id','package_id']);
+    foreach ($grants as $grant) {
+     if (!isset($ownedPackages[(int)$grant->package_id])) $ownedPackages[(int)$grant->package_id] = [
+      'method'=>'manual','order_id'=>\App\Services\PremiumClass\PremiumManualAccess::ORDER_OFFSET + (int)$grant->id
+     ];
+    }
+   }
+  }
+  return view('premium-class.packages',compact('packages','group','topic','type','ownedPackages'));
  }
  public function watch(LebdRecordedVideo $video){
   abort_unless($video->is_published,404);

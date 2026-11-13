@@ -10,16 +10,16 @@
 @endforeach
 </div>
 <form method="GET" class="form-inline" style="margin:12px 0"><input type="hidden" name="method" value="{{$method}}"><input type="search" class="form-control" name="q" value="{{$q}}" maxlength="120" placeholder="Name, ID or Email"><button class="btn btn-primary">Search</button></form>
-<div class="table-responsive"><table class="table table-striped table-bordered"><thead><tr><th>Student ID</th><th>Name</th><th>Email</th><th>Contact</th><th>Studying</th><th>Account</th><th>Access Method</th><th>Premium Access</th><th>Expiry</th><th>View / Manual Remove</th></tr></thead><tbody>
+<div class="table-responsive"><table class="table table-striped table-bordered"><thead><tr><th>Student ID</th><th>Name</th><th>Email</th><th>Contact</th><th>Studying</th><th>Account</th><th>Access Method</th><th>Premium Access</th><th>Expiry</th><th>View / Remove Package Access</th></tr></thead><tbody>
 @forelse($rows as $id=>$r)
 @php $s=$r['student']; @endphp
-<tr><td>{{$id}}</td><td>{{$s->name??'Student not found'}}</td><td>{{$s->email??'—'}}</td><td>{{$s->contact??'—'}}</td><td>{{$s->studying??'—'}}</td><td>{{$s->status??'—'}}</td><td>{{implode(', ',array_keys($r['methods']))}}</td><td>{{$r['active']?'Active':'Expired'}}</td><td>{{$r['expires_at']??'—'}}</td><td>
+<tr><td>{{$id}}</td><td>{{$s->name??'Student not found'}}</td><td>{{$s->email??'—'}}</td><td>{{$s->contact??'—'}}</td><td>{{$s->studying??'—'}}</td><td>{{$s->status??'—'}}</td><td>{{implode(', ',array_keys($r['methods']))}}</td><td>{{!empty($r['revoked'])?'Removed':($r['active']?'Active':'Expired')}}</td><td>{{$r['expires_at']??'—'}}</td><td>
 @if($s)<a class="btn btn-info btn-sm" href="{{route('student.show',$id)}}">View Student</a>@endif
-@if(isset($r['methods']['manual']))
-<form method="POST" action="{{route('admin.ebook-packages.students.manual.remove',['package'=>$p->id,'student'=>$id])}}" style="display:inline-block;margin:3px 0" onsubmit="return confirm('এই Student-এর শুধু E-Book Manual Access প্রত্যাহার করবেন? Payment/Wallet Order পরিবর্তন হবে না।');">
+@if($s)
+<form method="POST" action="{{route('admin.ebook-packages.students.access.remove',['package'=>$p->id,'student'=>$id])}}" style="display:inline-block;margin:3px 0" onsubmit="return confirm('এই শিক্ষার্থীর এই প্যাকেজের সব Access (SSLCommerz, Referral Balance ও Manual) বন্ধ করবেন? Payment history মুছে যাবে না।');">
 @csrf
 <input type="hidden" name="confirm_remove" value="1">
-<button type="submit" class="btn btn-danger btn-sm">Remove Manual</button>
+<button type="submit" class="btn btn-danger btn-sm" {{ !empty($r['revoked']) ? 'disabled' : '' }}>{{ !empty($r['revoked']) ? 'Access Removed' : 'Remove Access' }}</button>
 </form>
 @endif
 </td></tr>

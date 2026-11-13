@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use App\Services\ExamSection\ExamReferralSettlement;
 
@@ -36,7 +37,7 @@ class ExamSectionCheckoutController extends Controller
     {
         $access = $this->activeAccess($studentId, $packageId);
         if (!$access) return null;
-        return redirect()->route('student.exam-section.packages')
+        return redirect()->route('student.exam-section.categories')
             ->with('success', 'আপনি ইতিমধ্যে এই প্যাকেজ কিনেছেন। মেয়াদ শেষ হলে আবার কিনতে পারবেন। মেয়াদ শেষ: '.Carbon::parse($access->ends_at)->format('d M Y, h:i A'));
     }
     private function amount(object $package): int
@@ -107,17 +108,24 @@ class ExamSectionCheckoutController extends Controller
             || (time() - (int) ($pending['created_at'] ?? 0)) > 900
         ) {
             return redirect()->route('student.exam-section.package.review', $package)
-                ->withErrors(['payment' => 'Checkout session পাওয়া যায়নি বা মেয়াদ শেষ। পেমেন্ট পদ্ধতি আবার নির্বাচন করুন।']);
+                ->with('checkout_notice', 'আগের Checkout session পাওয়া যায়নি বা মেয়াদ শেষ হয়েছে। নতুন করে পেমেন্ট পদ্ধতি নির্বাচন করুন।');
         }
         $plan = $this->package($package);
         if ($owned = $this->alreadyOwned((int)$student->id, (int)$plan->id)) return $owned;
         $method = $pending['method'];
         $token = $pending['token'];
         $available = $this->available($student) / 100;
-        $quote=$this->referral()->sessionQuote($plan,(int)$student->id,$request->session());
-        if ((int)($pending['quote_cents']??-1)!==$quote['payable']) {
+        $intent = DB::table('lebd_exam_section_checkout_intents')
+            ->where('token_hash', hash('sha256', (string)$token))
+            ->where('student_id', (int)$student->id)->where('package_id', $package)
+            ->where('method', $method)->where('status', 'pending')
+            ->where('expires_at', '>', now())->first();
+        $quote = $intent && !empty($intent->quote_payload)
+            ? json_decode($intent->quote_payload, true)
+            : null;
+        if (!is_array($quote) || (int)($pending['quote_cents']??-1)!==(int)($quote['payable']??-2)) {
             return redirect()->route('student.exam-section.package.review',$package)
-                ->withErrors(['payment'=>'Referral price changed. Please review the updated price.']);
+                ->with('checkout_notice', 'আগের Checkout তথ্য পাওয়া যায়নি বা মেয়াদ শেষ হয়েছে। নতুন করে পেমেন্ট পদ্ধতি নির্বাচন করুন।');
         }
         return view('student.exam-section.package-checkout-confirm', compact('plan', 'method', 'available', 'token','quote'));
     }
@@ -140,10 +148,16 @@ class ExamSectionCheckoutController extends Controller
         }
         $method = $data['method'];
         $token = Str::random(40);
-        // Persist a short-lived, one-time checkout intent independently of browser session cookies.
+        // Keep the verified quote with the server-side intent. The pay step must
+        // not depend on a browser session surviving between Preview and Confirm.
+        if (!Schema::hasColumn('lebd_exam_section_checkout_intents', 'quote_payload')) {
+            return redirect()->route('student.exam-section.package.review',$package)
+                ->withErrors(['payment'=>'Checkout update SQL install করুন, তারপর আবার চেষ্টা করুন।']);
+        }
         DB::table('lebd_exam_section_checkout_intents')->insert([
             'student_id'=>(int)$student->id, 'package_id'=>(int)$plan->id,
             'token_hash'=>hash('sha256',$token), 'method'=>$method,
+            'quote_payload'=>json_encode($quote, JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR),
             'status'=>'pending', 'expires_at'=>now()->addMinutes(15),
             'created_at'=>now(), 'updated_at'=>now(),
         ]);
@@ -223,14 +237,21 @@ class ExamSectionCheckoutController extends Controller
             return redirect()->route('student.exam-section.package.review',$package)
                 ->withErrors(['payment'=>'এই Checkout আগে থেকেই Process করা হয়েছে।']);
         }
-        $pendingCheckout=$request->session()->get('exam_section_checkout',[]);
         $plan = $this->package($package);
         if ($owned = $this->alreadyOwned((int)$student->id, (int)$plan->id)) return $owned;
-        $quote=$this->referral()->sessionQuote($plan,(int)$student->id,$request->session());
-        if ((int)($pendingCheckout['quote_cents']??-1)!==$quote['payable']) {
+        $quote = !empty($intent->quote_payload) ? json_decode($intent->quote_payload, true) : null;
+        $currentBase = (int) round((float)$plan->final_price * 100);
+        $quoteValid = is_array($quote)
+            && isset($quote['base'], $quote['discount'], $quote['bonus'], $quote['payable'])
+            && (int)$quote['base'] === $currentBase
+            && (int)$quote['discount'] >= 0
+            && (int)$quote['bonus'] >= 0
+            && (int)$quote['payable'] === ((int)$quote['base'] - (int)$quote['discount'])
+            && (int)$quote['payable'] >= 100;
+        if (!$quoteValid) {
             DB::table('lebd_exam_section_checkout_intents')->where('id',$intent->id)->update(['status'=>'failed','updated_at'=>now()]);
             return redirect()->route('student.exam-section.package.review',$package)
-                ->withErrors(['payment'=>'Price changed. Please review the final amount again.']);
+                ->withErrors(['payment'=>'Checkout মূল্য যাচাই করা যায়নি। নতুন করে Payment Preview করুন।']);
         }
         $request->session()->forget('exam_section_checkout');
         $request->session()->forget(ExamReferralSettlement::SESSION);
@@ -259,7 +280,7 @@ class ExamSectionCheckoutController extends Controller
                 },3);
             } catch (\DomainException $e) { DB::table('lebd_exam_section_checkout_intents')->where('id',$intent->id)->update(['status'=>'failed','updated_at'=>now()]); return redirect()->route('student.exam-section.package.review',$package)->withErrors(['payment'=>$e->getMessage()]); } catch (\Throwable $e) { DB::table('lebd_exam_section_checkout_intents')->where('id',$intent->id)->update(['status'=>'failed','updated_at'=>now()]); Log::error('Exam package wallet transaction failed',['student_id'=>$student->id, 'package_id'=>$package]); return redirect()->route('student.exam-section.package.review',$package)->withErrors(['payment'=>'পেমেন্ট সম্পন্ন হয়নি। আবার চেষ্টা করুন।']); }
             DB::table('lebd_exam_section_checkout_intents')->where('id',$intent->id)->update(['status'=>'completed','updated_at'=>now()]);
-            return redirect()->route('student.exam-section.packages')->with('success','Referral Balance থেকে পেমেন্ট সফল। প্রিমিয়াম পরীক্ষার অ্যাক্সেস চালু হয়েছে।');
+            return redirect()->route('student.exam-section.categories')->with('success','অভিনন্দন! আপনার প্যাকেজ কেনা সফল হয়েছে। Premium Exam Access চালু হয়েছে। এখন Exam Section থেকে পরীক্ষা দিতে পারবেন।');
         }
         [$store,$secret,$sandbox]=$this->credentials();
         if ($store===''||$secret==='') {
@@ -278,33 +299,53 @@ class ExamSectionCheckoutController extends Controller
             'value_a'=>(string)$student->id,'value_b'=>(string)$plan->id,
         ];
         try {
-            $res=Http::asForm()->timeout(25)->post($this->host($sandbox).'/gwprocess/v4/api.php',$payload);
-            $url=(string)$res->json('GatewayPageURL');
-            if (!$res->successful() || $res->json('status')!=='SUCCESS' || !str_starts_with($url,'https://')) throw new \RuntimeException('Session initialization failed');
+            $res=Http::asForm()->acceptJson()->connectTimeout(12)->timeout(35)
+                ->post($this->host($sandbox).'/gwprocess/v4/api.php',$payload);
+            $reply=$res->json();
+            $url=is_array($reply) ? ($reply['GatewayPageURL'] ?? null) : null;
+            $host=is_string($url) ? strtolower((string)parse_url($url, PHP_URL_HOST)) : '';
+            $allowedHost=$host==='sslcommerz.com' || str_ends_with($host,'.sslcommerz.com');
+            $safeGatewayUrl=is_string($url)
+                && filter_var($url, FILTER_VALIDATE_URL)
+                && strtolower((string)parse_url($url, PHP_URL_SCHEME))==='https'
+                && $allowedHost
+                && parse_url($url, PHP_URL_USER)===null
+                && parse_url($url, PHP_URL_PASS)===null;
+            // Accept a valid SSLCommerz hosted GatewayPageURL even if the optional
+            // response status field is absent or differently cased.
+            if (!$res->successful() || !$safeGatewayUrl) {
+                throw new \RuntimeException('Session initialization failed');
+            }
             DB::table('lebd_exam_section_checkout_intents')->where('id',$intent->id)->update(['status'=>'completed','updated_at'=>now()]);
             return redirect()->away($url);
         } catch (\Throwable $e) {
             DB::table('lebd_exam_section_package_orders')->where('transaction_id',$reference)->where('status','pending')->update(['status'=>'failed','updated_at'=>now()]);
             DB::table('lebd_exam_section_checkout_intents')->where('id',$intent->id)->update(['status'=>'failed','updated_at'=>now()]);
-            Log::warning('Exam Section SSL session failure',['order'=>$reference,'error'=>$e->getMessage()]);
-            return back()->withErrors(['payment'=>'SSLCommerz Checkout খুলতে পারেনি। Credentials/Network যাচাই করুন।']);
+            $gatewayReply=isset($res) ? $res->json() : null;
+            Log::warning('Exam Section SSL session failure',[
+                'order'=>$reference,
+                'error'=>$e->getMessage(),
+                'http_status'=>isset($res) ? $res->status() : null,
+                'gateway_status'=>is_array($gatewayReply) ? ($gatewayReply['status'] ?? null) : null,
+                'gateway_reason'=>is_array($gatewayReply) ? ($gatewayReply['failedreason'] ?? $gatewayReply['error'] ?? $gatewayReply['message'] ?? null) : null,
+                'gateway_response_keys'=>is_array($gatewayReply) ? array_keys($gatewayReply) : [],
+                'gateway_body_excerpt'=>isset($res) ? mb_substr((string)$res->body(),0,1200) : null,
+                'sandbox'=>$sandbox,
+            ]);
+            return redirect()->route('student.exam-section.package.review',$package)
+                ->withErrors(['payment'=>'SSLCommerz Session তৈরি হয়নি। Gateway response ও credentials/log যাচাই করে আবার চেষ্টা করুন।']);
         }
     }
     private function credentials(): array
     {
-        // Reuse the existing SSLCZ_* .env credentials without storing secrets in source code.
-        // Exam-specific credentials, when configured, take precedence.
-        $store = (string) config('services.lebd_exam_ssl.store_id', '');
-        $secret = (string) config('services.lebd_exam_ssl.store_password', '');
-        if ($store === '') {
-            $store = (string) env('LEBD_EXAM_SSL_STORE_ID', env('SSLCZ_STORE_ID', ''));
-        }
-        if ($secret === '') {
-            $secret = (string) env('LEBD_EXAM_SSL_STORE_PASSWORD', env('SSLCZ_STORE_PASSWORD', ''));
-        }
-        // Live credentials supplied by user: production is the default ONLY when
-        // no sandbox setting already exists; explicit configuration always wins.
-        $sandboxValue = config('services.lebd_exam_ssl.sandbox', env('LEBD_EXAM_SSL_SANDBOX', false));
+        // Use the project's canonical SSLCommerz config file. Direct env()
+        // reads from controllers can fail when Laravel configuration is cached.
+        $store = (string) config('sslcommerz.apiCredentials.store_id',
+            config('lebd_premium_ssl.store_id', ''));
+        $secret = (string) config('sslcommerz.apiCredentials.store_password',
+            config('lebd_premium_ssl.store_password', ''));
+        $sandboxValue = config('lebd_premium_ssl.sandbox',
+            config('services.sslcommerz.testmode', true));
         return [$store, $secret, filter_var($sandboxValue, FILTER_VALIDATE_BOOLEAN)];
     }
     private function host(bool $sandbox):string {return $sandbox?'https://sandbox.sslcommerz.com':'https://securepay.sslcommerz.com';}
@@ -337,7 +378,7 @@ class ExamSectionCheckoutController extends Controller
                 });
             } catch (\Throwable $e) {Log::error('Exam Section payment validation failure',['order'=>$id]);return response('Verification error',502);}
             if ($event==='ipn') return response('OK',200);
-            return redirect()->route('student.exam-section.packages')->with('success','✅ পেমেন্ট সফল! SSLCommerz পেমেন্ট যাচাই সম্পন্ন হয়েছে। আপনার Exam Package-এর Premium Access চালু হয়েছে।');
+            return redirect()->route('student.exam-section.categories')->with('success','অভিনন্দন! আপনার প্যাকেজ কেনা সফল হয়েছে। Premium Exam Access চালু হয়েছে। এখন Exam Section থেকে পরীক্ষা দিতে পারবেন।');
         }
         DB::table('lebd_exam_section_package_orders')->where('transaction_id',$id)->where('status','pending')->update(['status'=>$event,'updated_at'=>now()]);
         return redirect()->route('student.exam-section.packages')->withErrors(['payment'=>'Payment '.($event==='failed'?'failed':'cancelled')]);

@@ -115,6 +115,8 @@ class PremiumManualStudentController extends Controller
             $package = PremiumClassPackage::query()->whereKey($id)->lockForUpdate()->firstOrFail();
             abort_unless($package->is_active, 422, 'Package is inactive.');
             foreach ($selected as $studentId) {
+                // Re-adding a student explicitly restores this package's access.
+                \App\Services\PremiumClass\PremiumPackageAccessRevocation::restore($studentId,$id);
                 if (PremiumManualAccess::owned($studentId, $id)) continue;
                 $now = now();
                 $values = [

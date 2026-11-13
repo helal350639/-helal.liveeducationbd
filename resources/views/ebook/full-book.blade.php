@@ -29,6 +29,8 @@
 }
 </style>
 <div class="lebd-complete-book lebd-mobile-a4-reader">
+@include('ebook.partials.all-premium-packages-button')
+
  <div class="lebd-complete-toolbar">
   <div><h2>{{ $cat->name }} — সম্পূর্ণ বই</h2><p>সূচিপত্র অনুসারে অধ্যায়; নতুন অধ্যায় সর্বদা নতুন A4 পৃষ্ঠা থেকে শুরু</p></div>
   <div class="lebd-complete-buttons">

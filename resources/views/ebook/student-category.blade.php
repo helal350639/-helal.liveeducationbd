@@ -3,6 +3,7 @@
 @section('content')
 <link rel="stylesheet" href="{{ asset('web/css/lebd-ebook-student-v22.css') }}">
 <main class="leb-v23-library">
+
  <nav class="leb-v23-breadcrumb"><a href="{{url('/')}}">হোম</a><span>›</span><a href="{{route('student.ebook.categories',['kind'=>$kind])}}">{{ $kind==='department'?'Department E-Books':'General E-Books' }}</a><span>›</span><b>{{$cat->name}}</b></nav>
  <section class="leb-v23-detail-hero">
   <div class="leb-v23-detail-cover" aria-hidden="true"><div class="leb-v23-cover-placeholder"><i class="fa {{$cat->icon ?: 'fa-book'}}"></i></div></div>
@@ -15,6 +16,7 @@
       <a class="leb-v23-secondary" href="{{route('student.ebook.packages',['kind'=>$kind,'category'=>$cat->id])}}"><i class="fa-solid fa-crown"></i> Premium Package</a>
     @endif
    </div>
+   @include('ebook.partials.all-premium-packages-button')
   </div>
  </section>
  <section class="leb-v23-toc" id="toc"><div class="leb-v23-section-top"><div><small>BOOK CONTENTS</small><h2>সূচিপত্র</h2><p>প্রতিটি অধ্যায় আলাদাভাবে পড়ার সুবিধা</p></div><span class="leb-v23-section-count">মোট {{$chapters->count()}} অধ্যায়</span></div>

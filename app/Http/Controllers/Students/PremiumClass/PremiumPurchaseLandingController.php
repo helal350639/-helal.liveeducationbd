@@ -16,7 +16,13 @@ class PremiumPurchaseLandingController extends Controller
             ->where('id', $orderId)
             ->where('student_id', $studentId)
             ->where('status', 'paid')
-            ->first();
+            ->when(\App\Services\PremiumClass\PremiumPackageAccessRevocation::available(), function($q) use ($studentId) {
+                $q->whereNotExists(function($sub) use ($studentId) {
+                    $sub->selectRaw('1')->from('lebd_premium_package_access_revocations as rv')
+                        ->whereColumn('rv.package_id','lebd_premium_class_orders.package_id')
+                        ->where('rv.student_id',$studentId)->whereNotNull('rv.revoked_at');
+                });
+            })->first();
         abort_unless($order, 404);
         return $order;
     }
@@ -26,10 +32,9 @@ class PremiumPurchaseLandingController extends Controller
         $paid = $this->ownedPaidOrder($order);
         $packageName = DB::table('lebd_premium_class_packages')
             ->where('id', $paid->package_id)->value('name') ?: 'Premium Package';
-        return view('premium-class.purchase-success', [
-            'order' => $paid, 'packageName' => $packageName,
-            'returnUrl' => $this->originalVideoUrl(),
-        ]);
+        return redirect()->route('students.premium.video.classes')
+            ->with('success', 'অভিনন্দন! আপনার Premium Video Package সফলভাবে কেনা হয়েছে। Premium Class Access চালু হয়েছে।')
+            ->with('purchased_package_name', $packageName);
     }
 
     // Only redirect to a relative local page captured before visiting the package catalog.

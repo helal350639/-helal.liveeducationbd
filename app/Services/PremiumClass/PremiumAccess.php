@@ -6,7 +6,14 @@ class PremiumAccess {
  public static function hasAccess(int $studentId,string $group,string $topic):bool {
   if (!$studentId || !Schema::hasTable('lebd_premium_class_orders')) return false;
   return DB::table('lebd_premium_class_orders')->where('student_id',$studentId)->where('status','paid')
-   ->where('expires_at','>',now())->get()->contains(function($order)use($group,$topic){
+   ->where('expires_at','>',now())
+   ->when(\App\Services\PremiumClass\PremiumPackageAccessRevocation::available(), function($q) use ($studentId) {
+    $q->whereNotExists(function($sub) use ($studentId) {
+     $sub->selectRaw('1')->from('lebd_premium_package_access_revocations as rv')
+      ->whereColumn('rv.package_id','lebd_premium_class_orders.package_id')
+      ->where('rv.student_id',$studentId)->whereNotNull('rv.revoked_at');
+    });
+   })->get()->contains(function($order)use($group,$topic){
     $type=str_replace('-','_',(string)$order->package_type);
     if($type!=='combined' && $type!==str_replace('-','_',$group))return false;
     $json=$group==='department'?$order->department_categories:$order->non_department_categories;

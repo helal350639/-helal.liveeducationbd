@@ -4,7 +4,6 @@ namespace App\Http\Controllers\EBook;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use App\Services\EBook\EBookReferralSettlement;
 
 /** Display-only package-specific referral landing. Does not initiate financial transactions. */
@@ -44,12 +43,8 @@ class EBookReferralPackageLandingController extends Controller
         // Preserve attribution only for this specific package. The checkout re-validates server-side.
         $request->session()->put(EBookReferralSettlement::SESSION_KEY,
             ['package_id'=>$package,'ref'=>$ref]);
-        $owned = $buyerId && (DB::table('lebd_ebook_entitlements')
-            ->where('user_id',$buyerId)->where('package_id',$package)
-            ->where('status','Active')->where('expires_at','>',now('Asia/Dhaka'))->exists()
-            || (Schema::hasTable('lebd_ebook_manual_grants') &&
-                DB::table('lebd_ebook_manual_grants')->where('student_id',$buyerId)
-                ->where('package_id',$package)->where('ends_at','>',now('Asia/Dhaka'))->exists()));
+        $owned = $buyerId && app(\App\Services\EBook\EBookAccess::class)
+            ->packageAccess((int) $buyerId, $package);
         return view('ebook.referral-package', compact('p','owner','cat','base','discount','fee','payable','owned'));
     }
 

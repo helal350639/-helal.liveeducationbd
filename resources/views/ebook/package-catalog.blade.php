@@ -13,7 +13,10 @@
 @if((float)$p->discount_amount>0 && (empty($p->offer_ends_at) || \Carbon\Carbon::parse($p->offer_ends_at)->endOfDay()->isFuture()))<div class="ebp-package-save">সাশ্রয় ৳{{number_format($p->discount_amount,0)}} @if($p->offer_ends_at) • অফার শেষ: {{\Carbon\Carbon::parse($p->offer_ends_at)->format('d/m/Y')}} @endif</div>@endif
 <div class="ebp-package-bottom">
 @auth('student')
-<a class="ebp-buy-button" href="{{route('lebd.ebook.referral.preview',['kind'=>$kind,'category'=>$cat->id,'package'=>$p->id])}}"><i class="fa fa-shopping-bag"></i> প্যাকেজ কিনুন →</a>
+<form action="{{ route('lebd.ebook.payment.start',['kind'=>$kind,'category'=>$cat->id,'package'=>$p->id]) }}" method="POST">
+    @csrf
+    <button type="submit" class="ebp-buy-button"><i class="fa fa-shopping-bag"></i> প্যাকেজ কিনুন →</button>
+</form>
 @else<a class="ebp-buy-button" href="{{ url('/students/login') }}">প্যাকেজ কিনতে Student Login করুন →</a>@endauth
 </div></article>
 @empty<div class="ebp-no-packages">এই বইয়ের জন্য এখনো কোনো Premium Package প্রকাশ করা হয়নি।</div>@endforelse

@@ -26,14 +26,20 @@ final class PremiumPackageStudentReport
         $seen = [];
         $active = [];
         $channels = [];
+        $revokedPairs = PremiumPackageAccessRevocation::revokedPairs($packageIds);
         if (Schema::hasTable('lebd_premium_class_orders')) {
             $rows = DB::table('lebd_premium_class_orders')->whereIn('package_id', $packageIds)
                 ->where('status', 'paid')->select('package_id','student_id','tran_id','expires_at')->cursor();
             foreach ($rows as $row) {
                 $package=(int)$row->package_id; $student=(int)$row->student_id;
-                $key=$package.':'.$student;
+                // A revoked student/package pair is hidden from every current
+                // package count, including historical paid-channel counts.
+                // The underlying order remains untouched for audit/financial history.
+                if (!empty($revokedPairs[$package][$student])) continue;
                 $seen[$package][$student]=true;
-                if ($row->expires_at && $row->expires_at > now()->toDateTimeString()) $active[$package][$student]=true;
+                if ($row->expires_at && $row->expires_at > now()->toDateTimeString()) {
+                    $active[$package][$student]=true;
+                }
                 $channels[$package][self::channel((string)$row->tran_id)][$student]=true;
             }
         }
@@ -42,8 +48,11 @@ final class PremiumPackageStudentReport
                 ->select('package_id','student_id','starts_at','ends_at')->cursor();
             foreach ($rows as $row) {
                 $package=(int)$row->package_id; $student=(int)$row->student_id;
+                if (!empty($revokedPairs[$package][$student])) continue;
                 $seen[$package][$student]=true;
-                if ($row->starts_at <= now()->toDateTimeString() && $row->ends_at > now()->toDateTimeString()) $active[$package][$student]=true;
+                if ($row->starts_at <= now()->toDateTimeString() && $row->ends_at > now()->toDateTimeString()) {
+                    $active[$package][$student]=true;
+                }
                 $channels[$package]['manual'][$student]=true;
             }
         }
@@ -60,10 +69,13 @@ final class PremiumPackageStudentReport
     {
         $rows=[];
         $now=now()->toDateTimeString();
+        $revokedPairs = PremiumPackageAccessRevocation::revokedPairs([$packageId]);
         if (Schema::hasTable('lebd_premium_class_orders')) {
             foreach (DB::table('lebd_premium_class_orders')->where('package_id',$packageId)->where('status','paid')
                 ->select('student_id','tran_id','amount','paid_at','expires_at')->orderByDesc('id')->cursor() as $order) {
                 $id=(int)$order->student_id;
+                // Do not expose a revoked student in the current package report.
+                if (!empty($revokedPairs[$packageId][$id])) continue;
                 if (!isset($rows[$id])) $rows[$id]=self::emptyRow($id);
                 $type=self::channel((string)$order->tran_id);
                 $rows[$id]['methods'][$type]=true;
@@ -76,6 +88,7 @@ final class PremiumPackageStudentReport
             foreach (DB::table('lebd_premium_manual_grants')->where('package_id',$packageId)
                 ->select('student_id','starts_at','ends_at')->cursor() as $grant) {
                 $id=(int)$grant->student_id;
+                if (!empty($revokedPairs[$packageId][$id])) continue;
                 if (!isset($rows[$id])) $rows[$id]=self::emptyRow($id);
                 $rows[$id]['methods']['manual']=true;
                 $rows[$id]['latest_expires']=max($rows[$id]['latest_expires'],(string)$grant->ends_at);
@@ -85,7 +98,10 @@ final class PremiumPackageStudentReport
         if (!$rows) return [];
         $students=DB::table('students')->whereIn('id',array_keys($rows))
             ->select('id','name','email','contact','studying','status')->get()->keyBy('id');
-        foreach ($rows as $id => &$row) $row['student']=$students->get($id);
+        foreach ($rows as $id => &$row) {
+            $row['student']=$students->get($id);
+            $row['revoked']=false;
+        }
         unset($row);
         usort($rows,fn($a,$b)=>$b['id']<=>$a['id']);
         return $rows;

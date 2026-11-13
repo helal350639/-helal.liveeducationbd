@@ -33,9 +33,12 @@ Route::middleware('auth')->prefix('admin/e-book')->name('admin.ebook.')->group(f
 });
 
 // STEP-62: exact static route BEFORE /e-books/{kind}. No other E-Book route removed.
-Route::get('e-books/my-library', function () {
- return view('ebook.dashboard-categories');
-})->middleware('auth:student')->name('student.ebook.dashboard');
+Route::get('e-books/my-library', [\App\Http\Controllers\EBook\EBookPurchasedAccessController::class, 'index'])
+ ->middleware('auth:student')->name('student.ebook.dashboard');
+
+// Global catalogue must be registered before the dynamic /{kind} route.
+Route::get('/e-books/premium-packages', [EBookPackageController::class, 'allCatalog'])
+ ->name('student.ebook.all-packages');
 
 Route::prefix('e-books')->name('student.ebook.')->group(function () {
  Route::get('/{kind}/{category}/packages',[EBookPackageController::class,'catalog'])->where('kind','department|non-department')->name('packages');
@@ -53,7 +56,10 @@ Route::post('e-books/{kind}/{category}/packages/{package}/pay',
 foreach(['success','fail','cancel','ipn'] as $event){
  Route::post('payments/e-book/'.$event,[\App\Http\Controllers\EBook\EBookPaymentController::class,'callback'])
   ->defaults('event',$event)
-  ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class])
+  ->withoutMiddleware([
+   \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
+   \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
+  ])
   ->name('lebd.ebook.payment.'.$event);
 }
 Route::get('e-books/{kind}/{category}/packages/{package}/referral-preview',
@@ -76,6 +82,7 @@ Route::post('e-books/payment-method/review',
     \Illuminate\Support\Facades\Route::get('/{package}/students-add', [\App\Http\Controllers\EBook\EBookPackageStudentsController::class,'start'])->whereNumber('package')->name('students.add');
     \Illuminate\Support\Facades\Route::get('/{package}/student-report', [\App\Http\Controllers\EBook\EBookPackageStudentsController::class,'report'])->whereNumber('package')->name('students.report');
     \Illuminate\Support\Facades\Route::post('/{package}/student-report/{student}/remove-manual', [\App\Http\Controllers\EBook\EBookPackageStudentsController::class,'removeManual'])->whereNumber('package')->whereNumber('student')->name('students.manual.remove');
+    \Illuminate\Support\Facades\Route::post('/{package}/student-report/{student}/remove-access', [\App\Http\Controllers\EBook\EBookPackageStudentsController::class,'removeAccess'])->whereNumber('package')->whereNumber('student')->name('students.access.remove');
 });
 // LEBD-05 V9: read-only, one-package referral landing; existing purchase routes unchanged.
 \Illuminate\Support\Facades\Route::get('e-books/referral-package/{package}',

@@ -132,7 +132,7 @@ class EBookPackageController extends Controller
                 $entitledIds = DB::table('lebd_ebook_entitlements')
                     ->where('user_id',$studentId)->where('category_id',$category)
                     ->whereIn('package_id',$packageIds)
-                    ->where('status','Active')->where('expires_at','>',$now)
+                    ->where('status','Active')->where('starts_at','<=',$now)->where('expires_at','>',$now)
                     ->pluck('package_id');
                 foreach ($entitledIds as $id) $active[(int)$id] = true;
             }
@@ -140,10 +140,177 @@ class EBookPackageController extends Controller
             $activePackageIds = array_map('intval',array_keys($active));
         }
 
+        $ebookAccess = app(\App\Services\EBook\EBookAccess::class);
         foreach ($packages as $package) {
-            $package->has_active_access = in_array((int)$package->id,$activePackageIds,true);
+            $packageId = (int) $package->id;
+            $package->has_active_access = $studentId > 0
+                && $ebookAccess->packageAccess($studentId, $packageId, (int) $category);
+            $package->is_purchased = $studentId > 0
+                && $ebookAccess->isPaidPackage($studentId, $packageId, (int) $category);
+        }
+
+        // Read-only category labels used by the refreshed catalog cards and filters.
+        // This does not alter package eligibility, pricing, checkout, or payment processing.
+        $packageCategoryMap = collect();
+        if ($packages->isNotEmpty()) {
+            $packageCategoryMap = DB::table('lebd_ebook_package_categories as pc')
+                ->join('lebd_ebook_categories as c', 'c.id', '=', 'pc.category_id')
+                ->whereIn('pc.package_id', $packages->pluck('id')->all())
+                ->select('pc.package_id', 'c.name', 'c.kind')
+                ->orderBy('c.name')
+                ->get()
+                ->groupBy('package_id');
+        }
+
+        foreach ($packages as $package) {
+            $linkedCategories = $packageCategoryMap->get($package->id, collect());
+            $package->catalog_category_labels = $linkedCategories->pluck('name')->filter()->unique()->values();
+            $linkedKinds = $linkedCategories->pluck('kind')->filter()->unique()->values();
+            $package->catalog_filter_group = $linkedKinds->count() > 1 ? 'combined' : ($linkedKinds->first() ?: $kind);
         }
 
         return view('ebook.packages',compact('kind','cat','packages','activePackageIds'));
     }
+
+    /**
+     * Global read-only catalogue of all Active E-Book packages.
+     * Package visibility depends on package status, not category status.
+     * Purchase continues through the existing category-scoped checkout routes.
+     */
+    public function allCatalog()
+    {
+        $packages = collect();
+        $catalogError = null;
+        $activePackageIds = [];
+        $purchasedPackageIds = [];
+
+        // Fail visibly rather than returning a completely blank page when a
+        // required E-Book table is absent or its schema is incomplete.
+        if (!Schema::hasTable('lebd_ebook_packages')) {
+            $catalogError = 'E-Book package table পাওয়া যায়নি। Admin database setup পরীক্ষা করুন।';
+        } else {
+            try {
+                $packageQuery = DB::table('lebd_ebook_packages');
+                if (Schema::hasColumn('lebd_ebook_packages', 'status')) {
+                    $packageQuery->whereRaw('LOWER(TRIM(`status`)) = ?', ['active']);
+                }
+                if (Schema::hasColumn('lebd_ebook_packages', 'sort_order')) {
+                    $packageQuery->orderBy('sort_order');
+                }
+                if (Schema::hasColumn('lebd_ebook_packages', 'price')) {
+                    $packageQuery->orderBy('price');
+                }
+                $packageQuery->orderBy('id');
+                $packages = $packageQuery->get();
+
+                $categoryMap = collect();
+                $activeCategoryMap = collect();
+                if ($packages->isNotEmpty()
+                    && Schema::hasTable('lebd_ebook_package_categories')
+                    && Schema::hasTable('lebd_ebook_categories')) {
+
+                    $packageIds = $packages->pluck('id')->map(fn ($id) => (int) $id)->all();
+                    $categoryQuery = DB::table('lebd_ebook_package_categories as pc')
+                        ->join('lebd_ebook_categories as c', 'c.id', '=', 'pc.category_id')
+                        ->whereIn('pc.package_id', $packageIds)
+                        ->select('pc.package_id', 'c.id as category_id', 'c.name', 'c.kind');
+
+                    $hasCategoryStatus = Schema::hasColumn('lebd_ebook_categories', 'status');
+                    if ($hasCategoryStatus) {
+                        $categoryQuery->addSelect('c.status');
+                    }
+                    if (Schema::hasColumn('lebd_ebook_categories', 'sort_order')) {
+                        $categoryQuery->orderBy('c.sort_order');
+                    }
+                    $allLinks = $categoryQuery->orderBy('c.name')->get();
+
+                    $categoryMap = $allLinks->groupBy('package_id');
+                    $activeCategoryMap = $hasCategoryStatus
+                        ? $allLinks->filter(fn ($row) => strtolower(trim((string) $row->status)) === 'active')->groupBy('package_id')
+                        : $categoryMap;
+                }
+
+                foreach ($packages as $package) {
+                    $linked = $categoryMap->get($package->id, collect());
+                    $activeLinked = $activeCategoryMap->get($package->id, collect());
+
+                    $package->catalog_category_labels = $linked
+                        ->pluck('name')->filter()->unique()->values();
+
+                    $kinds = $linked->pluck('kind')->filter()->unique()->values();
+                    $package->catalog_filter_group = $kinds->count() > 1
+                        ? 'combined'
+                        : ($kinds->first() ?: 'department');
+
+                    // Purchase URLs must use a category that the checkout accepts.
+                    $firstActiveCategory = $activeLinked->first();
+                    $package->catalog_category_id = $firstActiveCategory
+                        ? (int) $firstActiveCategory->category_id : null;
+                    $package->catalog_kind = $firstActiveCategory
+                        ? (string) $firstActiveCategory->kind : null;
+                }
+
+                $studentId = (int) auth('student')->id();
+                if ($studentId && $packages->isNotEmpty()) {
+                    $packageIds = $packages->pluck('id')->map(fn ($id) => (int) $id)->all();
+                    $now = now('Asia/Dhaka')->toDateTimeString();
+
+                    if (Schema::hasTable('lebd_ebook_payment_orders')
+                        && Schema::hasColumn('lebd_ebook_payment_orders', 'student_id')
+                        && Schema::hasColumn('lebd_ebook_payment_orders', 'package_id')
+                        && Schema::hasColumn('lebd_ebook_payment_orders', 'status')) {
+                        $purchasedPackageIds = DB::table('lebd_ebook_payment_orders')
+                            ->where('student_id', $studentId)
+                            ->whereIn('package_id', $packageIds)
+                            ->whereIn('status', ['Complete', 'Completed', 'Paid', 'Success', 'Successful'])
+                            ->pluck('package_id')->map(fn ($id) => (int) $id)
+                            ->unique()->values()->all();
+                    }
+
+                    if (Schema::hasTable('lebd_ebook_entitlements')
+                        && Schema::hasColumn('lebd_ebook_entitlements', 'user_id')
+                        && Schema::hasColumn('lebd_ebook_entitlements', 'package_id')
+                        && Schema::hasColumn('lebd_ebook_entitlements', 'status')
+                        && Schema::hasColumn('lebd_ebook_entitlements', 'starts_at')
+                        && Schema::hasColumn('lebd_ebook_entitlements', 'expires_at')) {
+                        $activePackageIds = DB::table('lebd_ebook_entitlements')
+                            ->where('user_id', $studentId)->whereIn('package_id', $packageIds)
+                            ->where('status', 'Active')->where('starts_at', '<=', $now)
+                            ->where('expires_at', '>', $now)
+                            ->pluck('package_id')->map(fn ($id) => (int) $id)
+                            ->unique()->values()->all();
+                    }
+
+                    if (Schema::hasTable('lebd_ebook_manual_grants')
+                        && Schema::hasColumn('lebd_ebook_manual_grants', 'student_id')
+                        && Schema::hasColumn('lebd_ebook_manual_grants', 'package_id')
+                        && Schema::hasColumn('lebd_ebook_manual_grants', 'starts_at')
+                        && Schema::hasColumn('lebd_ebook_manual_grants', 'ends_at')) {
+                        $manualIds = DB::table('lebd_ebook_manual_grants')
+                            ->where('student_id', $studentId)->whereIn('package_id', $packageIds)
+                            ->where('starts_at', '<=', $now)->where('ends_at', '>', $now)
+                            ->pluck('package_id')->map(fn ($id) => (int) $id)->all();
+                        $activePackageIds = array_values(array_unique(array_merge($activePackageIds, $manualIds)));
+                    }
+                }
+
+                foreach ($packages as $package) {
+                    $packageId = (int) $package->id;
+                    $package->has_active_access = in_array($packageId, $activePackageIds, true);
+                    $package->has_been_purchased = in_array($packageId, $purchasedPackageIds, true);
+                }
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::error('E-Book global premium catalogue failed', [
+                    'message' => $e->getMessage(),
+                ]);
+                $packages = collect();
+                $catalogError = 'প্যাকেজ তালিকা লোড করা যায়নি। E-Book package/category mapping ও database schema পরীক্ষা করুন।';
+            }
+        }
+
+        return view('ebook.all-premium-packages', compact(
+            'packages', 'activePackageIds', 'purchasedPackageIds', 'catalogError'
+        ));
+    }
+
 }

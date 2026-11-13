@@ -18,7 +18,7 @@ $value = $batch;
 
 /* =========================================================
    PRICE CALCULATION
-   EXISTING PAYMENT LOGIC PRESERVED
+   EXISTING LOGIC — DO NOT CHANGE
 ========================================================= */
 
 $price = 0;
@@ -81,50 +81,68 @@ $course_price = $price - $value->fee;
 <style>
 
 /* =========================================================
-   CHECKOUT PAGE
+   PAYMENT / CHECKOUT PAGE
 ========================================================= */
 
 .checkout-page{
+
     width:100%;
-    max-width:1050px;
+
+    max-width:1150px;
+
     margin:0 auto;
-    padding:25px 15px 40px;
+
+    padding:30px 20px 45px;
 }
 
 
 /* =========================================================
-   TITLE
+   PAGE TITLE
 ========================================================= */
 
 .checkout-title{
+
     text-align:center;
-    margin-bottom:22px;
+
+    margin-bottom:25px;
 }
 
 .checkout-title h1{
+
     margin:0;
-    font-size:30px;
+
+    font-size:32px;
+
     font-weight:700;
+
     color:#092b68;
 }
 
 .checkout-title p{
-    margin:6px 0 0;
+
+    margin:7px 0 0;
+
     color:#667085;
-    font-size:14px;
+
+    font-size:15px;
 }
 
 
 /* =========================================================
-   MAIN CARD
+   MAIN CHECKOUT CARD
 ========================================================= */
 
 .checkout-card{
+
     background:#fff;
+
     border:1px solid #dce8f5;
-    border-radius:16px;
+
+    border-radius:18px;
+
     overflow:hidden;
-    box-shadow:0 7px 25px rgba(0,70,140,.09);
+
+    box-shadow:0 8px 30px rgba(0,70,140,.10);
 }
 
 
@@ -133,32 +151,51 @@ $course_price = $price - $value->fee;
 ========================================================= */
 
 .checkout-media{
+
     width:100%;
+
     background:#eef5fc;
+
     text-align:center;
+
     overflow:hidden;
 }
 
 .checkout-media img{
+
     width:100%;
+
     max-height:360px;
+
     object-fit:cover;
+
     display:block;
 }
 
+
 .checkout-video{
+
     position:relative;
+
     width:100%;
+
     padding-bottom:56.25%;
+
     overflow:hidden;
 }
 
 .checkout-video iframe{
+
     position:absolute;
+
     top:0;
+
     left:0;
+
     width:100%;
+
     height:100%;
+
     border:0;
 }
 
@@ -168,42 +205,62 @@ $course_price = $price - $value->fee;
 ========================================================= */
 
 .checkout-course-header{
-    padding:18px 22px 8px;
+
+    padding:22px 25px 10px;
+
     text-align:center;
 }
 
 .checkout-course-header h2{
+
     margin:0;
-    font-size:24px;
+
+    font-size:26px;
+
     line-height:1.4;
+
     color:#092b68;
+
     font-weight:700;
 }
 
 .checkout-course-subtitle{
-    margin:6px 0 0;
+
+    margin:8px 0 0;
+
     color:#667085;
+
     font-size:14px;
+
     line-height:1.6;
 }
 
 
 /* =========================================================
-   OFFER
+   OFFER DEADLINE
 ========================================================= */
 
 .checkout-offer{
-    margin:12px 22px 0;
-    padding:10px 13px;
+
+    margin:15px 25px 0;
+
+    padding:12px 15px;
+
     background:#fff7ed;
+
     border:1px solid #fed7aa;
-    border-radius:9px;
+
+    border-radius:10px;
+
     text-align:center;
+
     color:#c2410c;
-    font-size:13px;
+
+    font-size:14px;
 }
 
 .checkout-offer strong{
+
     color:#b91c1c;
 }
 
@@ -213,24 +270,34 @@ $course_price = $price - $value->fee;
 ========================================================= */
 
 .checkout-countdown{
-    margin:9px 22px 0;
-    padding:9px;
+
+    margin:10px 25px 0;
+
+    padding:10px;
+
     background:#fff1f2;
+
     border:1px solid #fecdd3;
-    border-radius:9px;
+
+    border-radius:10px;
+
     text-align:center;
+
     color:#be123c;
-    font-size:13px;
+
+    font-size:14px;
+
     font-weight:600;
 }
 
 
 /* =========================================================
-   BODY
+   CHECKOUT BODY
 ========================================================= */
 
 .checkout-body{
-    padding:18px 22px 10px;
+
+    padding:20px 25px 10px;
 }
 
 
@@ -239,31 +306,48 @@ $course_price = $price - $value->fee;
 ========================================================= */
 
 .checkout-field{
-    margin-bottom:17px;
+
+    margin-bottom:20px;
 }
 
 .checkout-field label{
+
     display:block;
-    margin-bottom:6px;
-    font-size:14px;
+
+    margin-bottom:7px;
+
+    font-size:15px;
+
     font-weight:600;
+
     color:#123d79;
 }
 
 .checkout-field select{
+
     width:100%;
-    min-height:43px;
-    padding:8px 11px;
+
+    min-height:45px;
+
+    padding:8px 12px;
+
     border:1px solid #cbd8e6;
-    border-radius:8px;
+
+    border-radius:9px;
+
     background:#fff;
+
     color:#333;
+
     font-size:14px;
+
     outline:none;
 }
 
 .checkout-field select:focus{
+
     border-color:#0875df;
+
     box-shadow:0 0 0 3px rgba(8,117,223,.10);
 }
 
@@ -273,196 +357,98 @@ $course_price = $price - $value->fee;
 ========================================================= */
 
 .checkout-summary{
+
     border:1px solid #dce8f5;
-    border-radius:12px;
+
+    border-radius:14px;
+
     overflow:hidden;
-    margin-top:12px;
-    background:#fff;
+
+    margin-top:15px;
+
+    background:#fbfdff;
 }
 
 .checkout-summary-title{
-    padding:11px 14px;
+
+    padding:13px 16px;
+
     background:#f1f7ff;
+
     color:#123d79;
-    font-size:15px;
+
+    font-size:16px;
+
     font-weight:700;
 }
 
+
 .checkout-summary table{
+
     width:100%;
+
     border-collapse:collapse;
+
     margin:0;
 }
 
 .checkout-summary td,
 .checkout-summary th{
-    padding:11px 13px;
+
+    padding:12px 15px;
+
     border-bottom:1px solid #e7eef6;
+
     font-size:14px;
 }
 
 .checkout-summary td{
+
     color:#475467;
 }
 
 .checkout-summary th{
+
     text-align:right;
+
     color:#123d79;
 }
 
 .checkout-summary tr:last-child td,
 .checkout-summary tr:last-child th{
+
     border-bottom:0;
 }
 
 
-/* =========================================================
-   EXTRA FEE NOTE
-========================================================= */
-
-.extra-fee-wrap{
-    display:flex;
-    align-items:center;
-    justify-content:flex-end;
-    gap:6px;
-    flex-wrap:wrap;
-}
-
-.extra-fee-note{
-    display:inline-block;
-    padding:3px 7px;
-    background:#eef6ff;
-    border:1px solid #cfe2f5;
-    border-radius:5px;
-    color:#1269c9;
-    font-size:10px;
-    font-weight:500;
-    line-height:1.3;
-    max-width:180px;
-    white-space:normal;
-    text-align:left;
-}
-
-
-/* =========================================================
-   DISCOUNT
-========================================================= */
-
-.checkout-discount th{
-    color:#dc2626 !important;
-}
-
-.checkout-reference th{
-    color:#16a34a !important;
-}
-
-
-/* =========================================================
-   TOTAL
-========================================================= */
+/* TOTAL */
 
 .checkout-total td,
 .checkout-total th{
+
     font-size:18px !important;
+
     font-weight:700 !important;
+
     color:#092b68 !important;
+
     background:#eef7ff;
 }
 
 
-/* =========================================================
-   PAYMENT METHOD
-========================================================= */
+/* DISCOUNT */
 
-.payment-method-section{
-    margin-top:20px;
-    background:#fff;
-    border-radius:14px;
-    padding:18px;
-    box-shadow:0 4px 18px rgba(0,0,0,.07);
-}
+.checkout-discount th{
 
-.payment-method-title{
-    margin:0 0 13px;
-    font-size:20px;
-    font-weight:700;
-    color:#172554;
-    text-align:center;
-}
-
-.payment-method-box{
-    width:100%;
-    min-height:145px;
-    border:3px solid #17177d;
-    border-radius:13px;
-    background:#f1fbfb;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:15px;
-    box-sizing:border-box;
-}
-
-.payment-method-content{
-    width:100%;
-    text-align:center;
-}
-
-.payment-radio{
-    width:22px;
-    height:22px;
-    accent-color:#0875df;
-    vertical-align:middle;
-    margin-right:8px;
-}
-
-.payment-method-name{
-    display:inline-block;
-    font-size:17px;
-    font-weight:700;
-    color:#172554;
-}
-
-.payment-method-items{
-    margin-top:12px;
-    display:flex;
-    justify-content:center;
-    flex-wrap:wrap;
-    gap:8px;
-}
-
-.payment-method-item{
-    background:#fff;
-    border:1px solid #d7e2ea;
-    border-radius:5px;
-    padding:6px 10px;
-    font-size:11px;
-    color:#475467;
+    color:#dc2626 !important;
 }
 
 
-/* =========================================================
-   IMPORTANT NOTE
-========================================================= */
+/* REFERENCE DISCOUNT */
 
-.checkout-note{
-    margin-top:18px;
-    padding:16px 18px;
-    background:#17116e;
-    border-left:7px solid #64b5f6;
-    border-radius:12px;
-    color:#fff;
-    font-size:14px;
-    line-height:1.8;
-    box-shadow:0 5px 15px rgba(0,0,0,.12);
-}
+.checkout-reference th{
 
-.checkout-note-title{
-    display:block;
-    margin-bottom:4px;
-    font-weight:700;
-    font-size:15px;
-    color:#fff;
+    color:#16a34a !important;
 }
 
 
@@ -471,30 +457,46 @@ $course_price = $price - $value->fee;
 ========================================================= */
 
 .checkout-terms{
-    margin-top:18px;
-    padding:13px 14px;
-    background:#fff;
+
+    margin-top:20px;
+
+    padding:13px 15px;
+
+    background:#f8fafc;
+
     border:1px solid #e2e8f0;
+
     border-radius:10px;
+
     font-size:13px;
+
     line-height:1.7;
+
     color:#475467;
 }
 
 .checkout-terms label{
+
     cursor:pointer;
 }
 
 .checkout-terms input{
-    width:17px;
-    height:17px;
+
+    width:16px;
+
+    height:16px;
+
     vertical-align:middle;
+
     margin-right:5px;
 }
 
 .checkout-terms a{
+
     color:#0875df;
+
     font-weight:600;
+
     text-decoration:none;
 }
 
@@ -504,48 +506,52 @@ $course_price = $price - $value->fee;
 ========================================================= */
 
 .checkout-payment-button{
+
     width:100%;
+
     min-height:52px;
-    margin-top:17px;
+
+    margin-top:18px;
+
     padding:12px 20px;
+
     border:0;
+
     border-radius:11px;
-    background:#198754;
+
+    background:linear-gradient(
+        135deg,
+        #0875df,
+        #1269c9
+    );
+
     color:#fff;
+
     font-size:18px;
+
     font-weight:700;
+
     cursor:pointer;
+
     transition:.25s ease;
-    box-shadow:0 5px 15px rgba(25,135,84,.18);
+
+    box-shadow:0 7px 18px rgba(8,117,223,.22);
 }
 
 .checkout-payment-button:hover{
-    background:#157347;
+
+    background:linear-gradient(
+        135deg,
+        #0666c5,
+        #0d5eb5
+    );
+
     transform:translateY(-1px);
 }
 
-.checkout-payment-button:disabled{
-    opacity:.65;
-    cursor:wait;
-    transform:none;
-}
+.checkout-payment-button i{
 
-
-/* =========================================================
-   FREE COURSE BUTTON
-========================================================= */
-
-.checkout-confirm-button{
-    width:100%;
-    min-height:52px;
-    margin-top:17px;
-    border:0;
-    border-radius:11px;
-    background:#198754;
-    color:#fff;
-    font-size:18px;
-    font-weight:700;
-    cursor:pointer;
+    margin-left:7px;
 }
 
 
@@ -554,27 +560,113 @@ $course_price = $price - $value->fee;
 ========================================================= */
 
 .checkout-purchased{
-    margin-top:18px;
+
     padding:20px;
+
     text-align:center;
+
     background:#effdf5;
+
     border:1px solid #bbf7d0;
+
     border-radius:12px;
+
     color:#166534;
 }
 
 .checkout-purchased h4{
+
     margin:0 0 12px;
+
+    font-size:18px;
 }
 
 .checkout-my-course{
+
     display:inline-block;
+
     padding:10px 18px;
+
     background:#16a34a;
+
     color:#fff !important;
+
     text-decoration:none !important;
+
     border-radius:8px;
+
     font-weight:600;
+}
+
+
+/* =========================================================
+   FREE COURSE BUTTON
+========================================================= */
+
+.checkout-confirm-button{
+
+    width:100%;
+
+    min-height:52px;
+
+    border:0;
+
+    border-radius:11px;
+
+    background:#16a34a;
+
+    color:#fff;
+
+    font-size:18px;
+
+    font-weight:700;
+
+    cursor:pointer;
+}
+
+
+/* =========================================================
+   IMPORTANT NOTE
+========================================================= */
+
+.checkout-note{
+
+    margin:22px 0 0;
+
+    padding:14px 16px;
+
+    background:#fffbea;
+
+    border:1px solid #fde68a;
+
+    border-radius:10px;
+
+    color:#713f12;
+
+    font-size:13px;
+
+    line-height:1.7;
+}
+
+.checkout-note-title{
+
+    display:block;
+
+    margin-bottom:5px;
+
+    font-weight:700;
+
+    color:#92400e;
+}
+
+
+/* =========================================================
+   FOOTER AREA OF CHECKOUT CARD
+========================================================= */
+
+.checkout-footer{
+
+    padding:0 25px 25px;
 }
 
 
@@ -585,221 +677,231 @@ $course_price = $price - $value->fee;
 @media(max-width:600px){
 
     .checkout-page{
-        width:100%;
-        padding:10px 7px 25px;
-        margin:0;
-        box-sizing:border-box;
+
+        padding:12px 8px 25px;
+
+        margin:0 auto;
     }
+
 
     .checkout-title{
-        margin-bottom:12px;
+
+        margin-bottom:14px;
     }
+
 
     .checkout-title h1{
-        font-size:22px;
+
+        font-size:23px;
     }
+
 
     .checkout-title p{
-        font-size:11px;
+
+        font-size:12px;
     }
+
 
     .checkout-card{
-        width:100%;
-        border-radius:10px;
+
+        border-radius:13px;
     }
 
+
     .checkout-media img{
+
         max-height:220px;
     }
 
+
     .checkout-course-header{
-        padding:12px 10px 6px;
+
+        padding:14px 12px 7px;
     }
+
 
     .checkout-course-header h2{
-        font-size:18px;
+
+        font-size:19px;
     }
 
+
     .checkout-course-subtitle{
+
+        font-size:12px;
+
+        margin-top:5px;
+    }
+
+
+    .checkout-offer{
+
+        margin:10px 12px 0;
+
+        padding:9px 10px;
+
         font-size:11px;
     }
 
-    .checkout-offer{
-        margin:8px 10px 0;
-        padding:8px;
-        font-size:10px;
-    }
 
     .checkout-countdown{
-        margin:6px 10px 0;
-        padding:7px;
-        font-size:10px;
+
+        margin:7px 12px 0;
+
+        padding:8px;
+
+        font-size:11px;
     }
+
 
     .checkout-body{
-        padding:10px;
+
+        padding:12px;
     }
+
 
     .checkout-field{
-        margin-bottom:11px;
+
+        margin-bottom:13px;
     }
+
 
     .checkout-field label{
-        font-size:12px;
-    }
 
-    .checkout-field select{
-        min-height:40px;
-        font-size:12px;
-    }
-
-    .checkout-summary{
-        margin-top:9px;
-    }
-
-    .checkout-summary-title{
-        padding:9px 10px;
         font-size:13px;
     }
 
+
+    .checkout-field select{
+
+        min-height:42px;
+
+        font-size:13px;
+    }
+
+
+    .checkout-summary-title{
+
+        padding:10px 12px;
+
+        font-size:14px;
+    }
+
+
     .checkout-summary td,
     .checkout-summary th{
-        padding:8px 9px;
-        font-size:11px;
+
+        padding:9px 10px;
+
+        font-size:12px;
     }
+
 
     .checkout-total td,
     .checkout-total th{
-        font-size:14px !important;
+
+        font-size:15px !important;
     }
 
-    .extra-fee-wrap{
-        gap:4px;
-    }
-
-    .extra-fee-note{
-        max-width:115px;
-        font-size:8px;
-        padding:2px 4px;
-    }
-
-    .payment-method-section{
-        margin-top:13px;
-        padding:10px;
-        border-radius:10px;
-    }
-
-    .payment-method-title{
-        font-size:16px;
-        margin-bottom:9px;
-    }
-
-    .payment-method-box{
-        min-height:120px;
-        padding:9px;
-        border-width:2px;
-        border-radius:9px;
-    }
-
-    .payment-method-name{
-        font-size:13px;
-    }
-
-    .payment-method-items{
-        margin-top:8px;
-        gap:4px;
-    }
-
-    .payment-method-item{
-        padding:4px 6px;
-        font-size:8px;
-    }
-
-    .checkout-note{
-        margin-top:12px;
-        padding:10px 11px;
-        border-left-width:5px;
-        border-radius:8px;
-        font-size:10px;
-        line-height:1.7;
-    }
-
-    .checkout-note-title{
-        font-size:11px;
-        margin-bottom:2px;
-    }
 
     .checkout-terms{
-        margin-top:12px;
-        padding:9px;
-        font-size:9px;
+
+        padding:10px;
+
+        font-size:11px;
+
         line-height:1.7;
     }
 
-    .checkout-terms input{
-        width:15px;
-        height:15px;
-    }
 
-    .checkout-payment-button,
-    .checkout-confirm-button{
+    .checkout-payment-button{
+
         min-height:46px;
-        margin-top:12px;
-        padding:9px;
-        font-size:14px;
-        border-radius:9px;
+
+        padding:10px;
+
+        font-size:15px;
     }
 
-    .checkout-purchased{
-        margin-top:12px;
-        padding:14px;
+
+    .checkout-confirm-button{
+
+        min-height:46px;
+
+        font-size:15px;
     }
 
-}
-
-
-/* =========================================================
-   EXTRA SMALL MOBILE
-========================================================= */
-
-@media(max-width:380px){
-
-    .checkout-page{
-        padding-left:5px;
-        padding-right:5px;
-    }
-
-    .checkout-summary td,
-    .checkout-summary th{
-        padding:7px 6px;
-        font-size:10px;
-    }
-
-    .extra-fee-note{
-        max-width:95px;
-        font-size:7px;
-    }
-
-    .payment-method-box{
-        min-height:105px;
-    }
 
     .checkout-note{
-        font-size:9px;
+
+        margin-top:15px;
+
+        padding:10px;
+
+        font-size:11px;
+    }
+
+
+    .checkout-footer{
+
+        padding:0 12px 15px;
     }
 
 }
 
+/* =========================================================
+   EXTRA FEE NOTE
+========================================================= */
 
-.lebd-batch-referral {display:flex;align-items:center;gap:12px;cursor:pointer;border:1px solid #abd9ff;border-radius:12px;background:#eef8ff;padding:15px;margin-bottom:11px;color:#092b68}
-.lebd-batch-referral input {accent-color:#0875df;width:18px;height:18px;flex-shrink:0}
-.lebd-batch-referral-label {flex:1;display:flex;flex-direction:column;gap:4px}
-.lebd-batch-referral-label small,.lebd-batch-referral-amount small{font-size:11px;color:#5076a0}
-.lebd-batch-referral-amount{display:flex;flex-direction:column;text-align:center;background:white;border-radius:10px;padding:9px 12px;font-weight:800;color:#008b55}
-.lebd-batch-referral input:disabled{opacity:.45}
-.lebd-batch-referral:has(input:disabled){opacity:.65;cursor:not-allowed}
-.lebd-batch-referral-help{font-size:12px;color:#a14f18;margin:3px 0 12px}
-@media(max-width:600px){.lebd-batch-referral{padding:10px;gap:7px}.lebd-batch-referral-amount{padding:7px;font-size:12px}}
+.extra-fee-note{
+
+    display:inline-block;
+
+    margin-left:8px;
+
+    padding:3px 8px;
+
+    background:#eef6ff;
+
+    border:1px solid #cfe2f5;
+
+    border-radius:5px;
+
+    color:#1269c9;
+
+    font-size:11px;
+
+    font-weight:500;
+
+    vertical-align:middle;
+
+    white-space:nowrap;
+}
+
+
+/* MOBILE */
+
+@media(max-width:600px){
+
+    .extra-fee-note{
+
+        margin-left:5px;
+
+        padding:2px 5px;
+
+        font-size:9px;
+
+        max-width:120px;
+
+        overflow:hidden;
+
+        text-overflow:ellipsis;
+
+        vertical-align:middle;
+    }
+
+}
+
 </style>
 
 
@@ -808,6 +910,7 @@ $course_price = $price - $value->fee;
 ========================================================= -->
 
 <section class="checkout-page">
+
 
     <!-- PAGE TITLE -->
 
@@ -838,7 +941,7 @@ $course_price = $price - $value->fee;
             <div class="checkout-media checkout-video">
 
                 <iframe
-                    src="https://www.youtube.com/embed/{{ $value->video }}?autoplay=1&mute=1"
+                    src="https://www.youtube.com/embed/{{$value->video}}?autoplay=1&mute=1"
                     allowfullscreen>
                 </iframe>
 
@@ -857,6 +960,66 @@ $course_price = $price - $value->fee;
 
         @endif
 
+
+        <!-- =================================================
+             COURSE NAME
+        ================================================== -->
+
+        <div class="checkout-course-header">
+
+            <h2>
+                {{ $value->name }}
+            </h2>
+
+            @if($value->subtitle)
+
+                <p class="checkout-course-subtitle">
+                    {{ $value->subtitle }}
+                </p>
+
+            @endif
+
+        </div>
+
+
+        <!-- =================================================
+             OFFER DEADLINE
+        ================================================== -->
+
+        @if($value->offer_end_at)
+
+            <div class="checkout-offer">
+
+                ডিসকাউন্ট অফারের মেয়াদ:
+
+                <strong>
+                    {{ $source->dtformat($value->offer_end_at) }}
+                </strong>
+
+            </div>
+
+        @endif
+
+
+        <!-- =================================================
+             REGISTRATION COUNTDOWN
+        ================================================== -->
+
+        @if($value->reg_end_at)
+
+            <div class="checkout-countdown">
+
+                রেজিস্ট্রেশনের সময় বাকি:
+
+                <span id="timer">
+                    হিসাব করা হচ্ছে...
+                </span>
+
+            </div>
+
+        @endif
+
+
         <!-- =================================================
              CHECKOUT BODY
         ================================================== -->
@@ -864,7 +1027,10 @@ $course_price = $price - $value->fee;
         <div class="checkout-body">
 
 
-            <!-- EXISTING PAYMENT FORM -->
+            <!-- =================================================
+                 FORM
+                 EXISTING PAYMENT FLOW — UNCHANGED
+            ================================================== -->
 
             <form
                 action="{{ route('students.course.apply') }}"
@@ -875,7 +1041,9 @@ $course_price = $price - $value->fee;
                 @csrf
 
 
-                <!-- HIDDEN DATA -->
+                <!-- =================================================
+                     EXISTING HIDDEN DATA
+                ================================================== -->
 
                 <input
                     type="hidden"
@@ -934,7 +1102,9 @@ $course_price = $price - $value->fee;
                         <div class="checkout-field">
 
                             <label for="department_id">
+
                                 ডিপার্টমেন্ট নির্বাচন করুন
+
                             </label>
 
                             <select
@@ -959,6 +1129,20 @@ $course_price = $price - $value->fee;
 
                         </div>
 
+                    @else
+
+                        <div class="checkout-field">
+
+                            <label>
+                                ডিপার্টমেন্ট
+                            </label>
+
+                            <div>
+                                No Departments for The course
+                            </div>
+
+                        </div>
+
                     @endif
 
                 @endif
@@ -975,13 +1159,15 @@ $course_price = $price - $value->fee;
 
                     <div class="checkout-summary">
 
+
                         <div class="checkout-summary-title">
+
                             পেমেন্টের বিস্তারিত
+
                         </div>
 
 
                         <table>
-
 
                             <!-- COURSE PRICE -->
 
@@ -1006,31 +1192,24 @@ $course_price = $price - $value->fee;
                                     অন্যান্য ফী (+)
                                 </td>
 
-                                <th>
+                                <th style="text-align:right;">
 
-                                    <div class="extra-fee-wrap">
+    <span>
+        ৳ {{ $source->point0($value->fee) }}
+    </span>
 
-                                        <span>
-                                            ৳ {{ $source->point0($value->fee) }}
-                                        </span>
+    @if($value->fee > 0 && $value->extra_fee_note)
 
-                                        @if(
-                                            $value->fee > 0 &&
-                                            $value->extra_fee_note
-                                        )
+        <span
+            class="extra-fee-note"
+            title="{{ $value->extra_fee_note }}"
+        >
+            {{ $value->extra_fee_note }}
+        </span>
 
-                                            <span
-                                                class="extra-fee-note"
-                                                title="{{ $value->extra_fee_note }}"
-                                            >
-                                                {{ $value->extra_fee_note }}
-                                            </span>
+    @endif
 
-                                        @endif
-
-                                    </div>
-
-                                </th>
+</th>
 
                             </tr>
 
@@ -1087,115 +1266,7 @@ $course_price = $price - $value->fee;
 
                             </tr>
 
-
                         </table>
-
-                    </div>
-
-                @endif
-
-
-                <!-- =================================================
-                     PAYMENT METHOD
-                ================================================== -->
-
-                @if(
-                    !empty($user->id) &&
-                    !$value->students()->where('id', $user->id)->first() &&
-                    $value->price >= 1
-                )
-
-                    <div class="payment-method-section">
-
-                        <h3 class="payment-method-title">
-                            আমাদের পেমেন্ট সিস্টেমে অন্তরভুক্ত আছে
-                        </h3>
-
-                        @php
-                            $lebdAvailableBalance = max(0, (float)($student->referral_balance ?? 0)
-                                - (float)\App\Models\WithdrawRequest::where('student_id', $user->id)
-                                    ->where('status', 'pending')->sum('amount'));
-                        @endphp
-                        <label class="lebd-batch-referral">
-                            <input type="radio" name="lebd_payment_choice" value="referral" id="lebd-batch-referral-choice"
-                                {{ $lebdAvailableBalance + 0.00001 < $selling_price ? 'disabled' : '' }}>
-                            <span class="lebd-batch-referral-label"><strong>Use Your Referral Balance</strong>
-                                <small>Available Balance দিয়ে ব্যাচ কিনুন</small></span>
-                            <span class="lebd-batch-referral-amount">৳{{ number_format($lebdAvailableBalance, 2) }}<small>Available Balance</small></span>
-                        </label>
-                        @if($lebdAvailableBalance + 0.00001 < $selling_price)
-                            <p class="lebd-batch-referral-help">এই ব্যাচ কেনার জন্য পর্যাপ্ত Available Referral Balance নেই। SSLCommerz ব্যবহার করুন।</p>
-                        @endif
-                        <input type="hidden" name="lebd_referral_form" value="0" id="lebd_referral_form">
-                        <div class="payment-method-box">
-
-                            <div class="payment-method-content">
-
-                                <label>
-
-                                    <input
-                                        type="radio"
-                                        name="lebd_payment_choice"
-                                        value="online"
-                                        class="payment-radio"
-                                        checked
-                                    >
-
-                                    <span class="payment-method-name">
-                                        Online Payment Gateway — SSLCommerz
-                                    </span>
-
-                                </label>
-
-
-                                <div class="payment-method-items">
-
-                                    <span class="payment-method-item">
-                                        Card
-                                    </span>
-
-                                    <span class="payment-method-item">
-                                        Mobile Banking
-                                    </span>
-
-                                    <span class="payment-method-item">
-                                        Internet Banking
-                                    </span>
-
-                                    <span class="payment-method-item">
-                                        Wallet
-                                    </span>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                @endif
-
-
-                <!-- =================================================
-                     IMPORTANT NOTE
-                ================================================== -->
-
-                @if(
-                    !empty($user->id) &&
-                    !$value->students()->where('id', $user->id)->first() &&
-                    $value->price >= 1
-                )
-
-                    <div class="checkout-note">
-
-                        <span class="checkout-note-title">
-                            ⚠️ দ্রষ্টব্য
-                        </span>
-
-                        পেমেন্ট গেটওয়েতে প্রবেশ করে আপনার পেমেন্ট সম্পন্ন হওয়ার
-                        পর অনুগ্রহ করে নিশ্চিতকরণের জন্য ৫-৬ সেকেন্ড অপেক্ষা করুন।
-                        নিশ্চিতকরণ না আসা পর্যন্ত পেজটি বন্ধ করবেন না বা ত্যাগ করবেন না।
 
                     </div>
 
@@ -1243,7 +1314,7 @@ $course_price = $price - $value->fee;
                                 href="{{ route('home.page', 'return-policy') }}"
                                 target="_blank"
                             >
-                                Refund Policy
+                                Fund Return Policy
                             </a>.
 
                         </label>
@@ -1279,15 +1350,17 @@ $course_price = $price - $value->fee;
 
                 @else
 
+
                     @if($value->price < 1)
 
                         <button
                             type="submit"
                             class="checkout-confirm-button"
-                            onclick="return confirm('আপনার তথ্য পুনরায় যাচাই করতে Next পেজ তথ্য দেখুন.')"
+                            onclick="return confirm('Double check you provided information.')"
                         >
+
                             কনফার্ম করুন
-                            <i class="fa-solid fa-arrow-right"></i>
+
                         </button>
 
                     @else
@@ -1295,12 +1368,12 @@ $course_price = $price - $value->fee;
                         <button
                             type="submit"
                             class="checkout-payment-button"
-                            onclick="return confirm('আপনার তথ্য পুনরায় যাচাই করতে Next পেজ তথ্য দেখুন.')"
+                            onclick="return confirm('Double check you provided information.')"
                         >
 
                             <i class="fa-solid fa-lock"></i>
 
-                            Payment Preview →
+                            পেমেন্ট এর জন্য এগিয়ে যান
 
                             <i class="fa-solid fa-arrow-right"></i>
 
@@ -1312,6 +1385,31 @@ $course_price = $price - $value->fee;
 
 
             </form>
+
+        </div>
+
+
+        <!-- =================================================
+             NOTE
+        ================================================== -->
+
+        <div class="checkout-footer">
+
+            <div class="checkout-note">
+
+                <span class="checkout-note-title">
+
+                    ⚠️ দ্রষ্টব্য
+
+                </span>
+
+                পেমেন্ট সম্পন্ন করার পর Payment Gateway থেকে
+                সরাসরি বের হয়ে যাবেন না। Payment সম্পন্ন হওয়ার
+                পর কয়েক সেকেন্ড অপেক্ষা করুন, যাতে আপনার
+                পেমেন্টের তথ্য সঠিকভাবে আমাদের সিস্টেমে
+                আপডেট হতে পারে।
+
+            </div>
 
         </div>
 
@@ -1336,8 +1434,7 @@ $course_price = $price - $value->fee;
 
 (function(){
 
-    const timerElement =
-        document.getElementById('timer');
+    const timerElement = document.getElementById('timer');
 
     if(!timerElement){
         return;
@@ -1352,11 +1449,9 @@ $course_price = $price - $value->fee;
 
     function updateCountdown(){
 
-        const now =
-            new Date().getTime();
+        const now = new Date().getTime();
 
-        const distance =
-            countDownDate - now;
+        const distance = countDownDate - now;
 
 
         if(distance <= 0){
@@ -1404,32 +1499,24 @@ $course_price = $price - $value->fee;
 
         if(days > 0){
 
-            output +=
-                days + ' দিন ';
+            output += days + ' দিন ';
 
         }
 
 
-        output +=
-            hours + ' ঘণ্টা ';
+        output += hours + ' ঘণ্টা ';
+
+        output += minutes + ' মিনিট ';
+
+        output += seconds + ' সেকেন্ড';
 
 
-        output +=
-            minutes + ' মিনিট ';
-
-
-        output +=
-            seconds + ' সেকেন্ড';
-
-
-        timerElement.innerHTML =
-            output;
+        timerElement.innerHTML = output;
 
 
         if(distance < 60000){
 
-            timerElement.style.color =
-                '#d00';
+            timerElement.style.color = '#d00';
 
         }
 
@@ -1438,20 +1525,16 @@ $course_price = $price - $value->fee;
 
     updateCountdown();
 
-    setInterval(
-        updateCountdown,
-        1000
-    );
+    setInterval(updateCountdown,1000);
 
 })();
 
 @endif
 
 
-
 /* =========================================================
    PAYMENT FORM
-   PREVENT DOUBLE CLICK
+   Existing form submission remains untouched
 ========================================================= */
 
 document.addEventListener(
@@ -1480,14 +1563,9 @@ document.addEventListener(
 
 
                 if(button){
-
                     button.disabled = true;
-
-                    button.style.opacity =
-                        '0.70';
-
-                    button.style.cursor =
-                        'wait';
+                    button.style.opacity = '0.75';
+                    button.style.cursor = 'wait';
 
                 }
 
@@ -1497,19 +1575,6 @@ document.addEventListener(
     }
 );
 
-
-// Referral sends the existing batch and department selection to a safe preview route.
-// The legacy SSLCommerz course apply/confirm route remains unchanged.
-document.addEventListener('DOMContentLoaded', function(){
- const form=document.getElementById('courseCheckoutForm');if(!form)return;
- const original=form.getAttribute('action');
- const url=@json(route('students.batch.referral.preview'));
- form.addEventListener('submit',function(event){
-   const selected=form.querySelector('input[name="lebd_payment_choice"]:checked');
-   if (!selected || selected.disabled) { event.preventDefault(); return; }
-   form.action=selected.value==='referral'?url:original;
- });
-});
 </script>
 
 @endsection

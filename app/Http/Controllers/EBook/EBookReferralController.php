@@ -32,11 +32,12 @@ class EBookReferralController extends Controller
         return [$cat, $p, $amount];
     }
 
-    private function assertNotOwned(int $studentId, int $packageId): void
+    private function assertNotOwned(int $studentId, int $packageId, int $categoryId): void
     {
-        $active = DB::table('lebd_ebook_entitlements')
-            ->where('user_id', $studentId)->where('package_id', $packageId)
-            ->where('status', 'Active')->where('expires_at', '>', now('Asia/Dhaka'))->exists();
+        // E-Book ownership is category-scoped. Access to the same package in
+        // another category must not block this category's checkout.
+        $active = app(\App\Services\EBook\EBookAccess::class)
+            ->packageAccess($studentId, $packageId, $categoryId);
         if ($active) {
             throw \Illuminate\Validation\ValidationException::withMessages([
                 'payment' => 'এই প্যাকেজ কিনেছেন। মেয়াদ শেষ না হওয়া পর্যন্ত আবার কেনার প্রয়োজন নেই।',
@@ -56,20 +57,39 @@ class EBookReferralController extends Controller
     {
         abort_unless(Auth::guard('student')->check(), 401);
         $this->selection($kind, $category, $package);
-        $this->assertNotOwned((int) Auth::guard('student')->id(), $package);
-        return redirect()->route('lebd.ebook.referral.preview', compact('kind', 'category', 'package'));
+        $this->assertNotOwned((int) Auth::guard('student')->id(), $package, $category);
+
+        // Preserve a referral link only when it belongs to the exact package
+        // currently being purchased. A stale referral for another package is cleared.
+        $savedReferral = $request->session()->get(EBookReferralSettlement::SESSION_KEY);
+        $hasMatchingReferral = is_array($savedReferral)
+            && (int) ($savedReferral['package_id'] ?? 0) === $package
+            && !empty($savedReferral['ref']);
+        if (!$hasMatchingReferral) {
+            $request->session()->forget(EBookReferralSettlement::SESSION_KEY);
+        }
+
+        return redirect()->route('lebd.ebook.referral.preview', array_merge(
+            compact('kind', 'category', 'package'),
+            ['referral_purchase' => $hasMatchingReferral ? 1 : 0]
+        ));
     }
 
     public function preview(Request $request, string $kind, int $category, int $package)
     {
         $student = Auth::guard('student')->user();
         abort_unless($student, 401);
-        // A normal catalog/checkout visit must never inherit a previous referral landing.
-        if (!$request->boolean('referral_purchase')) {
+        // Keep only a matching, explicitly carried referral attribution.
+        // This prevents an old link for another package from affecting checkout.
+        $savedReferral = $request->session()->get(EBookReferralSettlement::SESSION_KEY);
+        $matchingReferral = is_array($savedReferral)
+            && (int) ($savedReferral['package_id'] ?? 0) === $package
+            && !empty($savedReferral['ref']);
+        if (!$request->boolean('referral_purchase') || !$matchingReferral) {
             $request->session()->forget(EBookReferralSettlement::SESSION_KEY);
         }
         [$cat, $p, $amount] = $this->selection($kind, $category, $package);
-        $this->assertNotOwned((int) $student->id, $package);
+        $this->assertNotOwned((int) $student->id, $package, $category);
         $quote = app(EBookReferralSettlement::class)->sessionQuote($p,(int)$student->id,$request->session());
         $amount = $quote['total'];
         $available = $this->available($student);
@@ -94,13 +114,13 @@ class EBookReferralController extends Controller
         $category = (int)$ctx['category_id'];
         $package = (int)$ctx['package_id'];
         [$cat, $p, $amount] = $this->selection($kind, $category, $package);
-        $this->assertNotOwned((int) $student->id, $package);
+        $this->assertNotOwned((int) $student->id, $package, $category);
         $quote = app(EBookReferralSettlement::class)->sessionQuote($p,(int)$student->id,$request->session());
         $amount = $quote['total'];
         $available = $this->available($student);
         $token = (string)$ctx['token'];
         $method = (string)$request->input('method');
-        return view('ebook.referral-preview', compact('cat','p','kind','category','package','amount','available','token','method','quote'));
+        return view('ebook.referral-preview', compact('cat','p','kind','category','package','amount','available','token','method','quote','student'));
     }
 
     public function confirm(Request $request)
@@ -124,15 +144,20 @@ class EBookReferralController extends Controller
             $student = DB::table('students')->where('id', $studentId)->lockForUpdate()->first();
             abort_unless($student, 401);
             [$cat, $p, $amount] = $this->selection($kind, $category, $package);
-            $this->assertNotOwned((int) $studentId, $package);
+            $this->assertNotOwned((int) $studentId, $package, $category);
             $code = is_array($attribution) && (int)($attribution['package_id']??0)===$package
                 ? (string)($attribution['ref']??'') : '';
             $quote = app(EBookReferralSettlement::class)->quote($p,$code,$studentId);
             $amount = $quote['total'];
             abort_if($this->available($student) < $amount, 422, 'পর্যাপ্ত Available Referral Balance নেই।');
             $now = Carbon::now('Asia/Dhaka');
+            if (Schema::hasTable('lebd_ebook_access_revocations')) {
+                DB::table('lebd_ebook_access_revocations')
+                    ->where('student_id', $studentId)->where('package_id', $package)->delete();
+            }
             $existing = DB::table('lebd_ebook_entitlements')->where('user_id', $studentId)
-                ->where('category_id', $category)->where('status', 'Active')
+                ->where('category_id', $category)->where('package_id', $package)
+                ->where('status', 'Active')
                 ->where('expires_at', '>', $now)->orderByDesc('expires_at')->lockForUpdate()->first();
             $start = $existing ? Carbon::parse($existing->expires_at, 'Asia/Dhaka') : $now->copy();
             $end = $start->copy();
@@ -166,7 +191,7 @@ class EBookReferralController extends Controller
                 ]);
             }
             app(EBookReferralSettlement::class)->credit($orderId);
-            return ['trx' => $trx, 'phone' => (string)($student->contact ?? ''), 'kind' => $kind, 'category' => $category];
+            return ['trx' => $trx, 'phone' => (string)($student->contact ?? ''), 'kind' => $kind, 'category' => $category, 'package_name' => (string) $p->name];
         }, 3);
         $request->session()->forget(EBookReferralSettlement::SESSION_KEY);
         // Send only after committed successful purchase. An SMS provider failure never rolls back a purchase.
@@ -178,11 +203,13 @@ class EBookReferralController extends Controller
                 Log::warning('E-Book referral purchase SMS failed', ['transaction_id' => $receipt['trx'], 'error' => $e->getMessage()]);
             }
         }
-        return redirect()->route('student.ebook.categories', ['kind' => $receipt['kind']])
+        return redirect()->route('student.ebook.dashboard')
             ->with('ebook_purchase_success', [
                 'category_id' => $receipt['category'],
                 'kind' => $receipt['kind'],
+                'package_name' => $receipt['package_name'],
                 'order' => $receipt['trx'],
+                'method' => 'referral',
             ]);
     }
 }
