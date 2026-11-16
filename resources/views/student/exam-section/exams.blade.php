@@ -16,6 +16,7 @@
     $progress = $total ? round($finished * 100 / $total) : 0;
     // Display-only flags; server-side authorization remains in StudentRoutineExamController.
     $routineIds = collect($exams)->pluck('routine_id')->unique()->values()->all();
+
     $routineLastEnds = $routineIds ? \Illuminate\Support\Facades\DB::table('lebd_exam_section_routine_items')
         ->whereIn('routine_id', $routineIds)
         ->select('routine_id', \Illuminate\Support\Facades\DB::raw('MAX(exam_end_at) AS last_end'))
@@ -45,6 +46,15 @@
             ->value('name');
     }
     $back = $sub ? route('student.exam-section.browse-category', ['category'=>$cat->id]) : route('student.exam-section.categories');
+    // Progress is scoped to the currently opened category/sub-category only.
+    $lebdCurrentScopeProgress = collect(\App\Services\StudentLearningProgress::build($currentStudent))
+        ->first(fn ($scope) => (int) $scope['category_id'] === (int) $cat->id
+            && (($sub === null && $scope['kind'] === 'category')
+                || ($sub !== null && $scope['kind'] === 'subcategory' && (int) $scope['subcategory_id'] === (int) $sub->id)));
+    $lebdScopeTotal = $lebdCurrentScopeProgress['total'] ?? $total;
+    $lebdScopeCompleted = $lebdCurrentScopeProgress['completed'] ?? 0;
+    $lebdScopeRemaining = max(0, $lebdScopeTotal - $lebdScopeCompleted);
+    $lebdScopePercent = $lebdCurrentScopeProgress['percent'] ?? 0;
 @endphp
 @extends('student')
 @section('title', '{{ $pageName }} — Exam Section')
@@ -54,13 +64,94 @@
 *{box-sizing:border-box}.lebd-exam-scope{background:#edf2fa;color:#17253b;font-family:system-ui,-apple-system,'Segoe UI','Noto Sans Bengali',sans-serif}.lebd-exam-scope a{text-decoration:none;color:inherit}.lebd-exam-scope button{font:inherit} .se26{max-width:1020px;margin:auto;padding:0 15px 50px}.se26-header{background:#fff;border-bottom:1px solid #e2e8f1}.se26-head-inner{max-width:1020px;margin:auto;padding:13px 17px;display:flex;justify-content:space-between;align-items:center;gap:10px}.se26-brand{color:#1870c6;font-weight:800;font-size:19px}.se26-back{font-size:13px;background:#edf3fc;color:#1457a4;padding:9px 12px;border-radius:9px}.se26-title{text-align:center;margin:34px 0 25px}.se26-title h1{font-size:clamp(23px,4vw,32px);margin:0 0 7px;font-weight:850}.se26-title p{color:#6c7b8f;margin:0;font-size:14px}.se26-notice{padding:17px 20px;border-radius:17px;background:#ffe391;color:#5d4810;font-size:16px;text-align:center;margin-bottom:20px;font-weight:700}.se26-notice.live{background:#d5f4e5;color:#07563a}.se26-panel{background:#fff;border:1px solid #e3eaf3;border-radius:22px;padding:24px;margin-bottom:25px;box-shadow:0 8px 26px #2039500b}.se26-feature-head{display:flex;justify-content:space-between;gap:10px;align-items:center}.se26-feature-head h2{font-size:22px;margin:0}.se26-icon{display:inline-flex;align-items:center;justify-content:center;background:#e6f3ff;color:#0b6fcc;border-radius:13px;width:60px;height:60px;font-size:27px}.se26-state{border-radius:20px;background:#eaf1fa;color:#4176a8;padding:7px 12px;font-size:12px;font-weight:750}.se26-state.live{background:#d9fae7;color:#08754a}.se26-feature-name{font-weight:800;font-size:19px;margin:15px 0 7px}.se26-muted{color:#77859a;line-height:1.8}.se26-feature-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:22px}.se26-btn{display:flex;align-items:center;justify-content:center;gap:8px;border-radius:13px;padding:14px 11px;border:1px solid #cde9db;background:#e4f9ec;color:#087e52;font-weight:800;font-size:14px;min-height:50px}.se26-btn.muted{background:#fff6e7;border-color:#fae8c7;color:#a98050}.se26-btn.disabled{cursor:not-allowed;opacity:.65}.se26-heading{font-size:24px;margin:29px 0 18px}.se26-menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.se26-menu-item{background:#fff;border-radius:20px;padding:17px 14px;display:flex;gap:12px;align-items:center;min-height:101px;font-weight:800;box-shadow:0 6px 21px #24416a08}.se26-menu-item span:first-child{display:flex;align-items:center;justify-content:center;background:#eaf3ff;color:#0f76c9;width:48px;height:48px;flex:none;border-radius:13px;font-size:22px}.se26-menu-item small{font-weight:500;color:#94a0ac;display:block;margin-top:3px}.se26-progress{margin-top:27px}.se26-progress-grid{display:grid;grid-template-columns:165px 1fr;gap:22px;align-items:center}.se26-ring{width:160px;height:160px;border-radius:100%;display:grid;place-items:center;background:conic-gradient(#1174d1 {{ $progress }}%,#e8eff8 0)}.se26-ring-inner{width:126px;height:126px;background:#fff;border-radius:100%;display:flex;flex-direction:column;align-items:center;justify-content:center}.se26-ring-inner strong{font-size:32px;color:#147bd7}.se26-progress-row{display:flex;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid #dfe6f0;font-size:16px}.se26-progress-row b{color:#1678d1}.se26-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.se26-exam{background:#fff;border:1px solid #dbe5f2;border-radius:15px;padding:15px;position:relative;box-shadow:0 4px 15px #213b5408}.se26-exam h3{font-size:16px;margin:0 0 8px}.se26-exam p{color:#586b83;font-size:12px;margin:4px 0}.se26-exam-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px;flex-wrap:wrap}.se26-dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#ff2861;box-shadow:0 0 0 4px #ff286120;animation:se26blink 1.15s infinite;margin-left:6px}.se26-more{color:#0a70c3;font-weight:750;font-size:12px}.se26-empty{padding:17px;color:#72829a;background:#fff;border-radius:12px}@keyframes se26blink{50%{opacity:.2;box-shadow:0 0 0 7px #ff28610d}}@media(max-width:560px){.se26{padding:0 13px 35px}.se26-panel{padding:17px;border-radius:19px}.se26-feature-head h2{font-size:19px}.se26-menu{gap:11px}.se26-menu-item{padding:12px;min-height:95px;font-size:13px;gap:8px}.se26-menu-item span:first-child{width:42px;height:42px;font-size:19px}.se26-progress-grid{grid-template-columns:105px 1fr;gap:15px}.se26-ring{height:105px;width:105px}.se26-ring-inner{width:80px;height:80px}.se26-ring-inner strong{font-size:23px}.se26-progress-row{font-size:13px;padding:8px 0}.se26-list{grid-template-columns:1fr}}@media(prefers-reduced-motion:reduce){.se26-dot{animation:none}}
 
 
+
+/* LEBD v21: compact package CTA beside Exam Menu + tactile 3D menu cards. */
+.lebd-exam-scope .se26-menu-heading-row{
+ display:flex;align-items:center;justify-content:space-between;gap:12px;
+ margin:27px 0 14px;min-width:0
+}
+.lebd-exam-scope .se26-menu-heading-row .se26-heading{
+ margin:0;min-width:0;font-size:22px;line-height:1.2
+}
+.lebd-exam-scope a.se26-package-menu-button{
+ display:inline-flex;align-items:center;justify-content:center;gap:8px;
+ min-height:42px;padding:9px 17px;border:1px solid #f97316;
+ border-radius:12px;background:linear-gradient(180deg,#ff9a35 0%,#f45a18 58%,#df4315 100%);
+ color:#fff!important;text-decoration:none;font-size:13px;font-weight:850;line-height:1.1;
+ white-space:nowrap;box-shadow:0 4px 0 #bd3b12,0 7px 15px rgba(218,75,24,.22);
+ transition:transform .16s ease,box-shadow .16s ease,filter .16s ease
+}
+.lebd-exam-scope a.se26-package-menu-button i{font-size:15px}
+.lebd-exam-scope a.se26-package-menu-button:hover,
+.lebd-exam-scope a.se26-package-menu-button:focus-visible{
+ filter:brightness(1.06);transform:translateY(-2px);
+ box-shadow:0 6px 0 #bd3b12,0 10px 18px rgba(218,75,24,.25)
+}
+.lebd-exam-scope a.se26-package-menu-button:active{
+ transform:translateY(2px);box-shadow:0 1px 0 #bd3b12,0 3px 7px rgba(218,75,24,.2)
+}
+.lebd-exam-scope .se26-menu-item{
+ position:relative;overflow:hidden;min-width:0;min-height:76px;padding:13px 14px;
+ gap:11px;border:1px solid #d7e5f7;border-radius:15px;
+ background:linear-gradient(145deg,#fff 0%,#f4f8ff 68%,#eaf2ff 100%);
+ color:#12345b;text-decoration:none;
+ box-shadow:0 4px 0 #c8d9ee,0 8px 16px rgba(24,67,119,.09);
+ transition:transform .16s ease,box-shadow .16s ease,filter .16s ease
+}
+.lebd-exam-scope .se26-menu-item::after{
+ content:"";position:absolute;left:0;top:9px;bottom:9px;width:3px;
+ border-radius:0 4px 4px 0;background:linear-gradient(180deg,#48a4ff,#0868cf)
+}
+.lebd-exam-scope .se26-menu-item:hover,
+.lebd-exam-scope .se26-menu-item:focus-visible{
+ transform:translateY(-2px);filter:brightness(1.015);
+ box-shadow:0 6px 0 #bfd3ec,0 12px 19px rgba(24,67,119,.13);
+ outline:none
+}
+.lebd-exam-scope .se26-menu-item:active{
+ transform:translateY(2px);box-shadow:0 1px 0 #c8d9ee,0 3px 7px rgba(24,67,119,.08)
+}
+.lebd-exam-scope .se26-menu-item span:first-child{
+ width:42px;height:42px;flex:0 0 42px;border:1px solid #cfe2fb;border-radius:12px;
+ background:linear-gradient(145deg,#f5faff,#dcecff);
+ color:#0875d8;font-size:19px;
+ box-shadow:inset 0 1px 0 #fff,0 3px 0 #c7dcf5,0 5px 9px rgba(31,103,174,.10)
+}
+.lebd-exam-scope .se26-menu-item .se26-menu-title{
+ display:block;min-width:0;font-size:14px;font-weight:850;line-height:1.25;
+ overflow-wrap:anywhere
+}
+.lebd-exam-scope .se26-menu-item small{display:none!important}
+.lebd-exam-scope .se26-menu-item.is-pending,
+.lebd-exam-scope .se26-menu-item[aria-disabled="true"]{opacity:.72;cursor:not-allowed}
+@media(max-width:560px){
+ .lebd-exam-scope .se26-menu-heading-row{gap:8px;margin:20px 0 12px}
+ .lebd-exam-scope .se26-menu-heading-row .se26-heading{font-size:17px}
+ .lebd-exam-scope a.se26-package-menu-button{
+  min-height:34px;padding:7px 10px;gap:5px;border-radius:10px;font-size:11px;
+  box-shadow:0 3px 0 #bd3b12,0 5px 10px rgba(218,75,24,.18)
+ }
+ .lebd-exam-scope a.se26-package-menu-button i{font-size:12px}
+ .lebd-exam-scope .se26-menu{gap:9px}
+ .lebd-exam-scope .se26-menu-item{
+  min-height:59px;padding:8px 8px;gap:7px;border-radius:12px;
+  box-shadow:0 3px 0 #c8d9ee,0 5px 10px rgba(24,67,119,.08)
+ }
+ .lebd-exam-scope .se26-menu-item::after{top:7px;bottom:7px;width:2px}
+ .lebd-exam-scope .se26-menu-item span:first-child{
+  width:32px;height:32px;flex:0 0 32px;border-radius:9px;font-size:15px;
+  box-shadow:inset 0 1px 0 #fff,0 2px 0 #c7dcf5,0 3px 6px rgba(31,103,174,.08)
+ }
+ .lebd-exam-scope .se26-menu-item .se26-menu-title{font-size:11px;line-height:1.2}
+}
+
 /* LEBD05: status + package CTA share the same content-width row. */
-.lebd-exam-scope .se26-status-package-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:stretch;margin:0 0 20px}
+.lebd-exam-scope .se26-status-package-row{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;align-items:stretch;margin:0 0 20px}
 .lebd-exam-scope .se26-status-package-row .se26-notice{margin:0;display:flex;align-items:center;justify-content:center;min-width:0;padding:14px 15px;border-radius:14px;font-size:15px;line-height:1.5;text-align:center}
 .lebd-exam-scope .se26-package-slot{display:flex;align-items:center;justify-content:center;min-width:0;padding:7px 12px;border:1px solid #fbd4bf;background:#fff4ed;border-radius:14px}
 .lebd-exam-scope a.se26-package-link{display:inline-flex;align-items:center;justify-content:center;gap:8px;max-width:100%;min-height:39px;padding:9px 20px;border-radius:999px;background:linear-gradient(115deg,#ff7a13,#ff4239);color:#fff!important;font-size:13px;font-weight:800;line-height:1.3;text-decoration:none;box-shadow:0 5px 13px rgba(235,81,31,.20);white-space:nowrap}
 .lebd-exam-scope a.se26-package-link:hover,.lebd-exam-scope a.se26-package-link:focus{box-shadow:0 6px 17px rgba(235,81,31,.28);filter:brightness(.98)}
-@media(max-width:600px){.lebd-exam-scope .se26-status-package-row{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:6px}.lebd-exam-scope .se26-status-package-row .se26-notice{padding:8px 5px;font-size:11px;line-height:1.3;border-radius:10px}.lebd-exam-scope .se26-package-slot{padding:4px;border-radius:10px}.lebd-exam-scope a.se26-package-link{width:100%;min-height:34px;padding:6px 4px;gap:3px;font-size:11px;white-space:nowrap}}
+@media(max-width:600px){.lebd-exam-scope .se26-status-package-row{grid-template-columns:minmax(0,1fr);gap:6px}.lebd-exam-scope .se26-status-package-row .se26-notice{padding:8px 5px;font-size:11px;line-height:1.3;border-radius:10px}.lebd-exam-scope .se26-package-slot{padding:4px;border-radius:10px}.lebd-exam-scope a.se26-package-link{width:100%;min-height:34px;padding:6px 4px;gap:3px;font-size:11px;white-space:nowrap}}
 /* LEBD05 scoped UI refinement: larger back control and single exam action. */
 .lebd-exam-scope a.se26-back{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:12px 20px;font-size:15px;font-weight:750;border:1px solid #d7e5f9;border-radius:10px;line-height:1.3}
 .lebd-exam-scope .se26-feature-actions{grid-template-columns:minmax(0,1fr)}
@@ -288,6 +379,94 @@ body:has(.lebd-exam-scope) #footer { display:none !important; }
 .lebd-exam-scope .lebd05-feature-topic-table td{background:white;padding:7px 8px;border-top:1px solid #dce9f8;overflow-wrap:anywhere;color:#243e5d;vertical-align:top}
 .lebd-exam-scope .lebd05-feature-topic-table th:first-child,.lebd-exam-scope .lebd05-feature-topic-table td:first-child{width:38%;border-right:1px solid #dce9f8}
 @media(max-width:600px){.lebd-exam-scope .lebd05-feature-topic-box{padding:7px;margin:9px 0 11px}.lebd-exam-scope .lebd05-feature-topic-table{font-size:10px}.lebd-exam-scope .lebd05-feature-topic-table th,.lebd-exam-scope .lebd05-feature-topic-table td{padding:6px 5px}}
+
+/* LEBD v22: premium boxed BCS Question Bank heading and live status. */
+.lebd-exam-scope .lebd05-question-bank-header{
+ position:relative;isolation:isolate;overflow:hidden;
+ margin:19px 0 25px;padding:25px 25px 22px;
+ border:1px solid rgba(255,255,255,.92);border-radius:26px;
+ background:
+  radial-gradient(ellipse at 100% 0%,rgba(116,183,255,.22) 0,rgba(116,183,255,0) 37%),
+  radial-gradient(ellipse at 0% 100%,rgba(93,190,255,.15) 0,rgba(93,190,255,0) 42%),
+  linear-gradient(135deg,#fafdff 0%,#eef6ff 52%,#e4f1ff 100%);
+ box-shadow:0 12px 30px rgba(36,91,151,.12),inset 0 1px 0 rgba(255,255,255,.95);
+ text-align:center
+}
+.lebd-exam-scope .lebd05-header-decoration{
+ position:absolute;z-index:-1;pointer-events:none;border-radius:50%;
+ border:1px solid rgba(92,164,242,.10)
+}
+.lebd-exam-scope .lebd05-header-decoration-top{
+ width:310px;height:170px;right:-105px;top:-115px;
+ box-shadow:0 0 0 18px rgba(92,164,242,.035),0 0 0 38px rgba(92,164,242,.025)
+}
+.lebd-exam-scope .lebd05-header-decoration-bottom{
+ width:390px;height:160px;left:-165px;bottom:-132px;
+ box-shadow:0 0 0 20px rgba(92,164,242,.035),0 0 0 42px rgba(92,164,242,.025)
+}
+.lebd-exam-scope .lebd05-header-book{
+ display:flex;align-items:center;justify-content:center;
+ width:58px;height:58px;margin:0 auto 10px;border-radius:18px;
+ color:#0874dc;font-size:29px;font-weight:900;
+ background:linear-gradient(145deg,#e8f4ff,#cfe6ff);
+ border:1px solid #c4e0ff;
+ box-shadow:inset 0 1px 0 #fff,0 5px 0 #b8d8fb,0 9px 16px rgba(31,111,193,.12)
+}
+.lebd-exam-scope .lebd05-header-title h1{
+ display:flex;align-items:center;justify-content:center;gap:9px;
+ margin:0;color:#102f58;font-size:clamp(23px,3.2vw,31px);
+ font-weight:900;line-height:1.22;letter-spacing:-.45px
+}
+.lebd-exam-scope .lebd05-header-info{
+ display:inline-flex;align-items:center;justify-content:center;
+ width:22px;height:22px;border-radius:50%;background:#1683e8;color:#fff;
+ font-family:Georgia,serif;font-size:15px;font-style:italic;font-weight:800;
+ box-shadow:0 3px 7px rgba(22,131,232,.2)
+}
+.lebd-exam-scope .lebd05-header-title p{
+ margin:7px 0 0;color:#58708e;font-size:14px;font-weight:650;line-height:1.5
+}
+.lebd-exam-scope .lebd05-header-live-status{
+ position:relative;display:flex;align-items:center;justify-content:center;gap:12px;
+ width:100%;min-height:62px;margin:22px auto 0;padding:13px 18px;
+ border:1px solid #8de5b2;border-radius:17px;
+ background:linear-gradient(110deg,#e3ffef 0%,#d0f8e1 55%,#c6f5dc 100%);
+ color:#087344;font-size:clamp(14px,2vw,18px);font-weight:850;line-height:1.35;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 4px 10px rgba(28,153,93,.08)
+}
+.lebd-exam-scope .lebd05-header-live-status.is-idle{
+ border-color:#f4d99a;
+ background:linear-gradient(110deg,#fff8e7,#fff1d3);
+ color:#8a5b09
+}
+.lebd-exam-scope .lebd05-live-check{
+ display:inline-flex;align-items:center;justify-content:center;flex:0 0 29px;
+ width:29px;height:29px;border-radius:50%;
+ background:linear-gradient(145deg,#39c86b,#16a34a);color:#fff;
+ font-size:19px;font-weight:950;line-height:1;
+ box-shadow:0 3px 7px rgba(22,163,74,.22)
+}
+.lebd-exam-scope .lebd05-header-live-status.is-idle .lebd05-live-check{
+ background:linear-gradient(145deg,#f6c65c,#e6a52d)
+}
+@media(max-width:600px){
+ .lebd-exam-scope .lebd05-question-bank-header{
+  margin:12px 0 18px;padding:17px 13px 14px;border-radius:19px
+ }
+ .lebd-exam-scope .lebd05-header-book{
+  width:43px;height:43px;margin-bottom:7px;border-radius:13px;font-size:22px;
+  box-shadow:inset 0 1px 0 #fff,0 3px 0 #b8d8fb,0 6px 10px rgba(31,111,193,.10)
+ }
+ .lebd-exam-scope .lebd05-header-title h1{font-size:21px;gap:6px;letter-spacing:-.25px}
+ .lebd-exam-scope .lebd05-header-info{width:18px;height:18px;font-size:12px}
+ .lebd-exam-scope .lebd05-header-title p{margin-top:5px;font-size:11px;line-height:1.4}
+ .lebd-exam-scope .lebd05-header-live-status{
+  min-height:43px;margin-top:13px;padding:8px 9px;gap:7px;
+  border-radius:12px;font-size:11px;line-height:1.3
+ }
+ .lebd-exam-scope .lebd05-live-check{width:21px;height:21px;flex-basis:21px;font-size:14px}
+}
+
 </style>
 @endsection
 @section('content')
@@ -593,16 +772,24 @@ body:has(.lebd-exam-scope) #footer { display:none !important; }
 </div>
 @else
 <main class="se26">
-<div class="lebd05-exam-return"><a href="{{ $back }}" class="lebd05-exam-return-link"><span aria-hidden="true">←</span> ফিরে যান</a></div><div class="se26-title"><h1>{{ $pageName }} <span style="color:#1678ce">ℹ</span></h1><p>পরীক্ষা, রুটিন ও অগ্রগতির বিস্তারিত</p></div>
-<div class="se26-status-package-row">
-  <div class="se26-notice {{ $liveRows->isNotEmpty() ? 'live' : '' }}" role="status">
-    @if($liveRows->isNotEmpty())● এখন {{ $liveRows->count() }}টি লাইভ পরীক্ষা চলছে
-    @else ⓘ আজকে এই বিভাগে কোনো লাইভ এক্সাম নেই @endif
+<div class="lebd05-exam-return"><a href="{{ $back }}" class="lebd05-exam-return-link"><span aria-hidden="true">←</span> ফিরে যান</a></div><section class="lebd05-question-bank-header" aria-label="BCS Question Bank">
+  <div class="lebd05-header-decoration lebd05-header-decoration-top" aria-hidden="true"></div>
+  <div class="lebd05-header-book" aria-hidden="true"><span>▤</span></div>
+  <div class="lebd05-header-title">
+    <h1>{{ $pageName }} <span class="lebd05-header-info" aria-hidden="true">i</span></h1>
+    <p>পরীক্ষা, রুটিন ও অগ্রগতির বিস্তারিত</p>
   </div>
-  <div class="se26-package-slot">
-    <a href="{{ route('student.exam-section.packages') }}" class="lebd215-package-button se26-package-link"><span aria-hidden="true">▣</span><span>প্যাকেজ কিনুন</span></a>
+  <div class="lebd05-header-live-status {{ $liveRows->isNotEmpty() ? 'is-live' : 'is-idle' }}" role="status">
+    @if($liveRows->isNotEmpty())
+      <span class="lebd05-live-check" aria-hidden="true">✓</span>
+      <span>এখন {{ $liveRows->count() }}টি লাইভ পরীক্ষা চলছে</span>
+    @else
+      <span class="lebd05-live-check" aria-hidden="true">i</span>
+      <span>আজকে এই বিভাগে কোনো লাইভ এক্সাম নেই</span>
+    @endif
   </div>
-</div>
+  <div class="lebd05-header-decoration lebd05-header-decoration-bottom" aria-hidden="true"></div>
+</section>
 <section class="se26-panel {{ $featured && !$featured['live'] ? 'lebd05-upcoming-only' : '' }}"><div class="se26-feature-head"><div style="display:flex;align-items:center;gap:13px"><span class="se26-icon">▤</span><h2>{{ $featured && $featured['live'] ? 'Live Exam' : 'Upcoming Exam' }}</h2></div><span class="se26-state {{ $featured && $featured['live'] ? 'live' : '' }}">{{ $featured && $featured['live'] ? '● Live' : 'Schedule' }}</span></div>
 @if($featured)<div class="lebd05-feature-inline-row"><span class="se26-feature-name">{{ preg_replace('/^Exam[-\s]*/i', 'Exam No-', (string) $featured['exam']->exam_name) }}</span>
 @if($lebd05FeaturedRoutineName)
@@ -672,24 +859,38 @@ body:has(.lebd-exam-scope) #footer { display:none !important; }
   <span class="lebd05-locked-action" role="status" aria-label="পরীক্ষা এখনো নির্ধারিত হয়নি"><span class="lebd05-lock-round"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></span></span>
 @endif
 </div></section>
-<h2 class="se26-heading">Exam Menu</h2><section class="se26-menu" aria-label="Exam Menu">
+<div class="se26-menu-heading-row">
+  <h2 class="se26-heading">Exam Menu</h2>
+  <a href="{{ route('student.exam-section.packages') }}" class="se26-package-menu-button" aria-label="প্যাকেজ কিনুন">
+    <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
+    <span>প্যাকেজ কিনুন</span>
+  </a>
+</div>
+<section class="se26-menu" aria-label="Exam Menu">
 @php $menu = [['Routine','▦',null],['Result','▣',null],['All Exam Paper','▤','#exam-list'],['Missing Exam List','▧',null],['Exam PDF','▤',null],['Merit List','✪',null],['Wrong & Unanswered','⊗',null],['Complain','☏',null]]; @endphp
 @foreach($menu as [$name,$symbol,$link])
 @if($name === 'Routine')
-<a class="se26-menu-item" href="{{ route('student.exam-section.browse-exams', ['category'=>$cat->id, 'subcategory_id'=>$sub?->id, 'routine'=>1]) }}"><span>{{ $symbol }}</span><span>{{ $name }}<small>পরীক্ষার সময়সূচি ও সিলেবাস দেখুন</small></span></a>
+<a class="se26-menu-item" href="{{ route('student.exam-section.browse-exams', ['category'=>$cat->id, 'subcategory_id'=>$sub?->id, 'routine'=>1]) }}"><span>{{ $symbol }}</span><span class="se26-menu-title">{{ $name }}</span></a>
 @elseif($name === 'Result')
-<a class="se26-menu-item" href="{{ route('student.exam-section.browse-exams', ['category'=>$cat->id, 'subcategory_id'=>$sub?->id, 'paper'=>'result']) }}"><span>{{ $symbol }}</span><span>{{ $name }}<small>সকল পরীক্ষার ফলাফল দেখুন</small></span></a>
+<a class="se26-menu-item" href="{{ route('student.exam-section.browse-exams', ['category'=>$cat->id, 'subcategory_id'=>$sub?->id, 'paper'=>'result']) }}"><span>{{ $symbol }}</span><span class="se26-menu-title">{{ $name }}</span></a>
 @elseif($name === 'All Exam Paper')
-<a class="se26-menu-item" href="{{ route('student.exam-section.browse-exams', ['category'=>$cat->id, 'subcategory_id'=>$sub?->id, 'paper'=>1]) }}"><span>{{ $symbol }}</span><span>{{ $name }}<small>সকল পরীক্ষার তালিকা দেখুন ({{ $total }})</small></span></a>
+<a class="se26-menu-item" href="{{ route('student.exam-section.browse-exams', ['category'=>$cat->id, 'subcategory_id'=>$sub?->id, 'paper'=>1]) }}"><span>{{ $symbol }}</span><span class="se26-menu-title">{{ $name }}</span></a>
 @elseif($name === 'Missing Exam List')
-<a class="se26-menu-item" href="{{ route('student.exam-section.browse-exams', ['category'=>$cat->id, 'subcategory_id'=>$sub?->id, 'missing'=>1]) }}"><span>{{ $symbol }}</span><span>{{ $name }}<small>সময়সীমা শেষ, অংশ নেননি এমন পরীক্ষার তালিকা</small></span></a>
+<a class="se26-menu-item" href="{{ route('student.exam-section.browse-exams', ['category'=>$cat->id, 'subcategory_id'=>$sub?->id, 'missing'=>1]) }}"><span>{{ $symbol }}</span><span class="se26-menu-title">{{ $name }}</span></a>
 @elseif($name === 'Exam PDF')
-<a class="se26-menu-item" href="{{ route('student.exam-section.exam-pdf', ['category'=>$cat->id, 'subcategory_id'=>$sub?->id]) }}"><span>{{ $symbol }}</span><span>{{ $name }}<small>Routine অনুযায়ী প্রকাশিত পরীক্ষার PDF দেখুন</small></span></a>
+<a class="se26-menu-item" href="{{ route('student.exam-section.exam-pdfs', ['category'=>$cat->id, 'subcategory_id'=>$sub?->id]) }}"><span>{{ $symbol }}</span><span class="se26-menu-title">{{ $name }}</span></a>
+@elseif($name === 'Wrong & Unanswered')
+<a class="se26-menu-item" href="{{ route('student.exam-section.wrong-unanswered', ['category'=>$cat->id, 'subcategory_id'=>$sub?->id]) }}"><span>{{ $symbol }}</span><span class="se26-menu-title">{{ $name }}</span></a>
+@elseif($name === 'Merit List')
+<a class="se26-menu-item" href="{{ route('student.exam-section.merit-list', ['category'=>$cat->id, 'subcategory_id'=>$sub?->id]) }}"><span>{{ $symbol }}</span><span class="se26-menu-title">{{ $name }}</span></a>
+@elseif($name === 'Complain')
+<a class="se26-menu-item" href="{{ route('students.complain', ['category_id'=>$cat->id, 'subcategory_id'=>$sub?->id]) }}"><span>{{ $symbol }}</span><span class="se26-menu-title">{{ $name }}</span></a>
 @elseif($link)<a class="se26-menu-item" href="{{ $link }}"><span>{{ $symbol }}</span><span>{{ $name }}</span></a>
-@else<div class="se26-menu-item"><span>{{ $symbol }}</span><span>{{ $name }}<small>Coming soon</small></span></div>@endif
+@else<div class="se26-menu-item"><span>{{ $symbol }}</span><span class="se26-menu-title">{{ $name }}</span></div>@endif
 @endforeach
 </section>
-<section class="se26-panel se26-progress"><h2 style="margin:0 0 21px;font-size:23px">My Exam Progress <span style="float:right;color:#1977cd">◔</span></h2><div class="se26-progress-grid"><div class="se26-ring"><div class="se26-ring-inner"><strong>{{ $progress }}%</strong><small style="color:#8895a7">Completed</small></div></div><div><div class="se26-progress-row"><span>Total Exams</span><b>{{ $total }}</b></div><div class="se26-progress-row"><span>Completed</span><b>{{ $finished }}</b></div><div class="se26-progress-row"><span>Remaining</span><b>{{ max(0,$total-$finished) }}</b></div></div></div><p class="se26-muted" style="margin-bottom:0;font-size:12px">এই হিসাবটি Routine Schedule অনুযায়ী শেষ হওয়া Exam-এর, শিক্ষার্থীর ব্যক্তিগত জমা দেওয়া পরীক্ষার সংখ্যা নয়।</p></section>
+<section class="se26-panel se26-progress"><h2 style="margin:0 0 21px;font-size:23px">My Exam Progress <span style="float:right;color:#1977cd">◔</span></h2><div class="se26-progress-grid"><div class="se26-ring" style="background:conic-gradient(#1174d1 {{ $lebdScopePercent }}%,#e8eff8 0)"><div class="se26-ring-inner"><strong>{{ $lebdScopePercent }}%</strong><small style="color:#8895a7">Completed</small></div></div><div><div class="se26-progress-row"><span>Total Exams</span><b>{{ $lebdScopeTotal }}</b></div><div class="se26-progress-row"><span>Completed</span><b>{{ $lebdScopeCompleted }}</b></div><div class="se26-progress-row"><span>Remaining</span><b>{{ $lebdScopeRemaining }}</b></div></div></div><p class="se26-muted" style="margin-bottom:0;font-size:12px">এই হিসাব শুধু {{ $pageName }}-এর প্রকাশিত পরীক্ষা ও আপনার জমা দেওয়া পরীক্ষার ভিত্তিতে তৈরি। অন্য Category / Sub-category-এর পরীক্ষা এখানে যোগ হয় না।</p></section>
+<a class="se26-menu-item" style="min-height:58px;margin:-8px 0 26px;justify-content:center;background:linear-gradient(100deg,#0759c8,#087ee8);color:#fff" href="{{ route('student.exam-section.mark-progress', ['category_id'=>$cat->id, 'subcategory_id'=>$sub?->id]) }}"><span style="background:rgba(255,255,255,.18);color:#fff;width:38px;height:38px">▥</span><span class="se26-menu-title">Your Progress Report <small style="color:#e4efff">{{ $pageName }}-এর বিস্তারিত নম্বর ও অগ্রগতি দেখুন</small></span></a>
 
 </main>
 @endif

@@ -1,20 +1,17 @@
 @php
     $user = Auth::guard('student')->user();
-    $student = $user ? \App\Models\Student::with(['batches','departments'])->find($user->id) : null;
-    $myBatches = $student ? $student->batches->unique('id') : collect();
-    $myDepartments = $student ? $student->departments->unique('id') : collect();
-
-    // Batch and Department must come from the exam dashboard URL, never from a hardcoded ID.
-    $requestedBatchId = (int) old('batch_id', request()->query('batch_id', 0));
-    $requestedDepartmentId = (int) old('department_id', request()->query('department_id', 0));
-    $batch = $requestedBatchId ? $myBatches->firstWhere('id', $requestedBatchId) : ($myBatches->count() === 1 ? $myBatches->first() : null);
-    $department = $requestedDepartmentId ? $myDepartments->firstWhere('id', $requestedDepartmentId) : ($myDepartments->count() === 1 ? $myDepartments->first() : null);
-
-    // Never accept a submitted or URL-supplied batch / department that is not owned by the student.
-    if ($requestedBatchId && !$batch) abort(403);
-    if ($requestedDepartmentId && !$department) abort(403);
-
-    $canSubmit = (bool) ($user && $batch && $department);
+    $categoryId = (int) request()->query('category_id', request()->query('category', 0));
+    $subcategoryId = (int) request()->query('subcategory_id', 0);
+    $category = $categoryId
+        ? \Illuminate\Support\Facades\DB::table('lebd_exam_section_categories')->where('id', $categoryId)->where('status', 'Active')->first()
+        : null;
+    $subcategory = ($category && $subcategoryId)
+        ? \Illuminate\Support\Facades\DB::table('lebd_exam_section_subcategories')->where('id', $subcategoryId)->where('category_id', $categoryId)->where('status', 'Active')->first()
+        : null;
+    if ($categoryId && !$category) abort(404);
+    if ($subcategoryId && !$subcategory) abort(404);
+    $sourcePath = $category ? ($category->name . ($subcategory ? ' / ' . $subcategory->name : '')) : null;
+    $canSubmit = (bool) ($user && $user->name);
 @endphp
 @extends('student')
 @section('title', 'অভিযোগ ও পরামর্শ')
@@ -30,6 +27,14 @@
 .lebd-complaint-group label{display:block;margin:0 0 8px;font-size:15px;font-weight:700;color:#122b50}
 .lebd-complaint-group textarea{box-sizing:border-box;display:block;width:100%;min-height:145px;padding:15px 16px;border:1px solid #cbdcf1;border-radius:13px;background:#fff;color:#182b49;line-height:1.75;font-size:15px;resize:vertical;outline:none}
 .lebd-complaint-group textarea:focus{border-color:#1875e8;box-shadow:0 0 0 3px rgba(24,117,232,.10)}
+.lebd-complaint-text-input{box-sizing:border-box;display:block;width:100%;min-height:46px;padding:10px 13px;border:1px solid #cbdcf1;border-radius:11px;background:#fff;color:#182b49;font-size:14px;outline:none}
+.lebd-complaint-text-input:focus{border-color:#1875e8;box-shadow:0 0 0 3px rgba(24,117,232,.10)}
+.lebd-complaint-group select{box-sizing:border-box;display:block;width:100%;min-height:46px;padding:10px 13px;border:1px solid #cbdcf1;border-radius:11px;background:#fff;color:#182b49;font-size:14px;outline:none}
+.lebd-complaint-group select:focus{border-color:#1875e8;box-shadow:0 0 0 3px rgba(24,117,232,.10)}
+.lebd-complaint-context-note{padding:10px 12px;margin:0 0 15px;border:1px solid #cfe2ff;border-radius:10px;background:#f1f7ff;color:#31577f;font-size:13px;line-height:1.65}
+#Footer:empty{display:none!important;height:0!important;min-height:0!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important}
+@media(max-width:600px){.lebd-complaint-group select{min-height:43px;font-size:13px}}
+
 .lebd-complaint-submit{display:flex;justify-content:center;align-items:center;gap:8px;width:100%;min-height:50px;background:linear-gradient(95deg,#0861e9,#16b5f3);border:0;border-radius:12px;color:#fff;font-size:16px;font-weight:800;cursor:pointer}
 .lebd-complaint-submit:disabled{cursor:not-allowed;opacity:.55}
 .lebd-complaint-error{padding:12px 14px;border-radius:10px;background:#fff1ee;border:1px solid #fed4cb;color:#983b2f;margin:0 0 18px;font-size:13px;line-height:1.7}
@@ -38,26 +43,31 @@
 </style>
 <section class="lebd-complaint-page">
  <div class="lebd-complaint-shell">
-  <a class="lebd-complaint-back" href="{{ $batch && \Illuminate\Support\Facades\Route::has('students.batch.purchased-exams') ? route('students.batch.purchased-exams', ['batch'=>$batch->id, 'department_id'=>$department?->id]) : route('students.dashboard') }}">&#8592; ফিরে যান</a>
+  <a class="lebd-complaint-back" href="{{ url()->previous() }}">&#8592; ফিরে যান</a>
   <div class="lebd-complaint-head">
    <div class="lebd-complaint-icon"><i class="fa fa-comments" aria-hidden="true"></i></div>
    <div><h1>অভিযোগ ও পরামর্শ</h1><p>আপনার সমস্যা ও সমাধানের মতামত আমাদের জানান।</p></div>
   </div>
   @if(session('error'))<div class="lebd-complaint-error" role="alert">{{ session('error') }}</div>@endif
   @if($errors->any())<div class="lebd-complaint-error" role="alert">{{ $errors->first() }}</div>@endif
-  @unless($canSubmit)
-   <div class="lebd-complaint-error" role="alert">এই অভিযোগটি কোন ব্যাচ ও ডিপার্টমেন্টের, তা নিশ্চিত করা যায়নি। অনুগ্রহ করে আপনার কেনা ব্যাচের Exam Dashboard থেকে Complain/Suggestion খুলুন।</div>
+@unless($canSubmit)
+   <div class="lebd-complaint-error" role="alert">আপনার প্রোফাইলে নাম, ইমেইল অথবা মোবাইল নম্বর অনুপস্থিত। অভিযোগ পাঠানোর আগে প্রোফাইল তথ্য সম্পূর্ণ করুন।</div>
   @endunless
   <form action="{{ route('students.complain.store') }}" method="POST">
    @csrf
-   {{-- Keep the exact input names required by the existing complaint controller; identity is hidden in UI. --}}
    <input type="hidden" name="name" value="{{ $user?->name ?? '' }}">
-   <input type="hidden" name="email" value="{{ $user?->email ?? '' }}">
-   <input type="hidden" name="contact" value="{{ $user?->contact ?? '' }}">
-   @if($canSubmit)
-    <input type="hidden" name="batch_id" value="{{ $batch->id }}">
-    <input type="hidden" name="department_id" value="{{ $department->id }}">
+   @if($user?->email)
+    <input type="hidden" name="email" value="{{ $user->email }}">
+   @else
+    <div class="lebd-complaint-group"><label for="lebdComplaintEmail">ইমেইল <span style="color:#d42a2a">*</span></label><input id="lebdComplaintEmail" class="lebd-complaint-text-input" type="email" name="email" value="{{ old('email') }}" required></div>
    @endif
+   @if($user?->contact)
+    <input type="hidden" name="contact" value="{{ $user->contact }}">
+   @else
+    <div class="lebd-complaint-group"><label for="lebdComplaintContact">মোবাইল নম্বর <span style="color:#d42a2a">*</span></label><input id="lebdComplaintContact" class="lebd-complaint-text-input" type="tel" name="contact" value="{{ old('contact') }}" required></div>
+   @endif
+   <input type="hidden" name="category_id" value="{{ $category?->id ?? '' }}">
+   <input type="hidden" name="subcategory_id" value="{{ $subcategory?->id ?? '' }}">
    <div class="lebd-complaint-group">
     <label for="lebdComplaintDetails">আপনার অভিযোগ লিখুন <span style="color:#d42a2a">*</span></label>
     <textarea id="lebdComplaintDetails" name="details" placeholder="আপনার সমস্যাটি বিস্তারিত লিখুন..." required>{{ old('details') }}</textarea>
@@ -66,8 +76,23 @@
     <label for="lebdComplaintSolution">সমাধানে আপনার মতামত দিন</label>
     <textarea id="lebdComplaintSolution" name="solution" placeholder="সমাধানের বিষয়ে আপনার পরামর্শ লিখুন...">{{ old('solution') }}</textarea>
    </div>
-   <button class="lebd-complaint-submit" type="submit" @unless($canSubmit) disabled @endunless><i class="fa fa-paper-plane" aria-hidden="true"></i> সাবমিট করুন</button>
+   <button class="lebd-complaint-submit" id="lebdComplaintSubmit" type="submit" @unless($canSubmit) disabled @endunless><i class="fa fa-paper-plane" aria-hidden="true"></i> সাবমিট করুন</button>
   </form>
+  <script>
+  (function(){
+    var form=document.querySelector('.lebd-complaint-shell form');
+    var details=form && form.querySelector('[name="details"]');
+    var email=form && form.querySelector('[name="email"]');
+    var contact=form && form.querySelector('[name="contact"]');
+    var submit=document.getElementById('lebdComplaintSubmit');
+    if(!details || !submit)return;
+    function syncSubmit(){
+      submit.disabled=!(details.value.trim() && email && email.value.trim() && contact && contact.value.trim());
+    }
+    [details,email,contact].forEach(function(el){if(el)el.addEventListener('input',syncSubmit);});
+    syncSubmit();
+  })();
+  </script>
  </div>
 </section>
 @endsection

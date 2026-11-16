@@ -87,6 +87,42 @@ class AutoQuestionCreateController extends Controller
         return view('admin.exam-section.auto-question-details',compact('cat','sub','r','exam','item','links','options'));
     }
 
+    /** Print-ready paper built only from the MCQs already saved for this Exam. */
+    public function paperPdf(Request $request,int $category,int $routine)
+    {
+        $exam=trim((string)$request->query('exam',''));abort_if($exam==='',404);
+        [$cat,$sub,$r,$item]=$this->context($category,$routine,$exam);
+        abort_unless($item,404,'No saved Routine Item exists for this Exam.');
+
+        $links=DB::table('lebd_exam_section_generated_questions as g')
+            ->join('questions as q','q.id','=','g.question_id')
+            ->where('g.routine_id',$routine)->where('g.exam_name',$exam)
+            ->where('q.type','MCQ')->where('q.status','Active')
+            ->orderBy('g.position')
+            ->select('g.position','g.topic_key','q.id','q.title','q.image')
+            ->get();
+
+        $options=$links->isEmpty()?collect():DB::table('mcq_items')
+            ->whereIn('question_id',$links->pluck('id')->all())
+            ->orderBy('id')->get(['question_id','item','correct_answer','image'])
+            ->groupBy('question_id');
+
+        $topicNames=[];
+        $topics=DB::table('lebd_exam_section_routine_item_topics')
+            ->where('item_id',$item->id)->orderBy('id')->get();
+        $tables=['department'=>'lebd_exam_routine_departments','subject'=>'lebd_exam_routine_subjects','chapter'=>'lebd_exam_routine_chapters'];
+        foreach($topics as $topic){
+            if(!preg_match('/^(department|subject|chapter):(\d+)$/',(string)$topic->topic_key,$m))continue;
+            $name=DB::table($tables[$m[1]])->where('id',(int)$m[2])->value('name');
+            if($name && !in_array($name,$topicNames,true))$topicNames[]=$name;
+        }
+
+        return view('admin.exam-section.paper-pdf',[
+            'cat'=>$cat,'sub'=>$sub,'routine'=>$r,'exam'=>$exam,'item'=>$item,
+            'links'=>$links,'options'=>$options,'topicNames'=>$topicNames,
+        ]);
+    }
+
     public function reset(Request $request,int $category,int $routine)
     {
         $data=$request->validate(['exam'=>'required|string|max:190']);

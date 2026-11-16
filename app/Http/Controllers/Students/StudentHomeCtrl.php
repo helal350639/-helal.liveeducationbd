@@ -45,6 +45,14 @@ class StudentHomeCtrl extends Controller
   {
     $user = Auth::guard('student')->user();
 
+    // Admin replies are shown only on the Student Dashboard.
+    $complaintReplyNotices = Complain::where('student_id', $user->id)
+        ->whereNotNull('reply_message')
+        ->where('reply_message', '!=', '')
+        ->whereNull('student_notice_dismissed_at')
+        ->orderBy('replied_at', 'DESC')
+        ->get();
+
     // today exam
 $todayExam = DailyExam::where('status','Active')
     ->first();
@@ -112,6 +120,21 @@ $examSectionCourses = Course::where('status', 'Active')
 
     $circulars = Circular::where('status', 'Published')->count();
 
+    // Active circulars for the Student Dashboard slider.
+    // Keep this data in the controller instead of querying inside the Blade template.
+    $lebdCircularToday = Carbon::today('Asia/Dhaka')->toDateString();
+    $lebdSliderCirculars = Circular::query()
+        ->whereIn('status', ['Active', 'Published'])
+        ->whereNotNull('start_at')
+        ->whereNotNull('end_at')
+        ->whereDate('start_at', '<=', $lebdCircularToday)
+        ->whereDate('end_at', '>=', $lebdCircularToday)
+        ->orderByDesc('updated_at')
+        ->orderByDesc('id')
+        ->limit(10)
+        ->get();
+
+
     $courses = Batch::where('status', 'Active')
     ->whereHas('departments', function($query) use ($student_departments_ids) {
         $query->whereIn('departments.id', $student_departments_ids);
@@ -165,8 +188,22 @@ $examSectionCourses = Course::where('status', 'Active')
     'references',
     'paper',
     'todayExam',
-    'examSectionCourses'
+    'examSectionCourses',
+    'complaintReplyNotices',
+    'lebdSliderCirculars'
 ));
+  }
+
+  public function dismissComplaintReplyNotice($id)
+  {
+    $student = Auth::guard('student')->user();
+
+    Complain::where('id', $id)
+      ->where('student_id', $student->id)
+      ->whereNotNull('reply_message')
+      ->update(['student_notice_dismissed_at' => now()]);
+
+    return redirect()->route('students.dashboard');
   }
 
   public function profile()
@@ -1174,13 +1211,14 @@ $no_answered = $questions;
     //safe file name
     $fileName = preg_replace('/[\/\\\\:*?"<>|]/u', '-', $fileName);
 
-    //check file already exist?
-    if(Storage::exists('mpdf/'.$fileName))
-    {
-      return response()->json([
-        'status' => 'success',
-        'url' => route('students.syllabus.download', $fileName)
-      ]);
+    // Always rebuild the PDF from the current syllabus/routine data.
+    // The previous cache returned an old PDF forever, even after code/font fixes.
+    $pdfDirectory = storage_path('app/mpdf');
+    if (!is_dir($pdfDirectory)) {
+      mkdir($pdfDirectory, 0775, true);
+    }
+    if (Storage::exists('mpdf/'.$fileName)) {
+      Storage::delete('mpdf/'.$fileName);
     }
 
     $data = $this->syllabusQuestions($id);
@@ -1191,26 +1229,42 @@ $no_answered = $questions;
     ini_set("pcre.recursion_limit", "10000000");
     // ini_set('max_execution_time', 120); // 60 seconds or higher
 
+    $fontDirectory = resource_path('fonts');
+    $tempDirectory = storage_path('app/mpdf');
+    if (!is_dir($tempDirectory)) {
+      mkdir($tempDirectory, 0775, true);
+    }
+
+    // Use a genuine Unicode Bengali font. The bundled legacy SolaimanLipi /
+    // Siyamrupali files in this project do not cover all Bengali Unicode glyphs.
+    $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
+    $fontDirs = $defaultConfig['fontDir'];
+    $defaultFontConfig = (new \Mpdf\Config\FontVariables())->getDefaults();
+    $fontData = $defaultFontConfig['fontdata'];
+
     $mpdf = new Mpdf([
       'mode' => 'utf-8',
       'format' => 'A4',
-      'dpi' => 100, 
-      'default_font_size' => 14,
-      'default_font' => 'nikosh',
-      'fontDir' => storage_path('fonts'),
-      'fontdata' => [
-          'nikosh' => [
-              'R' => 'Nikosh.ttf',
-              'B' => 'Nikosh.ttf',
-              'I' => 'Nikosh.ttf',
-              'BI' => 'Nikosh.ttf',
-              'useOTL' => 0xFF,
-              'useKashida' => 75,
-          ],
+      'dpi' => 100,
+      'default_font_size' => 12,
+      'default_font' => 'lohitbengali',
+      'fontDir' => array_merge($fontDirs, [$fontDirectory]),
+      'fontdata' => $fontData + [
+        'lohitbengali' => [
+          'R' => 'Lohit-Bengali.ttf',
+          'B' => 'Lohit-Bengali.ttf',
+          'I' => 'Lohit-Bengali.ttf',
+          'BI' => 'Lohit-Bengali.ttf',
+          'useOTL' => 0xFF,
+          'useKashida' => 75,
+        ],
       ],
-      'tempDir' => storage_path('app/mpdf'),
+      'tempDir' => $tempDirectory,
       'setAutoTopMargin' => 'stretch',
       'setAutoBottomMargin' => 'stretch',
+      'autoScriptToLang' => true,
+      'autoLangToFont' => true,
+      'useSubstitutions' => true,
     ]);
 
     $html = view('student-panel.syllabus-pdf', compact('syllabus', 'groupedData'))->render();
@@ -1242,36 +1296,79 @@ $no_answered = $questions;
     return Storage::download('mpdf/'.$file, $file.'.pdf');
   }
 
-  public function complain()
+  public function complain(Request $request)
   {
-    return view('student-panel.complain');
+    $categoryId = (int) $request->query('category_id', $request->query('category', 0));
+    $subcategoryId = (int) $request->query('subcategory_id', 0);
+    $category = null;
+    $subcategory = null;
+
+    if ($categoryId) {
+      $category = DB::table('lebd_exam_section_categories')
+        ->where('id', $categoryId)->where('status', 'Active')->first();
+      abort_unless($category, 404);
+    }
+    if ($subcategoryId) {
+      abort_unless($category, 404);
+      $subcategory = DB::table('lebd_exam_section_subcategories')
+        ->where('id', $subcategoryId)->where('category_id', $categoryId)
+        ->where('status', 'Active')->first();
+      abort_unless($subcategory, 404);
+    }
+
+    return view('student-panel.complain', compact('category', 'subcategory'));
   }
 
   public function complainStore(Request $request)
   {
     $this->Validate($request, [
-      'name' => 'required|string',
-      'email' => 'required|string',
+      'email' => 'required|email',
       'contact' => 'required|string',
-      'batch_id' => 'nullable|string',
-      'department_id' => 'nullable|string',
+      'category_id' => 'nullable|integer',
+      'subcategory_id' => 'nullable|integer',
       'details' => 'required|string',
+      'solution' => 'nullable|string',
     ]);
 
-    $data = $request->all();
+    $categoryId = $request->filled('category_id') ? (int) $request->input('category_id') : 0;
+    $subcategoryId = $request->filled('subcategory_id') ? (int) $request->input('subcategory_id') : 0;
+    $sourcePath = null;
 
-    if(isset($data['_token']))
-    {
-      unset($data['_token']);
+    if ($categoryId) {
+      $category = DB::table('lebd_exam_section_categories')
+        ->where('id', $categoryId)->where('status', 'Active')->first();
+      abort_unless($category, 422, 'Invalid complaint source category.');
+      $sourcePath = $category->name;
+
+      if ($subcategoryId) {
+        $subcategory = DB::table('lebd_exam_section_subcategories')
+          ->where('id', $subcategoryId)->where('category_id', $categoryId)
+          ->where('status', 'Active')->first();
+        abort_unless($subcategory, 422, 'Invalid complaint source subcategory.');
+        $sourcePath .= ' / ' . $subcategory->name;
+      }
     }
 
-    $data['status'] = 'New';
+    $authenticatedStudent = Auth::guard('student')->user();
+    abort_unless($authenticatedStudent, 401);
 
-    $data['created_at'] = date('Y-m-d H:i:s');
+    $data = [
+      'student_id' => $authenticatedStudent->id,
+      'name' => $authenticatedStudent->name,
+      'email' => $authenticatedStudent->email ?: $request->input('email'),
+      'contact' => $authenticatedStudent->contact ?: $request->input('contact'),
+      'batch_id' => null,
+      'department_id' => null,
+      'details' => $request->input('details'),
+      'solution' => $request->input('solution'),
+      'source_path' => $sourcePath,
+      'status' => 'New',
+      'created_at' => date('Y-m-d H:i:s'),
+    ];
 
     try {
       Complain::insert($data);
-      Session::flash('success', 'আমরা আপনের মতামতটি গ্রহণ করেছি। আপনার বিনয়ী মতামতের জন্য ধন্যবাদ।');
+      Session::flash('success', 'আমরা আপনার অভিযোগটি গ্রহণ করেছি। ধন্যবাদ।');
       return redirect()->route('students.dashboard');
     }
     catch(\Exception $e)

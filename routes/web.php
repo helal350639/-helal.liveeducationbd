@@ -183,6 +183,7 @@ Route::middleware('auth:student')->group(function()
       Route::get('syllabus/pdf-download/{filename}', 'download')->name('students.syllabus.download');
       Route::get('complain', 'complain')->name('students.complain');
       Route::post('complain', 'complainStore')->name('students.complain.store');
+      Route::post('complain-reply-notice/{id}/dismiss', 'dismissComplaintReplyNotice')->whereNumber('id')->name('students.complain.reply-notice.dismiss');
       Route::get('update-paper/{id}', 'updatePaperAjax')->name('paper.update.ajax');
       Route::get('profile', 'profile')->name('students.profile');
       Route::get('batch-reference/{type?}/{batch}/{referrer}', 'batchReference')->name('student.batch-reference');

@@ -18,6 +18,7 @@
 <a class="btn orange" href="{{ route('admin.exam-section.routine.items',$routine->id) }}" title="Open this Routine's Edit/Item page">✎ Edit</a>
 
 <a class="btn primary" href="{{ route('admin.exam-section.auto-question.details',['category'=>$cat->id,'routine'=>$routine->id,'exam'=>$label->value]) }}">▤ Details View</a>
+<a class="btn green" target="_blank" rel="noopener" href="{{ route('admin.exam-section.auto-question.paper-pdf',['category'=>$cat->id,'routine'=>$routine->id,'exam'=>$label->value]) }}">▣ Exam PDF</a>
 <a class="btn green" href="{{ route('admin.exam-section.auto-question.create',['category'=>$cat->id,'routine'=>$routine->id,'exam'=>$label->value]) }}">✚ Create Question</a>
 <form method="POST" action="{{ route('admin.exam-section.auto-question.reset',['category'=>$cat->id,'routine'=>$routine->id]) }}" onsubmit="return confirm('Reset ONLY saved questions for {{ $label->value }}? Original question bank will not be deleted.')">@csrf<input type="hidden" name="exam" value="{{ $label->value }}"><button class="btn red" type="submit">↻ Reset Questions</button></form>
 </div></td></tr>

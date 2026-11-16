@@ -13,15 +13,13 @@ $qcount = 0;
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
   <title>Syllabus</title>
   <style type="text/css">
-    @font-face {
-      font-family: 'nikosh';
-      src: url('{{ storage_path("fonts/Nikosh.ttf") }}') format('truetype');
-      font-weight: normal;
-      font-style: normal;
-    }
     body {
-      font-family: 'nikosh', georgia;
-      font-size: 14px;
+      font-family: 'lohitbengali', sans-serif;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .question, .mcqitems, .explain, .header, .dept_title, .sub_title, .chap_title {
+      font-family: 'lohitbengali', sans-serif;
     }
 
     .mcqitems{list-style: none; padding-left: 10px}
@@ -78,37 +76,52 @@ $qcount = 0;
 
                     @foreach($questions as $questionId => $questionData)
                     <div class="question">
-                      <span style="display: inline-flex">
-                        <span class="q_number">প্রশ্ন {{$qcount+1}}.</span>
-                        <span>{!! preg_replace('/<\/?p>/i', '', $questionData['question']) !!}</span>
-                      </span>
                       @php
-                      $correct_ans = '';
-                      $qcount++;
+                        $correct_ans = '';
+                        $qcount++;
+                        $questionText = (string) ($questionData['question'] ?? '');
+                        // Strip a serial already typed into the saved title so the PDF
+                        // always displays exactly one generated question number.
+                        $questionText = preg_replace(
+                          '/^\\s*(?:<[^>]+>\\s*)*(?:(?:প্রশ্ন\\s*)?[০-৯0-9]+\\s*[.\\)\\-।]\\s*)/u',
+                          '',
+                          $questionText,
+                          1
+                        );
+                        // Clean malformed imported titles such as:
+                        // "Civil (Question 10)1. Civil (Question 10)Question 10)"
+                        $questionText = preg_replace('/(?<=\\))\\s*[০-৯0-9]+\\.\\s*/u', ' ', $questionText, 1);
+                        $questionText = preg_replace('/(.{8,}?)\\s*\\1/u', '$1', $questionText, 1);
+                        $questionText = preg_replace('/\\(([^()]{4,})\\)\\s*\\1\\)/u', '($1)', $questionText, 1);
                       @endphp
+                      <div class="question-line">
+                        <span class="q_number">প্রশ্ন {{$qcount}}.</span>
+                        <span>{!! preg_replace('/<\\/?p[^>]*>/i', '', $questionText) !!}</span>
+                      </div>
                       <div class="mcqitems">
                         @foreach($questionData['mcqs'] as $k => $mcq)
                         @php
-                        if($mcq['correct_answer'])
-                        {
-                          $correct_ans = $source->mcqlist()[$syllabus->format][$k].' '.$mcq['item'];
-                        }
+                          $optionLabel = $source->mcqlist()[$syllabus->format][$k] ?? '';
+                          $optionText = (string) ($mcq['item'] ?? '');
+                          // Some saved MCQ rows already contain their A./ক. label.
+                          // Remove one embedded copy and print the configured label once.
+                          if ($optionLabel !== '') {
+                            $labelPattern = '/(?<![A-Za-z])' . preg_quote(trim($optionLabel), '/') . '(?![A-Za-z])/iu';
+                            $optionText = preg_replace($labelPattern, '', $optionText);
+                          }
+                          $optionText = preg_replace('/(.{4,}?)\\s*\\1/u', '$1', trim($optionText), 1);
+                          $optionText = trim($optionText);
+                          if ($mcq['correct_answer']) {
+                            $correct_ans = trim($optionLabel . ' ' . strip_tags($optionText));
+                          }
                         @endphp
                         <div>
-                          <span> {{$source->mcqlist()[$syllabus->format][$k]}} </span>{{$mcq['item']}}
+                          @if($optionLabel !== '')<span>{{$optionLabel}} </span>@endif
+                          {!! $optionText !!}
                         </div>
                         @endforeach
                         <div class="clearfix"></div>
                       </div>
-                      <div style="color:green; clear:top; padding:10px 0;">সঠিক উত্তরঃ <b>{{$correct_ans}}</b></div>
-                      @if(isset($questionData['explain']))
-                      <div class="explain">
-                        <span class="exp-title">ব্যাখাঃ </span>
-                        {!! Str::substr($questionData['explain'], 3, -4) !!}
-                      </div>
-                      <br>
-                      @endif
-                    </div>
                     @endforeach
 
                 @endforeach

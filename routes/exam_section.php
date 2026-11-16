@@ -51,7 +51,6 @@ Route::middleware(['auth'])->prefix('admin/exam-section')->name('admin.exam-sect
  Route::get('/packages/{package}/students-add',[\App\Http\Controllers\Admin\ExamSection\ExamPackageStudentsPickerController::class,'start'])->whereNumber('package')->name('packages.students.picker');
  Route::post('/packages/{package}/students',[ExamPackageController::class,'addStudent'])->name('packages.students.add');
  Route::post('/packages/{package}/students/{grant}/remove',[ExamPackageController::class,'removeStudent'])->name('packages.students.remove');
- Route::post('/packages/{package}/students/{student}/revoke-access',[ExamPackageController::class,'revokeStudentAccess'])->whereNumber('package')->whereNumber('student')->name('packages.students.revoke');
  // Fix143: standalone Department > Subject > Chapter topic management and main Question IDs.
  Route::get('/routine-topics/{level}',[\App\Http\Controllers\Admin\ExamSection\RoutineTopicController::class,'index'])->where('level','department|subject|chapter')->name('routine-topic.index');
  Route::post('/routine-topics/{level}',[\App\Http\Controllers\Admin\ExamSection\RoutineTopicController::class,'store'])->where('level','department|subject|chapter')->name('routine-topic.store');
@@ -71,6 +70,8 @@ Route::middleware(['auth'])->prefix('admin/exam-section')->name('admin.exam-sect
  Route::put('/extra-student-picker/{category}/groups/{group}',[ExamExtraStudentGroupController::class,'update'])->whereNumber('category')->whereNumber('group')->name('extra-student-groups.update');
  Route::delete('/extra-student-picker/{category}/groups/{group}',[ExamExtraStudentGroupController::class,'destroy'])->whereNumber('category')->whereNumber('group')->name('extra-student-groups.destroy');
  Route::get('/extra-student-picker/{category}/groups/{group}/view',[ExamExtraStudentGroupController::class,'viewMembers'])->whereNumber('category')->whereNumber('group')->name('extra-student-groups.view');
+ Route::post('/extra-student-picker/{category}/groups/{group}/marks',[ExamExtraStudentGroupController::class,'saveMarks'])->whereNumber('category')->whereNumber('group')->name('extra-student-groups.marks.save');
+ Route::post('/extra-student-picker/{category}/groups/{group}/marks/auto-generate',[ExamExtraStudentGroupController::class,'autoGenerateMarks'])->whereNumber('category')->whereNumber('group')->name('extra-student-groups.marks.auto-generate');
  Route::get('/extra-student-picker/{category}/groups/{group}/students',[ExamExtraStudentGroupController::class,'students'])->whereNumber('category')->whereNumber('group')->name('extra-student-groups.students');
  Route::post('/extra-student-picker/{category}/groups/{group}/students',[ExamExtraStudentGroupController::class,'addStudents'])->whereNumber('category')->whereNumber('group')->name('extra-student-groups.students.add');
  Route::post('/extra-student-picker/{category}/groups/assign',[ExamExtraStudentGroupController::class,'assign'])->whereNumber('category')->name('extra-student-groups.assign');

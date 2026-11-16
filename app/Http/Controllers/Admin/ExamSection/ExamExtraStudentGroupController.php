@@ -195,12 +195,26 @@ class ExamExtraStudentGroupController extends Controller
         return view('admin.exam-section.extra-student-group-students',compact('cat','sub','current','students','shuffle','search','memberCount','availableCount'));
     }
 
-    // Read-only group members: strictly scoped to the selected Category/Sub-category and Group.
+    // Group membership is permanent; marks are saved separately for each exam.
     public function viewMembers(Request $r, int $category, int $group)
     {
         $subId = $this->subId($r);
         [$cat, $sub] = $this->scope($category, $subId);
         $current = $this->groupRow($category, $subId, $group);
+        abort_unless(Schema::hasTable('lebd_exam_extra_student_exam_marks'), 503, 'Import CREATE_EXTRA_STUDENT_EXAM_MARKS.sql first.');
+
+        $examItems = DB::table('lebd_exam_section_routine_items as i')
+            ->join('lebd_exam_section_routines as r', 'r.id', '=', 'i.routine_id')
+            ->where('r.category_id', $category)
+            ->where('r.subcategory_id', $subId)
+            ->whereRaw('LOWER(TRIM(i.type)) = ?', ['exam'])
+            ->whereRaw('LOWER(TRIM(r.status)) = ?', ['published'])
+            ->select('i.id', 'i.exam_name', 'i.exam_end_at', 'r.name as routine_name')
+            ->orderByDesc('i.exam_end_at')->orderByDesc('i.id')->get();
+
+        $examItemId = $r->filled('exam_item_id') ? (int) $r->query('exam_item_id') : (int) optional($examItems->first())->id;
+        $selectedExam = $examItems->firstWhere('id', $examItemId);
+        if ($examItemId && !$selectedExam) abort(404, 'Selected exam is not available in this Category/Sub-category.');
 
         $query = DB::table('lebd_exam_extra_student_group_members as m')
             ->join('lebd_exam_section_extra_student_picks as p', 'p.id', '=', 'm.pick_id')
@@ -220,15 +234,142 @@ class ExamExtraStudentGroupController extends Controller
         }
 
         $members = $query
-            ->select('s.id as student_id', 's.name', 's.department', 's.contact', 's.email', 's.status', 'm.created_at as assigned_at')
+            ->leftJoin('lebd_exam_extra_student_exam_marks as em', function ($join) use ($examItemId, $current) {
+                $join->on('em.pick_id', '=', 'p.id')->where('em.group_id', '=', $current->id);
+                if ($examItemId) $join->where('em.routine_item_id', '=', $examItemId);
+                else $join->whereRaw('1 = 0');
+            })
+            ->select('p.id as pick_id', 's.id as student_id', 's.name', 's.department', 's.contact', 's.email', 's.status', 'm.created_at as assigned_at', 'em.marks')
             ->orderBy('m.id')
-            ->paginate(25)
-            ->withQueryString();
-        $memberCount = DB::table('lebd_exam_extra_student_group_members')
-            ->where('group_id', $current->id)->count();
+            ->get();
+        $memberCount = DB::table('lebd_exam_extra_student_group_members')->where('group_id', $current->id)->count();
 
         return view('admin.exam-section.extra-student-group-members',
-            compact('cat', 'sub', 'current', 'members', 'memberCount', 'search'));
+            compact('cat', 'sub', 'current', 'members', 'memberCount', 'search', 'examItems', 'selectedExam', 'examItemId'));
+    }
+
+    /**
+     * Bulk-fill missing or out-of-range simulation scores for one exam only.
+     * These values remain explicitly simulation data and never become official submissions.
+     */
+    public function autoGenerateMarks(Request $r, int $category, int $group)
+    {
+        $subId = $this->subId($r);
+        $this->scope($category, $subId);
+        $current = $this->groupRow($category, $subId, $group);
+        abort_unless(Schema::hasTable('lebd_exam_extra_student_exam_marks'), 503, 'Import CREATE_EXTRA_STUDENT_EXAM_MARKS.sql first.');
+
+        $data = $r->validate(['exam_item_id' => ['required', 'integer', 'min:1']]);
+        $exam = DB::table('lebd_exam_section_routine_items as i')
+            ->join('lebd_exam_section_routines as r', 'r.id', '=', 'i.routine_id')
+            ->where('i.id', (int) $data['exam_item_id'])
+            ->where('r.category_id', $category)->where('r.subcategory_id', $subId)
+            ->whereRaw('LOWER(TRIM(i.type)) = ?', ['exam'])
+            ->whereRaw('LOWER(TRIM(r.status)) = ?', ['published'])
+            ->select('i.id')->first();
+        abort_unless($exam, 404, 'Exam does not belong to this Category/Sub-category.');
+
+        if ($current->mark_from === null || $current->mark_to === null) {
+            throw ValidationException::withMessages(['mark_range' => 'Set both Mark From and Mark To in this Group before generating simulation scores.']);
+        }
+        $minCents = (int) round(((float) $current->mark_from) * 100);
+        $maxCents = (int) round(((float) $current->mark_to) * 100);
+        if ($minCents > $maxCents) {
+            throw ValidationException::withMessages(['mark_range' => 'The Group Mark Range is invalid.']);
+        }
+
+        // Simulation scores use half-point increments only (e.g. 70, 70.5, 71).
+        // Convert the configured range to the first/last valid 0.50 step.
+        $minHalfSteps = (int) ceil($minCents / 50);
+        $maxHalfSteps = (int) floor($maxCents / 50);
+        if ($minHalfSteps > $maxHalfSteps) {
+            throw ValidationException::withMessages(['mark_range' => 'The selected Mark Range contains no valid 0.50-step score. Adjust the Group range.']);
+        }
+
+        $result = DB::transaction(function () use ($current, $exam, $minCents, $maxCents, $minHalfSteps, $maxHalfSteps) {
+            $members = DB::table('lebd_exam_extra_student_group_members')
+                ->where('group_id', $current->id)->orderBy('id')->lockForUpdate()->get(['pick_id']);
+            $created = 0;
+            $kept = 0;
+            foreach ($members as $member) {
+                $existing = DB::table('lebd_exam_extra_student_exam_marks')
+                    ->where('routine_item_id', $exam->id)->where('group_id', $current->id)
+                    ->where('pick_id', $member->pick_id)->lockForUpdate()->first();
+                if ($existing !== null) {
+                    $existingCents = (int) round(((float) $existing->marks) * 100);
+                    if ($existingCents >= $minCents && $existingCents <= $maxCents && $existingCents % 50 === 0) {
+                        $kept++;
+                        continue;
+                    }
+                }
+                $halfSteps = $minHalfSteps === $maxHalfSteps
+                    ? $minHalfSteps
+                    : random_int($minHalfSteps, $maxHalfSteps);
+                $cents = $halfSteps * 50;
+                DB::table('lebd_exam_extra_student_exam_marks')->updateOrInsert(
+                    ['routine_item_id' => $exam->id, 'group_id' => $current->id, 'pick_id' => $member->pick_id],
+                    ['marks' => number_format($cents / 100, 2, '.', ''), 'updated_at' => now(), 'created_at' => $existing->created_at ?? now()]
+                );
+                $created++;
+            }
+            return compact('created', 'kept');
+        });
+
+        return redirect()->route('admin.exam-section.extra-student-groups.view',
+            $this->returnParams($category, $subId) + ['group' => $group, 'exam_item_id' => $exam->id])
+            ->with('success', $result['created'] . ' simulation score(s) generated within the Group range in 0.50 increments for this exam; ' . $result['kept'] . ' existing valid score(s) kept. These are not official exam marks.');
+    }
+
+    /** Save a distinct admin simulation score for each selected exam; never reuse it across exams. */
+    public function saveMarks(Request $r, int $category, int $group)
+    {
+        $subId = $this->subId($r);
+        $this->scope($category, $subId);
+        $current = $this->groupRow($category, $subId, $group);
+        abort_unless(Schema::hasTable('lebd_exam_extra_student_exam_marks'), 503, 'Import CREATE_EXTRA_STUDENT_EXAM_MARKS.sql first.');
+
+        $data = $r->validate([
+            'exam_item_id' => ['required', 'integer', 'min:1'],
+            'marks' => ['required', 'array', 'max:500'],
+            'marks.*' => ['nullable', 'numeric', 'min:0', 'max:9999999'],
+        ]);
+        $exam = DB::table('lebd_exam_section_routine_items as i')
+            ->join('lebd_exam_section_routines as r', 'r.id', '=', 'i.routine_id')
+            ->where('i.id', (int) $data['exam_item_id'])
+            ->where('r.category_id', $category)->where('r.subcategory_id', $subId)
+            ->whereRaw('LOWER(TRIM(i.type)) = ?', ['exam'])
+            ->whereRaw('LOWER(TRIM(r.status)) = ?', ['published'])
+            ->select('i.id')->first();
+        abort_unless($exam, 404, 'Exam does not belong to this Category/Sub-category.');
+
+        $min = $current->mark_from !== null ? (float) $current->mark_from : null;
+        $max = $current->mark_to !== null ? (float) $current->mark_to : null;
+
+        DB::transaction(function () use ($data, $current, $min, $max, $exam) {
+            foreach ($data['marks'] as $pickId => $rawMark) {
+                $pickId = (int) $pickId;
+                $isMember = DB::table('lebd_exam_extra_student_group_members')
+                    ->where('group_id', $current->id)->where('pick_id', $pickId)->exists();
+                if (!$isMember) throw ValidationException::withMessages(['marks' => 'A selected student is not a member of this group. Refresh and try again.']);
+                if ($rawMark === null || $rawMark === '') {
+                    DB::table('lebd_exam_extra_student_exam_marks')->where('group_id', $current->id)
+                        ->where('pick_id', $pickId)->where('routine_item_id', $exam->id)->delete();
+                    continue;
+                }
+                $mark = (float) $rawMark;
+                if (($min !== null && $mark < $min) || ($max !== null && $mark > $max)) {
+                    throw ValidationException::withMessages(['marks.' . $pickId => 'Mark must be within this Group Mark Range (' . ($min ?? '0') . ' – ' . ($max ?? '—') . ').']);
+                }
+                DB::table('lebd_exam_extra_student_exam_marks')->updateOrInsert(
+                    ['routine_item_id' => $exam->id, 'group_id' => $current->id, 'pick_id' => $pickId],
+                    ['marks' => $mark, 'updated_at' => now(), 'created_at' => now()]
+                );
+            }
+        });
+
+        return redirect()->route('admin.exam-section.extra-student-groups.view',
+            $this->returnParams($category, $subId) + ['group' => $group, 'exam_item_id' => $exam->id])
+            ->with('success', 'This exam\'s Extra Student simulation scores saved successfully. Other exams remain unchanged.');
     }
 
     public function addStudents(Request $r, int $category, int $group)

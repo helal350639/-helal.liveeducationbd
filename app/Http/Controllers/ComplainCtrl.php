@@ -193,28 +193,72 @@ class ComplainCtrl extends Controller
 
     public function reply(Request $request)
     {
-        $source = new SourceCtrl;
-        $complain = Complain::find($request->complain_id);
+        $request->validate([
+            'complain_id' => 'required|integer|exists:complains,id',
+            'reply_message' => 'required|string|max:10000',
+        ]);
 
+        $source = new SourceCtrl;
+        $complain = Complain::findOrFail($request->complain_id);
+
+        // Backfill the student link for older complaints created before v26.
+        // Prefer exact contact/email matches. Use the name only when it is unique.
+        if (empty($complain->student_id)) {
+            $matchedStudent = null;
+
+            if (!empty($complain->contact)) {
+                $matchedStudent = \App\Models\Student::where('contact', $complain->contact)->first();
+            }
+
+            if (!$matchedStudent && !empty($complain->email)) {
+                $matchedStudent = \App\Models\Student::where('email', $complain->email)->first();
+            }
+
+            if (!$matchedStudent && !empty($complain->name)) {
+                $sameNameCount = \App\Models\Student::where('name', $complain->name)->count();
+                if ($sameNameCount === 1) {
+                    $matchedStudent = \App\Models\Student::where('name', $complain->name)->first();
+                }
+            }
+
+            if ($matchedStudent) {
+                $complain->student_id = $matchedStudent->id;
+            }
+        }
+
+        // Save the reply for the student's dashboard and keep the existing email notification.
         $emailData = [
             'email_to' => $complain->email,
             'subject' => 'Reply from Live Education BD',
             'comments' => 'Hello '.$complain->name.',<br> '.$request->reply_message
         ];
 
-        $source->sendMail($emailData);
-
         try {
-            Complain::where('id', $complain->id)->update(['status' => 'Replied']);
+            $complain->reply_message = $request->reply_message;
+            $complain->replied_at = now();
+            $complain->student_notice_dismissed_at = null;
+            $complain->status = 'Replied';
+            $complain->save();
         }
         catch(\Exception $e)
         {
-            return $e;
+            return back()->with('error', 'Reply could not be saved: '.$e->getMessage());
         }
 
-        Session::flash('success', 'Your message successfully sent.');
-        return back();
+        // Email is an additional channel; failure must not prevent the in-dashboard notice.
+        if (!empty($complain->email)) {
+            try {
+                $source->sendMail($emailData);
+            } catch(\Exception $mailError) {
+                \Log::warning('Complaint reply email failed; dashboard notice was saved.', [
+                    'complain_id' => $complain->id,
+                    'error' => $mailError->getMessage(),
+                ]);
+            }
+        }
 
+        Session::flash('success', 'Your reply has been saved and the student will see it on the dashboard.');
+        return back();
     }
     
 }

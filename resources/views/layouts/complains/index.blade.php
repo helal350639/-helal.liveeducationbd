@@ -44,6 +44,7 @@ $source = New SourceCtrl;
                   <th>Email</th>
                   <th>Mobile</th>
                   <th>Department</th>
+                  <th>Complaint Source</th>
                   <th>Status</th>
                   <th width="130">Action</th>
                 </tr>
@@ -54,6 +55,7 @@ $source = New SourceCtrl;
                   <td>{{$val->email}}</td>
                   <td>{{$val->contact}}</td>
                   <td>{{$val->department ? $val->department->name : ''}}</td>
+                  <td>{{ $val->source_path ?: '—' }}</td>
                   <td>
                     @if($val->status == 'Replied')
                     <span class="label label-success">{{$val->status}}</span>

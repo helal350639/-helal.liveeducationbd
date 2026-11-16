@@ -1,149 +1,194 @@
-@extends('homepage')
-@section('title', 'Premium Exam Packages | Live Education BD')
-@section('content')
+@php $le185PageTitle = 'Exam Section'; @endphp
+@extends('student')
+@section('title', 'Exam Section')
+
+@section('stylesheets')
 <style>
-.lebd-exam-catalog{max-width:980px;width:calc(100% - 28px);margin:20px auto 60px;color:#102f62}
-.lebd-exam-catalog-top{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 14px;margin-bottom:17px;background:#fff;border:1px solid #dce7f7;border-radius:14px}
-.lebd-exam-catalog-top a{font-size:12px;font-weight:750;text-decoration:none;color:#1658b6}
-.lebd-exam-catalog-heading{display:flex;align-items:center;gap:12px;margin:12px 0 15px}
-.lebd-exam-catalog-heading .icon{width:48px;height:48px;display:grid;place-items:center;border-radius:14px;background:#fff1d4;color:#b87900;font-size:24px}
-.lebd-exam-catalog-heading h1{margin:0;font-size:25px;font-weight:900;line-height:1.25}
-.lebd-exam-catalog-heading p{margin:4px 0 0;color:#647b9b;font-size:11px}
-.lebd-exam-catalog-notice{padding:11px 14px;border-radius:10px;background:#fff1c5;color:#77591d;font-size:12px;line-height:1.6;margin:12px 0}
-.lebd-exam-catalog-filters{display:flex;gap:7px;flex-wrap:wrap;margin:14px 0}
-.lebd-exam-catalog-filters button{border:1px solid #d5e1f3;background:#fff;color:#234b83;border-radius:22px;padding:8px 13px;font-size:11px;font-weight:750;cursor:pointer}
-.lebd-exam-catalog-filters button.active{background:#2524c9;border-color:#2524c9;color:#fff}
-.lebd-exam-catalog-list{display:flex;flex-direction:column;gap:10px}
-.lebd-exam-package{display:grid;grid-template-columns:minmax(0,1fr) 145px;gap:13px;align-items:stretch;padding:13px;background:#fff;border:1px solid #dce7f5;border-radius:16px;box-shadow:0 5px 17px rgba(20,55,100,.055)}
-.lebd-exam-package[hidden]{display:none!important}
-.lebd-exam-package-main{display:flex;gap:11px;min-width:0}
-.lebd-exam-package-icon{width:38px;height:38px;flex:0 0 38px;display:grid;place-items:center;border-radius:11px;background:#edf3ff;color:#236bd4;font-size:18px}
-.lebd-exam-package-info{min-width:0}
-.lebd-exam-package-info h2{font-size:16px;font-weight:850;margin:0 0 5px;line-height:1.3}
-.lebd-exam-package-duration{display:inline-block;background:#f0f3fb;color:#617596;padding:3px 8px;border-radius:20px;font-size:10px;margin-bottom:7px}
-.lebd-exam-package-tags{display:flex;gap:5px;flex-wrap:wrap;margin:2px 0 7px}
-.lebd-exam-package-tags span{background:#edf4ff;color:#315f9a;padding:4px 7px;border-radius:5px;font-size:9px}
-.lebd-exam-package-info p{font-size:11px;color:#5d7392;line-height:1.5;margin:3px 0;overflow-wrap:anywhere}
-.lebd-exam-package-side{border-left:1px solid #e0e9f6;padding:5px 0 5px 12px;display:flex;flex-direction:column;justify-content:center;gap:7px;min-width:0}
-.lebd-exam-package-price{font-size:22px;font-weight:900;white-space:nowrap}
-.lebd-exam-package-old{font-size:10px;color:#9aa8ba;text-decoration:line-through;margin-left:4px}
-.lebd-exam-package-save{align-self:flex-start;padding:3px 6px;border-radius:5px;background:#e6f8ed;color:#087a45;font-size:9px;font-weight:800}
-.lebd-exam-package-link{display:block;width:100%;text-align:center;text-decoration:none!important;padding:9px 6px;border:1px solid #2537e9;border-radius:9px;background:#f3f5ff;color:#1726bd!important;font-family:inherit;font-size:10px;font-weight:850;line-height:1.35;cursor:pointer}
-.lebd-exam-package-purchased{display:inline-flex;align-items:center;gap:4px;padding:6px 7px;border:1px solid #b8e8ca;border-radius:7px;background:#eafaf0;color:#087343;font-size:10px;font-weight:850;line-height:1.35}
-.lebd-exam-package-empty{padding:28px 16px;border:1px dashed #cbd8e9;border-radius:13px;background:#fff;text-align:center;color:#657b98}
-.lebd-exam-catalog-note{margin-top:13px;padding:11px 13px;border-radius:9px;background:#fff8e8;color:#8a682e;font-size:10px;line-height:1.6}
-.lebd-exam-catalog-alert{padding:11px 13px;border-radius:9px;background:#e8f8ed;color:#176b3b;font-size:12px;margin:12px 0}
-@media(max-width:620px){
- .lebd-exam-catalog{width:calc(100% - 18px);margin-top:10px}
- .lebd-exam-catalog-heading h1{font-size:21px}
- .lebd-exam-package{grid-template-columns:minmax(0,1fr) 108px;gap:8px;padding:10px;border-radius:13px}
- .lebd-exam-package-main{gap:8px}
- .lebd-exam-package-icon{width:32px;height:32px;flex-basis:32px;font-size:16px}
- .lebd-exam-package-info h2{font-size:13px}
- .lebd-exam-package-side{padding-left:8px}
- .lebd-exam-package-price{font-size:18px}
- .lebd-exam-package-link{font-size:9px;padding:8px 4px}
- .lebd-exam-package-tags span{font-size:8px;padding:4px 5px}
+:root{--navy:#102653;--blue:#0867d8;--line:#d7e5f8;--ink:#102d59;--muted:#6882a5;--soft:#f3f7ff}
+.lep-page *{box-sizing:border-box}
+.lep-page{min-height:calc(100vh - 80px);background:#f3f7fd;color:var(--ink);font-family:Arial,"Noto Sans Bengali",sans-serif;padding:10px 0 24px}
+.lep-container{max-width:1040px;margin:10px auto;padding:12px}
+.lep-page .top{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12px;margin-bottom:12px}
+.lep-page .back{color:#1267c5;text-decoration:none;font-weight:700}
+.lep-page .top strong{font-size:11px;color:#174477;text-align:right}
+.lep-page .catalog-heading{display:flex;align-items:center;gap:12px;margin:8px 0 14px}
+.lep-page .catalog-heading .icon{width:42px;height:42px;display:grid;place-items:center;border-radius:12px;background:#fff0cf;color:#bd7800;font-size:20px;box-shadow:0 2px 7px #c78c2720;flex:none}
+.lep-page .catalog-heading h1{font-size:clamp(22px,3vw,29px);line-height:1.2;margin:0;color:#102d59}
+.lep-page .catalog-heading p{font-size:11px;color:#6a83a5;margin:4px 0 0}
+.lep-page .note{padding:12px 15px;background:#fff2c9;border:1px solid #f4df9e;border-radius:11px;margin:12px 0;font-size:13px;line-height:1.6;color:#684b0d}
+.lep-page .note p{margin:4px 0 0}
+.lep-page .notice-buy{display:inline-flex;align-items:center;justify-content:center;gap:7px;margin:0 0 12px;padding:9px 14px;border-radius:8px;background:linear-gradient(135deg,#ff8b24,#f45a22);color:#fff;text-decoration:none;font-size:12px;font-weight:800;box-shadow:0 3px 0 #c64d1d}
+.lep-page .filters-label{font-size:13px;font-weight:800;margin:12px 0 7px}
+.lep-page .filters{display:flex;align-items:center;gap:7px;overflow-x:auto;padding:2px 1px 10px;scrollbar-width:thin}
+.lep-page .filters button{font:inherit;font-size:11px;white-space:nowrap;flex:none;padding:8px 13px;border:1px solid #cbdcf5;border-radius:999px;background:#fff;color:#15569b;cursor:pointer}
+.lep-page .filters button.is-selected{background:#145fd5;color:#fff;border-color:#145fd5;box-shadow:0 2px 6px #145fd52b}
+.lep-page .package-list{display:flex;flex-direction:column;gap:9px}
+.lep-page .package-card{display:grid;grid-template-columns:minmax(0,1fr) 120px;gap:12px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:13px;padding:12px 13px;box-shadow:0 3px 12px #153c6a0b;min-width:0}
+.lep-page .package-main{display:flex;align-items:flex-start;gap:10px;min-width:0}
+.lep-page .package-icon{width:34px;height:34px;display:grid;place-items:center;flex:none;border-radius:9px;background:#eaf2ff;color:#1768d6;font-size:15px}
+.lep-page .package-info{min-width:0;flex:1}
+.lep-page .package-info h2{font-size:14px;line-height:1.35;margin:0 0 4px;color:#102e5b;overflow-wrap:anywhere}
+.lep-page .package-duration{display:inline-block;padding:3px 7px;border-radius:12px;background:#edf3ff;color:#57749a;font-size:9px;margin:0 0 5px}
+.lep-page .package-description{font-size:10px;line-height:1.5;color:#7186a3;margin:2px 0 4px;overflow-wrap:anywhere}
+.lep-page .details{font-size:10px;line-height:1.55;color:#536f94;min-width:0}
+.lep-page .details.collapsed{max-height:31px;overflow:hidden;position:relative}
+.lep-page .details.collapsed:after{content:"";position:absolute;bottom:0;left:0;right:0;height:12px;background:linear-gradient(transparent,#fff);pointer-events:none}
+.lep-page .details p{margin:0 0 4px;overflow-wrap:anywhere}
+.lep-page .scope{overflow-wrap:anywhere}
+.lep-page .more{display:inline-block;border:0;background:none;color:#0967bf;font-size:10px;font-weight:800;padding:2px 0;margin:2px 0 0;cursor:pointer}
+.lep-page .package-side{display:flex;flex-direction:column;align-items:stretch;gap:7px;min-width:0}
+.lep-page .price{font-size:20px;color:#0867c9;font-weight:900;white-space:nowrap;text-align:right;line-height:1.2}
+.lep-page .buy{display:flex;align-items:center;justify-content:center;gap:5px;min-height:32px;background:linear-gradient(135deg,#165fe0,#0649ca);padding:7px 8px;color:#fff;border-radius:7px;text-align:center;font-weight:800;text-decoration:none;font-size:10px;line-height:1.3;border:1px solid #0d56d4;box-shadow:0 2px 0 #0b3b9e}
+.lep-page .owned{background:#e4f8ec;color:#087344;border:1px solid #9ce0b9;box-shadow:none;cursor:default}
+.lep-page .owned-note{color:#168052;font-size:9px;line-height:1.4;margin:0;text-align:right}
+.lep-page .muted{color:var(--muted);font-size:10px;line-height:1.6;margin:12px 0}
+.lep-page .empty-filter{padding:22px 12px;text-align:center;border:1px dashed #b7cbe4;border-radius:12px;background:#fff;color:#607b9a;font-size:13px}
+.lep-page .package-card[hidden],.lep-page .empty-filter[hidden],.lep-page .more[hidden]{display:none!important}
+@media(max-width:600px){
+ .lep-container{margin:6px auto;padding:10px}.lep-page .top{font-size:11px;align-items:flex-start;flex-direction:column}.lep-page .catalog-heading{gap:12px;padding:16px;border-radius:18px;flex-direction:column;align-items:flex-start}.lep-page .catalog-heading .heading-main{gap:11px;align-items:flex-start}.lep-page .catalog-heading .icon{width:42px;height:42px;font-size:19px;border-radius:13px}.lep-page .catalog-heading h1{font-size:22px}.lep-page .catalog-heading p{font-size:11px}.lep-page .catalog-heading .heading-badge{align-items:flex-start;width:100%}.lep-page .catalog-heading .heading-badge .badge-pill{font-size:11px;padding:9px 12px}
+ .lep-page .note{padding:10px 11px;margin:9px 0;font-size:11px}.lep-page .package-list{gap:7px}
+ .lep-page .package-card{grid-template-columns:minmax(0,1fr) 94px;gap:8px;padding:10px;border-radius:11px}
+ .lep-page .package-main{gap:7px}.lep-page .package-icon{width:29px;height:29px;font-size:13px}
+ .lep-page .package-info h2{font-size:12px}.lep-page .package-duration{font-size:8px;padding:3px 6px}
+ .lep-page .package-description,.lep-page .details{font-size:9px}.lep-page .details.collapsed{max-height:28px}
+ .lep-page .price{font-size:17px}.lep-page .buy{font-size:9px;min-height:30px;padding:6px 5px}.lep-page .owned-note{font-size:8px}
+ .lep-page .filters button{font-size:10px;padding:7px 10px}.lep-page .filters-label{font-size:12px}
 }
-@media(max-width:370px){.lebd-exam-package{grid-template-columns:minmax(0,1fr) 96px}.lebd-exam-package-price{font-size:16px}}
+@media(max-width:350px){.lep-page .package-card{grid-template-columns:minmax(0,1fr) 84px;padding:8px}.lep-page .price{font-size:15px}}
+/* Premium boxed title header */
+.lep-page .catalog-heading{justify-content:space-between;gap:18px;margin:8px 0 16px;padding:20px 22px;border:1px solid #e3d8b1;border-radius:20px;background:linear-gradient(135deg,#fffdfa 0%,#fff8e7 42%,#f2f8ff 100%);box-shadow:0 9px 24px #153c6a14;position:relative;overflow:hidden}
+.lep-page .catalog-heading:before{content:"";position:absolute;right:-42px;top:-48px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,#ffe7a2 0,#fff0c7 44%,transparent 72%);pointer-events:none}
+.lep-page .heading-main{display:flex;align-items:center;gap:14px;min-width:0;position:relative;z-index:1}
+.lep-page .catalog-heading .icon{width:54px;height:54px;border-radius:16px;background:linear-gradient(135deg,#ffe7a3,#fff7dc);border:1px solid #f0d994;color:#b87905;font-size:23px;box-shadow:0 5px 14px #c78c2728}
+.lep-page .heading-copy{min-width:0}
+.lep-page .catalog-heading h1{font-size:clamp(24px,3vw,31px);font-weight:900;letter-spacing:-.02em}
+.lep-page .catalog-heading p{font-size:12px;margin-top:6px}
+.lep-page .heading-badge{display:flex;flex-direction:column;align-items:flex-end;gap:7px;position:relative;z-index:1;flex:none}
+.lep-page .mini-label{font-size:10px;color:#69809d;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.lep-page .badge-pill{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;background:linear-gradient(135deg,#145fd5,#0785e9);color:#fff;font-size:11px;font-weight:800;box-shadow:0 5px 14px #145fd535}
+@media(max-width:600px){
+ .lep-page .catalog-heading{padding:15px;gap:12px;align-items:flex-start;flex-direction:column;border-radius:17px}
+ .lep-page .heading-main{gap:11px;align-items:flex-start}
+ .lep-page .catalog-heading .icon{width:43px;height:43px;font-size:19px;border-radius:13px}
+ .lep-page .catalog-heading h1{font-size:22px}
+ .lep-page .catalog-heading p{font-size:10px}
+ .lep-page .heading-badge{align-items:flex-start;width:100%}
+ .lep-page .badge-pill{font-size:10px;padding:8px 11px}
+}
+
 </style>
-@php
- $durationLabels = ['days'=>'দিন','weeks'=>'সপ্তাহ','months'=>'মাস','years'=>'বছর'];
- $filterMonths = function($package) {
-   $unit = strtolower(trim((string)($package->duration_unit ?? '')));
-   $value = (int)($package->duration ?? 0);
-   if (str_contains($unit,'year')) return $value * 12;
-   if (str_contains($unit,'month')) return $value;
-   if (str_contains($unit,'week')) return 0;
-   return 0;
- };
-@endphp
-<main class="lebd-exam-catalog" id="lebd-exam-package-catalog">
- <nav class="lebd-exam-catalog-top">
-  <a href="{{ route('student.exam-section.categories') }}">← Exam Section-এ ফিরুন</a>
-  <strong style="font-size:11px;color:#183e70">LIVE Education BD · Exam Packages</strong>
-  <a href="{{ url('/') }}">Home</a>
- </nav>
- <header class="lebd-exam-catalog-heading">
-  <span class="icon"><i class="fa-solid fa-crown"></i></span>
-  <div><h1>All Premium Exam Packages</h1><p>পরীক্ষা বিভাগের সকল Active Premium Package</p></div>
- </header>
- <div class="lebd-exam-catalog-notice">
-  @if(request('notice')==='limit')
-   <strong>আপনার এই মাসের ৩টি ফ্রি পরীক্ষা ব্যবহার হয়ে গেছে।</strong><br>আরও পরীক্ষা দিতে Premium Package কিনুন।
-  @else
-   প্রতি মাসে ৩টি পরীক্ষা ফ্রি। আরও পরীক্ষা দিতে আপনার প্রয়োজন অনুযায়ী Premium Package বেছে নিন।
+@endsection
+
+@section('content')
+<div class="lep-page">
+  <div class="lep-container">
+<div class="top"><a class="back" href="{{ route('student.exam-section.categories') }}">← ফিরে যান</a><strong>Live Education BD · Exam Packages</strong></div>
+  <header class="catalog-heading">
+    <div class="heading-main">
+      <span class="icon" aria-hidden="true"><i class="fas fa-crown"></i></span>
+      <div class="heading-copy">
+        <h1>All Premium Packages</h1>
+        <p>Exam Section-এর সকল Active Premium Package</p>
+      </div>
+    </div>
+    <div class="heading-badge">
+      <span class="mini-label">Live Education BD</span>
+      <span class="badge-pill"><i class="fas fa-gem" aria-hidden="true"></i> Premium Packages</span>
+    </div>
+  </header>
+  @if(in_array(request('notice'), ['limit','pdf','paid'], true))
+    <a class="notice-buy" href="#package-cards"><i class="fas fa-shopping-cart" aria-hidden="true"></i> সকল প্যাকেজ দেখুন</a>
   @endif
-  @if($used !== null)<br>এই মাসে শুরু করেছেন: <strong>{{ $used }} টি পরীক্ষা</strong>।@endif
- </div>
- @if(session('success'))<div class="lebd-exam-catalog-alert" role="status">{{ session('success') }}</div>@endif
- @if($errors->any())<div class="lebd-exam-catalog-alert" style="background:#fff0f0;color:#a22" role="alert">{{ $errors->first() }}</div>@endif
- <nav class="lebd-exam-catalog-filters" aria-label="Filter exam packages">
-  <button type="button" class="active" data-filter="all">সব প্যাকেজ</button>
-  <button type="button" data-filter="3">৩ মাসের প্যাকেজ</button>
-  <button type="button" data-filter="6">৬ মাসের প্যাকেজ</button>
-  <button type="button" data-filter="12">১ বছরের প্যাকেজ</button>
- </nav>
- <section class="lebd-exam-catalog-list">
- @forelse($packages as $p)
-  @php
-   $original=(float)($p->main_price ?? $p->final_price);
-   $price=(float)$p->final_price;
-   $discount=max(0,(float)($p->discount_amount ?? ($original-$price)));
-   $months=$filterMonths($p);
-   $packageScopes=$scopes->get($p->id,collect());
-   $owned=$activeAccesses->has($p->id);
-  @endphp
-  <article class="lebd-exam-package" data-months="{{ $months }}">
-   <div class="lebd-exam-package-main">
-    <span class="lebd-exam-package-icon"><i class="fa-solid fa-book-open"></i></span>
-    <div class="lebd-exam-package-info">
-     <h2>{{ $p->name }}</h2>
-     <span class="lebd-exam-package-duration">মেয়াদ: {{ (int)$p->duration }} {{ $durationLabels[strtolower((string)$p->duration_unit)] ?? $p->duration_unit }}</span>
-     <div class="lebd-exam-package-tags">
-      @foreach($packageScopes as $scope)
-       <span>{{ $scope->category_name }}@if($scope->subcategory_name) → {{ $scope->subcategory_name }}@endif</span>
-      @endforeach
-     </div>
-     <p>{{ \Illuminate\Support\Str::limit(trim(strip_tags((string)($p->description ?? ''))) ?: 'এই প্যাকেজের অন্তর্ভুক্ত বিভাগ ও পরীক্ষাগুলোতে Premium Access সুবিধা।',170) }}</p>
-    </div>
-   </div>
-   <div class="lebd-exam-package-side">
-    <div><span class="lebd-exam-package-price">৳{{ number_format($price,2) }}</span>
-     @if($discount>0)<span class="lebd-exam-package-old">৳{{ number_format($original,2) }}</span>@endif
-    </div>
-    @if($discount>0)<span class="lebd-exam-package-save">Save {{ number_format($original>0 ? min(100,$discount*100/$original):0,2) }}%</span>@endif
-    @if($owned)
-     <span class="lebd-exam-package-purchased"><i class="fa-solid fa-circle-check"></i> আপনি প্যাকেজ কিনেছেন</span>
-     <a class="lebd-exam-package-link" href="{{ route('student.exam-section.categories') }}">পরীক্ষা দিন →</a>
-     <small style="font-size:9px;color:#087343;line-height:1.4">মেয়াদ: {{ \Carbon\Carbon::parse($activeAccesses->get($p->id)->ends_at)->format('d M Y, h:i A') }} পর্যন্ত</small>
-    @else
-     @auth('student')
-      <a class="lebd-exam-package-link" href="{{ route('student.exam-section.package.review',$p->id) }}">প্যাকেজ কিনুন →</a>
-     @else
-      <a class="lebd-exam-package-link" href="{{ url('/students/login') }}">কিনতে Login করুন →</a>
-     @endauth
-    @endif
-   </div>
-  </article>
- @empty
-  <div class="lebd-exam-package-empty">বর্তমানে কোনো Active Exam Package নেই।</div>
- @endforelse
- </section>
- <div class="lebd-exam-package-empty" id="lebd-exam-filter-empty" hidden>এই মেয়াদের কোনো প্যাকেজ বর্তমানে পাওয়া যায়নি।</div>
- <p class="lebd-exam-catalog-note">প্যাকেজ কিনুন নির্বাচন করলে প্যাকেজের বিস্তারিত ও Payment Summary দেখা যাবে। Referral Balance দিয়ে পেমেন্ট করলে সফল Transaction-এর পর Access চালু হবে। SSLCommerz-এর ক্ষেত্রে Gateway Verification সফল হওয়ার পর Access চালু হবে। Admin Panel থেকে শিক্ষার্থীকে Manual Add / Remove করার সুবিধাও রয়েছে।</p>
-</main>
+  @if(session('success'))<div class="note" style="background:#e2f7e9;color:#065e35">{{ session('success') }}</div>@endif
+  @if($errors->any())<div class="note" style="background:#ffe5e5;color:#a00">{{ $errors->first() }}</div>@endif
+  <div class="filters-label">প্যাকেজের মেয়াদ অনুযায়ী বেছে নিন</div>
+  <nav class="filters" aria-label="প্যাকেজের মেয়াদ">
+    <button type="button" class="is-selected" data-filter="all" aria-pressed="true">সব প্যাকেজ</button>
+    <button type="button" data-filter="3" aria-pressed="false">৩ মাসের প্যাকেজ</button>
+    <button type="button" data-filter="6" aria-pressed="false">৬ মাসের প্যাকেজ</button>
+    <button type="button" data-filter="12" aria-pressed="false">১ বছরের প্যাকেজ</button>
+  </nav>
+  <section class="package-list" id="package-cards" aria-label="Exam Packages">
+    @forelse($packages as $package)
+      @php
+        $unit = strtolower(trim((string)($package->duration_unit ?? '')));
+        $duration = (int) $package->duration;
+        $months = str_contains($unit, 'year') ? $duration * 12 : (str_contains($unit, 'week') ? 0 : (str_contains($unit, 'day') ? 0 : $duration));
+        $packageScopes = $scopes->get($package->id, collect());
+      @endphp
+      <article class="package-card" data-months="{{ $months }}">
+        <div class="package-main">
+          <span class="package-icon" aria-hidden="true"><i class="fas fa-book-open"></i></span>
+          <div class="package-info">
+            <h2>{{ $package->name }}</h2>
+            <span class="package-duration">মেয়াদ: {{ $package->duration }} {{ $package->duration_unit }}</span>
+            @if(filled($package->description))
+              <p class="package-description">{{ $package->description }}</p>
+            @endif
+            @if($packageScopes->isNotEmpty())
+              <div class="details collapsed" id="package-details-{{ $package->id }}">
+                <div class="scope"><b>অন্তর্ভুক্ত বিভাগ:</b>
+                  @foreach($packageScopes as $scope)
+                    <span>{{ $scope->category_name }}@if($scope->subcategory_name) → {{ $scope->subcategory_name }}@endif</span>@unless($loop->last), @endunless
+                  @endforeach
+                </div>
+              </div>
+              <button type="button" class="more" aria-expanded="false" aria-controls="package-details-{{ $package->id }}">See More</button>
+            @endif
+          </div>
+        </div>
+        <div class="package-side">
+          <div class="price">৳{{ number_format((float)$package->final_price, 2) }}</div>
+          @if($activeAccesses->has($package->id))
+            <div class="buy owned"><i class="fas fa-check-circle" aria-hidden="true"></i> প্যাকেজটি কিনেছেন</div>
+            <p class="owned-note">মেয়াদ: {{ \Carbon\Carbon::parse($activeAccesses->get($package->id)->ends_at)->format('d M Y, h:i A') }} পর্যন্ত।</p>
+          @else
+            <a class="buy" href="{{ route('student.exam-section.package.review', $package->id) }}">প্যাকেজ কিনুন →</a>
+          @endif
+        </div>
+      </article>
+    @empty
+      <div class="empty-filter">বর্তমানে কোনো Active Exam Package নেই।</div>
+    @endforelse
+  </section>
+  <div class="empty-filter" id="filter-empty" hidden>এই মেয়াদের কোনো প্যাকেজ বর্তমানে পাওয়া যায়নি।</div>
+  <p class="muted">Referral Balance দিয়ে পরিশোধ করলে সফল Transaction-এর সঙ্গে Package Access চালু হবে। SSLCommerz-এর ক্ষেত্রে Gateway Verification সফল হওয়ার পর Access চালু হবে।</p>
+  </div>
+</div>
+@endsection
+
+@section('scripts')
 <script>
 (function(){
- const root=document.getElementById('lebd-exam-package-catalog'); if(!root)return;
- const buttons=root.querySelectorAll('[data-filter]'), cards=root.querySelectorAll('.lebd-exam-package'), empty=root.querySelector('#lebd-exam-filter-empty');
- buttons.forEach(btn=>btn.addEventListener('click',()=>{
-  const filter=btn.getAttribute('data-filter');
-  buttons.forEach(b=>b.classList.toggle('active',b===btn));
-  let visible=0;
-  cards.forEach(card=>{const show=filter==='all'||card.getAttribute('data-months')===filter;card.hidden=!show;if(show)visible++;});
-  empty.hidden=visible!==0;
- }));
+  'use strict';
+  var cards=Array.prototype.slice.call(document.querySelectorAll('#package-cards .package-card'));
+  var empty=document.getElementById('filter-empty');
+  document.querySelectorAll('.lep-page [data-filter]').forEach(function(button){
+    button.addEventListener('click',function(){
+      var filter=button.getAttribute('data-filter'), count=0;
+      document.querySelectorAll('.lep-page [data-filter]').forEach(function(other){
+        var active=other===button;
+        other.classList.toggle('is-selected',active);
+        other.setAttribute('aria-pressed',active?'true':'false');
+      });
+      cards.forEach(function(card){
+        var visible=filter==='all'||card.getAttribute('data-months')===filter;
+        card.hidden=!visible;
+        if(visible)count++;
+      });
+      if(empty)empty.hidden=count!==0 || cards.length===0;
+    });
+  });
+  document.querySelectorAll('.lep-page .more').forEach(function(button){
+    button.addEventListener('click',function(){
+      var details=document.getElementById(button.getAttribute('aria-controls'));
+      if(!details)return;
+      var expanded=button.getAttribute('aria-expanded')==='true';
+      details.classList.toggle('collapsed',expanded);
+      button.setAttribute('aria-expanded',expanded?'false':'true');
+      button.textContent=expanded?'See More':'See Less';
+    });
+  });
 })();
 </script>
 @endsection

@@ -2,6 +2,19 @@
 use \App\Http\Controllers\SourceCtrl;
 $source = new SourceCtrl;
 $user = Auth::guard('student')->user();
+
+// Define today's exam data in the top-level view scope so it is always available
+// to the dashboard section, including when the service returns no exams.
+$lebdTodayExams = collect(\App\Services\StudentDashboardTodayExams::forStudent($user) ?? []);
+$lebdServerNow = \Carbon\Carbon::now('Asia/Dhaka')->getTimestamp() * 1000;
+
+// Calculate the same available referral balance used by StudentReferralController.
+// Define it in the top-level view scope so the dashboard card always receives it.
+$lebdPendingWithdraw = \App\Models\WithdrawRequest::query()
+    ->where('student_id', $user->id)
+    ->where('status', 'pending')
+    ->sum('amount');
+$lebdAvailableBalance = (float) ($user->referral_balance ?? 0) - (float) $lebdPendingWithdraw;
 @endphp
 @extends('student')
 @section('title', 'Dashboard')
@@ -126,6 +139,149 @@ $user = Auth::guard('student')->user();
 @section('content')
 {{-- Header is rendered once by resources/views/student.blade.php. --}}
 <div class="lebd-student-dashboard" id="lebd-student-dashboard">
+<?php if (isset($complaintReplyNotices) && $complaintReplyNotices->isNotEmpty()): ?>
+@php($replyNotice = $complaintReplyNotices->first())
+@php($replyAt = $replyNotice->replied_at ? \Carbon\Carbon::parse($replyNotice->replied_at) : null)
+<style>
+/* Complaint reply popup — enlarged to match the approved dashboard notice design */
+.lebd-complaint-modal-overlay{
+    position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;
+    padding:28px;background:rgba(8,18,43,.48);backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);overflow-y:auto;
+}
+.lebd-complaint-modal{
+    position:relative;width:min(100%,1040px);max-height:calc(100vh - 56px);overflow-y:auto;
+    padding:28px 30px 24px;border:1px solid rgba(255,255,255,.95);border-radius:26px;
+    background:#fff;box-shadow:0 28px 90px rgba(9,29,77,.30);color:#142e63;
+    animation:lebdComplaintPopupIn .24s ease-out;
+}
+@keyframes lebdComplaintPopupIn{
+    from{opacity:0;transform:translateY(14px) scale(.985)}
+    to{opacity:1;transform:translateY(0) scale(1)}
+}
+.lebd-complaint-modal .notice-close{
+    position:absolute;right:22px;top:20px;z-index:3;width:36px;height:36px;display:grid;place-items:center;
+    border:1px solid #d7e2f7;border-radius:50%;background:#fff;color:#536985;
+    font-size:23px;line-height:1;cursor:pointer;box-shadow:0 3px 12px rgba(20,65,120,.10);
+}
+.lebd-complaint-modal .notice-close:hover{background:#edf3ff;color:#1538c8}
+.lebd-complaint-modal .notice-hero{
+    position:relative;display:flex;align-items:center;gap:26px;min-height:154px;
+    padding:20px 74px 22px 4px;margin:-2px -2px 18px;border-bottom:2px solid #e7eafa;
+    background:linear-gradient(112deg,#fff 0%,#fff 66%,#f0efff 100%);overflow:hidden;
+}
+.lebd-complaint-modal .notice-hero:after{
+    content:'\f0e0';font-family:FontAwesome;position:absolute;right:54px;top:34px;
+    width:150px;height:95px;display:grid;place-items:center;color:#9c9fe7;font-size:72px;
+    opacity:.72;transform:rotate(-5deg);pointer-events:none;
+}
+.lebd-complaint-modal .notice-icon{
+    position:relative;z-index:1;width:100px;height:100px;display:grid;place-items:center;flex:0 0 100px;
+    border-radius:24px;background:linear-gradient(145deg,#eeebff,#e3e4ff);color:#3323d3;font-size:48px;
+}
+.lebd-complaint-modal .notice-icon:after{
+    content:'';position:absolute;right:8px;top:8px;width:17px;height:17px;border-radius:50%;
+    background:#ff3d52;border:3px solid #fff;
+}
+.lebd-complaint-modal .notice-hero-copy{position:relative;z-index:1;min-width:0}
+.lebd-complaint-modal .notice-badge{
+    display:inline-flex;align-items:center;padding:6px 13px;margin-bottom:8px;border-radius:10px;
+    background:linear-gradient(135deg,#6324df,#3814c9);color:#fff;font-size:14px;font-weight:800;
+    box-shadow:0 4px 10px rgba(69,35,196,.18);
+}
+.lebd-complaint-modal h3{margin:0;color:#102b70;font-size:30px;font-weight:900;line-height:1.35}
+.lebd-complaint-modal .notice-subtitle{margin:5px 0 0;color:#66738f;font-size:19px;font-weight:600}
+.lebd-complaint-modal .notice-subject{
+    display:flex;align-items:center;gap:20px;padding:18px 22px;margin-bottom:18px;border-radius:15px;
+    background:linear-gradient(100deg,#f3f4f7,#f8f9fb);color:#202b3e;font-size:20px;
+    line-height:1.65;overflow-wrap:anywhere;
+}
+.lebd-complaint-modal .notice-subject i{flex:0 0 auto;color:#65718a;font-size:24px}
+.lebd-complaint-modal .notice-subject strong{margin-right:8px;color:#1c2942;font-weight:900}
+.lebd-complaint-modal .notice-reply{
+    display:flex;align-items:flex-start;gap:22px;padding:20px 22px;margin-bottom:20px;
+    border-left:5px solid #10b8e7;border-radius:15px;background:linear-gradient(105deg,#e8faff,#e9f9ff);
+    color:#172c55;font-size:19px;line-height:1.8;white-space:pre-wrap;overflow-wrap:anywhere;
+}
+.lebd-complaint-modal .notice-admin-icon{
+    width:72px;height:72px;display:grid;place-items:center;flex:0 0 72px;border-radius:50%;
+    background:#d5f4ff;color:#1239b8;font-size:35px;
+}
+.lebd-complaint-modal .notice-reply-copy{min-width:0;flex:1}
+.lebd-complaint-modal .notice-reply strong{display:block;margin:0 0 3px;color:#152e88;font-size:20px;font-weight:900}
+.lebd-complaint-modal .notice-meta{
+    display:flex;align-items:center;gap:32px;flex-wrap:wrap;padding:4px 10px 20px;
+    border-bottom:2px solid #e7eafa;color:#4e5d7b;font-size:18px;font-weight:700;
+}
+.lebd-complaint-modal .notice-meta span{display:inline-flex;align-items:center;gap:12px}
+.lebd-complaint-modal .notice-meta i{color:#65718a;font-size:22px}
+.lebd-complaint-modal .notice-actions form{margin:0}
+.lebd-complaint-modal .notice-actions{display:flex;justify-content:flex-end;gap:14px;padding-top:20px}
+.lebd-complaint-modal .notice-action{
+    display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:58px;padding:12px 24px;
+    border:2px solid #2520d9;border-radius:15px;background:#fff;color:#211dcc;text-decoration:none;
+    font-size:19px;font-weight:800;transition:transform .16s,box-shadow .16s,background .16s;
+}
+.lebd-complaint-modal .notice-action:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(38,39,190,.16);text-decoration:none}
+.lebd-complaint-modal .notice-action.primary{background:linear-gradient(135deg,#2114d5,#3214bd);color:#fff;border-color:#2114d5}
+.lebd-complaint-modal .notice-action.mark-read{background:#fff;color:#211dcc}
+@media(max-width:700px){
+    .lebd-complaint-modal-overlay{padding:12px;align-items:center}
+    .lebd-complaint-modal{width:100%;padding:18px 16px 16px;border-radius:19px;max-height:calc(100vh - 24px)}
+    .lebd-complaint-modal .notice-close{right:12px;top:12px;width:32px;height:32px}
+    .lebd-complaint-modal .notice-hero{min-height:105px;gap:12px;padding:8px 38px 14px 0;margin-bottom:13px}
+    .lebd-complaint-modal .notice-hero:after{right:8px;top:25px;font-size:42px;width:65px;opacity:.35}
+    .lebd-complaint-modal .notice-icon{width:58px;height:58px;flex-basis:58px;border-radius:16px;font-size:27px}
+    .lebd-complaint-modal .notice-icon:after{width:13px;height:13px;right:4px;top:4px}
+    .lebd-complaint-modal .notice-badge{font-size:10px;padding:4px 9px;margin-bottom:4px}
+    .lebd-complaint-modal h3{font-size:17px;line-height:1.35}
+    .lebd-complaint-modal .notice-subtitle{font-size:12px}
+    .lebd-complaint-modal .notice-subject{gap:10px;padding:12px;font-size:13px;margin-bottom:12px}
+    .lebd-complaint-modal .notice-subject i{font-size:17px}
+    .lebd-complaint-modal .notice-reply{gap:11px;padding:13px 12px;font-size:13px;line-height:1.7;margin-bottom:13px}
+    .lebd-complaint-modal .notice-admin-icon{width:42px;height:42px;flex-basis:42px;font-size:21px}
+    .lebd-complaint-modal .notice-reply strong{font-size:14px}
+    .lebd-complaint-modal .notice-meta{gap:10px 18px;padding:2px 3px 14px;font-size:12px}
+    .lebd-complaint-modal .notice-meta span{gap:7px}
+    .lebd-complaint-modal .notice-meta i{font-size:15px}
+    .lebd-complaint-modal .notice-actions{display:grid;grid-template-columns:1fr;gap:9px;padding-top:13px}
+    .lebd-complaint-modal .notice-action{min-height:43px;padding:9px 12px;border-radius:11px;font-size:14px}
+}
+@media(prefers-reduced-motion:reduce){.lebd-complaint-modal{animation:none}.lebd-complaint-modal .notice-action{transition:none}}
+</style>
+<div class="lebd-complaint-modal-overlay" role="presentation">
+  <section class="lebd-complaint-modal" role="dialog" aria-modal="true" aria-labelledby="lebd-complaint-modal-title">
+    <form method="POST" action="{{ route('students.complain.reply-notice.dismiss', $replyNotice->id) }}">
+      @csrf
+      <button class="notice-close" type="submit" aria-label="নোটিশ বন্ধ করুন" title="বন্ধ করুন">&times;</button>
+    </form>
+    <div class="notice-hero">
+      <div class="notice-icon"><i class="fa fa-bell" aria-hidden="true"></i></div>
+      <div class="notice-hero-copy">
+        <span class="notice-badge">নতুন নোটিশ</span>
+        <h3 id="lebd-complaint-modal-title">আপনার অভিযোগের উত্তর এসেছে</h3>
+        <p class="notice-subtitle"><i class="fa fa-commenting-o" aria-hidden="true"></i> &nbsp; অভিযোগ ও পরামর্শ মডিউল</p>
+      </div>
+    </div>
+    <div class="notice-subject"><i class="fa fa-file-text-o" aria-hidden="true"></i><div><strong>অভিযোগের বিষয়:</strong> {{ \Illuminate\Support\Str::limit(strip_tags($replyNotice->details), 180) }}</div></div>
+    <div class="notice-reply">
+      <div class="notice-admin-icon"><i class="fa fa-user" aria-hidden="true"></i></div>
+      <div class="notice-reply-copy"><strong>এডমিনের উত্তর:</strong>{{ $replyNotice->reply_message }}</div>
+    </div>
+    <div class="notice-meta">
+      <span><i class="fa fa-calendar" aria-hidden="true"></i> তারিখ: {{ $replyAt ? $replyAt->locale('bn')->translatedFormat('d F Y') : '' }}</span>
+      <span><i class="fa fa-clock-o" aria-hidden="true"></i> সময়: {{ $replyAt ? $replyAt->locale('bn')->translatedFormat('h:i A') : '' }}</span>
+    </div>
+    <div class="notice-actions">
+      <a class="notice-action primary" href="{{ url('/students/complain') }}"><i class="fa fa-external-link" aria-hidden="true"></i> বিস্তারিত দেখুন</a>
+      <form method="POST" action="{{ route('students.complain.reply-notice.dismiss', $replyNotice->id) }}">
+        @csrf
+        <button class="notice-action mark-read" type="submit"><i class="fa fa-check" aria-hidden="true"></i> মার্ক অ্যাজ রিড</button>
+      </form>
+    </div>
+  </section>
+</div>
+<?php endif; ?>
 <!-- ================= STUDENT PROFILE CARD ================= -->
 <section class="student-dashboard">
 <div class="container">
@@ -157,16 +313,6 @@ $user = Auth::guard('student')->user();
             <h4>
                 Available Balance
             </h4>
-            @php
-                // Match StudentReferralController::index() exactly:
-                // Available Balance = student's wallet balance - pending withdrawal requests.
-                // This is not gross referral earnings and must not include pending withdrawals.
-                $lebdPendingWithdraw = \App\Models\WithdrawRequest::query()
-                    ->where('student_id', $user->id)
-                    ->where('status', 'pending')
-                    ->sum('amount');
-                $lebdAvailableBalance = (float) ($user->referral_balance ?? 0) - (float) $lebdPendingWithdraw;
-            @endphp
             <h2>৳ {{ number_format($lebdAvailableBalance, 2) }}</h2>
             <span class="withdraw-btn">
                 Withdraw →
@@ -931,7 +1077,7 @@ font-size:22px;
 margin:5px 0 0;
 font-size:14px;
 }
-.referral-right{
+.referral-right{.referral-right{
 text-align:center;
 background:white;
 padding:15px 30px;
@@ -1330,7 +1476,7 @@ font-size:10px;
 <span>My Batch</span>
 <small></small>
 </div>
-<!-- </a>
+</a>
 <a href="{{route('category.result.option')}}" class="quick-card">
 <div class="quick-icon">
 <i class="fa fa-chart-line"></i>
@@ -1338,8 +1484,8 @@ font-size:10px;
 <div class="quick-text">
 <span>Exam Results</span>
 <small></small>
-</div> -->
-<!-- </a>
+</div>
+</a>
 <a href="{{route('category.batches',['Exam PDF','Dashboard'])}}" class="quick-card">
 <div class="quick-icon">
 <i class="fa fa-file-pdf"></i>
@@ -1347,7 +1493,7 @@ font-size:10px;
 <div class="quick-text">
 <span>Exam PDF</span>
 <small></small>
-</div> -->
+</div>
 </a>
 <a href="{{ route('students.premium.video.classes') }}" class="quick-card">
 <div class="quick-icon">
@@ -1384,7 +1530,7 @@ font-size:10px;
 <span>E-Book</span>
 <small></small>
 </div>
-<!-- </a>
+</a>
 <a href="#" class="quick-card">
 <div class="quick-icon">
 <i class="fa fa-pen-to-square"></i>
@@ -1392,7 +1538,7 @@ font-size:10px;
 <div class="quick-text">
 <span>Free Exam</span>
 <small></small>
-</div> -->
+</div>
 </a>
 </div>
 </div>
@@ -1463,17 +1609,6 @@ font-size:10px;
 }
 </style>
 <!-- ================= HOMEPAGE-MATCHED LIVE CIRCULAR SLIDER ================= -->
-@php
-    // Same live source/filter/order as the homepage Circular slider.
-    $lebdCircularToday = \Carbon\Carbon::today('Asia/Dhaka')->toDateString();
-    $lebdSliderCirculars = \App\Models\Circular::query()
-        ->whereIn('status', ['Active', 'Published'])
-        ->whereNotNull('start_at')->whereNotNull('end_at')
-        ->whereDate('start_at', '<=', $lebdCircularToday)
-        ->whereDate('end_at', '>=', $lebdCircularToday)
-        ->orderByDesc('updated_at')->orderByDesc('id')
-        ->limit(10)->get();
-@endphp
 <section class="container mt-4 lebd-section-panel lebd-job-panel lebd-dash-job-v61" id="lebd-dash-circulars">
     <div class="job-slider-section">
         <div class="job-slider-title"><div></div><h2><span></span> নিয়োগ বিজ্ঞপ্তি স্লাইডার</h2><div></div></div>
@@ -1481,31 +1616,42 @@ font-size:10px;
         <div class="job-slider-container">
             <button class="job-slider-arrow job-prev" type="button" aria-label="আগের বিজ্ঞপ্তি" data-circular-step="-1"><i class="fas fa-chevron-left"></i></button>
             <div class="job-slider-track" id="lebdDashCircularTrack">
-                @forelse($lebdSliderCirculars as $lebdCircular)
-                <a href="{{ route('home.circular.show', $lebdCircular->id) }}" class="job-slider-card lebd-circular-card {{ ['slider-pink','slider-blue','slider-green','slider-orange','slider-purple','slider-yellow'][$loop->index % 6] }}">
-                    @php
-                        // Circular image is the Admin-uploaded image field (single path or JSON image list).
-                        $lebdImages = json_decode($lebdCircular->image ?? '', true);
-                        $lebdImage = is_array($lebdImages) ? ($lebdImages[0] ?? null) : $lebdCircular->image;
-                        $lebdImageUrl = $lebdImage ? (preg_match('~^https?://~i', $lebdImage) ? $lebdImage : asset(ltrim($lebdImage, '/'))) : null;
-                    @endphp
+                <?php
+                    $lebdCircularCollection = $lebdSliderCirculars ?? collect();
+                    if ($lebdCircularCollection instanceof \Illuminate\Support\Collection) {
+                        $lebdCircularCollection = $lebdCircularCollection->values();
+                    }
+                    if (count($lebdCircularCollection)):
+                        foreach ($lebdCircularCollection as $lebdCircularIndex => $lebdCircular):
+                            // Circular image is the Admin-uploaded image field (single path or JSON image list).
+                            $lebdImages = json_decode($lebdCircular->image ?? '', true);
+                            $lebdImage = is_array($lebdImages) ? ($lebdImages[0] ?? null) : $lebdCircular->image;
+                            $lebdImageUrl = $lebdImage ? (preg_match('~^https?://~i', $lebdImage) ? $lebdImage : asset(ltrim($lebdImage, '/'))) : null;
+                            $lebdSliderClasses = ['slider-pink','slider-blue','slider-green','slider-orange','slider-purple','slider-yellow'];
+                ?>
+                <a href="{{ route('home.circular.show', $lebdCircular->id) }}" class="job-slider-card lebd-circular-card {{ $lebdSliderClasses[$lebdCircularIndex % 6] }}">
                     <div class="lebd-circular-media">
-                        @if($lebdImageUrl)
+                        <?php if ($lebdImageUrl): ?>
                             <img src="{{ $lebdImageUrl }}" alt="{{ $lebdCircular->title }}" loading="lazy" onerror="this.hidden=true;this.nextElementSibling.hidden=false;" />
                             <span class="lebd-circular-placeholder" hidden aria-hidden="true"><i class="fas fa-briefcase"></i></span>
-                        @else
+                        <?php else: ?>
                             <span class="lebd-circular-placeholder" aria-hidden="true"><i class="fas fa-briefcase"></i></span>
-                        @endif
+                        <?php endif; ?>
                     </div>
                     <div class="lebd-circular-card-content">
                         <h3>{{ $lebdCircular->title }}</h3>
                         <p><i class="far fa-calendar-alt"></i> শেষ: {{ \Carbon\Carbon::parse($lebdCircular->end_at)->format('d/m/Y') }}</p>
-                        @if($lebdCircular->position)<p><i class="far fa-file-alt"></i> {{ $lebdCircular->position }}</p>@endif
+                        <?php if ($lebdCircular->position): ?>
+                            <p><i class="far fa-file-alt"></i> {{ $lebdCircular->position }}</p>
+                        <?php endif; ?>
                     </div>
                 </a>
-                @empty
+                <?php
+                        endforeach;
+                    else:
+                ?>
                     <div class="lebd-dash-circular-empty">এই মুহূর্তে আবেদন চলমান কোনো নিয়োগ বিজ্ঞপ্তি নেই।</div>
-                @endforelse
+                <?php endif; ?>
             </div>
             <button class="job-slider-arrow job-next" type="button" aria-label="পরের বিজ্ঞপ্তি" data-circular-step="1"><i class="fas fa-chevron-right"></i></button>
         </div>
@@ -1513,11 +1659,6 @@ font-size:10px;
     </div>
 </section>
 <!-- ================= TODAY'S LIVE / UPCOMING EXAMS ================= -->
-@php
-    // Published routine & assigned papers; access verified in the service.
-    $lebdTodayExams = \App\Services\StudentDashboardTodayExams::forStudent($user);
-    $lebdServerNow = \Carbon\Carbon::now('Asia/Dhaka')->getTimestamp() * 1000;
-@endphp
 <section class="container mt-4 lebd-section-panel lebd-daily-panel" id="lebd-today-exams">
     <div class="lebd-section-head">
         <span class="lebd-head-icon"><i class="fa fa-calendar-check"></i></span>
@@ -1527,9 +1668,9 @@ font-size:10px;
         </div>
         <span class="lebd-head-tag">TODAY</span>
     </div>
-    @if(count($lebdTodayExams))
+    @if(isset($lebdTodayExams) && $lebdTodayExams instanceof \Illuminate\Support\Collection && $lebdTodayExams->isNotEmpty())
     <div class="lebd-daily-grid" data-server-now="{{ $lebdServerNow }}">
-        @foreach($lebdTodayExams as $lebdExam)
+        <?php foreach ($lebdTodayExams as $lebdExam): ?>
         <article class="lebd-daily-card"
             data-start="{{ $lebdExam['start_ms'] }}"
             data-end="{{ $lebdExam['end_ms'] ?? '' }}"
@@ -1564,7 +1705,7 @@ font-size:10px;
                 @endif
             </div>
         </article>
-        @endforeach
+        <?php endforeach; ?>
     </div>
     @else
         <div class="lebd-daily-empty">

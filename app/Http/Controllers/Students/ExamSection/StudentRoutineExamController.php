@@ -142,20 +142,23 @@ class StudentRoutineExamController extends Controller
         $close = Carbon::parse($lastEnd, 'Asia/Dhaka');
         return $now->lt($close) ? $close : null;
     }
-    private function admission(object $row, array $settings, int $studentId): void
+    private function admission(object $row, array $settings, int $studentId): ?\Illuminate\Http\RedirectResponse
     {
         $now = now('Asia/Dhaka');
         abort_unless($row->exam_start_at && $row->exam_end_at, 403, 'Exam schedule is not available.');
         abort_unless($this->examWindowEnd($row, $now) !== null, 403, 'This exam is not available at this time.');
         // Payment integration is not implemented. Do not allow paid papers to be taken free.
-        $paid = ($settings['paid_exam'] ?? 'paid') === 'paid' || filter_var($settings['paid_exam'] ?? false, FILTER_VALIDATE_BOOLEAN);
-        abort_if($paid && !ExamSectionMonthlyAccess::premium($studentId, (int)$row->category_id, $row->subcategory_id ? (int)$row->subcategory_id : null), 403, 'This paper requires an active verified premium package.');
+        $paid = ($settings['paid_exam'] ?? 'free') === 'paid' || filter_var($settings['paid_exam'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        if ($paid && !ExamSectionMonthlyAccess::premium($studentId, (int)$row->category_id, $row->subcategory_id ? (int)$row->subcategory_id : null)) {
+            return redirect()->route('student.exam-section.packages', ['notice' => 'paid']);
+        }
         // If an exam explicitly requires enrollment, honor the manual enrollment scope.
         if (filter_var($settings['require_enrollment'] ?? false, FILTER_VALIDATE_BOOLEAN)) {
             abort_unless(DB::table('lebd_exam_section_student_enrollments')
                 ->where('student_id', $studentId)->where('category_id', $row->category_id)
                 ->where('subcategory_id', $row->subcategory_id)->exists(), 403, 'You are not enrolled in this exam.');
         }
+        return null;
     }
     public function show(Request $request, int $item)
     {
@@ -165,7 +168,8 @@ class StudentRoutineExamController extends Controller
         $existing = DB::table('lebd_exam_section_student_attempts')
             ->where('routine_item_id', $item)->where('student_id', $student->id)->first();
         if ($existing && $existing->status === 'submitted') return redirect()->route('student.exam-section.take.result', ['item'=>$item]);
-        $this->admission($row, $settings, (int)$student->id);
+        $admissionRedirect = $this->admission($row, $settings, (int)$student->id);
+        if ($admissionRedirect) return $admissionRedirect;
         $ids = $this->questionIds($row, $settings);
         if (!$ids) return view('student.exam-section.take-unavailable', ['message'=>'এই পরীক্ষার প্রশ্ন এখনো তৈরি করা হয়নি।']);
         $minutes = max(1, min(600, (int)($settings['exam_minutes'] ?? $settings['running_minutes'] ?? $settings['exam_running_time'] ?? 40)));

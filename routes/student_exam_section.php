@@ -2,19 +2,41 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Students\ExamSection\StudentExamCategoryController;
 
+// Student-only Wrong & Unanswered review, scoped to the currently opened Category / Sub-category.
+Route::middleware('auth:student')->group(function () {
+    Route::get('/lebd-exam-wrong-unanswered/{category}', [\App\Http\Controllers\Students\ExamSection\StudentWrongUnansweredController::class, 'index'])
+        ->whereNumber('category')->name('student.exam-section.wrong-unanswered');
+    Route::get('/lebd-exam-wrong-unanswered/{category}/exam/{item}', [\App\Http\Controllers\Students\ExamSection\StudentWrongUnansweredController::class, 'show'])
+        ->whereNumber('category')->whereNumber('item')->name('student.exam-section.wrong-unanswered.show');
+});
+
+// Student-only Merit List, ranked from published/submitted Exam Section results.
+Route::middleware('auth:student')->get('/lebd-exam-merit-list/{category}/{item?}', [\App\Http\Controllers\Students\ExamSection\StudentMeritListController::class, 'index'])
+    ->whereNumber('category')->whereNumber('item')->name('student.exam-section.merit-list');
+
+// Student-only Exam Mark Progress report (read-only; uses submitted Exam Section attempts).
+Route::middleware('auth:student')->get('/lebd-exam-mark-progress', [\App\Http\Controllers\Students\ExamSection\ExamMarkProgressController::class, 'index'])
+    ->name('student.exam-section.mark-progress');
+
 // Explicit non-overlapping browser paths; avoid old /student/{id} route and query routing.
 Route::get('/lebd-exam-browse/category/{category}', [StudentExamCategoryController::class, 'category'])
     ->whereNumber('category')->name('student.exam-section.browse-category');
 Route::get('/lebd-exam-browse/category/{category}/exams', [StudentExamCategoryController::class, 'exams'])
     ->whereNumber('category')->name('student.exam-section.browse-exams');
-// Exam PDF: one generated question paper per scheduled Routine exam.
-Route::get('/lebd-exam-browse/category/{category}/exam-pdf', [\App\Http\Controllers\Students\ExamSection\ExamPdfController::class, 'index'])
-    ->whereNumber('category')->name('student.exam-section.exam-pdf');
+
+// Shared Routine Exam PDF: the first student creates one file; all students view/download that same file.
+Route::get('/browse/category/{category}/exam-pdf', [\App\Http\Controllers\Students\ExamSection\StudentExamPdfController::class, 'index'])
+    ->whereNumber('category')->name('student.exam-section.exam-pdfs');
+Route::middleware('auth')->post('/browse/category/{category}/exam-pdf/{item}/reset', [\App\Http\Controllers\Students\ExamSection\StudentExamPdfController::class, 'resetSharedPdf'])
+    ->whereNumber('category')->whereNumber('item')->name('student.exam-section.exam-pdf.reset');
+
 Route::middleware('auth:student')->group(function () {
-    Route::get('/lebd-exam-pdf/{item}/view', [\App\Http\Controllers\Students\ExamSection\ExamPdfController::class, 'view'])
-        ->whereNumber('item')->name('student.exam-section.exam-pdf.view');
-    Route::get('/lebd-exam-pdf/{item}/download', [\App\Http\Controllers\Students\ExamSection\ExamPdfController::class, 'download'])
-        ->whereNumber('item')->name('student.exam-section.exam-pdf.download');
+    Route::post('/browse/category/{category}/exam-pdf/{item}/create', [\App\Http\Controllers\Students\ExamSection\StudentExamPdfController::class, 'build'])
+        ->whereNumber('category')->whereNumber('item')->name('student.exam-section.exam-pdf.build');
+    Route::get('/browse/category/{category}/exam-pdf/{item}/view', [\App\Http\Controllers\Students\ExamSection\StudentExamPdfController::class, 'view'])
+        ->whereNumber('category')->whereNumber('item')->name('student.exam-section.exam-pdf.view');
+    Route::get('/browse/category/{category}/exam-pdf/{item}/download', [\App\Http\Controllers\Students\ExamSection\StudentExamPdfController::class, 'download'])
+        ->whereNumber('category')->whereNumber('item')->name('student.exam-section.exam-pdf.download');
 });
 Route::prefix('lebd-student-exams')->name('student.exam-section.')->group(function () {
     Route::get('/', [StudentExamCategoryController::class, 'categories'])->name('categories');
@@ -60,3 +82,17 @@ Route::post('/lebd-exam-payment/cancel', [\App\Http\Controllers\Students\ExamSec
     ->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class)->name('student.exam-section.payment.cancel');
 Route::post('/lebd-exam-payment/ipn', [\App\Http\Controllers\Students\ExamSection\ExamSectionCheckoutController::class,'ipn'])
     ->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class)->name('student.exam-section.payment.ipn');
+
+// Practice quizzes built only from this student's wrong / unanswered questions in the active scope.
+Route::middleware('auth:student')->group(function () {
+    Route::get('/lebd-exam-wrong-unanswered/{category}/make-quiz', [\App\Http\Controllers\Students\ExamSection\StudentWrongUnansweredQuizController::class, 'setup'])
+        ->whereNumber('category')->name('student.exam-section.wrong-unanswered.quiz.setup');
+    Route::post('/lebd-exam-wrong-unanswered/{category}/make-quiz', [\App\Http\Controllers\Students\ExamSection\StudentWrongUnansweredQuizController::class, 'start'])
+        ->whereNumber('category')->name('student.exam-section.wrong-unanswered.quiz.start');
+    Route::get('/lebd-exam-wrong-unanswered/{category}/make-quiz/{quiz}', [\App\Http\Controllers\Students\ExamSection\StudentWrongUnansweredQuizController::class, 'take'])
+        ->whereNumber('category')->whereNumber('quiz')->name('student.exam-section.wrong-unanswered.quiz.take');
+    Route::post('/lebd-exam-wrong-unanswered/{category}/make-quiz/{quiz}', [\App\Http\Controllers\Students\ExamSection\StudentWrongUnansweredQuizController::class, 'submit'])
+        ->whereNumber('category')->whereNumber('quiz')->name('student.exam-section.wrong-unanswered.quiz.submit');
+    Route::get('/lebd-exam-wrong-unanswered/{category}/make-quiz/{quiz}/result', [\App\Http\Controllers\Students\ExamSection\StudentWrongUnansweredQuizController::class, 'result'])
+        ->whereNumber('category')->whereNumber('quiz')->name('student.exam-section.wrong-unanswered.quiz.result');
+});

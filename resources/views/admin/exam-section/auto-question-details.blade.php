@@ -5,6 +5,7 @@
 </style>
 <div class="ex182"><h2>Full Question Paper View — {{ $exam }}</h2>
 <a class="btn" href="{{ route('admin.exam-section.auto-question.exams',['category'=>$cat->id]+($sub?['subcategory_id'=>$sub->id]:[])) }}">← Exam List</a>
+<a class="btn" target="_blank" rel="noopener" href="{{ route('admin.exam-section.auto-question.paper-pdf',['category'=>$cat->id,'routine'=>$r->id,'exam'=>$exam]) }}">▣ Print / Exam PDF</a>
 <div class="panel"><b>Category:</b> {{ $cat->name }} @if($sub) / {{ $sub->name }} @endif &nbsp; <b>Routine:</b> {{ $r->name }} &nbsp; <b>Exam:</b> {{ $exam }} &nbsp; <b>Total:</b> {{ $links->count() }}<p class="meta">Read-only. Opening this page does not regenerate MCQs. Each original Question ID appears once in this Exam.</p></div>
 <div class="panel">
 @forelse($links as $link)

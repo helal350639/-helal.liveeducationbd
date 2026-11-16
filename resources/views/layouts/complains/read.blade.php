@@ -45,6 +45,10 @@ $value = $complain;
                     <td>{{$value->department ? $value->department->name : ''}}</td>
                   </tr>
                   <tr>
+                    <th>Complaint Source:</th>
+                    <td>{{ $value->source_path ?: '—' }}</td>
+                  </tr>
+                  <tr>
                     <th>Details:</th>
                     <td>{!! $value->details !!}</td>
                   </tr>
