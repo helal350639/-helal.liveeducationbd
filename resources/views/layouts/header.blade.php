@@ -145,6 +145,32 @@ if($complains)
                 </li>
             </ul>
         </li>
+        {{-- LEBD Live Chat: direct Admin Inbox shortcut with unread conversation badge. --}}
+        @php
+            $lebdLiveChatUnread = 0;
+            try {
+                if (\Illuminate\Support\Facades\Schema::hasTable('lebd_live_chat_messages')) {
+                    $lebdLiveChatUnread = \Illuminate\Support\Facades\DB::table('lebd_live_chat_messages')
+                        ->where('sender', 'visitor')
+                        ->whereNull('read_by_admin_at')
+                        ->distinct('conversation_id')
+                        ->count('conversation_id');
+                }
+            } catch (\Throwable $e) {
+                $lebdLiveChatUnread = 0;
+            }
+        @endphp
+        <li class="{{ request()->routeIs('admin.live-chat.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.live-chat.index') }}" title="Open Live Chat Inbox">
+                <i class="fa fa-comments-o"></i>
+                <span>Live Chat</span>
+                @if($lebdLiveChatUnread > 0)
+                    <span class="pull-right-container">
+                        <small class="label pull-right bg-red">{{ $lebdLiveChatUnread > 99 ? '99+' : $lebdLiveChatUnread }}</small>
+                    </span>
+                @endif
+            </a>
+        </li>
         {{-- LEBD-05 Admin Balance module: isolated parent menu with three child pages --}}
         @php
             $adminBalanceMenuActive = request()->routeIs('admin.balance.*');
@@ -656,7 +682,7 @@ if($complains)
     </ul>
 </li>
 <!-- Homepage Settings -->
-        @php $homeSettingsActive = request()->routeIs('admin.home-success.*'); @endphp
+        @php $homeSettingsActive = request()->routeIs('admin.home-success.*', 'settings.hero-banner*', 'settings.social-section*'); @endphp
         <li class="treeview {{ $homeSettingsActive ? 'active menu-open' : '' }}">
           <a href="#">
             <i class="fa fa-gear"></i> <span>Homepage Settings</span>
@@ -666,6 +692,12 @@ if($complains)
           </a>
           <ul class="treeview-menu" style="{{ $homeSettingsActive ? 'display:block;' : '' }}">
             <li>
+              <a href="{{ route('settings.hero-banner') }}"><i class="fa fa-picture-o"></i> Hero Banner</a>
+            </li>
+            <li class="{{ request()->routeIs('settings.social-section*') ? 'active' : '' }}">
+              <a href="{{ route('settings.social-section') }}"><i class="fa fa-share-alt"></i> Social Links & App Preview</a>
+            </li>
+<li>
               <a href="{{route('ad.index')}}"><i class="fa fa-copy"></i> Ads</a>
             </li>
             <li>
@@ -726,6 +758,7 @@ if($complains)
           var order = [
               'Dashboard',
               'Admin Balance',
+              'Live Chat',
               'Orders',
               'Batches',
               'Exam Section Dashboard',

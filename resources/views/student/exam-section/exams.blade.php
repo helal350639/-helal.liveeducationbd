@@ -870,7 +870,7 @@ body:has(.lebd-exam-scope) #footer { display:none !important; }
 @php $menu = [['Routine','▦',null],['Result','▣',null],['All Exam Paper','▤','#exam-list'],['Missing Exam List','▧',null],['Exam PDF','▤',null],['Merit List','✪',null],['Wrong & Unanswered','⊗',null],['Complain','☏',null]]; @endphp
 @foreach($menu as [$name,$symbol,$link])
 @if($name === 'Routine')
-<a class="se26-menu-item" href="{{ route('student.exam-section.browse-exams', ['category'=>$cat->id, 'subcategory_id'=>$sub?->id, 'routine'=>1]) }}"><span>{{ $symbol }}</span><span class="se26-menu-title">{{ $name }}</span></a>
+<a class="se26-menu-item" href="{{ route('student.exam-section.browse-routine', ['category'=>$cat->id, 'subcategory_id'=>$sub?->id]) }}"><span>{{ $symbol }}</span><span class="se26-menu-title">{{ $name }}</span></a>
 @elseif($name === 'Result')
 <a class="se26-menu-item" href="{{ route('student.exam-section.browse-exams', ['category'=>$cat->id, 'subcategory_id'=>$sub?->id, 'paper'=>'result']) }}"><span>{{ $symbol }}</span><span class="se26-menu-title">{{ $name }}</span></a>
 @elseif($name === 'All Exam Paper')

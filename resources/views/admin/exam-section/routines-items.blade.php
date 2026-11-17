@@ -67,12 +67,12 @@
 <div class="nav"><div class="nav-label">◉ Routine Navigation</div><div class="bar">
 <a class="btn gray" href="{{route('admin.exam-section.routine.list',['category'=>$routine->category_id,'subcategory_id'=>$routine->subcategory_id])}}">☷ Routine List</a>
 <a class="btn gray" href="{{route('admin.exam-section.routine')}}">⊕ New Routine</a>
-<a class="btn gray" href="{{route('admin.exam-section.routine.edit',$routine->id)}}">✎ Edit Routine</a>
+<a class="btn gray" href="{{route('admin.exam-section.routine.edit',$routine->id)}}">✎ Add Exam No</a>
 <a class="btn green" href="#ex165-table">▤ Show Routine Items</a>
 <button type="button" class="gray" data-type="exam">▦ Select Exam Type</button>
-<button type="button" data-type="exam">＋ Add Exam</button>
-<button type="button" data-type="revision" class="orange">↻ Add Revision</button>
-<button type="button" data-type="model" class="cyan">▤ Add Model</button>
+<button type="button" data-type="exam">＋ Add New Exam Topic</button>
+<button type="button" data-type="revision" class="orange">↻ Add Revision Exam Topic</button>
+<button type="button" data-type="model" class="cyan">▤ Add Model Exam Topic</button>
 <a class="btn gray" href="#ex165-table">◈ Revision / Model List</a>
 </div></div>
 @if(session('success'))<div class="notice">{{session('success')}}</div>@endif

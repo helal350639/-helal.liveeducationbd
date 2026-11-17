@@ -1,0 +1,133 @@
+/*
+ * LEBD v79 — Shared site layout normalization.
+ * Keeps the common header in normal document flow and makes the footer
+ * visually consistent with the centered page content on homepage/student pages.
+ */
+html body #Header {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  width: 100% !important;
+  height: auto !important;
+  transform: none !important;
+  z-index: 1050 !important;
+}
+html body #Header > .navbar {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  width: 100% !important;
+}
+html body #Header + main,
+html body main {
+  margin-top: 0 !important;
+  scroll-margin-top: 10px;
+}
+html body #Footer {
+  display: block;
+  width: calc(100% - 32px) !important;
+  max-width: 1100px !important;
+  margin: 26px auto 18px !important;
+  padding-top: 24px !important;
+  border-radius: 16px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+html body #Footer > .container {
+  width: 100% !important;
+  max-width: 1060px !important;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+  box-sizing: border-box;
+}
+html body #Footer .footer-logo-content .footer-logo .footer-logo-image img {
+  width: 145px !important;
+  max-width: 100%;
+  height: auto;
+}
+html body #Footer .footer-logo-content .footer-logo-text p {
+  font-size: 13px !important;
+  line-height: 1.6 !important;
+  margin-top: 14px !important;
+}
+html body #Footer .footer-logo-content .footer-social-media-area .social-media-icon {
+  gap: 12px !important;
+  padding-top: 10px !important;
+}
+html body #Footer .footer-logo-content .footer-social-media-area .social-media-icon a {
+  width: 40px !important;
+  height: 40px !important;
+  font-size: 19px !important;
+}
+html body #Footer .footer-others-div h3 {
+  font-size: 18px !important;
+  margin-bottom: 16px !important;
+}
+html body #Footer .footer-others-div ul li a {
+  font-size: 13px !important;
+  line-height: 1.45 !important;
+  margin-bottom: 9px !important;
+}
+html body #Footer .footer-others-div ul li i {
+  font-size: 16px !important;
+  margin-right: 6px !important;
+}
+html body #Footer .footer-others-div .official-info ul li {
+  margin-bottom: 8px !important;
+}
+html body #Footer > .container > .col-sm-12 img {
+  display: block;
+  width: 100% !important;
+  max-height: 48px !important;
+  object-fit: contain;
+  object-position: left center;
+}
+html body #Footer .copy-right-section {
+  padding: 10px 0 !important;
+}
+html body #Footer .copy-right-section p {
+  font-size: 12px !important;
+  line-height: 1.5;
+}
+@media (max-width: 767.98px) {
+  html body #Header > .navbar {
+    min-height: 0;
+  }
+  html body #Footer {
+    width: calc(100% - 16px) !important;
+    margin: 18px auto 10px !important;
+    padding-top: 18px !important;
+    border-radius: 12px;
+  }
+  html body #Footer > .container {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+  html body #Footer .footer-logo-content .footer-logo .footer-logo-image img {
+    width: 128px !important;
+  }
+  html body #Footer .footer-logo-content .footer-logo-text p {
+    font-size: 12px !important;
+    line-height: 1.55 !important;
+    margin-top: 10px !important;
+  }
+  html body #Footer .footer-logo-content .footer-social-media-area .social-media-icon a {
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 17px !important;
+  }
+  html body #Footer .footer-others-div h3 {
+    font-size: 16px !important;
+    margin-bottom: 11px !important;
+  }
+  html body #Footer .footer-others-div ul li a {
+    font-size: 12px !important;
+    margin-bottom: 7px !important;
+  }
+  html body #Footer > .container > .col-sm-12 img {
+    max-height: 38px !important;
+  }
+}

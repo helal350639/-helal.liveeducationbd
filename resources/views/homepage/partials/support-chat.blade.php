@@ -16,13 +16,30 @@
       <a class="lebd-help-option lebd-help-messenger" href="https://m.me/saeonlineexamgroup" target="_blank" rel="noopener noreferrer">
         <span class="lebd-help-option-icon"><i class="fa-brands fa-facebook-messenger" aria-hidden="true"></i></span><span class="lebd-help-option-copy"><strong>Messenger-এ কথা বলুন</strong><small>Live Education BD Facebook</small></span><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
       </a>
-      {{-- Future internal Admin live chat: presentation only; no backend or WebSocket connected. --}}
-      <button type="button" class="lebd-help-option lebd-help-live lebd-help-live-disabled" disabled aria-disabled="true" title="লাইভ চ্যাট শীঘ্রই চালু হবে">
+      <button type="button" class="lebd-help-option lebd-help-live" id="lebdLiveChatOpen" aria-expanded="false" aria-controls="lebdLiveChatRoom">
         <span class="lebd-help-option-icon"><i class="fa-solid fa-headset" aria-hidden="true"></i></span>
-        <span class="lebd-help-option-copy"><strong>লাইভ চ্যাটে কথা বলুন</strong><small>অ্যাডমিন সাপোর্ট · শীঘ্রই আসছে</small></span>
-        <span class="lebd-help-soon">শীঘ্রই</span>
+        <span class="lebd-help-option-copy"><strong>লাইভ চ্যাটে কথা বলুন</strong><small>অ্যাডমিন সাপোর্ট · এখানে মেসেজ পাঠান</small></span>
+        <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
       </button>
-      <p class="lebd-help-note"><i class="fa-solid fa-circle-info" aria-hidden="true"></i> WhatsApp ও Messenger এখনই ব্যবহার করতে পারবেন। লাইভ চ্যাটটি পরবর্তীতে Admin Panel-এর সঙ্গে যুক্ত হবে।</p>
+      {{-- View is organized under live-chat/visitor. Inline fallback keeps Homepage alive if only a partial deployment was copied. --}}
+      @if(\Illuminate\Support\Facades\View::exists('live-chat.visitor.chat-room'))
+        @include('live-chat.visitor.chat-room')
+      @else
+{{-- Live Chat: visitor message room, embedded in existing support widget. --}}
+      <div id="lebdLiveChatRoom" class="lebd-live-room" hidden data-list-url="{{ route('lebd.chat.messages') }}" data-send-url="{{ route('lebd.chat.send') }}">
+        <div class="lebd-live-room-heading"><strong>Live Chat</strong><button type="button" id="lebdLiveChatBack">← Back</button></div>
+        <div class="lebd-live-messages" id="lebdLiveMessages" role="log" aria-live="polite"><p class="lebd-live-welcome">স্বাগতম! আপনার প্রশ্ন লিখুন। আমাদের অ্যাডমিন উত্তর দেবেন।</p></div>
+        <form id="lebdLiveForm" class="lebd-live-form">
+          @csrf
+          <label class="sr-only" for="lebdLiveInput">আপনার মেসেজ</label>
+          <textarea id="lebdLiveInput" name="message" maxlength="2000" rows="2" placeholder="আপনার মেসেজ লিখুন..." required></textarea>
+          <button type="submit" id="lebdLiveSend"><i class="fa-solid fa-paper-plane"></i> Send</button>
+        </form>
+        <div class="lebd-live-error" id="lebdLiveError" role="status"></div>
+      </div>
+
+      @endif
+      <p class="lebd-help-note"><i class="fa-solid fa-circle-info" aria-hidden="true"></i> WhatsApp, Messenger অথবা সরাসরি অ্যাডমিন Live Chat ব্যবহার করুন।</p>
     </div>
   </section>
 

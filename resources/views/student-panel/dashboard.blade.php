@@ -29,7 +29,7 @@ $lebdAvailableBalance = (float) ($user->referral_balance ?? 0) - (float) $lebdPe
 .lebd-student-dashboard {
     width: 100%;
     margin: 0 auto;
-    padding: 12px 12px 46px;
+    padding: 16px 12px 46px;
     background: #fff;
     color: #142b4d;
     overflow-x: clip;
@@ -109,7 +109,7 @@ $lebdAvailableBalance = (float) ($user->referral_balance ?? 0) - (float) $lebdPe
     .lebd-student-dashboard .student-profile-card { padding: 14px; }
 }
 @media (max-width: 768px) {
-    .lebd-student-dashboard { padding: 8px 0 32px; }
+    .lebd-student-dashboard { padding: 12px 0 32px; }
     .lebd-student-dashboard .container { padding-inline: 10px !important; }
     .lebd-student-dashboard .exam-section {
         width: calc(100% - 20px);
@@ -1513,7 +1513,7 @@ font-size:10px;
 <small></small>
 </div>
 </a>
-<a href="{{ route('student.exam-section.categories') }}" class="quick-card">
+<a href="{{ route('student.exam-section.categories') }}" class="quick-card" aria-label="পরীক্ষা বিভাগ আলাদা পেজে খুলুন">
 <div class="quick-icon">
 <i class="fa fa-calendar"></i>
 </div>
@@ -1543,7 +1543,7 @@ font-size:10px;
 </div>
 </div>
 <!-- ================= EXAM SECTION: CATEGORY / SUB-CATEGORY ================= -->
-{{-- LEBD Fix211: Keep the Fix210 Available Balance, restore the linked category cards. --}}
+{{-- LEBD Fix241 correction: keep the existing Exam Section cards on Student Dashboard too. --}}
 @include('student.partials.exam-section-category-cards')
 <!-- ================= LEARNING PROGRESS — LEBD Fix240 ================= -->
 @include('student.partials.lebd-learning-progress')

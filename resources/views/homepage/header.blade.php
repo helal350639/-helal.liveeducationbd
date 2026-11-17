@@ -306,16 +306,8 @@ function active($name)
             <li class="nav-item">
               <a class="nav-link" href="{{ route('homepage.running.batches') }}">ব্যাচ</a>
             </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="/#exam-section">পরীক্ষা</a>
-              <ul class="dropdown-menu" aria-labelledby="moreDropdown">
-                <li class="nav-item">
-                  <a class="nav-link" href="{{route('category.batches', 'Free Exams')}}">ফ্রি পরীক্ষা সমূহ</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="{{route('category.batches', 'Premium Exams')}}">প্রিমিয়াম পরীক্ষা সমূহ</a>
-                </li>
-              </ul>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ route('student.exam-section.department') }}">পরীক্ষা</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/#our-success">আমাদের সাফল্য</a>

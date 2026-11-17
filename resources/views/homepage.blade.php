@@ -33,9 +33,9 @@ function active($name)
     @yield('stylesheets')
     <!-- LEBD v62: apply saved theme before page paints -->
     <script>(function(){try{var t=localStorage.getItem('lebd-site-theme');if(t==='dark'){document.documentElement.setAttribute('data-lebd-theme','dark');}}catch(e){}})();</script>
-    <link rel="stylesheet" href="{{ asset('web/css/lebd-global-night-mode-v62.css') }}?v=63">
+    <link rel="stylesheet" href="{{ asset('web/css/lebd-global-night-mode-v62.css') }}?v=64">
 
-    <link rel="stylesheet" href="{{ asset('web/css/lebd-support-chat-v58.css') }}?v=58">
+    <link rel="stylesheet" href="{{ asset('web/css/lebd-support-chat-v58.css') }}?v=62">
     <!-- Preconnect & Preload Resources -->
     <link href="{{'/web/assets/fonts.googleapis.com/css24d2f.css?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap" rel="stylesheet'}}">
     <link href="{{'/web/assets/fonts.googleapis.com/css26dcd.css?family=Noto+Sans+Bengali:wght@100..900&amp;display=swap" rel="stylesheet'}}" />
@@ -52,6 +52,7 @@ function active($name)
     <!-- Custom CSS (With Cache Busting) -->
     <link rel="stylesheet" href="{{'/web/assets/css/style2b24.css?v=3.8.40'}}" />
     <link rel="stylesheet" href="{{'/web/assets/css/responsive2b24.css?v=3523'}}" />
+    <link rel="stylesheet" href="{{ asset('web/css/lebd-global-site-layout-v79.css') }}?v=79" />
     <link rel="stylesheet" href="{{'/web/css/style.css?v=1.3.4'}}" />
     <style>
       .user-image{
@@ -363,6 +364,7 @@ function active($name)
 
 @yield('scripts')
    <script src="{{ asset('web/js/lebd-support-chat-v60.js') }}?v=60" defer></script>
+    <script src="{{ asset('web/js/lebd-live-chat-v1.js') }}?v=3" defer></script>
 
     <script src="{{ asset('web/js/lebd-global-night-mode-v62.js') }}?v=62" defer></script>
 </body>

@@ -24,7 +24,7 @@
 <div class="fix159-cards">
 @forelse($rows as $r)
 <article class="fix159-card"><div class="fix159-body"><h3 class="fix159-name">📋 {{ $r->name }}</h3><div class="fix159-meta"><div>Category: {{ $cat->name }}</div><div>Sub-category: {{ $sub->name??'Direct Category' }}</div><div><span class="fix159-status {{ $r->status==='Published'?'':'off' }}">{{ $r->status }}</span> · Routine #{{ $r->id }}</div>@if($r->pdf_path)<a href="{{asset('storage/'.$r->pdf_path)}}" target="_blank" rel="noopener noreferrer">View PDF</a>@endif</div></div>
-<div class="fix159-footer"><a class="btn blue" href="{{route('admin.exam-section.routine.items',$r->id)}}">View</a><a class="btn" href="{{route('admin.exam-section.routine.edit',$r->id)}}">Edit</a><form method="POST" action="{{route('admin.exam-section.routine.delete',$r->id)}}" onsubmit="return confirm('Delete this Routine and its items?')">@csrf @method('DELETE')<button class="red">Delete</button></form></div></article>
+<div class="fix159-footer"><a class="btn blue" href="{{route('admin.exam-section.routine.items',$r->id)}}">View</a><a class="btn green" href="{{route('admin.exam-section.routine.edit',$r->id)}}" title="Add or manage Main, Revision and Model Exam Names">Add Exam No</a><a class="btn" href="{{route('admin.exam-section.routine.edit',$r->id)}}">Edit</a><form method="POST" action="{{route('admin.exam-section.routine.delete',$r->id)}}" onsubmit="return confirm('Delete this Routine and its items?')">@csrf @method('DELETE')<button class="red">Delete</button></form></div></article>
 @empty<div class="fix159-empty">No Routine created. Use <strong>+ New Routine</strong>.</div>@endforelse
 </div></div>
 @endsection

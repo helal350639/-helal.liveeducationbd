@@ -14,7 +14,7 @@
     <div class="exam-result-grid">
         <div class="dashboard-box">
             <div class="box-title"><h3>📅 আসন্ন পরীক্ষা</h3><small>আগামী ৭ দিন</small></div>
-            <div class="lebd-feed-list" id="lebd-upcoming-list">
+            <div class="lebd-feed-list" id="lebd-upcoming-list" data-initial-visible="3">
                 @forelse($lebdUpcomingSevenDays as $exam)
                     <div class="exam-item lebd-feed-item" @if($loop->index >= 3) hidden @endif>
                         <div class="date-box"><strong>{{ \Carbon\Carbon::createFromTimestamp($exam['sort'],'Asia/Dhaka')->format('d') }}</strong><span>{{ \Carbon\Carbon::createFromTimestamp($exam['sort'],'Asia/Dhaka')->locale('bn')->translatedFormat('M') }}</span></div>
@@ -28,40 +28,28 @@
         </div>
         <div class="dashboard-box">
             <div class="box-title"><h3>🏆 আসন্ন ফলাফল</h3><small>জমা দেওয়া পরীক্ষাসমূহ</small></div>
-            <div class="lebd-feed-list" id="lebd-results-list">
-                @foreach($lebdSubmittedResults as $attempt)
-                    <div class="result-item lebd-feed-item" data-kind="submitted">
+            <div class="lebd-feed-list" id="lebd-results-list" data-initial-visible="4">
+                {{-- Only exams this student actually attended and submitted are listed here.
+                     The result publish date/time comes from that exam's Routine End Date & Time. --}}
+                @forelse($lebdSubmittedResults as $attempt)
+                    <div class="result-item lebd-feed-item" data-kind="submitted" @if($loop->index >= 4) hidden @endif>
                         <h4>{{ $attempt['title'] }}</h4>
-                        @if($attempt['subtitle'])<p>{{ $attempt['subtitle'] }}</p>@endif
-                        <p class="lebd-feed-future">⏳ পরীক্ষা জমা হয়েছে — ফলাফল অপেক্ষমাণ</p>
-                        <small>জমা: {{ $attempt['submitted'] }}</small>
-                        @if($attempt['exam_end'])
-                            <small style="display:block">পরীক্ষা শেষের সময়: {{ $attempt['exam_end'] }}</small>
+                        @if($attempt['subtitle'])<p>{{ $attempt['subtitle'] }}@if(!empty($attempt['subcategory'])) — {{ $attempt['subcategory'] }}@endif</p>@endif
+                        @if(!empty($attempt['result_visible']))
+                            <p class="lebd-feed-published">✅ ফলাফল প্রকাশ হয়েছে</p>
+                            <a class="lebd-result-view-btn" href="{{ $attempt['result_url'] }}">ফলাফল দেখুন</a>
+                        @else
+                            <p class="lebd-feed-future">⏳ পরীক্ষা জমা হয়েছে — ফলাফল অপেক্ষমাণ</p>
                         @endif
-                        <small style="display:block">ফলাফল প্রকাশের নির্দিষ্ট সময় এখনো যাচাই হয়নি</small>
-                    </div>
-                @endforeach
-                @forelse($lebdResultsSevenDays as $result)
-                    <div class="result-item lebd-feed-item" data-kind="published">
-                        <h4>{{ $result['title'] }}</h4>
-                        <p>@if($result['score'] !== null)নম্বর: {{ $result['score'] }}@if($result['total'] !== null)/{{ $result['total'] }}@endif @endif @if($result['rank'] !== null) | র‍্যাংক: {{ $result['rank'] }} @endif</p>
-                        <small>✅ প্রকাশিত: {{ $result['published'] }}</small>
+                        <small>জমা: {{ $attempt['submitted'] }}</small>
+                        <small style="display:block">ফলাফল প্রকাশের নির্ধারিত সময়: {{ $attempt['result_publish'] ?? (isset($attempt['exam_end_at']) && $attempt['exam_end_at'] ? \Carbon\Carbon::parse($attempt['exam_end_at'], 'Asia/Dhaka')->locale('bn')->translatedFormat('d F Y, h:i A') : 'Routine-এ Exam End Date & Time সেট করা নেই') }}</small>
                     </div>
                 @empty
+                    <p class="lebd-feed-empty">আপনি এখনো কোনো পরীক্ষা অংশগ্রহণ করে Submit করেননি।</p>
                 @endforelse
-                @foreach($lebdScheduledResults as $result)
-                    <div class="result-item lebd-feed-item" data-kind="scheduled">
-                        <h4>{{ $result['title'] }}</h4>
-                        <p class="lebd-feed-future">⏳ ফলাফল প্রকাশের অপেক্ষায়</p>
-                        <small>নির্ধারিত প্রকাশ: {{ $result['scheduled'] }}</small>
-                    </div>
-                @endforeach
-                @if(empty($lebdSubmittedResults) && empty($lebdResultsSevenDays) && empty($lebdScheduledResults))
-                    <p class="lebd-feed-empty">আপনার জমা দেওয়া কোনো পরীক্ষা বা প্রকাশিত ফলাফল পাওয়া যায়নি।</p>
-                @endif
             </div>
-            @if(count($lebdSubmittedResults) + count($lebdResultsSevenDays) + count($lebdScheduledResults) > 3)
-                <button type="button" class="lebd-feed-toggle" data-feed-target="lebd-results-list" aria-expanded="false">আরো দেখুন ({{ count($lebdSubmittedResults) + count($lebdResultsSevenDays) + count($lebdScheduledResults) - 3 }}) ↓</button>
+            @if(count($lebdSubmittedResults) > 4)
+                <button type="button" class="lebd-feed-toggle" data-feed-target="lebd-results-list" aria-expanded="false">আরো দেখুন ({{ count($lebdSubmittedResults) - 4 }}) ↓</button>
             @endif
         </div>
     </div>
@@ -75,18 +63,23 @@
 #lebd-seven-day-feed .exam-item,#lebd-seven-day-feed .result-item{overflow-wrap:anywhere}
 #lebd-seven-day-feed .date-box{flex-shrink:0}
 #lebd-seven-day-feed .lebd-feed-future{color:#ae7105;font-weight:700}
+#lebd-seven-day-feed .lebd-feed-published{color:#07834f;font-weight:700}
+#lebd-seven-day-feed .lebd-result-view-btn{display:inline-block;margin:5px 0 8px;padding:7px 13px;border-radius:7px;background:#0878cf;color:#fff!important;text-decoration:none;font-size:12px;font-weight:700}
+#lebd-seven-day-feed .lebd-result-view-btn:hover{background:#075fa5;color:#fff!important}
 </style>
 <script>
 (function(){
   var root=document.getElementById('lebd-seven-day-feed');if(!root)return;
   root.querySelectorAll('.lebd-feed-list').forEach(function(list){
-    list.querySelectorAll('.lebd-feed-item').forEach(function(item,index){item.hidden=index>=3;});
+    var initialVisible=parseInt(list.getAttribute('data-initial-visible')||'3',10);
+    list.querySelectorAll('.lebd-feed-item').forEach(function(item,index){item.hidden=index>=initialVisible;});
   });
   root.querySelectorAll('[data-feed-target]').forEach(function(button){
     button.addEventListener('click',function(){
       var list=document.getElementById(button.getAttribute('data-feed-target'));if(!list)return;
       var expanded=button.getAttribute('aria-expanded')==='true';
-      list.querySelectorAll('.lebd-feed-item').forEach(function(item,index){item.hidden=expanded && index>=3;});
+      var initialVisible=parseInt(list.getAttribute('data-initial-visible')||'3',10);
+      list.querySelectorAll('.lebd-feed-item').forEach(function(item,index){item.hidden=expanded && index>=initialVisible;});
       button.setAttribute('aria-expanded',expanded?'false':'true');
       button.textContent=expanded?'আরো দেখুন ↓':'কম দেখুন ↑';
     });

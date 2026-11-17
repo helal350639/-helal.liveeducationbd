@@ -2,6 +2,7 @@
 <html lang="bn"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>@yield('page_title', 'Premium Packages') | Live Education BD</title>
 <link rel="stylesheet" href="{{ asset('web/css/lebd-universal-packages.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/lebd-global-desktop-75-scale.css') }}?v=1">
 </head><body class="lebd-package-page">
 <div class="up-shell">
 <header class="up-header"><a href="{{ url('/') }}" class="up-back" aria-label="Back to homepage">←</a>

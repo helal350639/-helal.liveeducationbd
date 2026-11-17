@@ -14,6 +14,7 @@
 			.content-header, .content-header > .breadcrumb > li > a{color:#fff}
 		</style>
 
+    <link rel="stylesheet" href="{{ asset('css/lebd-global-desktop-75-scale.css') }}?v=1">
 </head>
 
 <body class="layout-top-nav" style="width:100%; {{$_SERVER['REQUEST_URI'] == '/login'? 'background:rgba(0,0,0,0.3)':''}}">

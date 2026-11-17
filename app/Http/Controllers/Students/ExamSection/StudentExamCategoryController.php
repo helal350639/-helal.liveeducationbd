@@ -48,6 +48,16 @@ class StudentExamCategoryController extends Controller {
       [$liveCats,$liveSubs]=$this->liveIds();
       return view('student.exam-section.subcategories',compact('cat','subs','liveSubs'));
     }
+    /**
+     * Dedicated Routine destination for the Routine button in the category Exam Menu.
+     * It reuses the existing category/sub-category scoped routine view and never
+     * falls back to the legacy global /students/batch-routine page.
+     */
+    public function routine(int $category, Request $request) {
+      $request->query->set('routine', '1');
+      return $this->exams($category, $request);
+    }
+
     public function exams(int $category, Request $request) {
       $cat=DB::table('lebd_exam_section_categories')->where('id',$category)->first();
       if (!$cat || strcasecmp((string) $cat->status,'Active') !== 0) return redirect()->route('student.exam-section.categories')->with('error','This category is unavailable.');

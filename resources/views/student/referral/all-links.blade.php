@@ -1,30 +1,11 @@
-@php
-    $refhubStudent = \Illuminate\Support\Facades\Auth::guard('student')->user();
-@endphp
-<!doctype html>
-<html lang="bn">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0b2a5c">
-<title>All Referral Link | Live Education BD</title>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+@extends('student')
+
+@section('title', 'All Referral Link')
+
+@section('stylesheets')
 <style>
-html,body{margin:0;min-height:100%;background:#f3f7fe;color:#0b2a5c}
-.lebd-refhub-top{box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px max(18px,calc((100vw - 1390px)/2));background:#fff;border-bottom:1px solid #d7e6fb;box-shadow:0 2px 12px #153c7610;font-family:system-ui,'Noto Sans Bengali',sans-serif}
-.lebd-refhub-brand{display:flex;align-items:center;gap:10px;color:#0b2a5c;font-weight:800;font-size:19px;text-decoration:none}
-.lebd-refhub-brand .mark{background:#0967dd;color:white;padding:10px;border-radius:11px}
-.lebd-refhub-topright{display:flex;align-items:center;gap:15px;font-size:13px}
-.lebd-refhub-topright a{color:#095bd0;text-decoration:none;font-weight:700}
-@media(max-width:650px){.lebd-refhub-top{padding:12px}.lebd-refhub-brand{font-size:15px}.lebd-refhub-topright .username{display:none}}
-</style>
-</head>
-<body>
-<header class="lebd-refhub-top">
- <a class="lebd-refhub-brand" href="{{ url('/students') }}"><span class="mark"><i class="fa-solid fa-book-open" aria-hidden="true"></i></span> LIVE EDUCATION BD</a>
- <nav class="lebd-refhub-topright" aria-label="Student navigation"><span class="username">{{ $refhubStudent?->name ?? 'Student' }}</span><a href="{{ url('/students') }}"><i class="fa-solid fa-house" aria-hidden="true"></i> Dashboard</a></nav>
-</header>
-<style>
+.lebd-refhub-page{background:#f3f7fe;min-height:65vh;width:100%;color:#0b2a5c}
+
 /* LEBD-05: Entirely scoped to referral hub; never style global homepage. */
 .lebd-refhub{--navy:#0b2a5c;--blue:#0663db;--line:#d7e6fb;--light:#f4f8ff;max-width:1370px;margin:auto;padding:22px 20px 55px;color:var(--navy);font-family:inherit}
 .lebd-refhub *{box-sizing:border-box}.lebd-refhub .back{display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:var(--blue);font-weight:700;margin:0 0 15px;padding:9px 13px;background:#edf5ff;border:1px solid var(--line);border-radius:12px}
@@ -40,14 +21,19 @@ html,body{margin:0;min-height:100%;background:#f3f7fe;color:#0b2a5c}
 .lebd-refhub .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:9999;border-radius:12px;background:#0c3268;color:white;font-weight:700;box-shadow:0 10px 24px #0b2a5c30;padding:12px 20px;max-width:calc(100vw - 28px);text-align:center;font-size:13px}.lebd-refhub .toast[hidden]{display:none!important}.lebd-refhub .notice{padding:13px 16px;margin:12px 0;border:1px solid #fae0ac;background:#fff8e8;border-radius:12px;color:#805708;font-size:13px;line-height:1.65}.lebd-refhub .mobile-tabs{display:none}
 @media(max-width:940px){.lebd-refhub .section{grid-template-columns:1fr}.lebd-refhub .entry{grid-template-columns:1fr 1fr}.lebd-refhub .actions{grid-column:1/-1;justify-content:flex-start}}
 @media(max-width:650px){.lebd-refhub{padding:12px 10px 80px;background:#f3f7fe}.lebd-refhub .intro{padding:15px;border-radius:17px}.lebd-refhub h1{font-size:20px}.lebd-refhub .intro p{font-size:12px}.lebd-refhub .section{padding:12px;gap:9px;border-radius:17px}.lebd-refhub .section-label{align-items:center}.lebd-refhub h2{font-size:15px}.lebd-refhub .entry{display:flex;flex-direction:column;align-items:stretch;gap:8px;padding:13px}.lebd-refhub .metadata{border-top:1px solid #edf3fd;padding-top:7px}.lebd-refhub .actions{display:grid;grid-template-columns:1fr 1fr}.lebd-refhub .action{text-align:center;padding:12px 8px}.lebd-refhub .mobile-tabs{display:flex;overflow-x:auto;gap:7px;margin:0 0 14px;padding-bottom:4px;scrollbar-width:none}.lebd-refhub .mobile-tabs a{flex:none;font-weight:750;text-decoration:none;color:#075ac0;border-radius:22px;background:white;border:1px solid #c9defa;padding:9px 13px;font-size:12px}.lebd-refhub .section{scroll-margin-top:16px}}
+
 </style>
+@endsection
+
+@section('content')
+<div class="lebd-refhub-page">
 <main class="lebd-refhub">
   <a href="{{ url('/students') }}" class="back"><i class="fa fa-arrow-left" aria-hidden="true"></i> Student Dashboard</a>
   <div class="intro"><span class="tile-icon"><i class="fa fa-link" aria-hidden="true"></i></span><div><h1>All Referral Link</h1><p>আপনার সক্রিয় প্যাকেজগুলোর রেফারেল তথ্য ও লিংক এখানে পাওয়া যাবে।</p></div></div>
   <nav class="mobile-tabs" aria-label="Referral sections">
     <a href="#lebd-ref-batch">Batch</a><a href="#lebd-ref-exam">Exam</a><a href="#lebd-ref-mcq">MCQ Study</a><a href="#lebd-ref-video">Video</a><a href="#lebd-ref-ebook">E-Book</a>
   </nav>
-  <div class="notice" role="status">MCQ-এর বৈধ Referral Link-এ নির্ধারিত Discount প্রযোজ্য হয়। E-Book-এর Referral Link নির্দিষ্ট একটি Package দেখাবে; E-Book Referral Discount Checkout ও Bonus Credit এখনো সম্পন্ন হয়নি। MCQ-এর বিদ্যমান Checkout অপরিবর্তিত রয়েছে।</div>
+  <div class="notice" role="status">নিচে আপনার কেনা প্যাকেজ গুলোর রেফার করার জন্য লিংক আছে । রেফার লিংক শুধু মাত্র কোর্স/ প্যাকেজ কেনার পরে এই লিংক গুলো কাজ করবে।</div>
   @php
     // E-Book section bridge: manual grants + paid package orders, DISPLAY ONLY.
     // No new checkout link is generated until E-Book referral settlement is verified.
@@ -127,6 +113,10 @@ html,body{margin:0;min-height:100%;background:#f3f7fe;color:#0b2a5c}
   @endforeach
   <div class="toast" id="lebdRefToast" role="status" aria-live="polite" hidden></div>
 </main>
+</div>
+@endsection
+
+@section('scripts')
 <script>
 (function(){
   'use strict';
@@ -175,5 +165,4 @@ html,body{margin:0;min-height:100%;background:#f3f7fe;color:#0b2a5c}
   });
 })();
 </script>
-</body>
-</html>
+@endsection

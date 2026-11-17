@@ -97,3 +97,102 @@ html[data-lebd-theme=dark] #lebdNightToggle.lebd-night-header-icon {background:#
 #lebdNightToggle:not(.lebd-night-header-icon){left:10px!important;right:auto!important;top:105px!important;bottom:auto!important;width:36px!important;height:36px!important;padding:0!important;border-radius:10px!important;justify-content:center!important;}
 #lebdNightToggle:not(.lebd-night-header-icon) .lebd-night-label{display:none!important;}
 @media print{#lebdNightToggle{display:none!important;}}
+
+
+/* LEBD Global Night Readability Fix v80
+   Shared by homepage and student layout. Darken page canvases and brighten
+   outer headings/body copy while deliberately preserving light cards,
+   forms, dropdowns, tables, buttons, media panels and the shared footer. */
+html[data-lebd-theme="dark"] body {
+  color: #e7eef8;
+}
+
+/* Premium Classes: this module had its own hard-coded light canvas and navy
+   heading colors, which caused low contrast when the global night theme was on. */
+html[data-lebd-theme="dark"] .lebd-premium-page {
+  background: #08172b !important;
+  color: #e7eef8 !important;
+}
+html[data-lebd-theme="dark"] .lebd-premium-page .lebd-premium-subheading,
+html[data-lebd-theme="dark"] .lebd-premium-page .lebd-student-intro h2,
+html[data-lebd-theme="dark"] .lebd-premium-page .lebd-premium-empty h3 {
+  color: #f3f7ff !important;
+  -webkit-text-fill-color: #f3f7ff !important;
+}
+html[data-lebd-theme="dark"] .lebd-premium-page .lebd-premium-back,
+html[data-lebd-theme="dark"] .lebd-premium-page .lebd-student-intro a {
+  color: #8fc8ff !important;
+}
+html[data-lebd-theme="dark"] .lebd-premium-page .lebd-premium-empty {
+  background: #102743 !important;
+  border-color: #355577 !important;
+  color: #e7eef8 !important;
+}
+html[data-lebd-theme="dark"] .lebd-premium-page .lebd-premium-empty p,
+html[data-lebd-theme="dark"] .lebd-premium-page .lebd-pr-preview-note,
+html[data-lebd-theme="dark"] .lebd-premium-page .lebd-pr-chapter-empty {
+  color: #c5d5e8 !important;
+}
+
+/* Shared page-canvas defaults. The selectors below target text outside
+   recognizable light surfaces, so white cards retain their original dark text. */
+html[data-lebd-theme="dark"] :is(
+  .lebd-student-main,
+  .lebd-student-dashboard,
+  .batch-detail-page,
+  .content-wrapper
+) {
+  color: #e7eef8;
+}
+html[data-lebd-theme="dark"] main :is(h1,h2,h3,h4,h5,h6):not(:where(
+  .card *, .panel *, .well *, .modal *, .modal-content *, .dropdown-menu *,
+  .navbar *, .main-header *, #Footer *, .lebd-premium-choice *,
+  .lebd-pr-chapter *, .lebd-pr-video *, .lebd-student-record-row *,
+  .lebd-student-rec-card *, .lebd-premium-empty *, .lebd-feed-card *,
+  .lebd-result-card *, .table *, .table-responsive *, .list-group-item *,
+  .alert *, .notice-box *, .exam-card *, .quiz-card *, .question-card *,
+  .result-card *, .package-card *, .course-card *, .batch-card *
+)) {
+  color: #f1f6ff !important;
+  -webkit-text-fill-color: #f1f6ff;
+}
+html[data-lebd-theme="dark"] main :is(p,small,label,li,dt,dd):not(:where(
+  .card *, .panel *, .well *, .modal *, .modal-content *, .dropdown-menu *,
+  .navbar *, .main-header *, #Footer *, .lebd-premium-choice *,
+  .lebd-pr-chapter *, .lebd-pr-video *, .lebd-student-record-row *,
+  .lebd-student-rec-card *, .lebd-feed-card *, .lebd-result-card *,
+  .table *, .table-responsive *, .list-group-item *, .alert *,
+  .notice-box *, .exam-card *, .quiz-card *, .question-card *,
+  .result-card *, .package-card *, .course-card *, .batch-card *
+)) {
+  color: #cbd8e8 !important;
+  -webkit-text-fill-color: #cbd8e8;
+}
+html[data-lebd-theme="dark"] main a:not(:where(
+  .card *, .panel *, .well *, .modal *, .modal-content *, .dropdown-menu *,
+  .navbar *, .main-header *, #Footer *, .lebd-premium-choice *,
+  .lebd-pr-chapter *, .lebd-pr-video *, .lebd-student-record-row *,
+  .lebd-student-rec-card *, .table *, .list-group-item *, .alert *,
+  .exam-card *, .quiz-card *, .question-card *, .result-card *,
+  .package-card *, .course-card *, .batch-card *
+)):not(.btn):not([class*="btn-"]) {
+  color: #8fc8ff;
+}
+html[data-lebd-theme="dark"] main hr {
+  border-color: #344a66 !important;
+}
+
+/* Do not force dark text/background changes inside intentionally light cards,
+   tables, modal dialogs, dropdowns, inputs or buttons. */
+html[data-lebd-theme="dark"] :is(
+  .card, .panel, .well, .modal-content, .dropdown-menu, .list-group-item,
+  .lebd-premium-choice, .lebd-pr-chapter, .lebd-pr-video,
+  .lebd-student-record-row, .lebd-student-rec-card, .lebd-feed-card,
+  .lebd-result-card, .exam-card, .quiz-card, .question-card, .result-card,
+  .package-card, .course-card, .batch-card, .notice-box
+) {
+  color-scheme: light;
+}
+html[data-lebd-theme="dark"] :is(input,select,textarea) {
+  color-scheme: light;
+}

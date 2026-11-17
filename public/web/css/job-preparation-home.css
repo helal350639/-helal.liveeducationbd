@@ -757,3 +757,28 @@
     }
 
 }
+
+/* LEBD visual update: Department MCQ Study section now matches the deep indigo
+   background tone of the reference department-card design. Category cards and
+   the orange heading remain unchanged. */
+.mcq-job-section{
+    background:
+        radial-gradient(circle at 92% 8%, rgba(105,88,220,.24) 0, rgba(105,88,220,0) 30%),
+        radial-gradient(circle at 4% 100%, rgba(54,102,220,.18) 0, rgba(54,102,220,0) 28%),
+        linear-gradient(135deg, #111344 0%, #1b1a63 52%, #282078 100%);
+    box-shadow: 0 10px 30px rgba(10,16,60,.18);
+}
+.mcq-job-section .mcq-left-decoration{color:#b9c9ff;}
+.mcq-job-section .mcq-right-decoration{color:#d4dcff;}
+
+/* LEBD follow-up: Non-MCQ Study section matches the same deep indigo
+   background palette requested for the Department MCQ reference. */
+.mcq-study-section{
+    background:
+        radial-gradient(circle at 92% 8%, rgba(105,88,220,.24) 0, rgba(105,88,220,0) 30%),
+        radial-gradient(circle at 4% 100%, rgba(54,102,220,.18) 0, rgba(54,102,220,0) 28%),
+        linear-gradient(135deg, #111344 0%, #1b1a63 52%, #282078 100%);
+    box-shadow: 0 10px 30px rgba(10,16,60,.18);
+}
+.mcq-study-section .study-left-decoration{color:#b9c9ff;}
+.mcq-study-section .study-books-decoration{color:#aebeff;opacity:.22;}

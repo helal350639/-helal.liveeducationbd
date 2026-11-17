@@ -128,25 +128,69 @@ final class StudentDashboardSevenDayFeed
      */
     private static function examSectionSubmitted($student, Carbon $now): array
     {
-        foreach (['lebd_exam_section_student_attempts',
-                  'lebd_exam_section_routine_items',
-                  'lebd_exam_section_routines',
-                  'lebd_exam_section_categories'] as $table) {
+        foreach ([
+            'lebd_exam_section_student_attempts',
+            'lebd_exam_section_routine_items',
+            'lebd_exam_section_routines',
+            'lebd_exam_section_categories',
+        ] as $table) {
             if (!Schema::hasTable($table)) return [];
         }
-        $rows = DB::table('lebd_exam_section_student_attempts as a')
+
+        $hasSubcategories = Schema::hasTable('lebd_exam_section_subcategories');
+        $query = DB::table('lebd_exam_section_student_attempts as a')
             ->join('lebd_exam_section_routine_items as i', 'i.id', '=', 'a.routine_item_id')
             ->join('lebd_exam_section_routines as r', 'r.id', '=', 'i.routine_id')
-            ->join('lebd_exam_section_categories as c', 'c.id', '=', 'r.category_id')
+            ->join('lebd_exam_section_categories as c', 'c.id', '=', 'r.category_id');
+
+        if ($hasSubcategories) {
+            $query->leftJoin('lebd_exam_section_subcategories as s', 's.id', '=', 'r.subcategory_id')
+                ->where(function ($q) {
+                    $q->whereNull('r.subcategory_id')
+                        ->orWhereRaw('LOWER(TRIM(s.status)) = ?', ['active']);
+                });
+        }
+
+        $rows = $query
             ->where('a.student_id', (int) $student->id)
+            ->where('a.status', 'submitted')
             ->whereNotNull('a.submitted_at')
-            ->where('a.submitted_at', '<=', $now->toDateTimeString())
+            ->whereNotNull('i.exam_end_at')
             ->whereRaw('LOWER(TRIM(i.type)) = ?', ['exam'])
-            ->select('a.id', 'a.routine_item_id', 'a.submitted_at',
-                     'i.exam_name', 'i.exam_end_at',
-                     'c.name as category_name')
-            ->orderByDesc('a.submitted_at')->orderByDesc('a.id')
-            ->limit(500)->get();
+            ->whereRaw('LOWER(TRIM(r.status)) = ?', ['published'])
+            ->whereRaw('LOWER(TRIM(c.status)) = ?', ['active'])
+            ->select(
+                'a.id',
+                'a.routine_item_id',
+                'a.submitted_at',
+                'i.exam_name',
+                'i.exam_end_at',
+                'r.category_id',
+                'r.subcategory_id',
+                'c.name as category_name'
+            )
+            // Nearest scheduled result release first; the source is the Routine End Date & Time.
+            ->orderBy('i.exam_end_at')
+            ->orderBy('a.id')
+            ->limit(500);
+
+        if ($hasSubcategories) {
+            $query->addSelect('s.name as subcategory_name');
+        }
+
+        $rows = $query->get();
+
+        $settingsByScope = [];
+        if (Schema::hasTable('lebd_exam_section_paper_settings')) {
+            $scopeRows = DB::table('lebd_exam_section_paper_settings')
+                ->whereIn('category_id', $rows->pluck('category_id')->unique()->values())
+                ->get(['category_id', 'subcategory_id', 'settings_json']);
+
+            foreach ($scopeRows as $scopeRow) {
+                $scopeKey = (int) $scopeRow->category_id . ':' . ($scopeRow->subcategory_id === null ? '0' : (int) $scopeRow->subcategory_id);
+                $settingsByScope[$scopeKey] = json_decode($scopeRow->settings_json, true) ?: [];
+            }
+        }
 
         $result = [];
         $seen = [];
@@ -155,20 +199,41 @@ final class StudentDashboardSevenDayFeed
             $examId = (int) $row->routine_item_id;
             if (isset($seen[$examId])) continue;
             $seen[$examId] = true;
+
             $submitted = Carbon::parse($row->submitted_at, 'Asia/Dhaka');
-            $end = $row->exam_end_at
-                ? Carbon::parse($row->exam_end_at, 'Asia/Dhaka') : null;
+            $release = Carbon::parse($row->exam_end_at, 'Asia/Dhaka');
+
+            // Keep each attended exam in this dashboard card until 24 hours after its own result time.
+            if ($now->greaterThanOrEqualTo($release->copy()->addHours(24))) {
+                continue;
+            }
+
+            $scopeKey = (int) $row->category_id . ':' . ($row->subcategory_id === null ? '0' : (int) $row->subcategory_id);
+            $settings = $settingsByScope[$scopeKey] ?? [];
+            $adminAllowsImmediate = in_array(
+                strtolower((string) ($settings['student_view_result'] ?? 'no')),
+                ['yes', '1', 'true'],
+                true
+            );
+            $visible = $adminAllowsImmediate || $now->greaterThanOrEqualTo($release);
+
             $result[] = [
                 'id' => $examId,
                 'title' => $row->exam_name,
                 'subtitle' => $row->category_name,
+                'subcategory' => $row->subcategory_name ?? null,
                 'submitted' => $submitted->locale('bn')->translatedFormat('d F Y, h:i A'),
-                'sort' => $submitted->timestamp,
-                // This is exam end date, NOT an invented publication timestamp.
-                'exam_end' => $end ? $end->locale('bn')->translatedFormat('d F Y, h:i A') : null,
-                'status' => 'pending',
+                'sort' => $release->timestamp,
+                // Use this exact Routine item's Exam End Date & Time as the result publish date/time.
+                'exam_end_at' => $row->exam_end_at,
+                'result_publish' => $release->copy()->locale('bn')->translatedFormat('d F Y, h:i A'),
+                'result_visible' => $now->greaterThanOrEqualTo($release),
+                'result_url' => route('student.exam-section.take.result', ['item' => $examId]),
+                'expires_at' => $release->copy()->addHours(24)->toDateTimeString(),
+                'status' => $now->greaterThanOrEqualTo($release) ? 'published' : 'pending',
             ];
         }
+
         return $result;
     }
 

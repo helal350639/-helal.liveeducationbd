@@ -47,11 +47,16 @@
 .lebd-merit-podium em{font-style:normal;color:#0b4c98;font-weight:900}
 .lebd-merit-bottom{display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
 .lebd-merit-table-wrap{overflow-x:auto}
-.lebd-merit-table{width:100%;min-width:760px;border-collapse:separate;border-spacing:0;font-size:11px}
+.lebd-merit-table{width:100%;min-width:0;table-layout:fixed;border-collapse:separate;border-spacing:0;font-size:11px}
 .lebd-merit-table th{padding:10px 9px;background:#e7f1ff;color:#193f70;text-align:left;font-weight:900;white-space:nowrap}
 .lebd-merit-table th:first-child{border-radius:8px 0 0 8px}.lebd-merit-table th:last-child{border-radius:0 8px 8px 0}
-.lebd-merit-table td{padding:9px;border-bottom:1px solid #eaf0f7;color:#2a4262;white-space:nowrap}
+.lebd-merit-table td{padding:9px;border-bottom:1px solid #eaf0f7;color:#2a4262;white-space:normal;overflow-wrap:anywhere}
 .lebd-merit-table tr:last-child td{border-bottom:0}
+.lebd-merit-table tr.lebd-merit-extra-row{display:none}
+.lebd-merit-more-wrap{display:flex;justify-content:center;margin-top:14px}
+.lebd-merit-more-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:150px;padding:9px 18px;border:1px solid #b8d5f5;border-radius:9px;background:#edf6ff;color:#075fbd;font-size:12px;font-weight:850;cursor:pointer;transition:background .15s ease}
+.lebd-merit-more-btn:hover{background:#dceeff}
+
 .lebd-merit-table tr.is-you td{background:#e8f3ff;color:#103e78;font-weight:850}
 .lebd-merit-table .rank-pill{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#edf3fb;color:#244d7e;font-weight:900}
 .lebd-merit-table tr:nth-child(1) .rank-pill{background:#ffdf83;color:#805000}
@@ -61,6 +66,7 @@
 .lebd-merit-empty{padding:28px 12px;text-align:center;border:1px dashed #cbdcf0;border-radius:12px;background:#f9fbff;color:#70849e;font-size:12px}
 @media(max-width:1050px){.lebd-merit-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.lebd-merit-bottom{grid-template-columns:1fr}}
 @media(max-width:720px){.lebd-merit-page{padding:7px 7px 16px}.lebd-merit-crumb{gap:6px;margin-bottom:8px;font-size:11px}.lebd-merit-back{padding:6px 10px;font-size:11px;border-radius:8px}.lebd-merit-banner{padding:11px 12px;border-radius:11px;margin-bottom:9px}.lebd-merit-banner-main{gap:9px}.lebd-merit-banner-icon{width:39px;height:39px;flex-basis:39px;border-radius:11px;font-size:18px}.lebd-merit-banner h1{font-size:19px;margin-bottom:3px}.lebd-merit-banner p{font-size:10px;line-height:1.35}.lebd-merit-trophy{font-size:28px;padding:0 2px}.lebd-merit-stats{gap:6px;margin-bottom:9px}.lebd-merit-stat{padding:8px;gap:7px;border-radius:11px}.lebd-merit-stat-icon{width:30px;height:30px;flex-basis:30px;border-radius:9px;font-size:14px}.lebd-merit-stat small{font-size:8px;margin-bottom:2px}.lebd-merit-stat strong{font-size:15px}.lebd-merit-panels{grid-template-columns:1fr;gap:8px;margin-bottom:9px}.lebd-merit-panel{padding:9px;border-radius:12px}.lebd-merit-panel-title{font-size:13px;margin-bottom:8px;padding-bottom:7px}.lebd-merit-you{gap:8px;padding:9px;min-height:82px;border-radius:10px}.lebd-merit-rank{flex-basis:62px}.lebd-merit-rank strong{font-size:24px}.lebd-merit-you-info strong{font-size:12px}.lebd-merit-you-info p{font-size:10px;margin-top:4px}.lebd-merit-top3{gap:5px;grid-template-columns:repeat(3,minmax(0,1fr))}.lebd-merit-podium{padding:8px 4px;min-height:84px;border-radius:10px}.lebd-merit-podium.first{min-height:94px}.lebd-merit-podium strong{font-size:9px}.lebd-merit-podium small{font-size:8px}.lebd-merit-bottom{gap:8px}}
+@media(max-width:720px){.lebd-merit-table{font-size:10px}.lebd-merit-table th{padding:8px 6px;font-size:10px}.lebd-merit-table td{padding:7px 6px;line-height:1.3}.lebd-merit-table .rank-pill{width:21px;height:21px;font-size:10px}.lebd-merit-you-tag{font-size:9px;padding:3px 6px;margin-left:3px}.lebd-merit-table-wrap{overflow-x:hidden}}
 @media(max-width:380px){.lebd-merit-stats{grid-template-columns:1fr 1fr}.lebd-merit-top3{grid-template-columns:repeat(3,minmax(0,1fr))}.lebd-merit-podium,.lebd-merit-podium.first{min-height:76px;flex-direction:column}.lebd-merit-podium .medal{font-size:18px}.lebd-merit-you-tag{margin-left:3px;padding:3px 7px}}
 </style>
 @endsection
@@ -127,7 +133,6 @@
                 <div class="lebd-merit-podium {{ $podium['class'] }}">
                   <span class="medal">{{ $podium['medal'] }}</span>
                   <strong>{{ $podium['row']['student_name'] }}</strong>
-                  @if(!empty($podium['row']['is_extra_student']))<small style="color:#0b8b73;font-weight:800">Extra Student · {{ $podium['row']['extra_group_name'] }}</small>@endif
                   <small>Score: <em>{{ number_format($podium['row']['percent'], 2) }}%</em></small>
                 </div>
               @else
@@ -144,27 +149,30 @@
     <div class="lebd-merit-bottom">
       <section class="lebd-merit-panel">
         <h2 class="lebd-merit-panel-title"><i class="fa fa-list"></i> Merit List <span style="font-size:11px;font-weight:600;color:#6b7f98">({{ $selectedExam->exam_name }} · {{ $scopeTitle }})</span><span style="margin-left:auto;font-size:11px;color:#657a95">Total: {{ number_format($totalParticipants) }} Students</span></h2>
-        <p style="font-size:11px;color:#526985;margin:0 0 10px">Official exam submissions and separately labeled Extra Student simulation scores are shown together for comparison. Simulation scores are not official exam submissions and do not alter submitted exam results. Their presence does not change any submitted exam score.</p>
+        <p style="font-size:11px;color:#526985;margin:0 0 10px">এই পরীক্ষার অংশগ্রহণকারী ও সংরক্ষিত ফলাফল একই মেধাতালিকায় দেখানো হয়েছে।</p>
         @if($visibleRows->isNotEmpty())
           <div class="lebd-merit-table-wrap">
-            <table class="lebd-merit-table">
-              <thead><tr><th>Rank</th><th>Student Name</th><th>Category / Sub-Category</th><th>{{ !empty($isExtraGroup) ? 'Group' : 'Exam Name' }}</th><th>{{ !empty($isExtraGroup) ? 'Marks' : 'Score' }}</th><th>{{ !empty($isExtraGroup) ? 'Mark (%)' : 'Accuracy' }}</th><th>Time</th><th>Status</th></tr></thead>
+            <table class="lebd-merit-table" id="lebd-merit-table">
+              <colgroup><col style="width:12%"><col style="width:58%"><col style="width:30%"></colgroup>
+              <thead><tr><th>Rank</th><th>Student Name</th><th>{{ !empty($isExtraGroup) ? 'Marks' : 'Score' }}</th></tr></thead>
               <tbody>
               @foreach($visibleRows as $row)
-                <tr class="{{ (int)$row['student_id'] === (int)$student->id ? 'is-you' : '' }}">
+                <tr class="{{ (int)$row['student_id'] === (int)$student->id ? 'is-you' : '' }} {{ $loop->iteration > 40 ? 'lebd-merit-extra-row' : '' }}">
                   <td><span class="rank-pill">{{ $row['rank'] }}</span></td>
-                  <td>{{ $row['student_name'] }} @if(!empty($row['is_extra_student']))<span class="lebd-merit-you-tag" style="background:#0b8b73">Extra Student · {{ $row['extra_group_name'] }}</span>@elseif((int)$row['student_id'] === (int)$student->id)<span class="lebd-merit-you-tag">You</span>@endif</td>
-                  <td>{{ $row['category_name'] }}@if($row['subcategory_name']) / {{ $row['subcategory_name'] }}@endif</td>
-                  <td>{{ $row['exam_name'] }}</td>
+                  <td>{{ $row['student_name'] }} @if((int)$row['student_id'] === (int)$student->id)<span class="lebd-merit-you-tag">You</span>@endif</td>
                   <td><b>{{ !empty($row['marks_entered']) ? number_format($row['score'], 2).' / '.number_format($row['possible'], 2) : '—' }}</b></td>
-                  <td>{{ !empty($row['is_extra_student']) ? '—' : number_format($row['accuracy'], 1).'%' }}</td>
-                  <td>{{ !empty($isExtraGroup) ? '—' : $formatDuration($row['duration']) }}</td>
-                  <td>@if(!empty($row['is_extra_student']) && empty($row['marks_entered']))<span class="lebd-merit-status" style="background:#fff1d6;color:#8a5a00">Marks Pending</span>@elseif(!empty($row['is_extra_student']))<span class="lebd-merit-status" style="background:#e5f3ff;color:#075fbd">Simulation score</span>@else<span class="lebd-merit-status">Qualified</span>@endif</td>
                 </tr>
               @endforeach
               </tbody>
             </table>
           </div>
+          @if($visibleRows->count() > 40)
+            <div class="lebd-merit-more-wrap">
+              <button type="button" class="lebd-merit-more-btn" id="lebd-merit-more-toggle" aria-expanded="false" aria-controls="lebd-merit-table">
+                See More <i class="fa fa-chevron-down" aria-hidden="true"></i>
+              </button>
+            </div>
+          @endif
 
         @else
           <div class="lebd-merit-empty">এই পরীক্ষার কোনো প্রকাশিত ফলাফল বা Group-এ যুক্ত Extra Student পাওয়া যায়নি।</div>
@@ -176,4 +184,26 @@
   </div>
 </div>
 
+@endsection
+
+@section('scripts')
+<script>
+(function () {
+  'use strict';
+  var button = document.getElementById('lebd-merit-more-toggle');
+  var table = document.getElementById('lebd-merit-table');
+  if (!button || !table) return;
+
+  button.addEventListener('click', function () {
+    var expanded = button.getAttribute('aria-expanded') === 'true';
+    table.querySelectorAll('tbody tr.lebd-merit-extra-row').forEach(function (row) {
+      row.style.display = expanded ? 'none' : 'table-row';
+    });
+    button.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+    button.innerHTML = expanded
+      ? 'See More <i class="fa fa-chevron-down" aria-hidden="true"></i>'
+      : 'See Less <i class="fa fa-chevron-up" aria-hidden="true"></i>';
+  });
+})();
+</script>
 @endsection

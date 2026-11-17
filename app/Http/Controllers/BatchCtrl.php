@@ -152,6 +152,8 @@ class BatchCtrl extends Controller
 
         $data['status'] = isset($data['status']) ? 'Active' : 'Deactive';
         $data['web'] = isset($data['web']) ? 'Yes' : 'No';
+        // Controls whether the enrolled-student count is visible on the public course page.
+        $data['show_student_count'] = $request->boolean('show_student_count') ? 1 : 0;
 
         if(isset($data['department_id']))
         {

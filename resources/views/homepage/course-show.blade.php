@@ -945,35 +945,21 @@
 
 
 
-                    <!-- STUDENTS -->
+                    <!-- STUDENTS: Admin-controlled visibility -->
 
+                    @if((int) ($value->show_student_count ?? 1) === 1)
                     <table class="batch-student-count lebd-v54-enrolled">
-
                         <tr>
-
                             <td>
-
                                 <i class="fa fa-users"></i>
-
                                 এই কোর্সটি করছেন
-
                             </td>
-
                             <th>
-
-                                {{
-                                    $value->students->count()
-                                    +
-                                    ($value->extra_student ?? 0)
-                                }}
-
-                                জন
-
+                                {{ $value->students->count() + ($value->extra_student ?? 0) }} জন
                             </th>
-
                         </tr>
-
                     </table>
+                    @endif
 
 
 

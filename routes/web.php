@@ -150,6 +150,12 @@ Route::controller(SslCommerzPaymentController::class)->group(function()
 });
 Route::middleware('auth:student')->group(function()
 {
+    // Live header notification feed, full-page centre, and per-student Seen state.
+    Route::get('students/notifications', [\App\Http\Controllers\Students\StudentHeaderNotificationController::class, 'page'])->name('students.notifications.page');
+    Route::get('students/header-notifications', [\App\Http\Controllers\Students\StudentHeaderNotificationController::class, 'index'])->name('students.header-notifications');
+    Route::post('students/header-notifications/seen', [\App\Http\Controllers\Students\StudentHeaderNotificationController::class, 'seen'])->name('students.header-notifications.seen');
+    Route::post('students/header-notifications/seen-all', [\App\Http\Controllers\Students\StudentHeaderNotificationController::class, 'seenAll'])->name('students.header-notifications.seen-all');
+
     Route::controller(StudentHomeCtrl::class)->group(function()
     {
     Route::prefix('students')->group(function()
@@ -717,8 +723,15 @@ Route::get('daily-exam/{id}',
   {
     Route::get('about-us', 'aboutUs')->name('settings.about-us');
     Route::post('about-us/update', 'aboutUsUpdate')->name('about.update');
-    //notices
+    Route::get('hero-banner', 'heroBannerEdit')->name('settings.hero-banner');
+    Route::post('hero-banner/update', 'heroBannerUpdate')->name('settings.hero-banner.update');
+    Route::get('social-section', 'socialSectionEdit')->name('settings.social-section');
+    Route::post('social-section/update', 'socialSectionUpdate')->name('settings.social-section.update');
+    // Notice manager: one sidebar entry with add/list/edit actions.
     Route::get('notice-edit', 'noticeEdit')->name('noitice.edit');
+    Route::get('notice-create', 'noticeCreate')->name('notice.create');
+    Route::post('notice-store', 'noticeStore')->name('notice.store');
+    Route::get('notice-edit/{id}', 'noticeEditById')->whereNumber('id')->name('notice.edit');
     Route::put('noitce-update/{id}', 'noticeUpdate')->name('notice.update');
   });
   // database backup
@@ -1070,3 +1083,6 @@ require __DIR__.'/lebd_purchased_batch_exams.php';
 require __DIR__.'/lebd_my_batch_exam_index.php';
 require __DIR__ . '/lebd_extra_students.php';
 require __DIR__.'/exam_activity.php';
+
+// LEBD Live Chat: visitor messaging and protected admin inbox.
+require __DIR__ . '/lebd_live_chat.php';

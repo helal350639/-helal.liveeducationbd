@@ -18,6 +18,7 @@
   <script src="/ckeditor/ckeditor.js"></script>
   <script src="https://www.wiris.net/demo/plugins/app/WIRISplugins.js?viewer=image"></script>
 
+    <link rel="stylesheet" href="{{ asset('css/lebd-global-desktop-75-scale.css') }}?v=1">
 </head>
 
 <body class="hold-transition skin-blue sidebar-mini">	

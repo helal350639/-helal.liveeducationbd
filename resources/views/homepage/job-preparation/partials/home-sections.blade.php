@@ -1,6 +1,6 @@
 {{-- LEBD-3 MCQ homepage sections, isolated from homepage/index.blade.php --}}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-<link rel="stylesheet" href="{{ asset('web/css/job-preparation-home.css') }}">
+<link rel="stylesheet" href="{{ asset('web/css/job-preparation-home.css') }}?v=20261117-3">
 @php
     // MCQ Job Preparation uses its own category tables; never mix with course subjects.
     $lebdJobDeptCategories = \Illuminate\Support\Facades\DB::table('job_prep_categories')

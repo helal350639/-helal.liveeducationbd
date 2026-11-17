@@ -462,11 +462,24 @@ $batches = $batchQuery
 
 
 
-    //notice
+    // Admin-managed website notice popup. Expired image files are purged safely.
 
 
 
-    $notice = Notice::latest()->where('status', 'published')->first();
+    Notice::purgeExpiredImages();
+    $lebdNoticeNow = now('Asia/Dhaka');
+    $noticeQuery = Notice::query()->whereRaw('LOWER(status) = ?', ['published']);
+    if (\Illuminate\Support\Facades\Schema::hasColumn('notices', 'show_on_website')) {
+      $noticeQuery->where('show_on_website', 1);
+    }
+    $notice = $noticeQuery
+      ->where(function ($q) use ($lebdNoticeNow) {
+        $q->whereNull('start_at')->orWhere('start_at', '<=', $lebdNoticeNow);
+      })
+      ->where(function ($q) use ($lebdNoticeNow) {
+        $q->whereNull('end_at')->orWhere('end_at', '>=', $lebdNoticeNow);
+      })
+      ->latest('id')->first();
 
 
 
@@ -474,7 +487,12 @@ $batches = $batchQuery
 
 
 
-    return view('homepage.index', compact('courses', 'sliders', 'batches', 'teachers', 'complains', 'about', 'circulars', 'ads', 'videos', 'main_video', 'services', 'book_categories','notice'));
+    $heroBannerSettings = [];
+    if (Storage::exists('hero-banner.json')) {
+      $heroBannerSettings = json_decode(Storage::get('hero-banner.json'), true) ?: [];
+    }
+
+    return view('homepage.index', compact('courses', 'sliders', 'batches', 'teachers', 'complains', 'about', 'circulars', 'ads', 'videos', 'main_video', 'services', 'book_categories','notice', 'heroBannerSettings'));
 
 
 

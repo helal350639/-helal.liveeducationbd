@@ -1,0 +1,19 @@
+/*
+ * Live Education BD — global desktop display scale
+ * Desktop screens: 75% visual scale across shared page layouts.
+ * Mobile screens: keep the existing responsive layout at 100%.
+ *
+ * Note: this is a website-level CSS scale, not a change to the visitor's
+ * Chrome/Edge browser zoom preference.
+ */
+@media screen and (min-width: 769px) {
+    html {
+        zoom: 0.75;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    html {
+        zoom: 1;
+    }
+}

@@ -23,6 +23,8 @@ Route::get('/lebd-exam-browse/category/{category}', [StudentExamCategoryControll
     ->whereNumber('category')->name('student.exam-section.browse-category');
 Route::get('/lebd-exam-browse/category/{category}/exams', [StudentExamCategoryController::class, 'exams'])
     ->whereNumber('category')->name('student.exam-section.browse-exams');
+Route::middleware('auth:student')->get('/lebd-exam-browse/category/{category}/routine', [StudentExamCategoryController::class, 'routine'])
+    ->whereNumber('category')->name('student.exam-section.browse-routine');
 
 // Shared Routine Exam PDF: the first student creates one file; all students view/download that same file.
 Route::get('/browse/category/{category}/exam-pdf', [\App\Http\Controllers\Students\ExamSection\StudentExamPdfController::class, 'index'])
@@ -39,7 +41,9 @@ Route::middleware('auth:student')->group(function () {
         ->whereNumber('category')->whereNumber('item')->name('student.exam-section.exam-pdf.download');
 });
 Route::prefix('lebd-student-exams')->name('student.exam-section.')->group(function () {
+    // LEBD Fix241: dedicated Exam Department landing page, separate from the Student Dashboard.
     Route::get('/', [StudentExamCategoryController::class, 'categories'])->name('categories');
+    Route::get('/department', [StudentExamCategoryController::class, 'categories'])->name('department');
     Route::get('/category/{category}', [StudentExamCategoryController::class, 'category'])->whereNumber('category')->name('category');
     Route::get('/category/{category}/exams', [StudentExamCategoryController::class, 'exams'])->whereNumber('category')->name('exams');
 });
