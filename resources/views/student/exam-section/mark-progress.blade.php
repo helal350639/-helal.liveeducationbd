@@ -37,6 +37,41 @@
 @media(max-width:1050px){.lebd-mark-stats{grid-template-columns:repeat(3,minmax(0,1fr))}.lebd-mark-bottom{grid-template-columns:1fr}}
 @media(max-width:700px){.lebd-mark-page{padding:10px 8px 28px}.lebd-mark-cta{min-height:49px;font-size:16px;gap:9px;padding:9px 12px}.lebd-mark-cta .cta-icon{width:29px;height:29px}.lebd-mark-banner{padding:15px;border-radius:11px}.lebd-mark-banner-icon{width:44px;height:44px;flex-basis:44px;font-size:20px}.lebd-mark-banner p{font-size:11px}.lebd-mark-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.lebd-mark-stat{padding:10px;gap:8px}.lebd-mark-stat-icon{width:34px;height:34px;flex-basis:34px;font-size:15px}.lebd-mark-stat strong{font-size:17px}.lebd-mark-stat small{font-size:9px}.lebd-mark-grid{grid-template-columns:1fr;gap:10px}.lebd-mark-panel{padding:12px}.lebd-mark-panel h2{font-size:15px}.lebd-subject-row{grid-template-columns:90px 1fr 48px;gap:7px}.lebd-subject-name,.lebd-subject-score{font-size:10px}.lebd-subject-track{height:10px}.lebd-mark-actions button{flex:1;font-size:12px;padding:0 10px}}
 @media print{.student-header,.navbar,.lebd-mark-cta,.lebd-mark-actions{display:none!important}.lebd-mark-page{background:#fff;padding:0}.lebd-mark-panel,.lebd-mark-stat{box-shadow:none;break-inside:avoid}.lebd-mark-wrap{max-width:none}.lebd-mark-banner{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
+
+/* LEBD v89 — dedicated per-category progress detail layout */
+.lebd-detail-topline{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 12px;color:#506b8d;font-size:12px}
+.lebd-detail-back{display:inline-flex;align-items:center;gap:7px;padding:8px 12px;border:1px solid #c9dcf7;border-radius:9px;background:#fff;color:#1557a6;text-decoration:none;font-weight:800}
+.lebd-mark-banner{background:linear-gradient(110deg,#f4f9ff,#dcecff 68%,#c8e1ff);color:#102e59;border:1px solid #d4e5fb}
+.lebd-mark-banner p{color:#526d91}
+.lebd-detail-overview{display:grid;grid-template-columns:minmax(250px,.8fr) minmax(0,1.2fr);gap:14px;margin:0 0 16px}
+.lebd-detail-progress,.lebd-detail-performance{background:#fff;border:1px solid #dfebfa;border-radius:15px;padding:16px;box-shadow:0 3px 12px rgba(16,59,110,.05);min-width:0}
+.lebd-detail-panel-title{font-size:17px;font-weight:900;color:#143b70;margin:0 0 14px}
+.lebd-detail-progress-body{display:flex;align-items:center;justify-content:center;gap:22px;min-height:155px}
+.lebd-detail-ring{--progress:0;width:142px;height:142px;flex:0 0 142px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#16b85d calc(var(--progress)*1%),#e7eef7 0);position:relative}
+.lebd-detail-ring:before{content:"";position:absolute;inset:13px;border-radius:50%;background:#fff}
+.lebd-detail-ring-inner{position:relative;text-align:center;color:#102e59;font-weight:900;font-size:27px;line-height:1.15}
+.lebd-detail-ring-inner small{display:block;font-size:12px;color:#607895;margin-top:4px}
+.lebd-detail-legend{display:grid;gap:10px;font-size:13px;color:#294b73}
+.lebd-detail-legend span{display:flex;align-items:center;gap:8px}
+.lebd-detail-dot{width:11px;height:11px;border-radius:3px;background:#16b85d;display:inline-block}.lebd-detail-dot.pending{background:#1477e8}.lebd-detail-dot.total{background:#aebed2}
+.lebd-detail-performance-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.lebd-detail-metric{min-width:0;min-height:124px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:12px 8px;border:1px solid #e1ebf8;border-radius:12px;background:#fbfdff}
+.lebd-detail-metric-icon{width:38px;height:38px;display:grid;place-items:center;border-radius:50%;background:#fff2d8;color:#d98b00;font-size:18px;margin-bottom:7px}
+.lebd-detail-metric:nth-child(2) .lebd-detail-metric-icon{background:#e8f2ff;color:#1477e8}.lebd-detail-metric:nth-child(3) .lebd-detail-metric-icon{background:#f1eaff;color:#8054dc}.lebd-detail-metric:nth-child(4) .lebd-detail-metric-icon{background:#e5faed;color:#10a45b}
+.lebd-detail-metric small{font-size:11px;color:#71839c}.lebd-detail-metric strong{font-size:20px;color:#102e59;font-weight:900;overflow-wrap:anywhere}
+.lebd-detail-table-panel{background:#fff;border:1px solid #dfe8f5;border-radius:15px;padding:16px;margin:0 0 16px;box-shadow:0 3px 12px rgba(15,55,100,.05)}
+.lebd-detail-table-panel h2{font-size:18px;color:#123b72;font-weight:900;margin:0 0 13px}
+.lebd-detail-table{width:100%;border-collapse:collapse;min-width:760px;font-size:12px}
+.lebd-detail-table th{padding:11px 9px;text-align:left;background:#edf4ff;color:#16467f;font-weight:850;white-space:nowrap}
+.lebd-detail-table td{padding:10px 9px;border-bottom:1px solid #edf1f7;color:#29415f;white-space:nowrap}
+.lebd-detail-table tr:last-child td{border-bottom:0}
+.lebd-detail-status{display:inline-flex;padding:5px 9px;border-radius:30px;background:#e0f8e9;color:#07884c;font-size:10px;font-weight:850}
+.lebd-detail-status.waiting{background:#fff4dc;color:#a66a00}.lebd-detail-status.pending{background:#edf3fb;color:#637895}
+.lebd-detail-result-link{display:inline-flex;padding:7px 10px;border:1px solid #b7d1ff;border-radius:9px;background:#f5f9ff;color:#075fd0;text-decoration:none;font-weight:850}
+.lebd-detail-empty{padding:22px;text-align:center;color:#72849d;background:#f7faff;border:1px dashed #cbd9ec;border-radius:11px;font-size:12px}
+@media(max-width:1050px){.lebd-detail-overview{grid-template-columns:1fr}.lebd-detail-performance-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:700px){.lebd-detail-topline{align-items:flex-start;flex-direction:column}.lebd-detail-progress-body{gap:15px;justify-content:flex-start}.lebd-detail-ring{width:112px;height:112px;flex-basis:112px}.lebd-detail-ring-inner{font-size:22px}.lebd-detail-ring:before{inset:11px}.lebd-detail-legend{font-size:11px}.lebd-detail-performance-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.lebd-detail-metric{min-height:105px}.lebd-detail-metric strong{font-size:17px}.lebd-detail-table-panel{padding:11px}}
+@media print{.lebd-detail-back{display:none!important}}
 </style>
 
 
@@ -68,17 +103,42 @@
   $weakSubject = $subjectRows->sortBy('percent')->first();
 @endphp
 <div class="lebd-mark-page"><div class="lebd-mark-wrap">
-  <header class="lebd-mark-banner" id="lebd-mark-report"><div><h1>Exam Mark Progress</h1><p>পরীক্ষার নম্বর, অগ্রগতি ও পারফরম্যান্স বিশ্লেষণ</p></div><span class="lebd-mark-banner-icon"><i class="fa fa-chart-simple"></i></span></header>
-
-  <div class="lebd-mark-scope-label" style="margin:0 0 16px;padding:11px 15px;border:1px solid #dce7f6;border-radius:11px;background:#fff;color:#23466f;font-size:13px"><strong>বর্তমান বিভাগ:</strong> {{ $scopeTitle }} @if($subcategory) <span style="color:#71839c">({{ $category->name }} / {{ $subcategory->name }})</span> @else <span style="color:#71839c">(এই Category-র সব Sub-category)</span> @endif</div>
+  <div class="lebd-detail-topline">
+    <div>Home &nbsp;›&nbsp; My Exam Progress &nbsp;›&nbsp; <strong>{{ $scopeTitle }}</strong></div>
+    <a class="lebd-detail-back" href="javascript:history.back()"><i class="fa fa-arrow-left"></i> ফিরে যান</a>
+  </div>
+  <header class="lebd-mark-banner" id="lebd-mark-report"><span class="lebd-mark-banner-icon"><i class="fa fa-list-check"></i></span><div style="flex:1"><h1>{{ $scopeTitle }}</h1><p>এই ক্যাটাগরির সকল পরীক্ষার অগ্রগতি, ফলাফল ও বিশ্লেষণ।</p></div></header>
 
   <section class="lebd-mark-stats">
-    <article class="lebd-mark-stat"><span class="lebd-mark-stat-icon"><i class="fa fa-clipboard-list"></i></span><div><small>মোট পরীক্ষা</small><strong>{{ $totalExams }}টি</strong></div></article>
-    <article class="lebd-mark-stat"><span class="lebd-mark-stat-icon"><i class="fa fa-trophy"></i></span><div><small>গড় নম্বর</small><strong>{{ number_format($average,1) }}%</strong></div></article>
-    <article class="lebd-mark-stat"><span class="lebd-mark-stat-icon"><i class="fa fa-award"></i></span><div><small>সর্বোচ্চ নম্বর</small><strong>{{ number_format($highest,2) }}</strong></div></article>
-    <article class="lebd-mark-stat"><span class="lebd-mark-stat-icon"><i class="fa fa-calendar-check"></i></span><div><small>সর্বশেষ পরীক্ষা</small><strong style="font-size:14px">{{ $latest['name'] ?? '—' }}</strong><span class="stat-sub">{{ $latest['date'] ?? 'ফলাফল নেই' }}</span></div></article>
-    <article class="lebd-mark-stat"><span class="lebd-mark-stat-icon"><i class="fa fa-chart-pie"></i></span><div><small>গড় পারফরম্যান্স</small><strong>{{ number_format($average,1) }}%</strong><span class="stat-sub">প্রকাশিত ফলাফলের ভিত্তিতে</span></div></article>
+    <article class="lebd-mark-stat"><span class="lebd-mark-stat-icon"><i class="fa fa-clipboard-list"></i></span><div><small>মোট পরীক্ষা</small><strong>{{ $publishedExamCount }}টি</strong></div></article>
+    <article class="lebd-mark-stat"><span class="lebd-mark-stat-icon"><i class="fa fa-circle-check"></i></span><div><small>সম্পন্ন পরীক্ষা</small><strong>{{ $submittedExamCount }}টি</strong></div></article>
+    <article class="lebd-mark-stat"><span class="lebd-mark-stat-icon"><i class="fa fa-hourglass-half"></i></span><div><small>বাকি পরীক্ষা</small><strong>{{ $remainingExamCount }}টি</strong></div></article>
+    <article class="lebd-mark-stat"><span class="lebd-mark-stat-icon"><i class="fa fa-trophy"></i></span><div><small>সাফল্যের হার</small><strong>{{ $totalExams ? number_format($successRate,1).'%' : '—' }}</strong></div></article>
+    <article class="lebd-mark-stat"><span class="lebd-mark-stat-icon"><i class="fa fa-layer-group"></i></span><div><small>বিভাগের অবস্থা</small><strong style="font-size:14px">{{ $remainingExamCount === 0 && $publishedExamCount > 0 ? 'সম্পন্ন' : 'চলমান' }}</strong><span class="stat-sub">{{ $scopeTitle }}</span></div></article>
   </section>
+
+  <div class="lebd-detail-overview">
+    <section class="lebd-detail-progress">
+      <h2 class="lebd-detail-panel-title"><i class="fa fa-chart-column" style="color:#0870df"></i> অগ্রগতি (Progress)</h2>
+      <div class="lebd-detail-progress-body">
+        <div class="lebd-detail-ring" style="--progress:{{ $completionPercent }}"><div class="lebd-detail-ring-inner">{{ $completionPercent }}%<small>সম্পন্ন</small></div></div>
+        <div class="lebd-detail-legend">
+          <span><i class="lebd-detail-dot"></i> সম্পন্ন পরীক্ষা: {{ $submittedExamCount }}টি</span>
+          <span><i class="lebd-detail-dot pending"></i> বাকি পরীক্ষা: {{ $remainingExamCount }}টি</span>
+          <span><i class="lebd-detail-dot total"></i> মোট পরীক্ষা: {{ $publishedExamCount }}টি</span>
+        </div>
+      </div>
+    </section>
+    <section class="lebd-detail-performance">
+      <h2 class="lebd-detail-panel-title"><i class="fa fa-chart-simple" style="color:#0870df"></i> পারফরম্যান্স বিশ্লেষণ</h2>
+      <div class="lebd-detail-performance-grid">
+        <div class="lebd-detail-metric"><span class="lebd-detail-metric-icon"><i class="fa fa-star"></i></span><small>মোট প্রাপ্ত নম্বর</small><strong>{{ $totalExams ? number_format($totalEarnedMarks,1) : '—' }}</strong></div>
+        <div class="lebd-detail-metric"><span class="lebd-detail-metric-icon"><i class="fa fa-layer-group"></i></span><small>মোট নম্বর</small><strong>{{ $totalExams ? number_format($totalPossibleMarks,1) : '—' }}</strong></div>
+        <div class="lebd-detail-metric"><span class="lebd-detail-metric-icon"><i class="fa fa-percent"></i></span><small>গড় নম্বর</small><strong>{{ $totalExams ? number_format($average,1).'%' : '—' }}</strong></div>
+        <div class="lebd-detail-metric"><span class="lebd-detail-metric-icon"><i class="fa fa-arrow-trend-up"></i></span><small>গড় সঠিক উত্তর</small><strong>{{ $totalExams ? number_format($averageAccuracy,1).'%' : '—' }}</strong></div>
+      </div>
+    </section>
+  </div>
 
   @if($totalExams)
   <div class="lebd-mark-grid">
@@ -105,22 +165,30 @@
       </div>
     </section>
   </div>
-
-  <div class="lebd-mark-bottom">
-    <section class="lebd-mark-panel"><h2><i class="fa fa-clipboard-list"></i> পরীক্ষার ফলাফল বিস্তারিত</h2><div class="lebd-mark-table-wrap"><table class="lebd-mark-table"><thead><tr><th>Exam Name</th><th>Date</th><th>Marks</th><th>Correct</th><th>Wrong</th><th>Accuracy</th><th>Status</th></tr></thead><tbody>
-      @foreach($rows as $row)<tr><td><strong>{{ $row['name'] }}</strong><br><small>{{ $row['category'] }} @if($row['subcategory']) / {{ $row['subcategory'] }} @endif</small></td><td>{{ $row['date'] }}</td><td>{{ number_format($row['score'],2) }} / {{ number_format($row['possible'],2) }}</td><td>{{ $row['correct'] }}</td><td>{{ $row['wrong'] }}</td><td>{{ number_format($row['accuracy'],1) }}%</td><td><span class="lebd-mark-badge">✓ সম্পন্ন</span></td></tr>@endforeach
-    </tbody></table></div></section>
-    <section class="lebd-mark-panel"><h2><i class="fa fa-medal"></i> র‍্যাংক ও বিশ্লেষণ</h2>
-      <div class="lebd-mark-analysis-row"><i class="fa fa-trophy"></i><div><strong>সর্বোচ্চ পরীক্ষার নম্বর</strong><span>{{ number_format($highest,2) }} নম্বর</span></div></div>
-      <div class="lebd-mark-analysis-row"><i class="fa fa-users"></i><div><strong>ব্যাচ র‍্যাংক</strong><span>ব্যাচের অন্যান্য শিক্ষার্থীর ফলাফল সংযুক্ত না থাকায় র‍্যাংক দেখানো যাচ্ছে না।</span></div></div>
-      <div class="lebd-mark-analysis-row"><i class="fa fa-circle-check"></i><div><strong>শক্তিশালী বিষয়</strong><span>{{ $bestSubject['subject'] ?? 'তথ্য নেই' }} @if($bestSubject) ({{ number_format($bestSubject['percent'],1) }}%) @endif</span></div></div>
-      <div class="lebd-mark-analysis-row"><i class="fa fa-triangle-exclamation"></i><div><strong>উন্নতির বিষয়</strong><span>{{ $weakSubject['subject'] ?? 'তথ্য নেই' }} @if($weakSubject) ({{ number_format($weakSubject['percent'],1) }}%) @endif</span></div></div>
-      <div class="lebd-mark-advice"><strong>পরামর্শ</strong><br>@if($weakSubject && $weakSubject['percent']<70) {{ $weakSubject['subject'] }} বিষয়ে নিয়মিত অনুশীলন করুন এবং ভুল প্রশ্নগুলো পুনরায় সমাধান করুন। @else আপনার ফলাফল নিয়মিত পর্যালোচনা করুন এবং প্রতিটি পরীক্ষার ভুলগুলো রিভিশন করুন। @endif</div>
-    </section>
-  </div>
   @else
-    <div class="lebd-mark-empty"><i class="fa fa-chart-line" style="font-size:28px;color:#7da5d5"></i><h3 style="font-size:17px;margin:10px 0 5px">এখনো কোনো প্রকাশিত পরীক্ষার ফলাফল পাওয়া যায়নি</h3><p style="margin:0;font-size:12px">পরীক্ষা সম্পন্ন করুন এবং Admin ফলাফল প্রকাশ করলে এখানে আপনার নম্বর ও অগ্রগতি দেখা যাবে।</p></div>
+    <div class="lebd-mark-empty" style="margin-bottom:16px"><i class="fa fa-chart-line" style="font-size:28px;color:#7da5d5"></i><h3 style="font-size:17px;margin:10px 0 5px">এখনো কোনো প্রকাশিত পরীক্ষার ফলাফল পাওয়া যায়নি</h3><p style="margin:0;font-size:12px">পরীক্ষা সম্পন্ন করুন এবং Admin ফলাফল প্রকাশ করলে এখানে নম্বর ও পারফরম্যান্স বিশ্লেষণ দেখা যাবে।</p></div>
   @endif
+
+  <section class="lebd-detail-table-panel">
+    <h2><i class="fa fa-clipboard-list" style="color:#0870df"></i> পরীক্ষার তালিকা ({{ $publishedExamCount }})</h2>
+    @if(count($examListRows))
+    <div class="lebd-mark-table-wrap"><table class="lebd-detail-table"><thead><tr><th>#</th><th>পরীক্ষার নাম</th><th>তারিখ</th><th>মোট নম্বর</th><th>প্রাপ্ত নম্বর</th><th>সাফল্য (%)</th><th>স্থিতি</th><th>অ্যাকশন</th></tr></thead><tbody>
+      @foreach($examListRows as $examRow)
+      <tr>
+        <td>{{ $loop->iteration }}</td><td><strong>{{ $examRow['name'] }}</strong></td><td>{{ $examRow['date'] }}</td>
+        <td>{{ $examRow['result_available'] ? number_format($examRow['possible'],1) : '—' }}</td>
+        <td>{{ $examRow['result_available'] ? number_format($examRow['score'],1) : '—' }}</td>
+        <td>{{ $examRow['result_available'] ? number_format($examRow['percent'],1).'%' : '—' }}</td>
+        <td>@if($examRow['result_available'])<span class="lebd-detail-status">✓ সম্পন্ন</span>@elseif($examRow['submitted'])<span class="lebd-detail-status waiting">ফলাফল অপেক্ষমাণ</span>@else<span class="lebd-detail-status pending">পরীক্ষা বাকি</span>@endif</td>
+        <td>@if($examRow['result_available'])<a class="lebd-detail-result-link" href="{{ route('student.exam-section.take.result', ['item' => $examRow['id']]) }}"><i class="fa fa-eye"></i> ফলাফল দেখুন</a>@elseif(!$examRow['submitted'])<a class="lebd-detail-result-link" href="{{ route('student.exam-section.take', ['item' => $examRow['id']]) }}">পরীক্ষা দিন</a>@else<span style="color:#8798ad">অপেক্ষমাণ</span>@endif</td>
+      </tr>
+      @endforeach
+    </tbody></table></div>
+    @else
+      <div class="lebd-detail-empty">এই বিভাগে এখনো কোনো প্রকাশিত পরীক্ষা পাওয়া যায়নি।</div>
+    @endif
+  </section>
+
   <div class="lebd-mark-actions" style="margin-top:15px"><button type="button" onclick="window.print()"><i class="fa fa-file-pdf"></i> PDF ডাউনলোড / প্রিন্ট</button><button type="button" class="secondary" onclick="window.location.href='{{ route('student.exam-section.browse-exams', ['category'=>$category->id, 'subcategory_id'=>$subcategory?->id]) }}'">Exam Page-এ ফিরে যান</button></div>
 </div></div>
 <script>

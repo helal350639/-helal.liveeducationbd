@@ -11,11 +11,18 @@
   <div class="progress-grid lebd-progress-real-grid" id="lebd-progress-real-grid">
     @foreach($lebdLearningItems as $scope)
     <article class="lebd-progress-entry" data-index="{{ $loop->index }}">
-      <button type="button" class="lebd-progress-card-button" aria-expanded="false" aria-controls="lebd-progress-detail-{{ $loop->index }}">
-        <span class="lebd-progress-pct" style="--pct:{{ $scope['percent'] }}">{{ $scope['percent'] }}%</span>
-        <span class="lebd-progress-card-info"><strong>{{ $scope['name'] }}</strong><small>{{ $scope['completed'] }} / {{ $scope['total'] }} জমা · বাকি {{ $scope['remaining'] }}</small></span>
-        <span class="lebd-progress-chevron" aria-hidden="true">⌄</span>
-      </button>
+      <div class="lebd-progress-card-top">
+        <button type="button" class="lebd-progress-card-button" aria-expanded="false" aria-controls="lebd-progress-detail-{{ $loop->index }}">
+          <span class="lebd-progress-pct" style="--pct:{{ $scope['percent'] }}">{{ $scope['percent'] }}%</span>
+          <span class="lebd-progress-card-info"><strong>{{ $scope['name'] }}</strong><small>{{ $scope['completed'] }} / {{ $scope['total'] }} জমা · বাকি {{ $scope['remaining'] }}</small></span>
+          <span class="lebd-progress-chevron" aria-hidden="true">⌄</span>
+        </button>
+        @if($scope['subcategory_id'])
+        <a class="lebd-progress-detail-button" href="{{ route('student.exam-section.mark-progress', ['category_id' => $scope['category_id'], 'subcategory_id' => $scope['subcategory_id']]) }}">বিস্তারিত দেখুন <span aria-hidden="true">→</span></a>
+        @else
+        <a class="lebd-progress-detail-button" href="{{ route('student.exam-section.mark-progress', ['category_id' => $scope['category_id']]) }}">বিস্তারিত দেখুন <span aria-hidden="true">→</span></a>
+        @endif
+      </div>
       <div class="lebd-progress-details" id="lebd-progress-detail-{{ $loop->index }}" hidden>
         <p class="lebd-progress-note">এই Card-এ শুধু {{ $scope['name'] }}-এর প্রকাশিত পরীক্ষাগুলো গণনা করা হয়েছে। অগ্রগতি = জমা দেওয়া পরীক্ষা ÷ মোট প্রকাশিত পরীক্ষা।</p>
         <div class="lebd-progress-table-scroll"><table>
@@ -43,7 +50,10 @@
 #lebd-real-learning-progress .lebd-progress-caption{font-size:12px;color:#637b9c;margin-bottom:12px}
 #lebd-real-learning-progress .lebd-progress-real-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:11px!important}
 #lebd-real-learning-progress .lebd-progress-entry{border:1px solid #dfebfa;border-radius:13px;background:white;min-width:0;overflow:hidden;box-shadow:0 2px 9px rgba(22,54,93,.045)}
-#lebd-real-learning-progress .lebd-progress-card-button{display:flex;align-items:center;gap:9px;width:100%;min-height:70px;padding:10px;text-align:left;border:0;background:transparent;cursor:pointer;color:#133b68}
+#lebd-real-learning-progress .lebd-progress-card-top{display:flex;align-items:center;gap:8px;min-width:0;padding:7px 9px}
+#lebd-real-learning-progress .lebd-progress-card-button{display:flex;align-items:center;gap:9px;flex:1;min-width:0;min-height:62px;padding:3px 0;text-align:left;border:0;background:transparent;cursor:pointer;color:#133b68}
+#lebd-real-learning-progress .lebd-progress-detail-button{display:inline-flex;align-items:center;justify-content:center;gap:5px;flex:0 0 auto;white-space:nowrap;border:1px solid #a9cbff;border-radius:9px;background:#f2f7ff;color:#075ed0;padding:8px 10px;font-size:11px;font-weight:850;text-decoration:none;transition:.18s ease}
+#lebd-real-learning-progress .lebd-progress-detail-button:hover{background:#0868dc;border-color:#0868dc;color:#fff;box-shadow:0 3px 9px rgba(8,104,220,.18)}
 #lebd-real-learning-progress .lebd-progress-pct{--pct:0;width:41px;height:41px;flex:0 0 41px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:800;background:conic-gradient(#0875e1 calc(var(--pct) * 1%),#e5effb 0);border:4px solid #eff5fc;color:#103c79}
 #lebd-real-learning-progress .lebd-progress-card-info{flex:1;min-width:0}
 #lebd-real-learning-progress .lebd-progress-card-info strong{display:block;font-size:12px;line-height:1.4;overflow-wrap:anywhere}
@@ -62,7 +72,7 @@
 #lebd-real-learning-progress .lebd-progress-empty{padding:16px;font-size:12px;color:#6a7f9d}
 #lebd-real-learning-progress .lebd-progress-entry[data-index]:nth-child(n+10){display:none}
 #lebd-real-learning-progress.lebd-progress-expanded .lebd-progress-entry[data-index]{display:block}
-@media(max-width:768px){#lebd-real-learning-progress .lebd-progress-real-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}#lebd-real-learning-progress .lebd-progress-card-button{padding:7px;gap:5px;min-height:62px}#lebd-real-learning-progress .lebd-progress-pct{width:33px;height:33px;flex-basis:33px;font-size:10px}#lebd-real-learning-progress .lebd-progress-card-info strong{font-size:10px}#lebd-real-learning-progress .lebd-progress-card-info small{font-size:9px}#lebd-real-learning-progress .lebd-progress-entry[data-index]:nth-child(n+9){display:none}#lebd-real-learning-progress.lebd-progress-expanded .lebd-progress-entry[data-index]{display:block}}
+@media(max-width:768px){#lebd-real-learning-progress .lebd-progress-real-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}#lebd-real-learning-progress .lebd-progress-card-top{align-items:flex-start;flex-wrap:wrap;padding:7px}#lebd-real-learning-progress .lebd-progress-card-button{padding:0;gap:5px;min-height:48px;flex-basis:100%}#lebd-real-learning-progress .lebd-progress-detail-button{margin-left:auto;padding:6px 8px;font-size:10px}#lebd-real-learning-progress .lebd-progress-pct{width:33px;height:33px;flex-basis:33px;font-size:10px}#lebd-real-learning-progress .lebd-progress-card-info strong{font-size:10px}#lebd-real-learning-progress .lebd-progress-card-info small{font-size:9px}#lebd-real-learning-progress .lebd-progress-entry[data-index]:nth-child(n+9){display:none}#lebd-real-learning-progress.lebd-progress-expanded .lebd-progress-entry[data-index]{display:block}}
 
 #lebd-real-learning-progress .lebd-progress-report-cta{
  display:flex;align-items:center;justify-content:center;gap:13px;width:100%;min-height:58px;margin:0 0 16px;padding:12px 20px;

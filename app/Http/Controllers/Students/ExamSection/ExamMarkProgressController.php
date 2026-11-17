@@ -21,8 +21,8 @@ class ExamMarkProgressController extends Controller
             abort_unless(Schema::hasTable($table), 503, 'Exam progress data is not available yet.');
         }
 
-        // The report is always bound to the Category / Sub-category currently
-        // opened in the Exam Blade page. No student-selectable scope filters.
+        // The report is bound to one active Category / Sub-category scope selected
+        // from the student's own My Exam Progress cards. Only this student's attempts are read.
         $categoryId = (int) $request->query('category_id', 0);
         $subcategoryId = $request->filled('subcategory_id') ? (int) $request->query('subcategory_id') : null;
         abort_unless($categoryId > 0, 404);
@@ -43,6 +43,24 @@ class ExamMarkProgressController extends Controller
                 ->first(['id', 'category_id', 'name']);
             abort_unless($subcategory, 404);
         }
+
+        // All published exams in this exact Category / Sub-category scope.
+        // This list drives the completion totals and includes exams not yet attempted.
+        $examItemsQuery = DB::table('lebd_exam_section_routine_items as i')
+            ->join('lebd_exam_section_routines as r', 'r.id', '=', 'i.routine_id')
+            ->join('lebd_exam_section_categories as c', 'c.id', '=', 'r.category_id')
+            ->leftJoin('lebd_exam_section_subcategories as s', 's.id', '=', 'r.subcategory_id')
+            ->where('r.category_id', $categoryId)
+            ->when($subcategoryId, fn ($q) => $q->where('r.subcategory_id', $subcategoryId))
+            ->whereRaw('LOWER(TRIM(i.type)) = ?', ['exam'])
+            ->whereRaw('LOWER(TRIM(r.status)) = ?', ['published'])
+            ->whereRaw('LOWER(TRIM(c.status)) = ?', ['active'])
+            ->where(function ($q) {
+                $q->whereNull('r.subcategory_id')->orWhereRaw('LOWER(TRIM(s.status)) = ?', ['active']);
+            })
+            ->select(['i.id', 'i.exam_name', 'i.exam_start_at', 'i.exam_end_at', 'i.routine_id', 'r.category_id', 'r.subcategory_id'])
+            ->orderBy('i.exam_start_at')->orderBy('i.id');
+        $allExamItems = $examItemsQuery->get();
 
         $query = DB::table('lebd_exam_section_student_attempts as a')
             ->join('lebd_exam_section_routine_items as i','i.id','=','a.routine_item_id')
@@ -155,15 +173,56 @@ class ExamMarkProgressController extends Controller
             $r['percent']=$r['possible']>0?round($r['marks']/$r['possible']*100,1):0;
             return $r;
         })->sortByDesc('percent')->values();
-        $totalExams = count($rows);
-        $completed = $totalExams;
+        // Keep the existing result-publication filtering above. A submitted attempt
+        // is counted as completed, but marks are shown only when that result is visible.
+        $visibleResultByItem = [];
+        foreach ($rows as $resultRow) {
+            $visibleResultByItem[(int) $resultRow['id']] = $resultRow; // latest visible attempt wins
+        }
+        $submittedItemIds = $rawAttempts->pluck('routine_item_id')->map(fn ($id) => (int) $id)->unique()->values()->all();
+        $submittedItemSet = array_fill_keys($submittedItemIds, true);
+        $examListRows = [];
+        foreach ($allExamItems as $examItem) {
+            $itemId = (int) $examItem->id;
+            $submitted = isset($submittedItemSet[$itemId]);
+            $visibleResult = $visibleResultByItem[$itemId] ?? null;
+            $examListRows[] = [
+                'id' => $itemId,
+                'name' => (string) ($examItem->exam_name ?: ('Exam #' . $itemId)),
+                'date' => $examItem->exam_start_at ? Carbon::parse($examItem->exam_start_at, 'Asia/Dhaka')->format('d M Y') : '—',
+                'submitted' => $submitted,
+                'result_available' => $visibleResult !== null,
+                'score' => $visibleResult['score'] ?? null,
+                'possible' => $visibleResult['possible'] ?? null,
+                'percent' => $visibleResult['percent'] ?? null,
+                'correct' => $visibleResult['correct'] ?? null,
+                'wrong' => $visibleResult['wrong'] ?? null,
+                'accuracy' => $visibleResult['accuracy'] ?? null,
+            ];
+        }
+
+        $totalExams = count($rows); // attempts with results visible; retained for trend/chart compatibility
+        $publishedExamCount = count($allExamItems);
+        $submittedExamCount = count($submittedItemIds);
+        $remainingExamCount = max(0, $publishedExamCount - $submittedExamCount);
+        $completionPercent = $publishedExamCount ? (int) round(($submittedExamCount / $publishedExamCount) * 100) : 0;
+        $completed = $submittedExamCount;
         $average = $totalExams ? round(collect($rows)->avg('percent'),1) : 0;
+        $totalPossibleMarks = $totalExams ? array_sum(array_column($rows, 'possible')) : 0;
+        $totalEarnedMarks = $totalExams ? array_sum(array_column($rows, 'score')) : 0;
+        $averageAccuracy = $totalExams ? round(collect($rows)->avg('accuracy'), 1) : 0;
+        $successRate = $average;
         $highest = $totalExams ? max(array_column($rows,'score')) : 0;
         $latest = $totalExams ? end($rows) : null;
         $first = $totalExams ? reset($rows) : null;
         $improvement = ($first && $latest && $first['percent'] > 0) ? round($latest['percent']-$first['percent'],1) : null;
 
         $scopeTitle = $subcategory ? $subcategory->name : $category->name;
-        return view('student.exam-section.mark-progress', compact('category','subcategory','scopeTitle','categoryId','subcategoryId','rows','subjectRows','totalExams','completed','average','highest','latest','improvement'));
+        return view('student.exam-section.mark-progress', compact(
+            'category','subcategory','scopeTitle','categoryId','subcategoryId','rows','subjectRows',
+            'totalExams','completed','average','highest','latest','improvement',
+            'publishedExamCount','submittedExamCount','remainingExamCount','completionPercent',
+            'totalPossibleMarks','totalEarnedMarks','averageAccuracy','successRate','examListRows'
+        ));
     }
 }
